@@ -1,0 +1,14 @@
+^\.Rprofile$
+^.*\.Rproj$
+^\.Rproj\.user$
+^_pkgdown\.yml$
+^\.httr-oauth*
+^Makefile$
+^NEWS$
+^tmp.*$
+^README-.*\.png$
+^README\.Rmd$
+^\.github$
+^cran-comments.md$
+^CRAN-RELEASE$
+^LICENSE$
