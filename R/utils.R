@@ -121,7 +121,7 @@ orbi_filter_isox <- function(dataset, isotopocules, base_peak, isox_files, compo
 #' @param x Vector to compute standard error from
 #' @return Standard error
 
-orbi_calculate_se <- function(x) {
+calculate_se <- function(x) {
   stats::sd(x) / sqrt(length(x))
 }
 
@@ -132,7 +132,7 @@ orbi_calculate_se <- function(x) {
 #'
 #' @return The calculated geometric mean
 
-orbi_calculate_gmean <- function(x) {
+calculate_gmean <- function(x) {
   exp(mean(log(x)))
 } #define geometric mean
 
@@ -143,7 +143,7 @@ orbi_calculate_gmean <- function(x) {
 #'
 #' @return The calculated geometric standard deviation
 
-orbi_calculate_gsd <- function(x) {
+calculate_gsd <- function(x) {
   exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))
 }
 
@@ -154,7 +154,7 @@ orbi_calculate_gsd <- function(x) {
 #'
 #' @return The calculated geometric standard error
 
-orbi_calculate_gse <- function(x) {
+calculate_gse <- function(x) {
   (exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))) / sqrt(length(x))
 }
 
@@ -166,7 +166,7 @@ orbi_calculate_gse <- function(x) {
 #'
 #' @return The slope
 
-orbi_calculate_slope <- function(x, y) {
+calculate_slope <- function(x, y) {
   model <-
     stats::lm(x ~ y + 0, weights = x) #Note order of x and y to get correct slope!
   sl <- model$coefficients[[1]]
@@ -181,7 +181,7 @@ orbi_calculate_slope <- function(x, y) {
 #'
 #' @return ???
 
-orbi_calculate_weighted.vector.sum <- function(x, y) {
+calculate_weighted.vector.sum <- function(x, y) {
   df <- cbind(x, y)
 
   avg.ions <- (sum(df[, 1]) + sum(df[, 2])) / length(df[, 1])
@@ -217,7 +217,7 @@ orbi_calculate_ratio <-
       o
     } else {
       if (ratio.method == "slope") {
-        o <- orbi_calculate_slope(peak1, peak2)
+        o <- calculate_slope(peak1, peak2)
         o
       } else{
         if (ratio.method == "sum") {
@@ -225,11 +225,11 @@ orbi_calculate_ratio <-
           o
         } else{
           if (ratio.method == "geometric.mean") {
-            o <- orbi_calculate_gmean(peak1 / peak2)
+            o <- calculate_gmean(peak1 / peak2)
             o
           } else{
             if (ratio.method == "weighted.vector.sum") {
-              o <- orbi_calculate_weighted.vector.sum(peak1, peak2)
+              o <- calculate_weighted.vector.sum(peak1, peak2)
               o
             } else{
               if (ratio.method == "median") {

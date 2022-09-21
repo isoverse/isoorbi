@@ -38,66 +38,66 @@ test_that("orbi_filter_isox() tests",{
   expect_error(orbi_filter_isox(), "argument \"dataset\" is missing, with no default")
 })
 
-  # orbi_calculate_se
-test_that("orbi_calculate_se() tests", {
+  # calculate_se
+test_that("calculate_se() tests", {
   #success
-  expect_equal(orbi_calculate_se(c(1,2,3)), 0.57735026919)
-  expect_type(orbi_calculate_se(c(1,2,3)), "double")
+  expect_equal(calculate_se(c(1,2,3)), 0.57735026919)
+  expect_type(calculate_se(c(1,2,3)), "double")
 
   #failure
-  expect_error(orbi_calculate_se(), "argument \"x\" is missing, with no default")
+  expect_error(calculate_se(), "argument \"x\" is missing, with no default")
 })
 
-  # orbi_calculate_gmean
-test_that("orbi_calculate_gmean() tests", {
+  # calculate_gmean
+test_that("calculate_gmean() tests", {
   #success
   list<- c(4,5,6)
-  expect_type(orbi_calculate_gmean(list), "double")
-  expect_equal(orbi_calculate_gmean(list), 4.9324241486609)
+  expect_type(calculate_gmean(list), "double")
+  expect_equal(calculate_gmean(list), 4.9324241486609)
 
   #failure
-  expect_error(orbi_calculate_gmean(), "argument \"x\" is missing, with no default")
+  expect_error(calculate_gmean(), "argument \"x\" is missing, with no default")
 })
 
-  # gsd
-test_that("orbi_calculate_gsd() tests", {
+  # calculate_gsd
+test_that("calculate_gsd() tests", {
   #success
-  expect_type(orbi_calculate_gsd(c(1,2,3)), "double")
+  expect_type(calculate_gsd(c(1,2,3)), "double")
 
   #failure
-  expect_error(orbi_calculate_gsd(), "argument \"x\" is missing, with no default")
+  expect_error(calculate_gsd(), "argument \"x\" is missing, with no default")
 })
 
-  # orbi_calculate_gse
-test_that("orbi_calculate_gse() tests", {
+  # calculate_gse
+test_that("calculate_gse() tests", {
   #success
-  expect_type(orbi_calculate_gse(c(4,5,6)), "double")
+  expect_type(calculate_gse(c(4,5,6)), "double")
 
   #failure
-  expect_error(orbi_calculate_gse(), "argument \"x\" is missing, with no default")
+  expect_error(calculate_gse(), "argument \"x\" is missing, with no default")
 })
 
-  # orbi_calculate_slope
-test_that("orbi_calculate_slope() tests", {
+  # calculate_slope
+test_that("calculate_slope() tests", {
   #success
   x <- c(0,1,2,3)
   y <- c(0,1,2,3)
-  expect_type(orbi_calculate_slope(x,y), "double")
-  expect_equal(orbi_calculate_slope(x,y), 1)
+  expect_type(calculate_slope(x,y), "double")
+  expect_equal(calculate_slope(x,y), 1)
 
   #failure
-  expect_error(orbi_calculate_slope(), "argument \"x\" is missing, with no default")
+  expect_error(calculate_slope(), "argument \"x\" is missing, with no default")
 
 })
 
-  # orbi_calculate_weighted.vector.sum
-test_that("orbi_calculate_weighted.vector.sum() tests", {
+  # calculate_weighted.vector.sum
+test_that("calculate_weighted.vector.sum() tests", {
   #success
   x<- c(2,4,6)
   y<- c(3,5,7)
-  expect_type(orbi_calculate_weighted.vector.sum(x,y), "double")
+  expect_type(calculate_weighted.vector.sum(x,y), "double")
   #failure
-  expect_error(orbi_calculate_weighted.vector.sum(), "argument \"x\" is missing, with no default")
+  expect_error(calculate_weighted.vector.sum(), "argument \"x\" is missing, with no default")
 })
 
   # orbi_calculate_ratio
