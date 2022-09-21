@@ -1,0 +1,20 @@
+---
+title: "Loading Orbitrap Iso files"
+description: >
+  A minimal example for usage of the function iso_read_isox_file().
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{dplyr compatibility}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+library(isoorbi)
+```
+
+
+```{r}
+file_path <-system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi")
+isox <- iso_read_isox_file(file_path) 
+```
