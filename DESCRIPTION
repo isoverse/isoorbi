@@ -1,0 +1,45 @@
+Package: isoorbi
+Type: Package
+Title: Process Orbitrap Isotopocule Data
+Version: 0.1
+Date: 2022-09-20
+Authors@R: 
+    c(person(
+        given = "Caj", family = "Neubauer", 
+        email = "caj.neubauer@colorado.edu", 
+        role = c("aut", "cre", "cph"), 
+        comment = c(ORCID = "0000-0002-5348-5609")),
+    person(
+        given = "Sebastian", family = "Kopf", 
+        email = "sebastian.kopf@colorado.edu", 
+        role = c("aut"), 
+        comment = c(ORCID = "0000-0002-2044-0201")),
+    person(
+        given = "Kristýna", family = "Kantnerová", 
+        email = "kristyna.kantnerova@colorado.edu", 
+        role = c("aut"), 
+        comment = c(ORCID = "0000-0001-6259-3225"))
+    )
+URL: https://github.com/isoverse/isoorbi
+BugReports: https://github.com/isoverse/isoorbi/issues
+Depends:
+    R (>= 4.0.0)
+Imports:
+    tidyr,
+    dplyr,
+    magrittr (>= 1.5),
+    rlang (>= 1.0.5),
+    readr,
+    stringr
+Suggests:
+    devtools,
+    knitr,
+    rmarkdown,
+    testthat
+Description: First generation tool to process data from Orbitrap Iso mass spectrometers. Citation: <doi:10.1021/acs.analchem.1c00944>.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+VignetteBuilder: knitr
+RoxygenNote: 7.2.1
+Roxygen: list(markdown = TRUE)
