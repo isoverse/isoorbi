@@ -1,0 +1,25 @@
+testfile_DualInlet.isox
+- measured on January 25th 2022 by Kristýna Kantnerová on Q Exactive HF
+- reference - USGS34
+- sample - USGS32
+- method file "20220125 DI noM0 10ea_70min 15k 5uScans.meth"
+- raw file "20220125_01.raw"
+
+testfile_DualInlet_small.isox
+- based on testfile_DualInlet.isox
+- 3 injections, ref-sam-ref
+- 1st injection - ref #1, scans 1-278 (0.005-1.000 min); in original file scans 1-278 (0.005-1.000 min)
+- 2nd injection - sam #1, scans 279-585 (1.002-1.997 min); in original file scans 3122-3428 (11.002-11.997 min)
+- 3rd injection - ref #2, scans 586-864 (2.002-3.000 min); in original file scans 6195-6473 (21.002-22.000 min)
+
+testfile_FlowInjection_DataExploration.isox
+- measured on XXX by XXX on XXX
+- 3 samples - s3744, ac5, ac6
+- method file "XXX.meth"
+- raw file "XXX.raw"
+
+testfile_Flow_Exploration_small.isox
+- based on testile_FlowInjection_DataExploration.isox
+- 1st sample - scans 1-430 (0.002-0.999 min)
+- 2nd sample - scans 1-430 (0.002-0.999 min)
+- 3rd sample - scans 1-430 (0.002-0.999 min)
