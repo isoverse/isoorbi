@@ -1,0 +1,32 @@
+citHeader("To cite isoorbi in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Exploring the potential of electrospray-Orbitrap for stable isotope analysis using nitrate as a model",
+  author   = c(person(given = "Andreas",
+                        family = "Hilkert"),
+              person(given = "John K.",
+                        family = "Böhlke"),
+              person(given = "Stanley J.",
+                        family = "Mroczkowski"),
+              person(given = "Kyle L.",
+                        family = "Fort"),
+              person(given = "Konstantin",
+                        family = "Aizikov"),
+              person(given = "Xingchen T.",
+                        family = "Wang"),
+              person(given = "Sebastian H.",
+                        family = "Kopf"),
+              person(given = "Cajetan",
+                        family = "Neubauer")),
+  journal  = "Analytical Chemistry",
+  year     = "2021",
+  volume   = "93",
+  number   = "26",
+  pages    = "9139–9148",
+  publisher= "ACS Publications",
+  doi     = "10.1021/acs.analchem.1c00944",
+  url      = "https://doi.org/10.1021/acs.analchem.1c00944",
+  textVersion = paste("Hilkert et al. (2021)"
+  )
+)
