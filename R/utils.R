@@ -1,29 +1,4 @@
-# Common core logic functions
-
-#' @title Simplify IsoX output
-#' @description Keep only columns that are essential for isotopocule ratio analysis
-#'
-#' @param dataset The loaded IsoX data that is to be simplified
-#'
-#' @return A simplified data frame with the columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
-#'
-#' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-#' df <- iso_read_isox_file(filepath = fpath) %>% iso_simplify_isox_file()
-#'
-#' @export
-
-iso_simplify_isox_file <- function(dataset) {
-  df.out <- dataset %>% dplyr::select(.data$filename,
-                                      .data$scan.no,
-                                      .data$time.min,
-                                      .data$compound,
-                                      .data$isotopolog,
-                                      .data$ions.incremental,
-                                      .data$tic,
-                                      .data$it.ms)
-}
-
+# Common utility functions
 
 #' @title Remove rare isotopocules
 #' @description Remove isotopocules that are not consistently detected across scans

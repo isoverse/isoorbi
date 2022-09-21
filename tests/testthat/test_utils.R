@@ -5,16 +5,7 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("core")
 
-  # iso_simplify_isox_file
-test_that("iso_simplify_isox_file() tests", {
-  #success
-  df <- iso_read_isox_file(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))
-  expect_true(is.tbl(iso_simplify_isox_file(df)))
 
-  # test safety checks
-  expect_error(iso_simplify_isox_file(), "argument \"dataset\" is missing, with no default")
-  #add 10 more tests
-})
 
   # remove.rare
 test_that("remove.rare() tests", {

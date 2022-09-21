@@ -1,4 +1,4 @@
-# functions for logic_isox_file_interactions.R
+# functions for interacting with isox data
 
 #' @title Read .isox file
 #' @description Read an IsoX output file into a tibble
@@ -9,11 +9,11 @@
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
-#' df <- iso_read_isox_file(filepath = fpath)
+#' df <- orbi_read_isox(filepath = fpath)
 #'
 #' @export
 
-iso_read_isox_file <- function(filepath) {
+orbi_read_isox <- function(filepath) {
   # safety checks
   if (missing(filepath)) stop("no file path supplied", call. = FALSE)
   if (length(filepath) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(filepath), call. = FALSE)
@@ -39,6 +39,30 @@ iso_read_isox_file <- function(filepath) {
       stop("file format error: ", w$message, call. = FALSE)
     }
   )
+}
+
+#' @title Simplify IsoX output
+#' @description Keep only columns that are essential for isotopocule ratio analysis
+#'
+#' @param dataset The loaded IsoX data that is to be simplified
+#'
+#' @return A simplified data frame with the columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
+#'
+#' @examples
+#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+#' df <- orbi_read_isox(filepath = fpath) %>% orbi_simplify_isox()
+#'
+#' @export
+
+orbi_simplify_isox <- function(dataset) {
+  df.out <- dataset %>% dplyr::select(.data$filename,
+                                      .data$scan.no,
+                                      .data$time.min,
+                                      .data$compound,
+                                      .data$isotopolog,
+                                      .data$ions.incremental,
+                                      .data$tic,
+                                      .data$it.ms)
 }
 
 

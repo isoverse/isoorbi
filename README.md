@@ -14,7 +14,7 @@ install.packages("isoorbi")
 ```
 library(isoorbi)
 
-iso_read_isox(filepath)
+orbi_read_isox(filepath)
 ```
 
 ## Getting help
