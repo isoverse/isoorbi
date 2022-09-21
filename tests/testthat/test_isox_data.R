@@ -3,7 +3,7 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-context("file loading")
+context("isox data")
 
 test_that("test that isox files can be read", {
 
@@ -25,8 +25,8 @@ test_that("test that isox files can be read", {
 
 })
 
-# iso_simplify_isox_file
-test_that("orbi_simplify_isox_file() tests", {
+# orbi_simplify_isox
+test_that("orbi_simplify_isox() tests", {
   #success
   df <- orbi_read_isox(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))
   expect_true(is.tbl(orbi_simplify_isox(df)))
