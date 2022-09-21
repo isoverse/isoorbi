@@ -1,14 +1,14 @@
 # Common utility functions
 
-#' @title Remove rare isotopocules
+#' @title Filter weak isotopocules
 #' @description Remove isotopocules that are not consistently detected across scans
 #'
 #' @param data Simplified IsoX data to be processed
 #' @param min_percent Set threshold. Isotopocule must be observed in at least  x percent of scans
 #'
-#' @return Returns data frame with inconsistent isotopocules removed
+#' @return Filtered tibble
 #' @export
-orbi_filter_rare <-
+orbi_filter_weak <-
   function(data, min_percent) {
     remove.df <- data %>%
       dplyr::group_by(.data$filename) %>%
@@ -16,7 +16,7 @@ orbi_filter_rare <-
       dplyr::group_by(.data$filename, .data$compound, .data$isotopolog) %>%
       dplyr::mutate(i.scans = length(.data$scan.no)) %>%
       dplyr::filter(.data$i.scans < min_percent / 100 * .data$n.scans) %>% # => update selection in GUI?, add message? used previously `input$rare`
-      dplyr::select(-.data$n.scans, -.data$i.scans) %>% droplevels() %>% as.data.frame()
+      dplyr::select(-.data$n.scans,-.data$i.scans) %>% droplevels() %>% as.data.frame()
 
 
     df <-
@@ -41,42 +41,45 @@ orbi_filter_rare <-
 
 
 
-#FIXME-LEIF: complete and confirm
-#' @title remove.satellitePeaks
+#
+#' @title Filter satellite peaks
 #' @description Remove minor signals (e.g., satellite peaks) that were reported by IsoX
-#' @param df Simplified IsoX file to have satellites removed from
-#' @return IsoX file with satellites removed
+#' @param df Simplified IsoX file produced by orbi_simplify_isox()
+#' @return Filtered tibble
 #' @export
 orbi_filter_satellitePeaks <- function(df) {
   df <- df %>%
-    dplyr::group_by(.data$filename, .data$compound, .data$scan.no, .data$isotopolog) %>%
+    dplyr::group_by(.data$filename,
+                    .data$compound,
+                    .data$scan.no,
+                    .data$isotopolog) %>%
     dplyr::filter(.data$ions.incremental == max(.data$ions.incremental))
 
   return(df)
 }
 
-#FIXME-LEIF: complete and confirm
+
 #' @title Filter by TIC x Injection Time
 #' @description Remove extreme scans based on TIC x Injection time
 #' @param df Simplified IsoX file to have 'ticxit' removed
-#' @param extreme_min ???
-#' @return Returns filtered IsoX file based of input value
+#' @param truncate_extreme Remove extreme scans (peercentage) based on TIC x Injection time
+#' @return Filtered tibble
 #' @export
-orbi_filter_TICxIT <- function(df, extreme_min) {
+orbi_filter_TICxIT <- function(df, truncate_extreme) {
   df <-
     df %>% dplyr::group_by(.data$filename) %>% dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>% #edit 28-Feb-2022 enable multiple dual inlet files
     dplyr::filter(
-      .data$TICxIT > stats::quantile(.data$TICxIT, extreme_min / 100) &
-        .data$TICxIT < stats::quantile(.data$TICxIT, 1 - extreme_min / 100)
+      .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
+        .data$TICxIT < stats::quantile(.data$TICxIT, 1 - truncate_extreme / 100)
     ) %>%
     dplyr::select(-.data$TICxIT)
 
   return(df)
 }
 
-#FIXME-LEIF: complete and confirm
+
 #' @title orbi_filter_isox
-#' @description A basic dplyr::filter(should be generalized for most use cases)
+#' @description A basic filter (should be generalized for most use cases)
 #' @param dataset The file.tsv to be filtered
 #' @param isotopocules Vector of isotopocules to select
 #' @param base_peak Name of base peak to select
@@ -84,7 +87,7 @@ orbi_filter_TICxIT <- function(df, extreme_min) {
 #' @param compounds Vector of compounds files to select
 #' @param time_min Minimum time in minutes
 #' @param time_max Maximum time in minutes
-#' @return Returns a filtered IsoX file
+#' @return Filtered tibble
 #' @export
 orbi_filter_isox <- function(dataset, isotopocules, base_peak, isox_files, compounds, time_min, time_max) {
   df.out <- dataset %>%

@@ -4,15 +4,15 @@
 \alias{orbi_filter_TICxIT}
 \title{Filter by TIC x Injection Time}
 \usage{
-orbi_filter_TICxIT(df, extreme_min)
+orbi_filter_TICxIT(df, truncate_extreme)
 }
 \arguments{
 \item{df}{Simplified IsoX file to have 'ticxit' removed}
 
-\item{extreme_min}{???}
+\item{truncate_extreme}{Remove extreme scans (peercentage) based on TIC x Injection time}
 }
 \value{
-Returns filtered IsoX file based of input value
+Filtered tibble
 }
 \description{
 Remove extreme scans based on TIC x Injection time

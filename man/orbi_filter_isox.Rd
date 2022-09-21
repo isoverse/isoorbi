@@ -30,8 +30,8 @@ orbi_filter_isox(
 \item{time_max}{Maximum time in minutes}
 }
 \value{
-Returns a filtered IsoX file
+Filtered tibble
 }
 \description{
-A basic dplyr::filter(should be generalized for most use cases)
+A basic filter (should be generalized for most use cases)
 }

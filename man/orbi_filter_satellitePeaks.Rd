@@ -2,15 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{orbi_filter_satellitePeaks}
 \alias{orbi_filter_satellitePeaks}
-\title{remove.satellitePeaks}
+\title{Filter satellite peaks}
 \usage{
 orbi_filter_satellitePeaks(df)
 }
 \arguments{
-\item{df}{Simplified IsoX file to have satellites removed from}
+\item{df}{Simplified IsoX file produced by orbi_simplify_isox()}
 }
 \value{
-IsoX file with satellites removed
+Filtered tibble
 }
 \description{
 Remove minor signals (e.g., satellite peaks) that were reported by IsoX

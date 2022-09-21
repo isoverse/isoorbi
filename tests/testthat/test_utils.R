@@ -7,16 +7,16 @@ context("utils")
 
 
 
-  # orbi_filter_rare
-test_that("orbi_filter_rare() tests", {
+  # orbi_filter_weak
+test_that("orbi_filter_weak() tests", {
   #success
   # ...
   #failure
-  expect_error(orbi_filter_rare(), "argument \"data\" is missing, with no default")
+  expect_error(orbi_filter_weak(), "argument \"data\" is missing, with no default")
 })
 
-  # orbi_filter_rare
-test_that("orbi_filter_rare() tests", {
+  # orbi_filter_satellitePeaks
+test_that("orbi_filter_satellitePeaks() tests", {
   #succcess
   df <- orbi_read_isox(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))
   expect_true(is.tbl(orbi_filter_satellitePeaks(orbi_simplify_isox(df))))
