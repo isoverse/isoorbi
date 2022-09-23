@@ -4,7 +4,7 @@ description: >
   A minimal example for usage of the function orbi_read_isox().
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dplyr compatibility}
+  %\VignetteIndexEntry{Loading Orbitrap Iso files}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
