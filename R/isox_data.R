@@ -1,11 +1,11 @@
 # functions for interacting with isox data
 
-#' @title Read .isox file
-#' @description Read an IsoX output file into a tibble
+#' @title Read IsoX file
+#' @description Read an IsoX output file (.isox) into a tibble
 #'
 #' @param filepath Path to the .isox file
 #'
-#' @return A dataframe containing at minimum named 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'
+#' @return A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
@@ -55,6 +55,11 @@ orbi_read_isox <- function(filepath) {
 #' @export
 
 orbi_simplify_isox <- function(dataset) {
+  # safety checks
+  if (missing(dataset)) stop("no dataset supplied", call. = FALSE)
+  if (length(dataset) != 1) stop("can only read exactly 1 dataset at the time, supplied datasets: ", length(dataset), call. = FALSE)
+
+  tryCatch(
   df.out <- dataset %>% dplyr::select(.data$filename,
                                       .data$scan.no,
                                       .data$time.min,
@@ -62,7 +67,11 @@ orbi_simplify_isox <- function(dataset) {
                                       .data$isotopolog,
                                       .data$ions.incremental,
                                       .data$tic,
-                                      .data$it.ms)
+                                      .data$it.ms),
+  warning = function(w) {
+    stop("format error: ", w$message, call. = FALSE)
+  }
+  )
 }
 
 
