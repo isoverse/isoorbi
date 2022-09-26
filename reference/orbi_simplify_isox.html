@@ -80,6 +80,7 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fpath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_Flow_Exploration_small.isox"</span>, package<span class="op">=</span><span class="st">"isoorbi"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>filepath <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">orbi_simplify_isox</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> can only read exactly 1 dataset at the time, supplied datasets: 21</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
