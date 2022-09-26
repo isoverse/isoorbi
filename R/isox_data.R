@@ -57,7 +57,7 @@ orbi_read_isox <- function(filepath) {
 orbi_simplify_isox <- function(dataset) {
   # safety checks
   if (missing(dataset)) stop("no dataset supplied", call. = FALSE)
-  if (length(dataset) != 1) stop("can only read exactly 1 dataset at the time, supplied datasets: ", length(dataset), call. = FALSE)
+  #if (length(dataset) != 1) stop("can only read exactly 1 dataset at the time, supplied datasets: ", length(dataset), call. = FALSE)
 
   tryCatch(
   df.out <- dataset %>% dplyr::select(.data$filename,
