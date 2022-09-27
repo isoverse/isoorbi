@@ -7,11 +7,12 @@
 calculate_gse(x)
 }
 \arguments{
-\item{x}{value to compute geometric standard error from}
+\item{x}{A vector of values used to calculate geometric standard errors}
 }
 \value{
 The calculated geometric standard error
 }
 \description{
-Define 'gse' to calculate geometic standard error
+The function calculate_gse() is used to calculate geometric standard errors
 }
+\keyword{internal}

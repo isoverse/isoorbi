@@ -2,18 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{calculate_slope}
 \alias{calculate_slope}
-\title{slope}
+\title{Slope of a linear regression of x, y values; ratio.method}
 \usage{
 calculate_slope(x, y)
 }
 \arguments{
-\item{x}{???}
+\item{x}{A vector of values used as ratio nominator}
 
-\item{y}{???}
+\item{y}{A vector of values used as ratio denominator}
 }
 \value{
-The slope
+The calculated slope, an estimate of the ratio x/y
 }
 \description{
-Define 'slope' to calculate geometic mean
+The function calculate_slope() is used to the slope of x, y values used in a ratio
 }
+\details{
+The slope is calculates from a linear model that is weighted by the nominator x, using stats::lm(x ~ y + 0, weights = x).
+}
+\keyword{internal}

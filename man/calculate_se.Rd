@@ -7,11 +7,12 @@
 calculate_se(x)
 }
 \arguments{
-\item{x}{Vector to compute standard error from}
+\item{x}{A numeric vector used to calculate a standard error}
 }
 \value{
-Standard error
+The calculated standard error
 }
 \description{
-Calculates standard error
+Calculates a regular standard error
 }
+\keyword{internal}

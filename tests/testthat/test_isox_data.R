@@ -32,6 +32,6 @@ test_that("orbi_simplify_isox() tests", {
   expect_true(is.tbl(orbi_simplify_isox(df)))
 
   # test safety checks
-  expect_error(orbi_simplify_isox(), "argument \"dataset\" is missing, with no default")
+  expect_error(orbi_simplify_isox(), "no dataset supplied")
   #add 10 more tests
 })

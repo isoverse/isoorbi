@@ -2,26 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{orbi_filter_isox}
 \alias{orbi_filter_isox}
-\title{orbi_filter_isox}
+\title{Basic  filtering of IsoX data}
 \usage{
 orbi_filter_isox(
   dataset,
   isotopocules,
   base_peak,
-  isox_files,
+  filenames,
   compounds,
   time_min,
   time_max
 )
 }
 \arguments{
-\item{dataset}{The file.tsv to be filtered}
+\item{dataset}{The data frame to be filtered}
 
 \item{isotopocules}{Vector of isotopocules to select}
 
 \item{base_peak}{Name of base peak to select}
 
-\item{isox_files}{Vector of isox files to select}
+\item{filenames}{Vector of filenames to select}
 
 \item{compounds}{Vector of compounds files to select}
 
@@ -33,5 +33,5 @@ orbi_filter_isox(
 Filtered tibble
 }
 \description{
-A basic filter (should be generalized for most use cases)
+A basic generic filter for filenames, isotopocules, compounds and time ranges
 }

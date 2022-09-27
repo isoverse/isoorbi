@@ -7,11 +7,12 @@
 calculate_gmean(x)
 }
 \arguments{
-\item{x}{value to compute geometric mean from}
+\item{x}{A numeric vector used to calculate the geometric mean}
 }
 \value{
 The calculated geometric mean
 }
 \description{
-Define 'gmean' to calculate geometic mean
+The function calculate_gmean() is used to calculate geometric means
 }
+\keyword{internal}

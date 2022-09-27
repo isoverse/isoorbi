@@ -7,11 +7,12 @@
 calculate_gsd(x)
 }
 \arguments{
-\item{x}{value to compute geometric standard deviation from}
+\item{x}{A numeric values used to calculate the geometric standard deviation}
 }
 \value{
 The calculated geometric standard deviation
 }
 \description{
-Define 'gsd' to calculate geometic standard deviation
+The function calculate_gsd() is used to calculate geometric standard deviations
 }
+\keyword{internal}

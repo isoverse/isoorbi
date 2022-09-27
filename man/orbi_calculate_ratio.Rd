@@ -7,8 +7,7 @@
 orbi_calculate_ratio(
   peak1,
   peak2,
-  ratio.method = c("mean", "sum", "median", "geometric.mean", "slope",
-    "weighted.vector.sum")
+  ratio.method = c("mean", "sum", "median", "geometric.mean", "slope", "weighted.sum")
 )
 }
 \arguments{
