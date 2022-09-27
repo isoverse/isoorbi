@@ -66,18 +66,22 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>df</dt>
-<dd><p>Simplified IsoX file to have 'ticxit' removed</p></dd>
+<dd><p>Simplified IsoX file to have 'ticxit' outliers removed</p></dd>
 
 
 <dt>truncate_extreme</dt>
-<dd><p>Remove extreme scans (peercentage) based on TIC x Injection time</p></dd>
+<dd><p>Remove extreme scans (percentage) based on TIC x Injection time</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>Filtered tibble</p>
+<p>Filtered data frame</p>
+    </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>The orbi_filter_TICxIT() function removes scans that are outliers. TIC x it.ms serves as a proxy for the number of ions in the Orbitrap. The filter is a basic truncation that removed x % of scans with maximal or minimal ion estimates.</p>
     </div>
 
   </div>
