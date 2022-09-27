@@ -15,11 +15,11 @@
 
 orbi_read_isox <- function(filepath) {
   # safety checks
-  if (missing(filepath)) stop("no file path supplied", call. = FALSE)
-  if (length(filepath) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(filepath), call. = FALSE)
-  if (!file.exists(filepath)) stop("this file does not exist: ", filepath, call. = FALSE)
+  if (missing(filepath)) stop("no file path supplied", call. = TRUE)
+  if (length(filepath) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(filepath), call. = TRUE)
+  if (!file.exists(filepath)) stop("this file does not exist: ", filepath, call. = TRUE)
   ext <- stringr::str_extract(basename(filepath), "\\.[^.]+$")
-  if (is.na(ext) || ext != ".isox") stop("unrecognized file extension: ", ext, call. = FALSE)
+  if (is.na(ext) || ext != ".isox") stop("unrecognized file extension: ", ext, call. = TRUE)
 
   tryCatch(
     readr::read_tsv(
@@ -36,7 +36,7 @@ orbi_read_isox <- function(filepath) {
       )
     ),
     warning = function(w) {
-      stop("file format error: ", w$message, call. = FALSE)
+      stop("file format error: ", w$message, call. = TRUE)
     }
   )
 }
@@ -46,7 +46,7 @@ orbi_read_isox <- function(filepath) {
 #'
 #' @param dataset The loaded IsoX data that is to be simplified
 #'
-#' @return A simplified data frame with the columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
+#' @return A data frame containing only the 8 columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
@@ -56,21 +56,47 @@ orbi_read_isox <- function(filepath) {
 
 orbi_simplify_isox <- function(dataset) {
   # safety checks
-  if (missing(dataset)) stop("no dataset supplied", call. = FALSE)
-  #if (length(dataset) != 1) stop("can only read exactly 1 dataset at the time, supplied datasets: ", length(dataset), call. = FALSE)
+  if (missing(dataset))
+    stop("no dataset supplied", call. = TRUE)
+  if (is.data.frame(dataset) == FALSE)
+    stop("dataset must be a data frame",  call. = TRUE)
+  if (ncol(dataset) < 8)
+    stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+  if (nrow(dataset) < 1)
+    stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+
+  # check that requires columns are present
+  if (!(c("filename") %in% colnames(dataset)))
+    stop("dataset does not contain column filename", call. = TRUE)
+  if (!(c("scan.no") %in% colnames(dataset)))
+    stop("dataset does not contain column scan.no", call. = TRUE)
+  if (!(c("time.min") %in% colnames(dataset)))
+    stop("dataset does not contain column time.min", call. = TRUE)
+  if (!(c("compound") %in% colnames(dataset)))
+    stop("dataset does not contain column compound", call. = TRUE)
+  if (!(c("isotopolog") %in% colnames(dataset)))
+    stop("dataset does not contain column isotopolog", call. = TRUE)
+  if (!(c("ions.incremental") %in% colnames(dataset)))
+    stop("dataset does not contain column ions.incrementalo", call. = TRUE)
+  if (!(c("tic") %in% colnames(dataset)))
+    stop("dataset does not contain column tic", call. = TRUE)
+  if (!(c("it.ms") %in% colnames(dataset)))
+    stop("dataset does not contain column it.ms",  call. = TRUE)
 
   tryCatch(
-  df.out <- dataset %>% dplyr::select(.data$filename,
-                                      .data$scan.no,
-                                      .data$time.min,
-                                      .data$compound,
-                                      .data$isotopolog,
-                                      .data$ions.incremental,
-                                      .data$tic,
-                                      .data$it.ms),
-  warning = function(w) {
-    stop("format error: ", w$message, call. = FALSE)
-  }
+    dataset %>% dplyr::select(
+      .data$filename,
+      .data$scan.no,
+      .data$time.min,
+      .data$compound,
+      .data$isotopolog,
+      .data$ions.incremental,
+      .data$tic,
+      .data$it.ms
+    ),
+    warning = function(w) {
+      stop("format error: ", w$message, call. = FALSE)
+    }
   )
 }
 
