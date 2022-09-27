@@ -101,6 +101,8 @@ orbi_filter_satellitePeaks <- function(dataset) {
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
 
+
+
   # check that requires columns are present
   if (!(c("filename") %in% colnames(dataset)))
     stop("dataset does not contain column filename", call. = TRUE)
@@ -132,43 +134,144 @@ orbi_filter_satellitePeaks <- function(dataset) {
 
 #' @title Filter by TIC x Injection Time
 #' @description Remove extreme scans based on TIC x Injection time
-#' @param df Simplified IsoX file to have 'ticxit' outliers removed
-#' @param truncate_extreme Remove extreme scans (percentage) based on TIC x Injection time
-#' @details The orbi_filter_TICxIT() function removes scans that are outliers. TIC x it.ms serves as a proxy for the number of ions in the Orbitrap. The filter is a basic truncation that removed x % of scans with maximal or minimal ion estimates.
+#' @param dataset Simplified IsoX file to have 'ticxit' outliers removed
+#' @param truncate_extreme Remove extreme scans (percentage) based on TIC x Injection time. A number between 0 and 10.
+#' @details The orbi_filter_TICxIT() function removes scans that are outliers. TIC x Injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x % of scans with maximal or minimal ion estimates.
 #' @return Filtered data frame
 #' @export
-orbi_filter_TICxIT <- function(df, truncate_extreme) {
-  df <-
-    df %>% dplyr::group_by(.data$filename) %>% dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>% #edit 28-Feb-2022 enable multiple dual inlet files
+orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
+
+  # safety checks
+  if (missing(dataset))
+    stop("no dataset supplied", call. = TRUE)
+  if (is.data.frame(dataset) == FALSE)
+    stop("dataset must be a data frame",  call. = TRUE)
+  if (ncol(dataset) < 8)
+    stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+  if (nrow(dataset) < 1)
+    stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+
+  if (missing(truncate_extreme))
+    stop("value for truncate_extreme missing", call. = TRUE)
+
+  if (!(is.numeric(truncate_extreme)))
+    stop("truncate_extreme needs to be a number", call. = TRUE)
+  if (!(truncate_extreme >= 0 && truncate_extreme <=10))
+    stop("truncate_extremet needs to be between 0 and 10 ", call. = TRUE)
+
+
+
+  # check that requires columns are present
+  if (!(c("filename") %in% colnames(dataset)))
+    stop("dataset does not contain column filename", call. = TRUE)
+  if (!(c("scan.no") %in% colnames(dataset)))
+    stop("dataset does not contain column scan.no", call. = TRUE)
+  if (!(c("time.min") %in% colnames(dataset)))
+    stop("dataset does not contain column time.min", call. = TRUE)
+  if (!(c("compound") %in% colnames(dataset)))
+    stop("dataset does not contain column compound", call. = TRUE)
+  if (!(c("isotopolog") %in% colnames(dataset)))
+    stop("dataset does not contain column isotopolog", call. = TRUE)
+  if (!(c("ions.incremental") %in% colnames(dataset)))
+    stop("dataset does not contain column ions.incrementalo", call. = TRUE)
+  if (!(c("tic") %in% colnames(dataset)))
+    stop("dataset does not contain column tic", call. = TRUE)
+  if (!(c("it.ms") %in% colnames(dataset)))
+    stop("dataset does not contain column it.ms",  call. = TRUE)
+
+
+  df.out <-
+    dataset %>% dplyr::group_by(.data$filename) %>% dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>% #edit 28-Feb-2022 enable multiple dual inlet files
     dplyr::filter(
       .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
         .data$TICxIT < stats::quantile(.data$TICxIT, 1 - truncate_extreme / 100)
     ) %>%
     dplyr::select(-.data$TICxIT)
 
-  return(df)
+  return(df.out)
 }
 
 
-#' @title orbi_filter_isox
-#' @description A basic filter (should be generalized for most use cases)
-#' @param dataset The file.tsv to be filtered
+#' @title Basic  filtering of IsoX data
+#' @description A basic generic filter for filenames, isotopocules, compounds and time ranges
+#' @param dataset The data frame to be filtered
 #' @param isotopocules Vector of isotopocules to select
 #' @param base_peak Name of base peak to select
-#' @param isox_files Vector of isox files to select
+#' @param filenames Vector of filenames to select
 #' @param compounds Vector of compounds files to select
 #' @param time_min Minimum time in minutes
 #' @param time_max Maximum time in minutes
 #' @return Filtered tibble
 #' @export
-orbi_filter_isox <- function(dataset, isotopocules, base_peak, isox_files, compounds, time_min, time_max) {
+orbi_filter_isox <- function(dataset, isotopocules, base_peak, filenames, compounds, time_min, time_max) {
+
+  # safety checks
+  if (missing(dataset))
+    stop("no dataset supplied", call. = TRUE)
+  if (is.data.frame(dataset) == FALSE)
+    stop("dataset must be a data frame",  call. = TRUE)
+  if (ncol(dataset) < 8)
+    stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+  if (nrow(dataset) < 1)
+    stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+
+  if (missing(isotopocules))
+    stop("input for isotopocules missing", call. = TRUE)
+  if (missing(base_peak))
+    stop("input for base_peak missing", call. = TRUE)
+  if (missing(filenames))
+    stop("input for filenames missing", call. = TRUE)
+  if (missing(filenames))
+    stop("input for filenames missing", call. = TRUE)
+  if (missing(compounds))
+    stop("input for compounds missing", call. = TRUE)
+  if (missing(time_min))
+    stop("input for time_min missing", call. = TRUE)
+  if (missing(time_max))
+    stop("input for time_max missing", call. = TRUE)
+
+
+  if (!(is.vector(filenames)))
+    stop("filenames needs to be a vector of names", call. = TRUE)
+  if (!(is.vector(isotopocules)))
+    stop("isotopocules needs to be a vector of names", call. = TRUE)
+  if (!(is.vector(compounds)))
+    stop("compounds needs to be a vector of names", call. = TRUE)
+  if (!(is.character(base_peak)))
+    stop("base_peak needs to be a character string", call. = TRUE)
+
+  if (!(is.numeric(time_min)))
+    stop("time_min needs to be a number", call. = TRUE)
+  if (!(is.numeric(time_max)))
+    stop("time_max needs to be a number", call. = TRUE)
+
+
+  # check that requires columns are present
+  if (!(c("filename") %in% colnames(dataset)))
+    stop("dataset does not contain column filename", call. = TRUE)
+  if (!(c("scan.no") %in% colnames(dataset)))
+    stop("dataset does not contain column scan.no", call. = TRUE)
+  if (!(c("time.min") %in% colnames(dataset)))
+    stop("dataset does not contain column time.min", call. = TRUE)
+  if (!(c("compound") %in% colnames(dataset)))
+    stop("dataset does not contain column compound", call. = TRUE)
+  if (!(c("isotopolog") %in% colnames(dataset)))
+    stop("dataset does not contain column isotopolog", call. = TRUE)
+  if (!(c("ions.incremental") %in% colnames(dataset)))
+    stop("dataset does not contain column ions.incrementalo", call. = TRUE)
+  if (!(c("tic") %in% colnames(dataset)))
+    stop("dataset does not contain column tic", call. = TRUE)
+  if (!(c("it.ms") %in% colnames(dataset)))
+    stop("dataset does not contain column it.ms",  call. = TRUE)
+
+
   df.out <- dataset %>%
     # isotopolog filter
     dplyr::filter(.data$isotopolog %in% c(isotopocules, base_peak)) %>% #maybe this line should be moved out of the core function!
     # file name filter
     {
-      if (!"all" %in% isox_files)
-        dplyr::filter(., .data$filename %in% isox_files)
+      if (!"all" %in% filenames)
+        dplyr::filter(., .data$filename %in% filenames)
       else
         .
     } %>%
@@ -197,6 +300,16 @@ orbi_filter_isox <- function(dataset, isotopocules, base_peak, isox_files, compo
 #' @return Standard error
 
 calculate_se <- function(x) {
+
+  #basic checks
+  if (!(is.vector(x)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(x)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(x) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
   stats::sd(x) / sqrt(length(x))
 }
 
@@ -208,55 +321,133 @@ calculate_se <- function(x) {
 #' @return The calculated geometric mean
 
 calculate_gmean <- function(x) {
+
+  #basic checks
+  if (!(is.vector(x)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(x)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(x) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
   exp(mean(log(x)))
 } #define geometric mean
 
 #' @title Standard deviation (geometric)
-#' @description  Define 'gsd' to calculate geometic standard deviation
-#'
-#' @param x value to compute geometric standard deviation from
+#' @description  The function calculate_gsd() is used to calculate geometric standard deviations
+#' @param x A vector of values from which to compute geometric standard deviation
 #'
 #' @return The calculated geometric standard deviation
 
 calculate_gsd <- function(x) {
+
+  #basic checks
+  if (!(is.vector(x)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(x)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(x) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
   exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))
 }
 
 #' @title Standard error (geometric)
-#' @description  Define 'gse' to calculate geometic standard error
+#' @description  The function calculate_gse() is used to calculate geometric standard errors
 #'
-#' @param x value to compute geometric standard error from
+#' @param x A vector of values from which to compute geometric standard errors
 #'
 #' @return The calculated geometric standard error
 
 calculate_gse <- function(x) {
+
+  #basic checks
+  if (!(is.vector(x)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(x)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(x) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
   (exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))) / sqrt(length(x))
 }
 
-#' @title slope
-#' @description  Define 'slope' to calculate geometic mean
+#' @title Estimate the ratios with a linear regression of x, y values
+#' @description  The function calculate_slope() is used to the slope of x, y values used in a ratio
 #'
-#' @param x ???
-#' @param y ???
+#' @param x A vector of values used as ratio nominator
+#' @param y A vector of values used as ratio denominator
+#' @details The slope is calculates from a linear model that is weighted by the nominator x, using stats::lm(x ~ y + 0, weights = x).
 #'
-#' @return The slope
+#' @return The calculated slope, an estimate of the ratio x/y
 
 calculate_slope <- function(x, y) {
+
+  #basic checks
+  if (!(is.vector(x)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(x)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(x) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
+  #basic checks
+  if (!(is.vector(y)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(y)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(y) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
+  if (length(x) != length(y))
+    stop("Length of x and y need to be equal", call. = TRUE)
+
+
   model <-
     stats::lm(x ~ y + 0, weights = x) #Note order of x and y to get correct slope!
   sl <- model$coefficients[[1]]
   sl
 }
 
-#' @title weighted.vector.sum
-#' @description ???
+#' @title Use a weighted sum to estimate the ratios
+#' @description The function calculate_weighted.vector.sum () is used to calculate ratios by weighted sums of x and y values
 #'
-#' @param x ???
-#' @param y ???
-#'
-#' @return ???
+#' @param x A vector of values used as ratio nominator
+#' @param y A vector of values used as ratio denominator
+#' @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+#' @return The calculated ratio x/y
 
 calculate_weighted.vector.sum <- function(x, y) {
+
+  #basic checks
+  if (!(is.vector(x)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(x)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(x) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
+  #basic checks
+  if (!(is.vector(y)))
+    stop("x needs to be a vector", call. = TRUE)
+  if (!(is.numeric(y)))
+    stop("x needs to be a numeric vector", call. = TRUE)
+
+  if (length(y) <=1)
+    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+
+  if (length(x) != length(y))
+    stop("Length of x and y need to be equal", call. = TRUE)
+
+
+
   df <- cbind(x, y)
 
   avg.ions <- (sum(df[, 1]) + sum(df[, 2])) / length(df[, 1])

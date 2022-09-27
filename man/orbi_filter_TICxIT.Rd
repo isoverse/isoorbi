@@ -4,12 +4,12 @@
 \alias{orbi_filter_TICxIT}
 \title{Filter by TIC x Injection Time}
 \usage{
-orbi_filter_TICxIT(df, truncate_extreme)
+orbi_filter_TICxIT(dataset, truncate_extreme)
 }
 \arguments{
-\item{df}{Simplified IsoX file to have 'ticxit' outliers removed}
+\item{dataset}{Simplified IsoX file to have 'ticxit' outliers removed}
 
-\item{truncate_extreme}{Remove extreme scans (percentage) based on TIC x Injection time}
+\item{truncate_extreme}{Remove extreme scans (percentage) based on TIC x Injection time. A number between 0 and 10.}
 }
 \value{
 Filtered data frame
@@ -18,5 +18,5 @@ Filtered data frame
 Remove extreme scans based on TIC x Injection time
 }
 \details{
-The orbi_filter_TICxIT() function removes scans that are outliers. TIC x it.ms serves as a proxy for the number of ions in the Orbitrap. The filter is a basic truncation that removed x \% of scans with maximal or minimal ion estimates.
+The orbi_filter_TICxIT() function removes scans that are outliers. TIC x Injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x \% of scans with maximal or minimal ion estimates.
 }
