@@ -3,25 +3,63 @@
 #' @title Filter weak isotopocules
 #' @description Remove isotopocules that are not consistently detected across scans
 #'
-#' @param data Simplified IsoX data to be processed
+#' @param dataset Simplified IsoX data to be processed
 #' @param min_percent Set threshold. Isotopocule must be observed in at least  x percent of scans
 #'
 #' @return Filtered tibble
 #' @export
 orbi_filter_weak <-
-  function(data, min_percent) {
-    remove.df <- data %>%
+  function(dataset, min_percent) {
+
+    # safety checks
+    if (missing(dataset))
+      stop("no dataset supplied", call. = TRUE)
+    if (is.data.frame(dataset) == FALSE)
+      stop("dataset must be a data frame",  call. = TRUE)
+    if (ncol(dataset) < 8)
+      stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+    if (nrow(dataset) < 1)
+      stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+
+    if (missing(min_percent))
+      stop("value for min_percent missing", call. = TRUE)
+
+    if (!(is.numeric(min_percent)))
+      stop("min_percent needs to be a number", call. = TRUE)
+    if (!(min_percent >= 0 && min_percent <=90))
+      stop("min_percent needs to be between 0 and 90 ", call. = TRUE)
+
+
+    # check that requires columns are present
+    if (!(c("filename") %in% colnames(dataset)))
+      stop("dataset does not contain column filename", call. = TRUE)
+    if (!(c("scan.no") %in% colnames(dataset)))
+      stop("dataset does not contain column scan.no", call. = TRUE)
+    if (!(c("time.min") %in% colnames(dataset)))
+      stop("dataset does not contain column time.min", call. = TRUE)
+    if (!(c("compound") %in% colnames(dataset)))
+      stop("dataset does not contain column compound", call. = TRUE)
+    if (!(c("isotopolog") %in% colnames(dataset)))
+      stop("dataset does not contain column isotopolog", call. = TRUE)
+    if (!(c("ions.incremental") %in% colnames(dataset)))
+      stop("dataset does not contain column ions.incrementalo", call. = TRUE)
+    if (!(c("tic") %in% colnames(dataset)))
+      stop("dataset does not contain column tic", call. = TRUE)
+    if (!(c("it.ms") %in% colnames(dataset)))
+      stop("dataset does not contain column it.ms",  call. = TRUE)
+
+    remove.df <- dataset %>%
       dplyr::group_by(.data$filename) %>%
       dplyr::mutate(n.scans = max(.data$scan.no) - min(.data$scan.no)) %>% #FIXME: implement a more general solution here
       dplyr::group_by(.data$filename, .data$compound, .data$isotopolog) %>%
       dplyr::mutate(i.scans = length(.data$scan.no)) %>%
       dplyr::filter(.data$i.scans < min_percent / 100 * .data$n.scans) %>% # => update selection in GUI?, add message? used previously `input$rare`
-      dplyr::select(-.data$n.scans,-.data$i.scans) %>% droplevels() %>% as.data.frame()
+      dplyr::select(-.data$n.scans, -.data$i.scans) %>% droplevels() %>% as.data.frame()
 
 
-    df <-
+    df.out <-
       anti_join(
-        data,
+        dataset,
         remove.df,
         by = c(
           "filename",
@@ -35,7 +73,7 @@ orbi_filter_weak <-
         )
       ) #FIXME:More elegant/robust solution?
 
-    return(df)
+    return(df.out)
 
   }
 
