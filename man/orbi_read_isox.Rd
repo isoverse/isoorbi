@@ -2,7 +2,7 @@
 % Please edit documentation in R/isox_data.R
 \name{orbi_read_isox}
 \alias{orbi_read_isox}
-\title{Read .isox file}
+\title{Read IsoX file}
 \usage{
 orbi_read_isox(filepath)
 }
@@ -10,10 +10,10 @@ orbi_read_isox(filepath)
 \item{filepath}{Path to the .isox file}
 }
 \value{
-A dataframe containing at minimum named 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'
+A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'
 }
 \description{
-Read an IsoX output file into a tibble
+Read an IsoX output file (.isox) into a tibble
 }
 \examples{
 fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")

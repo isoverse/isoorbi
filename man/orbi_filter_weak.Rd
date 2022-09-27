@@ -4,10 +4,10 @@
 \alias{orbi_filter_weak}
 \title{Filter weak isotopocules}
 \usage{
-orbi_filter_weak(data, min_percent)
+orbi_filter_weak(dataset, min_percent)
 }
 \arguments{
-\item{data}{Simplified IsoX data to be processed}
+\item{dataset}{Simplified IsoX data to be processed}
 
 \item{min_percent}{Set threshold. Isotopocule must be observed in at least  x percent of scans}
 }

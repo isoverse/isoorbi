@@ -10,7 +10,7 @@ orbi_simplify_isox(dataset)
 \item{dataset}{The loaded IsoX data that is to be simplified}
 }
 \value{
-A simplified data frame with the columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
+A data frame containing only the 8 columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
 }
 \description{
 Keep only columns that are essential for isotopocule ratio analysis
