@@ -7,7 +7,6 @@
 orbi_filter_isox(
   dataset,
   isotopocules,
-  base_peak,
   filenames,
   compounds,
   time_min,
@@ -19,9 +18,7 @@ orbi_filter_isox(
 
 \item{isotopocules}{Vector of isotopocules to select}
 
-\item{base_peak}{Name of base peak to select}
-
-\item{filenames}{Vector of filenames to select}
+\item{filenames}{Vector of filen ames to select}
 
 \item{compounds}{Vector of compounds files to select}
 
@@ -30,8 +27,14 @@ orbi_filter_isox(
 \item{time_max}{Maximum time in minutes}
 }
 \value{
-Filtered tibble
+Filtered data frame (tibble)
 }
 \description{
 A basic generic filter for filenames, isotopocules, compounds and time ranges
+}
+\examples{
+fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+df <- orbi_read_isox(filepath = fpath) \%>\% orbi_simplify_isox()
+df <- df \%>\% orbi_filter_isox(isotopocules=c("M0"),filenames=c("s3744"),compounds="HSO4-", time_min=0,time_max=1)
+
 }

@@ -12,13 +12,15 @@ orbi_calculate_output(dataset, ratio.method)
 \item{ratio.method}{Method  for computing the ratio; passed to 'iso_calculate_ratio()'}
 }
 \value{
-Returns table containing 'filename', 'sample.name', 'Basepeak', 'Compound', 'Isotopolog', 'Ratio', 'relSE.permill', 'shot.noise.permill', 'mins.to.1mio'
+Returns table containing 'filename', 'sample.name', 'Basepeak', 'Compound', 'Isotopocule', 'Ratio', 'relSE.permill', 'shot.noise.permill', 'mins.to.1mio'
 }
 \description{
 Contains the logic to generate the output table
 }
 \examples{
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\% orbi_simplify_isox() \%>\% orbi_basepeak(basepeak = "M0") \%>\% orbi_calculate_output(ratio.method = "sum")
+fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+df <- orbi_read_isox(filepath = fpath)
+df <- df \%>\% orbi_simplify_isox() \%>\% orbi_basepeak(basepeak = "M0")
+df <- df \%>\% orbi_calculate_output(ratio.method = "sum")
 
 }

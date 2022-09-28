@@ -5,7 +5,7 @@
 #'
 #' @param filepath Path to the .isox file
 #'
-#' @return A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'
+#' @return A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopocule', 'ions.incremental', 'tic', 'it.ms'
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
@@ -34,7 +34,7 @@ orbi_read_isox <- function(filepath) {
         tic = readr::col_double(),
         it.ms = readr::col_double()
       )
-    ),
+    ) %>% rename(isotopocule = .data$isotopolog), #isox format should change as well
     warning = function(w) {
       stop("file format error: ", w$message, call. = TRUE)
     }
@@ -46,7 +46,7 @@ orbi_read_isox <- function(filepath) {
 #'
 #' @param dataset The loaded IsoX data that is to be simplified
 #'
-#' @return A data frame containing only the 8 columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'.
+#' @return A data frame containing only the 8 columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopocule', 'ions.incremental', 'tic', 'it.ms'.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
@@ -74,10 +74,10 @@ orbi_simplify_isox <- function(dataset) {
     stop("dataset does not contain column time.min", call. = TRUE)
   if (!(c("compound") %in% colnames(dataset)))
     stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopolog") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopolog", call. = TRUE)
+  if (!(c("isotopocule") %in% colnames(dataset)))
+    stop("dataset does not contain column isotopocule", call. = TRUE)
   if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incrementalo", call. = TRUE)
+    stop("dataset does not contain column ions.incremental", call. = TRUE)
   if (!(c("tic") %in% colnames(dataset)))
     stop("dataset does not contain column tic", call. = TRUE)
   if (!(c("it.ms") %in% colnames(dataset)))
@@ -89,7 +89,7 @@ orbi_simplify_isox <- function(dataset) {
       .data$scan.no,
       .data$time.min,
       .data$compound,
-      .data$isotopolog,
+      .data$isotopocule,
       .data$ions.incremental,
       .data$tic,
       .data$it.ms

@@ -10,7 +10,7 @@ orbi_read_isox(filepath)
 \item{filepath}{Path to the .isox file}
 }
 \value{
-A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopolog', 'ions.incremental', 'tic', 'it.ms'
+A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopocule', 'ions.incremental', 'tic', 'it.ms'
 }
 \description{
 Read an IsoX output file (.isox) into a tibble
