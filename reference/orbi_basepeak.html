@@ -65,15 +65,16 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>basepeak</dt>
-<dd><p>The isotopolog used as base peak in 'orbi_calculate_ratio()'</p>
+    <dl><dt>dataset</dt>
+<dd><p>A data frame from a an IsoX output. Needs to contain columns for filename, compound, scan.no, isotopocule, ions.incremental.</p></dd>
+
+
+<dt>basepeak</dt>
+<dd><p>The isotopocule used as base peak in 'orbi_calculate_ratio()'</p>
 <p>#' @examples
 fpath &lt;- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-df &lt;- orbi_read_isox(filepath = fpath) %&gt;% orbi_simplify_isox() %&gt;% orbi_basepeak(basepeak = "M0")</p></dd>
-
-
-<dt>data</dt>
-<dd><p>A data frame from a an IsoX output. Needs to contain columns for filename, compound, scan.no, isotopolog, ions.incremental.</p></dd>
+df &lt;- orbi_read_isox(filepath = fpath) %&gt;% orbi_simplify_isox()
+df &lt;- df %&gt;% orbi_basepeak(basepeak = "M0")</p></dd>
 
 </dl></div>
     <div id="value">
