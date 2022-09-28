@@ -6,7 +6,11 @@
 #' @param dataset Simplified IsoX data to be processed
 #' @param min_percent Set threshold. Isotopocule must be observed in at least  x percent of scans
 #'
-#' @return Filtered tibble
+#' #' #' @examples
+#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+#' df <- orbi_read_isox(filepath = fpath) %>% orbi_simplify_isox() %>% orbi_filter_weak(min_percent = 2)
+#'
+#' @return Filtered data frame (tibble)
 #' @export
 orbi_filter_weak <-
   function(dataset, min_percent) {
@@ -571,3 +575,105 @@ orbi_calculate_ratio <-
       }
     }
   }
+
+#' @title Assign the base peak
+#' @description `orbi_basepeak()` assigns one isotopocule in the data frame as the base peak
+#' @param data A data frame from a an IsoX output. Needs to contain columns for filename, compound, scan.no, isotopolog, ions.incremental.
+#' @param basepeak The isotopolog used as base peak in 'orbi_calculate_ratio()'
+#'
+#' #' @examples
+#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+#' df <- orbi_read_isox(filepath = fpath) %>% orbi_simplify_isox() %>% orbi_basepeak(basepeak = "M0")
+#'
+#'
+#' @returns Outputs the input data frame plus two columns called `Basepeak` and `Basepeak.Ions`
+#' @export
+orbi_basepeak <- function(dataset, basepeak) {
+
+  # Annotation: Identify 'base peak' for each scan
+
+  df.sel <- dataset  %>%
+    dplyr::select(filename,
+                  compound,
+                  scan.no,
+                  isotopolog,
+                  ions.incremental) %>%
+    dplyr::group_by(.data$filename, .data$scan.no) %>%
+    dplyr::filter(isotopolog == basepeak) %>%
+    dplyr::mutate(Basepeak = factor(.data$isotopolog),
+                  Basepeak.Ions = .data$ions.incremental) %>%
+    dplyr::select(.data$filename,
+                  .data$compound,
+                  .data$scan.no,
+                  .data$Basepeak,
+                  .data$Basepeak.Ions) %>%
+    as.data.frame()
+
+  df.out <- merge(df.sel, dataset, all = TRUE)
+
+  df.out <-
+    df.out %>% dplyr::filter(isotopolog != basepeak) %>% droplevels()
+
+  return(df.out)
+}
+
+
+#' @title Calculate output table
+#' @description Contains the logic to generate the output table
+#' @param dataset A processed data frame from IsoX output
+#' @param ratio.method Method  for computing the ratio; passed to 'iso_calculate_ratio()'
+#'
+#' @examples
+#' #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+#' df <- orbi_read_isox(filepath = fpath) %>% orbi_simplify_isox() %>% orbi_basepeak(basepeak = "M0") %>% orbi_calculate_output(ratio.method = "sum")
+#'
+#' @return Returns table containing 'filename', 'sample.name', 'Basepeak', 'Compound', 'Isotopolog', 'Ratio', 'relSE.permill', 'shot.noise.permill', 'mins.to.1mio'
+#' @export
+orbi_calculate_output <- function(dataset, ratio.method) {
+  df.stat <- dataset  %>%  dplyr::group_by(filename,
+                                      compound,
+                                      Basepeak,
+                                      isotopolog) %>%
+
+    dplyr::mutate(Ratio = orbi_calculate_ratio(ions.incremental, Basepeak.Ions, ratio.method = ratio.method)) %>% #RATIO CALCULATION!
+
+    dplyr::mutate(Ratio.SEM = calculate_se(ions.incremental / Basepeak.Ions))      #For simplicity use basic standard error for all options
+
+  df.stat <- df.stat %>% dplyr::mutate(
+    No.of.scans = length(Ratio),
+    Mins.to.1mio = (1E6 / sum(ions.incremental)) * (max(time.min) - min(time.min)),
+    Shot.Noise.permil = 1000 * (sqrt((
+      sum(ions.incremental) + sum(Basepeak.Ions)
+    ) / (
+      sum(ions.incremental) * sum(Basepeak.Ions)
+    ))),
+    relSE.permil = 1000 * (Ratio.SEM / Ratio)
+  ) %>%
+
+    #Round values for output
+    dplyr::mutate(
+      Ratio = round(Ratio, 8),
+      Ratio.SEM = round(Ratio.SEM, 8),
+      Shot.Noise.permil = round(Shot.Noise.permil, 3),
+      relSE.permil = round(relSE.permil, 3),
+      Mins.to.1mio = round(Mins.to.1mio, 2)
+    ) %>%
+
+    dplyr::select(
+      filename,
+      compound,
+      Basepeak,
+      isotopolog,
+      Ratio,
+      Ratio.SEM,
+      relSE.permil,
+      Shot.Noise.permil,
+      No.of.scans,
+      Mins.to.1mio
+    ) %>%
+    unique() %>%
+    arrange(filename, isotopolog)
+
+  df.stat <- as.data.frame(df.stat)
+  return(df.stat)
+}
