@@ -15,7 +15,7 @@ orbi_calculate_ratio(
 
 \item{denominator}{Isotopocule used as denominator}
 
-\item{ratio.method}{The desired method of computing ratio}
+\item{ratio.method}{The desired method of computing the ratio}
 }
 \value{
 Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.

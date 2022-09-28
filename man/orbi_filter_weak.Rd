@@ -9,10 +9,14 @@ orbi_filter_weak(dataset, min_percent)
 \arguments{
 \item{dataset}{Simplified IsoX data to be processed}
 
-\item{min_percent}{Set threshold. Isotopocule must be observed in at least  x percent of scans}
+\item{min_percent}{Set threshold. Isotopocule must be observed in at least  x percent of scans
+
+#' #' @examples
+fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+df <- orbi_read_isox(filepath = fpath) \%>\% orbi_simplify_isox() \%>\% orbi_filter_weak(min_percent = 2)}
 }
 \value{
-Filtered tibble
+Filtered data frame (tibble)
 }
 \description{
 Remove isotopocules that are not consistently detected across scans
