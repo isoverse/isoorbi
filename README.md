@@ -1,4 +1,12 @@
 # isoorbi
+
+<!-- badges: start -->
+  [![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://www.isoverse.org/isoorbi)
+  [![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
+<!-- badges: end -->
+
+## About
+
 This R package is providing functions for processing isotopocule measurements from an Orbitrap mass spectrometer. It uses <code>.isox</code> files created by IsoX as input.
 
 ## Installation
