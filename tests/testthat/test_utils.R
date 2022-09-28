@@ -122,7 +122,7 @@ test_that("orbi_calculate_ratio() tests", {
   expect_equal(orbi_calculate_ratio(a,b,"median2"), "`ratio.method` has to be `mean`, `sum`, `median`, `geometric.mean`, `slope` or `weighted.sum`")
 
   #failure
-  expect_error(orbi_calculate_ratio(), "no input for peak1 supplied")
+  expect_error(orbi_calculate_ratio(), "no input for numerator supplied")
 
 })
 

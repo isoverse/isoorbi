@@ -492,17 +492,30 @@ calculate_weighted.sum <- function(x, y) {
 }
 
 #' @title Calculate ratio
-#' @description Ratio calculation between peaks of interest. NOTE: The formula used to average ratios matters! Do not simply use arithmetic mean.
+#' @description Ratio calculation between isotopocules of interest.
 #'
-#' @param peak1 Peak 1 of interest
-#' @param peak2 Peak 2 of interest
-#' @param ratio.method The desired method of computing ratio
+#' Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
 #'
-#' @return calculated ratio between peak1 and peak2 with selected ratio method
+#' @param numerator Isotopocule(s) used as numerator
+#' @param denominator Isotopocule used as denominator
+#' @param ratio.method The desired method of computing the ratio
+#' @details Description of options for ratio.method:
+#'
+#' "mean": arithmetic mean of ratios from individual scans.
+#'
+#' "sum": sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+#'
+#' "geometric.mean": geometric mean of ratios from individual scans.
+#'
+#' "slope": The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using stats::lm(x ~ y + 0, weights = x).
+#'
+#' "weighted.sum": The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+#' @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 
 orbi_calculate_ratio <-
-  function(peak1,
-           peak2,
+  function(numerator,
+           denominator,
            ratio.method = c("mean",
                             "sum",
                             "median",
@@ -511,41 +524,41 @@ orbi_calculate_ratio <-
                             "weighted.sum")) {
 
 
-    if (missing(peak1))
-      stop("no input for peak1 supplied", call. = TRUE)
+    if (missing(numerator))
+      stop("no input for numerator supplied", call. = TRUE)
 
-    if (is.numeric(peak1) == FALSE)
-      stop("peak1 must be a numeric vector",  call. = TRUE)
+    if (is.numeric(numerator) == FALSE)
+      stop("numerator must be a numeric vector",  call. = TRUE)
 
-    if (missing(peak2))
-      stop(" no input for peak1 supplied", call. = TRUE)
-    if (is.numeric(peak2) == FALSE)
-      stop("peak2 must be a numeric vector",  call. = TRUE)
+    if (missing(denominator))
+      stop(" no input for denominator supplied", call. = TRUE)
+    if (is.numeric(denominator) == FALSE)
+      stop("denominator must be a numeric vector",  call. = TRUE)
 
 
     if (ratio.method == "mean") {
-      o <- base::mean(peak1 / peak2)
+      o <- base::mean(numerator / denominator)
       o
     } else {
       if (ratio.method == "slope") {
-        o <- calculate_slope(peak1, peak2)
+        o <- calculate_slope(numerator, denominator)
         o
       } else{
         if (ratio.method == "sum") {
-          o <-  base::sum(peak1) / sum(peak2)
+          o <-  base::sum(numerator) / sum(denominator)
           o
         } else{
           if (ratio.method == "geometric.mean") {
-            o <- calculate_gmean(peak1 / peak2)
+            o <- calculate_gmean(numerator / denominator)
             o
           } else{
             if (ratio.method == "weighted.sum") {
-              o <- calculate_weighted.sum(peak1, peak2)
+              o <- calculate_weighted.sum(numerator, denominator)
               o
             } else{
               if (ratio.method == "median") {
                 o <-
-                  stats::median(peak1 / peak2)
+                  stats::median(numerator / denominator)
                 o
               } else{
                 print(

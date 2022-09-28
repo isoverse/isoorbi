@@ -5,21 +5,37 @@
 \title{Calculate ratio}
 \usage{
 orbi_calculate_ratio(
-  peak1,
-  peak2,
+  numerator,
+  denominator,
   ratio.method = c("mean", "sum", "median", "geometric.mean", "slope", "weighted.sum")
 )
 }
 \arguments{
-\item{peak1}{Peak 1 of interest}
+\item{numerator}{Isotopocule(s) used as numerator}
 
-\item{peak2}{Peak 2 of interest}
+\item{denominator}{Isotopocule used as denominator}
 
 \item{ratio.method}{The desired method of computing ratio}
 }
 \value{
-calculated ratio between peak1 and peak2 with selected ratio method
+Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 }
 \description{
-Ratio calculation between peaks of interest. NOTE: The formula used to average ratios matters! Do not simply use arithmetic mean.
+Ratio calculation between isotopocules of interest.
+
+Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+}
+\details{
+Description of options for ratio.method:
+
+"mean": arithmetic mean of ratios from individual scans.
+
+"sum": sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+
+"geometric.mean": geometric mean of ratios from individual scans.
+
+"slope": The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using stats::lm(x ~ y + 0, weights = x).
+
+"weighted.sum": The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
 }
