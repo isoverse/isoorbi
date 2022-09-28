@@ -15,10 +15,11 @@ library(isoorbi)
 
 
 ```{r}
+# Read .isox test data
 file_path <-system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi")
 df <- orbi_read_isox(file_path) 
 
-# Keep only most important columns; equivalent to simplify checkbox in IsoX
+# Keep only most important columns; equivalent to simplify check box in IsoX
 df.simple <- orbi_simplify_isox(dataset = df)
 
 # Filter the data
@@ -28,13 +29,12 @@ df.filtered <- df.simple %>% orbi_filter_isox(filename = "20220125_01",
                                               compounds = c("NO3-"),
                                               isotopocules = c("M0", "15N", "18O"),
                                               base_peak = "M0") %>% #FIXME
-                             orbi_filter_satellitePeaks %>% 
+                             orbi_filter_satellitePeaks() %>% 
                              orbi_filter_weak(min_percent = 10) %>% 
                              orbi_filter_TICxIT(truncate_extreme = 1)
 
 # Calculate output table
 df.summary <- df.filtered %>% orbi_basepeak(basepeak = "15N") %>% #FIXME
                               orbi_calculate_output(ratio.method = "sum")
-
 
 ```
