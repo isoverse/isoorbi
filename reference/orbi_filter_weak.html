@@ -70,14 +70,17 @@
 
 
 <dt>min_percent</dt>
-<dd><p>Set threshold. Isotopocule must be observed in at least  x percent of scans</p></dd>
+<dd><p>Set threshold. Isotopocule must be observed in at least  x percent of scans</p>
+<p>#' #' @examples
+fpath &lt;- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+df &lt;- orbi_read_isox(filepath = fpath) %&gt;% orbi_simplify_isox() %&gt;% orbi_filter_weak(min_percent = 2)</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>Filtered tibble</p>
+<p>Filtered data frame (tibble)</p>
     </div>
 
   </div>
