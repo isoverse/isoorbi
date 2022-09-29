@@ -19,8 +19,8 @@ Contains the logic to generate the output table
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-df <- orbi_read_isox(filepath = fpath)
-df <- df \%>\% orbi_simplify_isox() \%>\% orbi_basepeak(basepeak = "M0")
-df <- df \%>\% orbi_calculate_output(ratio.method = "sum")
+df <- orbi_read_isox(filepath = fpath) \%>\%
+      orbi_simplify_isox() \%>\% orbi_basepeak(basepeak = "M0")  \%>\%
+      orbi_calculate_output(ratio.method = "sum")
 
 }

@@ -308,13 +308,11 @@ orbi_filter_isox <- function(dataset, isotopocules, filenames, compounds, time_m
 
 # Functions to calculate stats --------------------------------------------
 
-# isox data manipulation
-
-#' @title Standard error
-#' @description Calculates a regular standard error
-#' @keywords internal
-#' @param x A numeric vector used to calculate a standard error
-#' @return The calculated standard error
+# @title Internal function to calculate standard error
+# @description Calculates a regular standard error
+# @keywords internal
+# @param x A numeric vector used to calculate a standard error
+# @return The calculated standard error
 
 calculate_se <- function(x) {
 
@@ -666,9 +664,9 @@ orbi_basepeak <- function(dataset, basepeak) {
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-#' df <- orbi_read_isox(filepath = fpath)
-#' df <- df %>% orbi_simplify_isox() %>% orbi_basepeak(basepeak = "M0")
-#' df <- df %>% orbi_calculate_output(ratio.method = "sum")
+#' df <- orbi_read_isox(filepath = fpath) %>%
+#'       orbi_simplify_isox() %>% orbi_basepeak(basepeak = "M0")  %>%
+#'       orbi_calculate_output(ratio.method = "sum")
 #'
 #' @return Returns table containing 'filename', 'sample.name', 'Basepeak', 'Compound', 'Isotopocule', 'Ratio', 'relSE.permill', 'shot.noise.permill', 'mins.to.1mio'
 #' @export
