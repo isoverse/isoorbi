@@ -22,24 +22,6 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/calculate_gmean.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculate_gsd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculate_gse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculate_se.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculate_slope.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calculate_weighted.sum.html</loc>
-  </url>
-  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -50,9 +32,6 @@
   </url>
   <url>
     <loc>/reference/orbi_calculate_output.html</loc>
-  </url>
-  <url>
-    <loc>/reference/orbi_calculate_ratio.html</loc>
   </url>
   <url>
     <loc>/reference/orbi_filter_TICxIT.html</loc>
