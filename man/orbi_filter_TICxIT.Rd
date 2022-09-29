@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{orbi_filter_TICxIT}
 \alias{orbi_filter_TICxIT}
-\title{Filter by TIC x Injection Time}
+\title{Filter to remove extreme scans}
 \usage{
 orbi_filter_TICxIT(dataset, truncate_extreme)
 }
 \arguments{
-\item{dataset}{Simplified IsoX file to have 'ticxit' outliers removed}
+\item{dataset}{Simplified IsoX file to have \code{TICxIT} outliers removed}
 
 \item{truncate_extreme}{Remove extreme scans (percentage) based on TIC x Injection time. A number between 0 and 10.}
 }
@@ -15,14 +15,15 @@ orbi_filter_TICxIT(dataset, truncate_extreme)
 Filtered data frame (tibble)
 }
 \description{
-Remove extreme scans based on TIC x Injection time
+Remove extreme scans based on TIC x Injection time with \code{orbi_filter_TICxIT()}
 }
 \details{
-The orbi_filter_TICxIT() function removes scans that are outliers. TIC x Injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x \% of scans with maximal or minimal ion estimates.
+The \code{orbi_filter_TICxIT()} function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x \% of scans with maximal or minimal ion estimates.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\% orbi_simplify_isox()
-df <- df \%>\% orbi_filter_TICxIT(truncate_extreme = 1)
+df <- orbi_read_isox(filepath = fpath) \%>\%
+orbi_simplify_isox() \%>\%
+orbi_filter_TICxIT(truncate_extreme = 1)
 
 }

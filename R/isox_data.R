@@ -42,11 +42,11 @@ orbi_read_isox <- function(filepath) {
 }
 
 #' @title Simplify IsoX output
-#' @description Keep only columns that are essential for isotopocule ratio analysis
+#' @description Keep only columns that directly relevant for isotopocule ratio analysis
 #'
 #' @param dataset The loaded IsoX data that is to be simplified
 #'
-#' @return A data frame containing only the 8 columns: 'filename', 'scan.no', 'time.min', 'compound', 'isotopocule', 'ions.incremental', 'tic', 'it.ms'.
+#' @return A data frame containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")

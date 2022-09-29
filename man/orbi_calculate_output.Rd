@@ -12,10 +12,24 @@ orbi_calculate_output(dataset, ratio.method)
 \item{ratio.method}{Method  for computing the ratio; passed to 'iso_calculate_ratio()'}
 }
 \value{
-Returns table containing 'filename', 'sample.name', 'Basepeak', 'Compound', 'Isotopocule', 'Ratio', 'relSE.permill', 'shot.noise.permill', 'mins.to.1mio'
+Returns table containing \code{filename}, \code{compound},  \code{Basepeak}, \code{Isotopocule}, \code{Ratio}, \code{Ratio.SEM}, \code{relSE.permil}, \code{Shot.Noise.permil}, \code{No.of.Scans}, \code{Mins.to.1mio}
 }
 \description{
 Contains the logic to generate the output table
+}
+\details{
+Description of options for ratio.method:
+
+"mean": arithmetic mean of ratios from individual scans.
+
+"sum": sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+
+"geometric.mean": geometric mean of ratios from individual scans.
+
+"slope": The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using stats::lm(x ~ y + 0, weights = x).
+
+"weighted.sum": The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")

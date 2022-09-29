@@ -9,16 +9,18 @@ orbi_basepeak(dataset, basepeak)
 \arguments{
 \item{dataset}{A data frame from a an IsoX output. Needs to contain columns for filename, compound, scan.no, isotopocule, ions.incremental.}
 
-\item{basepeak}{The isotopocule used as base peak in 'orbi_calculate_ratio()'
-
-#' @examples
-fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\% orbi_simplify_isox()
-df <- df \%>\% orbi_basepeak(basepeak = "M0")}
+\item{basepeak}{The isotopocule used as base peak in \code{orbi_calculate_ratio()}}
 }
 \value{
-Outputs the input data frame plus two columns called \code{Basepeak} and \code{Basepeak.Ions}
+Input data frame plus two columns called \code{Basepeak} and \code{Basepeak.Ions}
 }
 \description{
 \code{orbi_basepeak()} assigns one isotopocule in the data frame as the base peak
+}
+\examples{
+fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+df <- orbi_read_isox(filepath = fpath) \%>\%
+                     orbi_simplify_isox() \%>\%
+                     orbi_basepeak(basepeak = "M0")
+
 }

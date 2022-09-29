@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{orbi_filter_isox}
 \alias{orbi_filter_isox}
-\title{Basic  filtering of IsoX data}
+\title{Basic filtering of IsoX data}
 \usage{
 orbi_filter_isox(
   dataset,
-  isotopocules,
   filenames,
+  isotopocules,
   compounds,
   time_min,
   time_max
@@ -16,9 +16,9 @@ orbi_filter_isox(
 \arguments{
 \item{dataset}{The data frame to be filtered}
 
-\item{isotopocules}{Vector of isotopocules to select}
+\item{filenames}{Vector of file names to select}
 
-\item{filenames}{Vector of filen ames to select}
+\item{isotopocules}{Vector of isotopocules to select}
 
 \item{compounds}{Vector of compounds files to select}
 
@@ -30,11 +30,16 @@ orbi_filter_isox(
 Filtered data frame (tibble)
 }
 \description{
-A basic generic filter for filenames, isotopocules, compounds and time ranges
+A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\% orbi_simplify_isox()
-df <- df \%>\% orbi_filter_isox(isotopocules=c("M0"),filenames=c("s3744"),compounds="HSO4-", time_min=0,time_max=1)
+df <- orbi_read_isox(filepath = fpath) \%>\%
+orbi_simplify_isox() \%>\%
+orbi_filter_isox(filenames = c("s3744"),
+compounds = c("HSO4-"),
+isotopocules = c("M0"),
+time_min = 0,
+time_max = 1)
 
 }
