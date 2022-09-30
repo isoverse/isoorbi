@@ -25,12 +25,12 @@ BugReports: https://github.com/isoverse/isoorbi/issues
 Depends:
     R (>= 4.0.0)
 Imports:
-    tidyr,
-    dplyr,
-    magrittr (>= 1.5),
-    rlang (>= 1.0.5),
-    readr,
-    stringr
+    tidyr (>= 1.2.1),
+    dplyr (>= 1.0.10),
+    magrittr (>= 2.0.3),
+    rlang (>= 1.0.6),
+    readr (>= 2.1.2),
+    stringr (>= 1.4.1)
 Suggests:
     devtools,
     knitr,
