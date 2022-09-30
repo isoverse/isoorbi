@@ -1,6 +1,6 @@
 # isoorbi
 
-# isoorbi <img src="man/figures/logo.svg" align="right" height="139" />
+# isoorbi <img src="man/figures/logo.png" align="right" height="138" />
 
 <!-- badges: start -->
   [![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://www.isoverse.org/isoorbi)
