@@ -5,7 +5,7 @@
 #'
 #' @param filepath Path to the .isox file
 #'
-#' @return A data frame containing at minimum the columns named 'filename', 'scan.no', 'time.min', 'compound', 'isotopocule', 'ions.incremental', 'tic', 'it.ms'
+#' @return A data frame containing at minimum the columns named `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
