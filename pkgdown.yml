@@ -2,6 +2,6 @@ pandoc: 2.7.3
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
-  orbi_read_isox: orbi_read_isox.html
-last_built: 2022-09-29T21:17Z
+  example_analysis: example_analysis.html
+last_built: 2022-09-30T22:07Z
 
