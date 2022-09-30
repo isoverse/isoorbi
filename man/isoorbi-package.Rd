@@ -6,6 +6,8 @@
 \alias{isoorbi-package}
 \title{isoorbi: Process Orbitrap Iso Data}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 First generation tool to process data from Orbitrap Iso mass spectrometers. Citation: \doi{10.1021/acs.analchem.1c00944}.
 }
 \seealso{
