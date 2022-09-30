@@ -34,7 +34,7 @@ orbi_read_isox <- function(filepath) {
         tic = readr::col_double(),
         it.ms = readr::col_double()
       )
-    ) %>% rename(isotopocule = .data$isotopolog), #isox format should change as well
+    ) %>% dplyr::rename(isotopocule = .data$isotopolog), #isox format should change as well
     warning = function(w) {
       stop("file format error: ", w$message, call. = TRUE)
     }
@@ -66,22 +66,15 @@ orbi_simplify_isox <- function(dataset) {
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
   # check that requires columns are present
-  if (!(c("filename") %in% colnames(dataset)))
-    stop("dataset does not contain column filename", call. = TRUE)
-  if (!(c("scan.no") %in% colnames(dataset)))
-    stop("dataset does not contain column scan.no", call. = TRUE)
-  if (!(c("time.min") %in% colnames(dataset)))
-    stop("dataset does not contain column time.min", call. = TRUE)
-  if (!(c("compound") %in% colnames(dataset)))
-    stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopocule") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopocule", call. = TRUE)
-  if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incremental", call. = TRUE)
-  if (!(c("tic") %in% colnames(dataset)))
-    stop("dataset does not contain column tic", call. = TRUE)
-  if (!(c("it.ms") %in% colnames(dataset)))
-    stop("dataset does not contain column it.ms",  call. = TRUE)
+  req_cols <- c("filename", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+
+  missing_cols <- setdiff(req_cols, names(dataset))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
+
 
   tryCatch(
     dataset %>% dplyr::select(
