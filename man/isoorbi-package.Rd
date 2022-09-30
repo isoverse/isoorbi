@@ -4,7 +4,7 @@
 \name{isoorbi-package}
 \alias{isoorbi}
 \alias{isoorbi-package}
-\title{isoorbi: Process Orbitrap Isotopocule Data}
+\title{isoorbi: Process Orbitrap Iso Data}
 \description{
 First generation tool to process data from Orbitrap Iso mass spectrometers. Citation: \doi{10.1021/acs.analchem.1c00944}.
 }

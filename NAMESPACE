@@ -2,7 +2,7 @@
 
 export("%>%")
 export(orbi_basepeak)
-export(orbi_calculate_output)
+export(orbi_calculate_results)
 export(orbi_filter_TICxIT)
 export(orbi_filter_isox)
 export(orbi_filter_satellitePeaks)

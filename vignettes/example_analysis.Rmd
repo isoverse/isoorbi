@@ -4,7 +4,7 @@ description: >
   A minimal example for usage of the function orbi_read_isox().
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Loading Orbitrap Iso files}
+  %\VignetteIndexEntry{Loading and Processing Orbitrap Iso files}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,8 +32,8 @@ df.filtered <- df.simple %>% orbi_filter_isox(filename = c("s3744", "ac6"),
                              orbi_filter_weak(min_percent = 10) %>% 
                              orbi_filter_TICxIT(truncate_extreme = 1)
 
-# Calculate output table
+# Define base peak and calculate the output table
 df.output <- df.filtered %>% orbi_basepeak(basepeak = "M0") %>% 
-                              orbi_calculate_output(ratio.method = "sum")
+                             orbi_calculate_output(ratio.method = "sum")
 
 ```

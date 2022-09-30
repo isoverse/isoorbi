@@ -21,7 +21,7 @@ Remove extreme scans based on TIC x Injection time with \code{orbi_filter_TICxIT
 The \code{orbi_filter_TICxIT()} function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x \% of scans with maximal or minimal ion estimates.
 }
 \examples{
-fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
 orbi_simplify_isox() \%>\%
 orbi_filter_TICxIT(truncate_extreme = 1)

@@ -18,7 +18,7 @@ Filtered data frame (tibble)
 Remove isotopocules that are not consistently detected across scans with \code{orbi_filter_weak()}
 }
 \examples{
-fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
                      orbi_simplify_isox() \%>\%
                      orbi_filter_weak(min_percent = 2)
