@@ -1,7 +1,7 @@
 ---
 title: "Example Processing of an Orbitrap Iso file (.isox)"
 description: >
-  A minimal example for usage of the function orbi_read_isox().
+  A minimal example for isotopocule data processing.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Loading and Processing Orbitrap Iso files}
