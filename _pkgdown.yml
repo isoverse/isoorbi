@@ -5,6 +5,10 @@ template:
   bootswatch: litera
   bslib:
     base_font: {google: "Roboto"}
+
+development:
+  mode: auto
+
 navbar:
   title: isoorbi
   type: default

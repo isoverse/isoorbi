@@ -22,7 +22,8 @@ orbi_read_isox <- function(filepath) {
   if (is.na(ext) || ext != ".isox") stop("unrecognized file extension: ", ext, call. = TRUE)
 
   tryCatch(
-    readr::read_tsv(
+
+    df <- readr::read_tsv(
       filepath,
       col_types = list(
         filename = readr::col_factor(),
@@ -34,11 +35,25 @@ orbi_read_isox <- function(filepath) {
         tic = readr::col_double(),
         it.ms = readr::col_double()
       )
-    ) %>% dplyr::rename(isotopocule = .data$isotopolog), #isox format should change as well
+    ) %>% dplyr::rename(isotopocule = .data$isotopolog),
+    #isox format should change as well
     warning = function(w) {
       stop("file format error: ", w$message, call. = TRUE)
     }
   )
+
+  # check that all the most important columns are present
+  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+
+  missing_cols <- setdiff(req_cols, names(df))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
+
+  return(df)
+
 }
 
 #' @title Simplify IsoX output

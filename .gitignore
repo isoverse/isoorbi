@@ -48,3 +48,6 @@ vignettes/**/*.pdf
 # Auxiliary package files
 tmp/
 docs/
+
+# Pkgdown
+pkgdown/**
