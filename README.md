@@ -32,7 +32,7 @@ For questions and other discussion, please use the [isoorbi slack workspace](htt
 
 ## Development version
 
-To get a bug fix or to use the latest features from the development version of isoorbi from GitHub.
+To get a bug fix or to use the latest features, install the development version of isoorbi from GitHub.
 
 ``` r
 # install the development version 
