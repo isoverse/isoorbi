@@ -53,9 +53,9 @@ orbi_filter_weak <-
         dplyr::group_by(.data$filename,
                         .data$compound,
                         .data$isotopocule) %>%
-        dplyr::mutate(obs.scans = length(unique(scan.no))) %>%
+        dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
         dplyr::group_by(.data$filename, .data$compound) %>%
-        dplyr::mutate(max.scans = max(obs.scans)) %>%
+        dplyr::mutate(max.scans = max(.data$obs.scans)) %>%
         dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
         dplyr::select(-.data$obs.scans,-.data$max.scans) %>% droplevels() %>% as.data.frame(),
       warning = function(w) {
@@ -226,9 +226,9 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 #' orbi_simplify_isox() %>%
 #' orbi_filter_isox(filenames = c("s3744"),
 #' compounds = c("HSO4-"),
-#' isotopocules = c("M0"),
-#' time_min = 0,
-#' time_max = 1)
+#' isotopocules = "M0",
+#' time_min = "all",
+#' time_max = "all")
 #'
 #' @return  Filtered data frame (tibble)
 #' @export
@@ -265,9 +265,9 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
   if (!(is.vector(compounds)))
     stop("compounds needs to be a vector of names", call. = TRUE)
 
-  if (!(is.numeric(time_min)))
+  if (!(is.numeric(time_min) | time_min=="all"))
     stop("time_min needs to be a number", call. = TRUE)
-  if (!(is.numeric(time_max)))
+  if (!(is.numeric(time_max) | time_max=="all"))
     stop("time_max needs to be a number", call. = TRUE)
 
 
@@ -284,24 +284,40 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
 
   tryCatch(df.out <- dataset %>%
              # isotopocule filter
-             dplyr::filter(.data$isotopocule %in% c(isotopocules)) %>%
-             # file name filter
+             {
+               if (!"all" %in% isotopocules)
+                 dplyr::filter(., .data$isotopocule %in% isotopocules)
+               else
+                 .
+             } %>%
+             # # file name filter
              {
                if (!"all" %in% filenames)
                  dplyr::filter(., .data$filename %in% filenames)
                else
                  .
              } %>%
-             # compounds filter
+             # # compounds filter
              {
                if (!"all" %in% compounds)
                  dplyr::filter(., .data$compound %in% compounds)
                else
                  .
              } %>%
-
-             # time range filter
-             dplyr::filter(.data$time.min >= time_min, .data$time.min <= time_max),
+             # time_min  filter
+             {
+               if (time_min != "all")
+                 dplyr::filter(., .data$time.min >= time_min)
+               else
+                 .
+             } %>%
+             # time_max  filter
+             {
+               if (time_max != "all")
+                 dplyr::filter(., .data$time.min <= time_max)
+               else
+                 .
+             },
     warning = function(w) {
       stop("something went wrong: ", w$message, call. = TRUE)
     }
