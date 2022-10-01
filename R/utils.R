@@ -3,8 +3,8 @@
 #' @title Filter weak isotopocules
 #' @description Remove isotopocules that are not consistently detected across scans with `orbi_filter_weak()`
 #'
-#' @param dataset Simplified IsoX data to be processed
-#' @param min_percent Set threshold. Isotopocule must be observed in at least  x percent of scans
+#' @param dataset A simplified IsoX data frame to be processed
+#' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (relative to the most observed isotopocule of the compound)
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -48,22 +48,25 @@ orbi_filter_weak <-
 
 
     tryCatch(
+
       remove.df <- dataset %>%
-        dplyr::group_by(.data$filename) %>%
-        dplyr::mutate(n.scans = length(unique(scan.no))) %>%
-        dplyr::group_by(.data$filename, .data$compound, .data$isotopocule) %>%
-        dplyr::mutate(i.scans = length(unique(scan.no))) %>%
-        dplyr::filter(.data$i.scans < min_percent / 100 * .data$n.scans) %>% # => update selection in GUI?, add message? used previously `input$rare`
-        dplyr::select(-.data$n.scans, -.data$i.scans) %>% droplevels() %>% as.data.frame(),
-             warning = function(w) {
-               stop("something went wrong: ", w$message, call. = TRUE)
-             }
+        dplyr::group_by(.data$filename,
+                        .data$compound,
+                        .data$isotopocule) %>%
+        dplyr::mutate(obs.scans = length(unique(scan.no))) %>%
+        dplyr::group_by(.data$filename, .data$compound) %>%
+        dplyr::mutate(max.scans = max(obs.scans)) %>%
+        dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
+        dplyr::select(-.data$obs.scans,-.data$max.scans) %>% droplevels() %>% as.data.frame(),
+      warning = function(w) {
+        stop("something went wrong: ", w$message, call. = TRUE)
+      }
     )
 
 
     tryCatch(
       df.out <-
-        anti_join(
+        dplyr::anti_join(
           dataset,
           remove.df,
           by = c(
@@ -81,7 +84,6 @@ orbi_filter_weak <-
                stop("something went wrong: ", w$message, call. = TRUE)
              }
     )
-
 
     return(df.out)
 
@@ -144,10 +146,12 @@ orbi_filter_satellitePeaks <- function(dataset) {
 
 
 #' @title Filter to remove extreme scans
-#' @description Remove extreme scans based on TIC x Injection time with `orbi_filter_TICxIT()`
+#' @description Remove extremely high and low intense scans based on TIC x Injection time with `orbi_filter_TICxIT()`
 #' @param dataset Simplified IsoX file to have `TICxIT` outliers removed
-#' @param truncate_extreme Remove extreme scans (percentage) based on TIC x Injection time. A number between 0 and 10.
-#' @details The `orbi_filter_TICxIT()` function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x % of scans with maximal or minimal ion estimates.
+#' @param truncate_extreme A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.
+#' @details The `orbi_filter_TICxIT()` function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' The filter is a basic truncation that removed x % of scans with maximal **and** x % of scans with minimal ion estimates. Grouping is by `filename` and `compound`.
+#'
 #'
 #'@examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -191,10 +195,11 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 
 
   tryCatch(  df.out <-
-               dataset %>% dplyr::group_by(.data$filename) %>% dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>% #edit 28-Feb-2022 enable multiple dual inlet files
+               dataset %>% dplyr::group_by(.data$filename, .data$compound) %>%
+               dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
                dplyr::filter(
                  .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
-                   .data$TICxIT < stats::quantile(.data$TICxIT, 1 - truncate_extreme / 100)
+                 .data$TICxIT < stats::quantile(.data$TICxIT, 1 - truncate_extreme / 100)
                ) %>%
                dplyr::select(-.data$TICxIT),
     warning = function(w) {

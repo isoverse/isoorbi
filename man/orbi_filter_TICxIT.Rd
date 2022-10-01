@@ -9,16 +9,17 @@ orbi_filter_TICxIT(dataset, truncate_extreme)
 \arguments{
 \item{dataset}{Simplified IsoX file to have \code{TICxIT} outliers removed}
 
-\item{truncate_extreme}{Remove extreme scans (percentage) based on TIC x Injection time. A number between 0 and 10.}
+\item{truncate_extreme}{A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.}
 }
 \value{
 Filtered data frame (tibble)
 }
 \description{
-Remove extreme scans based on TIC x Injection time with \code{orbi_filter_TICxIT()}
+Remove extremely high and low intense scans based on TIC x Injection time with \code{orbi_filter_TICxIT()}
 }
 \details{
-The \code{orbi_filter_TICxIT()} function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. The filter is a basic truncation that removed x \% of scans with maximal or minimal ion estimates.
+The \code{orbi_filter_TICxIT()} function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+The filter is a basic truncation that removed x \% of scans with maximal \strong{and} x \% of scans with minimal ion estimates. Grouping is by \code{filename} and \code{compound}.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")

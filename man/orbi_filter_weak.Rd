@@ -7,9 +7,9 @@
 orbi_filter_weak(dataset, min_percent)
 }
 \arguments{
-\item{dataset}{Simplified IsoX data to be processed}
+\item{dataset}{A simplified IsoX data frame to be processed}
 
-\item{min_percent}{Set threshold. Isotopocule must be observed in at least  x percent of scans}
+\item{min_percent}{A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (relative to the most observed isotopocule of the compound)}
 }
 \value{
 Filtered data frame (tibble)
