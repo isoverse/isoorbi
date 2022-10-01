@@ -354,7 +354,7 @@ calculate_se <- function(x) {
   tryCatch(
     stats::sd(x) / sqrt(length(x)),
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong calculating the standard error: ", w$message, call. = TRUE)
     }
   )
 
@@ -383,7 +383,7 @@ calculate_gmean <- function(x) {
   tryCatch(
     exp(mean(log(x))),
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong calculating the geometic mean: ", w$message, call. = TRUE)
     }
   )
 
@@ -413,7 +413,7 @@ calculate_gsd <- function(x) {
   tryCatch(
     exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x))),
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong calculating geometric standard deviaton: ", w$message, call. = TRUE)
     }
   )
 
@@ -441,7 +441,7 @@ calculate_gse <- function(x) {
   tryCatch(
     (exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))) / sqrt(length(x)),
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong calculating the geometric standard error: ", w$message, call. = TRUE)
     }
   )
 
@@ -488,7 +488,7 @@ calculate_slope <- function(x, y) {
     model <- stats::lm(x ~ y + 0, weights = x), #Note order of x and y to get correct slope!
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong calculating the ratio as slope using a linear model: ", w$message, call. = TRUE)
     }
   )
 
@@ -547,7 +547,7 @@ calculate_weighted.sum <- function(x, y) {
     ratio <- sum(weighted.x) / sum(weighted.y), #Note order of x and y to get correct slope!
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong calculating the ratio from weighted sums: ", w$message, call. = TRUE)
     }
   )
 
@@ -692,13 +692,9 @@ orbi_basepeak <- function(dataset, basepeak) {
   missing_cols <- setdiff(req_cols, names(dataset))
 
   if (length(missing_cols) > 0) {
-    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+    paste0("Missing expected column(s): ", paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
-
-
-
-
 
 
 
@@ -732,7 +728,7 @@ orbi_basepeak <- function(dataset, basepeak) {
     df.out <- merge(df.sel, dataset, all = TRUE),
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong merging data: ", w$message, call. = TRUE)
     }
   )
 
@@ -828,15 +824,40 @@ orbi_calculate_results <- function(dataset, ratio.method) {
   }
 
 
+
   tryCatch(
-    df.stat <- dataset  %>%  dplyr::group_by(.data$filename,
-                                             .data$compound,
-                                             .data$Basepeak,
-                                             .data$isotopocule) %>%
+
+    df.stat <- dataset  %>%
+      # segmented data
+      {
+        if ("segment" %in% names(dataset))
+          dplyr::group_by(.data$segment)
+        else
+          .
+      } %>%
+      # blocks for dual inlet data
+      {
+        if ("block" %in% names(dataset))
+          dplyr::group_by(.data$block)
+        else
+          .
+      } %>%
+      # injection for automated flow injections
+      {
+        if ("injection" %in% names(dataset))
+          dplyr::group_by(.data$injection)
+        else
+          .
+      } %>%
+      dplyr::group_by(.data$filename,
+                      .data$compound,
+                      .data$Basepeak,
+                      .data$isotopocule) %>%
 
       dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #RATIO CALCULATION!
 
-      dplyr::mutate(Ratio.SEM = calculate_se(.data$ions.incremental / .data$Basepeak.Ions)),      #For simplicity use basic standard error for all options
+      dplyr::mutate(Ratio.SEM = calculate_se(.data$ions.incremental / .data$Basepeak.Ions)),
+    #For simplicity use basic standard error for all options
 
 
     warning = function(w) {
@@ -869,16 +890,12 @@ orbi_calculate_results <- function(dataset, ratio.method) {
       ) %>%
 
       dplyr::select(
-        .data$filename,
-        .data$compound,
-        .data$Basepeak,
-        .data$isotopocule,
-        .data$Ratio,
-        .data$Ratio.SEM,
-        .data$relSE.permil,
-        .data$Shot.Noise.permil,
-        .data$No.of.scans,
-        .data$Mins.to.1mio
+        -.data$ions.incremental,
+        -.data$Basepeak.Ions,
+        -.data$time.min,
+        -.data$scan.no,
+        -.data$it.ms,
+        -.data$tic
       ) %>%
       unique() %>%
       arrange(.data$filename, .data$isotopocule),
