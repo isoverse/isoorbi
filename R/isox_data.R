@@ -66,7 +66,7 @@ orbi_simplify_isox <- function(dataset) {
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
   # check that requires columns are present
-  req_cols <- c("filename", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
 
   missing_cols <- setdiff(req_cols, names(dataset))
 
@@ -79,9 +79,9 @@ orbi_simplify_isox <- function(dataset) {
   tryCatch(
     dataset %>% dplyr::select(
       .data$filename,
+      .data$compound,
       .data$scan.no,
       .data$time.min,
-      .data$compound,
       .data$isotopocule,
       .data$ions.incremental,
       .data$tic,

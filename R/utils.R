@@ -37,47 +37,51 @@ orbi_filter_weak <-
 
 
     # check that requires columns are present
-    if (!(c("filename") %in% colnames(dataset)))
-      stop("dataset does not contain column filename", call. = TRUE)
-    if (!(c("scan.no") %in% colnames(dataset)))
-      stop("dataset does not contain column scan.no", call. = TRUE)
-    if (!(c("time.min") %in% colnames(dataset)))
-      stop("dataset does not contain column time.min", call. = TRUE)
-    if (!(c("compound") %in% colnames(dataset)))
-      stop("dataset does not contain column compound", call. = TRUE)
-    if (!(c("isotopocule") %in% colnames(dataset)))
-      stop("dataset does not contain column isotopocule", call. = TRUE)
-    if (!(c("ions.incremental") %in% colnames(dataset)))
-      stop("dataset does not contain column ions.incremental", call. = TRUE)
-    if (!(c("tic") %in% colnames(dataset)))
-      stop("dataset does not contain column tic", call. = TRUE)
-    if (!(c("it.ms") %in% colnames(dataset)))
-      stop("dataset does not contain column it.ms",  call. = TRUE)
+    req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
 
-    remove.df <- dataset %>%
-      dplyr::group_by(.data$filename) %>%
-      dplyr::mutate(n.scans = max(.data$scan.no) - min(.data$scan.no)) %>% #FIXME: implement a more general solution here
-      dplyr::group_by(.data$filename, .data$compound, .data$isotopocule) %>%
-      dplyr::mutate(i.scans = length(.data$scan.no)) %>%
-      dplyr::filter(.data$i.scans < min_percent / 100 * .data$n.scans) %>% # => update selection in GUI?, add message? used previously `input$rare`
-      dplyr::select(-.data$n.scans, -.data$i.scans) %>% droplevels() %>% as.data.frame()
+    missing_cols <- setdiff(req_cols, names(dataset))
+
+    if (length(missing_cols) > 0) {
+      paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+        stop(call. = FALSE)
+    }
 
 
-    df.out <-
-      anti_join(
-        dataset,
-        remove.df,
-        by = c(
-          "filename",
-          "scan.no",
-          "time.min",
-          "compound",
-          "isotopocule",
-          "ions.incremental",
-          "tic",
-          "it.ms"
-        )
-      )
+    tryCatch(
+      remove.df <- dataset %>%
+        dplyr::group_by(.data$filename) %>%
+        dplyr::mutate(n.scans = max(.data$scan.no) - min(.data$scan.no)) %>% #FIXME: implement a more general solution here
+        dplyr::group_by(.data$filename, .data$compound, .data$isotopocule) %>%
+        dplyr::mutate(i.scans = length(.data$scan.no)) %>%
+        dplyr::filter(.data$i.scans < min_percent / 100 * .data$n.scans) %>% # => update selection in GUI?, add message? used previously `input$rare`
+        dplyr::select(-.data$n.scans, -.data$i.scans) %>% droplevels() %>% as.data.frame(),
+             warning = function(w) {
+               stop("something went wrong: ", w$message, call. = TRUE)
+             }
+    )
+
+
+    tryCatch(
+      df.out <-
+        anti_join(
+          dataset,
+          remove.df,
+          by = c(
+            "filename",
+            "scan.no",
+            "time.min",
+            "compound",
+            "isotopocule",
+            "ions.incremental",
+            "tic",
+            "it.ms"
+          )
+        ),
+             warning = function(w) {
+               stop("something went wrong: ", w$message, call. = TRUE)
+             }
+    )
+
 
     return(df.out)
 
@@ -114,29 +118,26 @@ orbi_filter_satellitePeaks <- function(dataset) {
 
 
   # check that requires columns are present
-  if (!(c("filename") %in% colnames(dataset)))
-    stop("dataset does not contain column filename", call. = TRUE)
-  if (!(c("scan.no") %in% colnames(dataset)))
-    stop("dataset does not contain column scan.no", call. = TRUE)
-  if (!(c("time.min") %in% colnames(dataset)))
-    stop("dataset does not contain column time.min", call. = TRUE)
-  if (!(c("compound") %in% colnames(dataset)))
-    stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopocule") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopocule", call. = TRUE)
-  if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incremental", call. = TRUE)
-  if (!(c("tic") %in% colnames(dataset)))
-    stop("dataset does not contain column tic", call. = TRUE)
-  if (!(c("it.ms") %in% colnames(dataset)))
-    stop("dataset does not contain column it.ms",  call. = TRUE)
+  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
 
-  df.out <- dataset %>%
-    dplyr::group_by(.data$filename,
-                    .data$compound,
-                    .data$scan.no,
-                    .data$isotopocule) %>%
-    dplyr::filter(.data$ions.incremental == max(.data$ions.incremental))
+  missing_cols <- setdiff(req_cols, names(dataset))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
+
+  tryCatch(
+    df.out <- dataset %>%
+      dplyr::group_by(.data$filename,
+                      .data$compound,
+                      .data$scan.no,
+                      .data$isotopocule) %>%
+      dplyr::filter(.data$ions.incremental == max(.data$ions.incremental)),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
 
   return(df.out)
 }
@@ -179,31 +180,27 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 
 
   # check that requires columns are present
-  if (!(c("filename") %in% colnames(dataset)))
-    stop("dataset does not contain column filename", call. = TRUE)
-  if (!(c("scan.no") %in% colnames(dataset)))
-    stop("dataset does not contain column scan.no", call. = TRUE)
-  if (!(c("time.min") %in% colnames(dataset)))
-    stop("dataset does not contain column time.min", call. = TRUE)
-  if (!(c("compound") %in% colnames(dataset)))
-    stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopocule") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopocule", call. = TRUE)
-  if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incremental", call. = TRUE)
-  if (!(c("tic") %in% colnames(dataset)))
-    stop("dataset does not contain column tic", call. = TRUE)
-  if (!(c("it.ms") %in% colnames(dataset)))
-    stop("dataset does not contain column it.ms",  call. = TRUE)
+  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+
+  missing_cols <- setdiff(req_cols, names(dataset))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
 
 
-  df.out <-
-    dataset %>% dplyr::group_by(.data$filename) %>% dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>% #edit 28-Feb-2022 enable multiple dual inlet files
-    dplyr::filter(
-      .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
-        .data$TICxIT < stats::quantile(.data$TICxIT, 1 - truncate_extreme / 100)
-    ) %>%
-    dplyr::select(-.data$TICxIT)
+  tryCatch(  df.out <-
+               dataset %>% dplyr::group_by(.data$filename) %>% dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>% #edit 28-Feb-2022 enable multiple dual inlet files
+               dplyr::filter(
+                 .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
+                   .data$TICxIT < stats::quantile(.data$TICxIT, 1 - truncate_extreme / 100)
+               ) %>%
+               dplyr::select(-.data$TICxIT),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
 
   return(df.out)
 }
@@ -270,44 +267,39 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
 
 
   # check that requires columns are present
-  if (!(c("filename") %in% colnames(dataset)))
-    stop("dataset does not contain column filename", call. = TRUE)
-  if (!(c("scan.no") %in% colnames(dataset)))
-    stop("dataset does not contain column scan.no", call. = TRUE)
-  if (!(c("time.min") %in% colnames(dataset)))
-    stop("dataset does not contain column time.min", call. = TRUE)
-  if (!(c("compound") %in% colnames(dataset)))
-    stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopocule") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopocule", call. = TRUE)
-  if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incremental", call. = TRUE)
-  if (!(c("tic") %in% colnames(dataset)))
-    stop("dataset does not contain column tic", call. = TRUE)
-  if (!(c("it.ms") %in% colnames(dataset)))
-    stop("dataset does not contain column it.ms",  call. = TRUE)
+  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+
+  missing_cols <- setdiff(req_cols, names(dataset))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
 
 
-  df.out <- dataset %>%
-    # isotopocule filter
-    dplyr::filter(.data$isotopocule %in% c(isotopocules)) %>%
-    # file name filter
-    {
-      if (!"all" %in% filenames)
-        dplyr::filter(., .data$filename %in% filenames)
-      else
-        .
-    } %>%
-    # compounds filter
-    {
-      if (!"all" %in% compounds)
-        dplyr::filter(., .data$compound %in% compounds)
-      else
-        .
-    } %>%
-    # time range filter
-    dplyr::filter(.data$time.min >= time_min, .data$time.min <= time_max)
-
+  tryCatch(df.out <- dataset %>%
+             # isotopocule filter
+             dplyr::filter(.data$isotopocule %in% c(isotopocules)) %>%
+             # file name filter
+             {
+               if (!"all" %in% filenames)
+                 dplyr::filter(., .data$filename %in% filenames)
+               else
+                 .
+             } %>%
+             # compounds filter
+             {
+               if (!"all" %in% compounds)
+                 dplyr::filter(., .data$compound %in% compounds)
+               else
+                 .
+             } %>%
+             # time range filter
+             dplyr::filter(.data$time.min >= time_min, .data$time.min <= time_max),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
 
   return(df.out)
 }
@@ -336,7 +328,14 @@ calculate_se <- function(x) {
   if (length(x) <=1)
     stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
 
-  stats::sd(x) / sqrt(length(x))
+
+  tryCatch(
+    stats::sd(x) / sqrt(length(x)),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
 }
 
 # @title Internal function to calculate geometric mean
@@ -359,7 +358,14 @@ calculate_gmean <- function(x) {
   if (length(x) <=1)
     stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
 
-  exp(mean(log(x)))
+  tryCatch(
+    exp(mean(log(x))),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
+
 }
 
 
@@ -382,7 +388,13 @@ calculate_gsd <- function(x) {
   if (length(x) <=1)
     stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
 
-  exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))
+  tryCatch(
+    exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x))),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
 }
 
 # @title Internal function to calculate standard error (geometric)
@@ -404,7 +416,14 @@ calculate_gse <- function(x) {
   if (length(x) <=1)
     stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
 
-  (exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))) / sqrt(length(x))
+  tryCatch(
+    (exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))) / sqrt(length(x)),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
+
 }
 
 # @title Internal function for ratio.method `slope`
@@ -443,11 +462,16 @@ calculate_slope <- function(x, y) {
   if (length(x) != length(y))
     stop("Length of x and y need to be equal", call. = TRUE)
 
+  tryCatch(
+    model <- stats::lm(x ~ y + 0, weights = x), #Note order of x and y to get correct slope!
 
-  model <-
-    stats::lm(x ~ y + 0, weights = x) #Note order of x and y to get correct slope!
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
   sl <- model$coefficients[[1]]
-  sl
+  return(sl)
 }
 
 # @title Internal function for ratio.method `weighted.sum`
@@ -487,6 +511,7 @@ calculate_weighted.sum <- function(x, y) {
   if (length(x) != length(y))
     stop("Length of x and y need to be equal", call. = TRUE)
 
+
   df <- cbind(x, y)
 
   avg.ions <- (sum(df[, 1]) + sum(df[, 2])) / length(df[, 1])
@@ -495,8 +520,16 @@ calculate_weighted.sum <- function(x, y) {
 
   weighted.x <- avg.ions / scan.ions  * as.numeric(df[, 1])
   weighted.y <- avg.ions / scan.ions  * as.numeric(df[, 2])
-  ratio <- sum(weighted.x) / sum(weighted.y)
-  ratio
+
+  tryCatch(
+    ratio <- sum(weighted.x) / sum(weighted.y), #Note order of x and y to get correct slope!
+
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
+  return(ratio)
 }
 
 # @title Internal function to calculate ratio
@@ -553,6 +586,10 @@ orbi_calculate_ratio <-
       stop("denominator must be a numeric vector",  call. = TRUE)
 
 
+    tryCatch(
+      {
+
+
     if (ratio.method == "mean") {
       o <- base::mean(numerator / denominator)
       o
@@ -587,6 +624,13 @@ orbi_calculate_ratio <-
         }
       }
     }
+      },
+
+
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+    )
   }
 
 #' @title Assign the base peak
@@ -618,43 +662,68 @@ orbi_basepeak <- function(dataset, basepeak) {
   if (length(basepeak) > 1)
     stop("only one baspeak can be assigned",  call. = TRUE)
 
+
+
   # check that requires columns are present
-  if (!(c("filename") %in% colnames(dataset)))
-    stop("dataset does not contain column filename", call. = TRUE)
-  if (!(c("scan.no") %in% colnames(dataset)))
-    stop("dataset does not contain column scan.no", call. = TRUE)
-  if (!(c("compound") %in% colnames(dataset)))
-    stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopocule") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopocule", call. = TRUE)
-  if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incremental", call. = TRUE)
+  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental")
+
+  missing_cols <- setdiff(req_cols, names(dataset))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
+
+
+
+
 
 
 
   # Annotation: Identify `base peak` for each scan
 
-  df.sel <- dataset  %>%
-    dplyr::select(.data$filename,
-                  .data$compound,
-                  .data$scan.no,
-                  .data$isotopocule,
-                  .data$ions.incremental) %>%
-    dplyr::group_by(.data$filename, .data$scan.no) %>%
-    dplyr::filter(.data$isotopocule == basepeak) %>%
-    dplyr::mutate(Basepeak = factor(.data$isotopocule),
-                  Basepeak.Ions = .data$ions.incremental) %>%
-    dplyr::select(.data$filename,
-                  .data$compound,
-                  .data$scan.no,
-                  .data$Basepeak,
-                  .data$Basepeak.Ions) %>%
-    as.data.frame()
+  tryCatch(
+    df.sel <- dataset  %>%
+      dplyr::select(.data$filename,
+                    .data$compound,
+                    .data$scan.no,
+                    .data$isotopocule,
+                    .data$ions.incremental) %>%
+      dplyr::group_by(.data$filename, .data$scan.no) %>%
+      dplyr::filter(.data$isotopocule == basepeak) %>%
+      dplyr::mutate(Basepeak = factor(.data$isotopocule),
+                    Basepeak.Ions = .data$ions.incremental) %>%
+      dplyr::select(.data$filename,
+                    .data$compound,
+                    .data$scan.no,
+                    .data$Basepeak,
+                    .data$Basepeak.Ions) %>%
+      as.data.frame(),
 
-  df.out <- merge(df.sel, dataset, all = TRUE)
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
 
-  df.out <-
-    df.out %>% dplyr::filter(.data$isotopocule != basepeak) %>% droplevels()
+
+  tryCatch(
+    df.out <- merge(df.sel, dataset, all = TRUE),
+
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
+
+  tryCatch(
+    df.out <-
+      df.out %>% dplyr::filter(.data$isotopocule != basepeak) %>% droplevels(),
+
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
 
   return(df.out)
 }
@@ -688,6 +757,7 @@ orbi_basepeak <- function(dataset, basepeak) {
 #' @export
 orbi_calculate_results <- function(dataset, ratio.method) {
 
+
   #basic checks
   if (missing(dataset))
     stop("no input for dataset supplied", call. = TRUE)
@@ -706,69 +776,98 @@ orbi_calculate_results <- function(dataset, ratio.method) {
                      "weighted.sum")
 
   if (!(ratio.method %in% ratio.options))
-    stop(cat("ratio.method must be on of the following: ", ratio.options,"\n",sep = " "),  call. = TRUE)
-
-
+    stop(cat(
+      "ratio.method must be on of the following: ",
+      ratio.options,
+      "\n",
+      sep = " "
+    ),
+    call. = TRUE)
 
 
   # check that requires columns are present
-  if (!(c("filename") %in% colnames(dataset)))
-    stop("dataset does not contain column filename", call. = TRUE)
-  if (!(c("compound") %in% colnames(dataset)))
-    stop("dataset does not contain column compound", call. = TRUE)
-  if (!(c("isotopocule") %in% colnames(dataset)))
-    stop("dataset does not contain column isotopocule", call. = TRUE)
-  if (!(c("ions.incremental") %in% colnames(dataset)))
-    stop("dataset does not contain column ions.incrementalo", call. = TRUE)
-  if (!(c("time.min") %in% colnames(dataset)))
-    stop("dataset does not contain column time.min", call. = TRUE)
-  if (!(c("Basepeak") %in% colnames(dataset)))
-    stop("dataset does not contain column Basepeak", call. = TRUE)
+  req_cols <-
+    c(
+      "filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental",
+      "Basepeak"
+    )
+
+  missing_cols <- setdiff(req_cols, names(dataset))
+
+  if (length(missing_cols) > 0) {
+    paste0("Missing required column(s): ",
+           paste(missing_cols, collapse = ", ")) %>%
+      stop(call. = FALSE)
+  }
 
 
-  df.stat <- dataset  %>%  dplyr::group_by(.data$filename,
-                                           .data$compound,
-                                          .data$Basepeak,
-                                        .data$isotopocule) %>%
+  tryCatch(
+    df.stat <- dataset  %>%  dplyr::group_by(.data$filename,
+                                             .data$compound,
+                                             .data$Basepeak,
+                                             .data$isotopocule) %>%
 
-    dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #RATIO CALCULATION!
+      dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #RATIO CALCULATION!
 
-    dplyr::mutate(Ratio.SEM = calculate_se(.data$ions.incremental / .data$Basepeak.Ions))      #For simplicity use basic standard error for all options
+      dplyr::mutate(Ratio.SEM = calculate_se(.data$ions.incremental / .data$Basepeak.Ions)),      #For simplicity use basic standard error for all options
 
-  df.stat <- df.stat %>% dplyr::mutate(
-    No.of.scans = length(.data$Ratio),
-    Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
-    Shot.Noise.permil = 1000 * (sqrt((
-      sum(.data$ions.incremental) + sum(.data$Basepeak.Ions)
-    ) / (
-      sum(.data$ions.incremental) * sum(.data$Basepeak.Ions)
-    ))),
-    relSE.permil = 1000 * (.data$Ratio.SEM / .data$Ratio)
-  ) %>%
 
-    #Round values for output
-    dplyr::mutate(
-      Ratio = round(.data$Ratio, 8),
-      Ratio.SEM = round(.data$Ratio.SEM, 8),
-      Shot.Noise.permil = round(.data$Shot.Noise.permil, 3),
-      relSE.permil = round(.data$relSE.permil, 3),
-      Mins.to.1mio = round(.data$Mins.to.1mio, 2)
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
+
+
+  tryCatch(
+    df.stat <- df.stat %>% dplyr::mutate(
+
+      No.of.scans = length(.data$Ratio),
+      Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
+      Shot.Noise.permil = 1000 * (sqrt((
+        sum(.data$ions.incremental) + sum(.data$Basepeak.Ions)
+      ) / (
+        sum(.data$ions.incremental) * sum(.data$Basepeak.Ions)
+      ))),
+      relSE.permil = 1000 * (.data$Ratio.SEM / .data$Ratio)
     ) %>%
 
-    dplyr::select(
-      .data$filename,
-      .data$compound,
-      .data$Basepeak,
-      .data$isotopocule,
-      .data$Ratio,
-      .data$Ratio.SEM,
-      .data$relSE.permil,
-      .data$Shot.Noise.permil,
-      .data$No.of.scans,
-      .data$Mins.to.1mio
-    ) %>%
-    unique() %>%
-    arrange(.data$filename, .data$isotopocule)
+      #Round values for output
+      dplyr::mutate(
+        Ratio = round(.data$Ratio, 8),
+        Ratio.SEM = round(.data$Ratio.SEM, 8),
+        Shot.Noise.permil = round(.data$Shot.Noise.permil, 3),
+        relSE.permil = round(.data$relSE.permil, 3),
+        Mins.to.1mio = round(.data$Mins.to.1mio, 2)
+      ) %>%
+
+      dplyr::select(
+        .data$filename,
+        .data$compound,
+        .data$Basepeak,
+        .data$isotopocule,
+        .data$Ratio,
+        .data$Ratio.SEM,
+        .data$relSE.permil,
+        .data$Shot.Noise.permil,
+        .data$No.of.scans,
+        .data$Mins.to.1mio
+      ) %>%
+      unique() %>%
+      arrange(.data$filename, .data$isotopocule),
+
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
+  )
+
+
+
 
   df.stat <- as.data.frame(df.stat)
   return(df.stat)
