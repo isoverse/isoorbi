@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   quick_start: quick_start.html
-last_built: 2022-10-01T07:06Z
+last_built: 2022-10-01T07:17Z
 urls:
   reference: https://www.isoverse.org/isoorbi/reference
   article: https://www.isoverse.org/isoorbi/articles
