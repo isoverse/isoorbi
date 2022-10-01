@@ -1,27 +1,24 @@
-# isoorbi
-
-# isoorbi <img src="man/figures/logo.png" align="right" height="138" />
+# isoorbi <a href='https://www.isoverse.org/isoorbi'> <img src="man/figures/logo.png" align="right" height="138" /> </a>
 
 <!-- badges: start -->
   [![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://www.isoverse.org/isoorbi)
   [![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
 <!-- badges: end -->
 
-## About
+## Overview
 
-This R package is providing functions for processing isotopocule measurements from an Orbitrap mass spectrometer. It uses <code>.isox</code> files created by IsoX as input.
+The goal of the isoorbi R package is to help you process isotopocule measurements from an **Orbitrap Iso** mass spectrometer. It expects <code>.isox</code> files created by IsoX as input.
 
 ## Installation
 
-To install from CRAN:
-
-```
+``` r
+# To install from CRAN
 install.packages("isoorbi")
 ```
 
-## Usage
+## Getting started
 
-```
+``` r
 library(isoorbi)
 
 orbi_read_isox(filepath)
@@ -31,12 +28,14 @@ orbi_read_isox(filepath)
 
 If you encounter a clear bug, please file an issue with a minimal reproducible example on [GitHub](https://github.com/isoverse/isoorbi/issues). 
 
+For questions and other discussion, please use the [isoorbi slack workspace](https://isoorbi.slack.com).
+
 ## Development version
 
-To get a bug fix or to use the latest features from the development version, you can install 
-the development version of isoorbi from GitHub.
+To get a bug fix or to use the latest features from the development version of isoorbi from GitHub.
 
-```
+``` r
+# install the development version 
 install.packages("devtools")
 
 devtools::install_github("isoverse/isoorbi")
