@@ -50,9 +50,9 @@ orbi_filter_weak <-
     tryCatch(
       remove.df <- dataset %>%
         dplyr::group_by(.data$filename) %>%
-        dplyr::mutate(n.scans = max(.data$scan.no) - min(.data$scan.no)) %>% #FIXME: implement a more general solution here
+        dplyr::mutate(n.scans = length(unique(scan.no))) %>%
         dplyr::group_by(.data$filename, .data$compound, .data$isotopocule) %>%
-        dplyr::mutate(i.scans = length(.data$scan.no)) %>%
+        dplyr::mutate(i.scans = length(unique(scan.no))) %>%
         dplyr::filter(.data$i.scans < min_percent / 100 * .data$n.scans) %>% # => update selection in GUI?, add message? used previously `input$rare`
         dplyr::select(-.data$n.scans, -.data$i.scans) %>% droplevels() %>% as.data.frame(),
              warning = function(w) {
