@@ -2,8 +2,8 @@ pandoc: 2.7.3
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
-  example_analysis: example_analysis.html
-last_built: 2022-10-01T05:53Z
+  quick_start: quick_start.html
+last_built: 2022-10-01T06:23Z
 urls:
   reference: https://www.isoverse.org/isoorbi/reference
   article: https://www.isoverse.org/isoorbi/articles
