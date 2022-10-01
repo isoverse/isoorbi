@@ -299,6 +299,7 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
                else
                  .
              } %>%
+
              # time range filter
              dplyr::filter(.data$time.min >= time_min, .data$time.min <= time_max),
     warning = function(w) {
