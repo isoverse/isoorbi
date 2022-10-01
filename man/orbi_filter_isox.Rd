@@ -20,7 +20,7 @@ orbi_filter_isox(
 
 \item{isotopocules}{Vector of isotopocules to select}
 
-\item{compounds}{Vector of compounds files to select}
+\item{compounds}{Vector of compounds to select}
 
 \item{time_min}{Minimum time in minutes}
 

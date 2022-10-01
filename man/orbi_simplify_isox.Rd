@@ -13,7 +13,7 @@ orbi_simplify_isox(dataset)
 A data frame containing only the 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
 }
 \description{
-Keep only columns that directly relevant for isotopocule ratio analysis
+Keep only columns that are directly relevant for isotopocule ratio analysis
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
