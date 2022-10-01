@@ -1,10 +1,5 @@
 title: isoorbi
 url: https://www.isoverse.org/isoorbi
 template:
-  params:
-    bootswatch: simplex
-    ganalytics: UA-106138361-4
-    toc_float: true
-
-home:
-  strip_header: true
+  bootstrap: 5
+  bootswatch: quartz
