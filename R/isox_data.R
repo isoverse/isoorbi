@@ -42,7 +42,7 @@ orbi_read_isox <- function(filepath) {
 }
 
 #' @title Simplify IsoX output
-#' @description Keep only columns that directly relevant for isotopocule ratio analysis
+#' @description Keep only columns that are directly relevant for isotopocule ratio analysis
 #'
 #' @param dataset The loaded IsoX data that is to be simplified
 #'
@@ -65,7 +65,7 @@ orbi_simplify_isox <- function(dataset) {
   if (nrow(dataset) < 1)
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
-  # check that requires columns are present
+   # check that requires columns are present
   req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
 
   missing_cols <- setdiff(req_cols, names(dataset))

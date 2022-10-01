@@ -210,7 +210,7 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 #' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges
 #' @param dataset The data frame to be filtered
 #' @param filenames Vector of file names to select
-#' @param compounds Vector of compounds files to select
+#' @param compounds Vector of compounds to select
 #' @param isotopocules Vector of isotopocules to select
 #' @param time_min Minimum time in minutes
 #' @param time_max Maximum time in minutes
@@ -431,7 +431,7 @@ calculate_gse <- function(x) {
 # @keywords internal
 # @param x A vector of values used as ratio nominator
 # @param y A vector of values used as ratio denominator
-# @details The slope is calculates from a linear model that is weighted by the nominator x, using stats::lm(x ~ y + 0, weights = x)
+# @details The slope is calculates from a linear model that is weighted by the nominator x, using `stats::lm(x ~ y + 0, weights = x)`
 # @return The calculated slope, an estimate of the ratio x/y
 calculate_slope <- function(x, y) {
 
