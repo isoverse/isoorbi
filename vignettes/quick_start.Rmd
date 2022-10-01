@@ -4,7 +4,7 @@ description: >
   A minimal example for isotopocule data processing of an Orbitrap Iso file (.isox).
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Loading and Processing Orbitrap Iso files}
+  %\VignetteIndexEntry{Quick start guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
