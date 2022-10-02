@@ -1,6 +1,5 @@
 # Common utility functions
 
-
 #' @title Filter to remove minor satellite peaks
 #' @description Remove minor signals (e.g., satellite peaks) that were reported by IsoX
 #' @param dataset A data frame or tibble produced from IsoX data by `orbi_simplify_isox()`

@@ -11,12 +11,14 @@ vignette: >
 
 ```{r}
 library(isoorbi)
+
+# Load a path to a system test file
+file_path <-system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 ```
 
-
+A basic data processing example
 ```{r}
 # Read .isox test data
-file_path <-system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(file_path) 
 
 # Keep only most important columns; equivalent to simplify check box in IsoX
@@ -40,7 +42,7 @@ df.results <- df.filtered %>% orbi_basepeak(basepeak = "M0") %>%
 
 
 FIXME: Temp
-```{r}
+```{r, include=FALSE} 
 
 df.simple$segment <- NA
 df.simple$block <- NA
