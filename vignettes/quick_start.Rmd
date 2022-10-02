@@ -41,9 +41,9 @@ df.results <- df.filtered %>% orbi_basepeak(basepeak = "M0") %>%
 ```
 
 
-FIXME: Temp
-```{r, include=FALSE} 
 
+```{r, include=FALSE} 
+#Temporary tests for optional grouping
 df.simple$segment <- NA
 df.simple$block <- NA
 df.simple$injection <- NA
