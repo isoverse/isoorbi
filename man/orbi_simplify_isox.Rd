@@ -2,7 +2,7 @@
 % Please edit documentation in R/isox_data.R
 \name{orbi_simplify_isox}
 \alias{orbi_simplify_isox}
-\title{Simplify IsoX output}
+\title{Simplify IsoX data}
 \usage{
 orbi_simplify_isox(dataset)
 }

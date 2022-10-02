@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{orbi_filter_weak}
 \alias{orbi_filter_weak}
-\title{Filter weak isotopocules}
+\title{Filter to remove weak isotopocules}
 \usage{
 orbi_filter_weak(dataset, min_percent)
 }
