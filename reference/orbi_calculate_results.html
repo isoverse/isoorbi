@@ -68,30 +68,28 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Returns table containing <code>filename</code>, <code>compound</code>,  <code>Basepeak</code>, <code>Isotopocule</code>, <code>Ratio</code>, <code>Ratio.SEM</code>, <code>relSE.permil</code>, <code>Shot.Noise.permil</code>, <code>No.of.Scans</code>, <code>Mins.to.1mio</code></p>
+<p>Returns a results table containing <code>filename</code>, <code>compound</code>,  <code>Basepeak</code>, <code>Isotopocule</code>, <code>Ratio</code>, <code>Ratio.SEM</code>, <code>relSE.permil</code>, <code>Shot.Noise.permil</code>, <code>No.of.Scans</code>, <code>Mins.to.1mio</code></p>
 
 
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><strong>Description of the output columns:</strong></p>
-<p><code>Basepeak</code>: Isotopocule used as denominator in ratio calculation.</p>
-<p><code>isotopocule</code>: Isotopocule used as numerator in ratio calculation.</p>
-<p><code>Ratio.SEM</code>: Standard error of the mean for the ratio</p>
-<p><code>No.of.scans</code>: Number of scans used for the final ratio calculation</p>
-<p><code>Mins.to.1mio</code>: Time in minutes it would take to observe 1 million ions of the <code>isotopocule</code> used as numerator of the ratio calculation.</p>
-<p><code>Shot.Noise.permil</code>: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.</p>
-<p><code>Rel.SE.permil</code>: Relative standard error of the reported ratio in permil</p>
-<p><strong>Description of options for <code>ratio.method</code>:</strong></p>
+    <p><strong>Description of the output columns:</strong></p><ul><li><p><code>Basepeak</code>: Isotopocule used as denominator in ratio calculation.</p></li>
+<li><p><code>isotopocule</code>: Isotopocule used as numerator in ratio calculation.</p></li>
+<li><p><code>Ratio.SEM</code>: Standard error of the mean for the ratio</p></li>
+<li><p><code>No.of.scans</code>: Number of scans used for the final ratio calculation</p></li>
+<li><p><code>Mins.to.1mio</code>: Time in minutes it would take to observe 1 million ions of the <code>isotopocule</code> used as numerator of the ratio calculation.</p></li>
+<li><p><code>Shot.Noise.permil</code>: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.</p></li>
+<li><p><code>Rel.SE.permil</code>: Relative standard error of the reported ratio in permil</p></li>
+</ul><p><strong>Description of options for <code>ratio.method</code>:</strong></p>
 <p>Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).</p>
-<p><code>mean</code>: arithmetic mean of ratios from individual scans.</p>
-<p><code>sum</code>: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.</p>
-<p><code>geometric.mean</code>: geometric mean of ratios from individual scans.</p>
-<p><code>slope</code>: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the <code>numerator x</code>, using <code>stats::lm(x ~ y + 0, weights = x)</code>.</p>
-<p><code>weighted.sum</code>: A derivative of the <code>sum</code> option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total <code>sum</code> of <code>x</code> and <code>y</code> that is used to calculate <code>x/y</code>.</p>
-    </div>
+The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).</p><ul><li><p><code>mean</code>: arithmetic mean of ratios from individual scans.</p></li>
+<li><p><code>sum</code>: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.</p></li>
+<li><p><code>geometric.mean</code>: geometric mean of ratios from individual scans.</p></li>
+<li><p><code>slope</code>: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the <code>numerator x</code>, using <code>stats::lm(x ~ y + 0, weights = x)</code>.</p></li>
+<li><p><code>weighted.sum</code>: A derivative of the <code>sum</code> option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total <code>sum</code> of <code>x</code> and <code>y</code> that is used to calculate <code>x/y</code>.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
