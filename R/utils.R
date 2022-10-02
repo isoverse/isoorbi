@@ -56,7 +56,7 @@ orbi_filter_satellitePeaks <- function(dataset) {
 
 
 
-#' @title Filter weak isotopocules
+#' @title Filter to remove weak isotopocules
 #' @description The function `orbi_filter_weak()` removes isotopocules that are not consistently detected in most scans
 #'
 #' @param dataset A simplified IsoX data frame to be processed
