@@ -50,6 +50,27 @@ orbi_filter_weak <-
     tryCatch(
 
       remove.df <- dataset %>%
+        # segmented data
+        {
+          if ("segment" %in% names(dataset))
+            dplyr::group_by(.data$segment)
+          else
+            .
+        } %>%
+        # blocks for dual inlet data
+        {
+          if ("block" %in% names(dataset))
+            dplyr::group_by(.data$block)
+          else
+            .
+        } %>%
+        # injection for automated flow injections
+        {
+          if ("injection" %in% names(dataset))
+            dplyr::group_by(.data$injection)
+          else
+            .
+        } %>%
         dplyr::group_by(.data$filename,
                         .data$compound,
                         .data$isotopocule) %>%
@@ -195,7 +216,29 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 
 
   tryCatch(  df.out <-
-               dataset %>% dplyr::group_by(.data$filename, .data$compound) %>%
+               dataset %>%
+               # segmented data
+               {
+                 if ("segment" %in% names(dataset))
+                   dplyr::group_by(.data$segment)
+                 else
+                   .
+               } %>%
+               # blocks for dual inlet data
+               {
+                 if ("block" %in% names(dataset))
+                   dplyr::group_by(.data$block)
+                 else
+                   .
+               } %>%
+               # injection for automated flow injections
+               {
+                 if ("injection" %in% names(dataset))
+                   dplyr::group_by(.data$injection)
+                 else
+                   .
+               } %>%
+               dplyr::group_by(.data$filename, .data$compound) %>% #FIX: segments, blocks, injections
                dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
                dplyr::filter(
                  .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
@@ -277,7 +320,7 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
   missing_cols <- setdiff(req_cols, names(dataset))
 
   if (length(missing_cols) > 0) {
-    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+    paste0("missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
 
@@ -707,7 +750,7 @@ orbi_basepeak <- function(dataset, basepeak) {
                     .data$scan.no,
                     .data$isotopocule,
                     .data$ions.incremental) %>%
-      dplyr::group_by(.data$filename, .data$scan.no) %>%
+      dplyr::group_by(.data$filename, .data$compound, .data$scan.no) %>% #FIX: OK for LC?
       dplyr::filter(.data$isotopocule == basepeak) %>%
       dplyr::mutate(Basepeak = factor(.data$isotopocule),
                     Basepeak.Ions = .data$ions.incremental) %>%
