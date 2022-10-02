@@ -52,21 +52,21 @@ orbi_filter_weak <-
       remove.df <- dataset %>%
         # segmented data
         {
-          if ("segment" %in% names(dataset))
+          if ("segment" %in% names(.data))
             dplyr::group_by(.data$segment)
           else
             .
         } %>%
         # blocks for dual inlet data
         {
-          if ("block" %in% names(dataset))
+          if ("block" %in% names(.data))
             dplyr::group_by(.data$block)
           else
             .
         } %>%
         # injection for automated flow injections
         {
-          if ("injection" %in% names(dataset))
+          if ("injection" %in% names(.data))
             dplyr::group_by(.data$injection)
           else
             .
@@ -219,21 +219,21 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
                dataset %>%
                # segmented data
                {
-                 if ("segment" %in% names(dataset))
+                 if ("segment" %in% names(.data))
                    dplyr::group_by(.data$segment)
                  else
                    .
                } %>%
                # blocks for dual inlet data
                {
-                 if ("block" %in% names(dataset))
+                 if ("block" %in% names(.data))
                    dplyr::group_by(.data$block)
                  else
                    .
                } %>%
                # injection for automated flow injections
                {
-                 if ("injection" %in% names(dataset))
+                 if ("injection" %in% names(.data))
                    dplyr::group_by(.data$injection)
                  else
                    .
@@ -873,21 +873,21 @@ orbi_calculate_results <- function(dataset, ratio.method) {
     df.stat <- dataset  %>%
       # segmented data
       {
-        if ("segment" %in% names(dataset))
+        if ("segment" %in% names(.data))
           dplyr::group_by(.data$segment)
         else
           .
       } %>%
       # blocks for dual inlet data
       {
-        if ("block" %in% names(dataset))
+        if ("block" %in% names(.data))
           dplyr::group_by(.data$block)
         else
           .
       } %>%
       # injection for automated flow injections
       {
-        if ("injection" %in% names(dataset))
+        if ("injection" %in% names(.data))
           dplyr::group_by(.data$injection)
         else
           .

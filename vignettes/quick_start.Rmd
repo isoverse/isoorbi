@@ -27,10 +27,13 @@ df.filtered <- df.simple %>% orbi_filter_isox(filename = c("s3744", "ac6"),
                                               time_min = 0.1, 
                                               time_max = 1, 
                                               compounds = c("HSO4-"),
-                                              isotopocules = c("M0", "34S", "33S", "17O", "18O")) %>% 
+                                              isotopocules = c("M0", "34S", "33S", "17O", "18O"))%>% 
                              orbi_filter_satellitePeaks() %>% 
                              orbi_filter_weak(min_percent = 10) %>% 
                              orbi_filter_TICxIT(truncate_extreme = 1)
+
+# df.simple$block <- 1
+# df.simple[df.simple$time.min<0.5, ]$block <- 2
 
 # Define base peak and calculate the results table
 df.results <- df.filtered %>% orbi_basepeak(basepeak = "M0") %>% 
