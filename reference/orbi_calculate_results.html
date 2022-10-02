@@ -74,9 +74,17 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).</p>
+    <p><strong>Description of the output columns:</strong></p>
+<p><code>Basepeak</code>: Isotopocule used as denominator in ratio calculation.</p>
+<p><code>isotopocule</code>: Isotopocule used as numerator in ratio calculation.</p>
+<p><code>Ratio.SEM</code>: Standard error of the mean for the ratio</p>
+<p><code>No.of.scans</code>: Number of scans used for the final ratio calculation</p>
+<p><code>Mins.to.1mio</code>: Time in minutes it would take to observe 1 million ions of the <code>isotopocule</code> used as numerator of the ratio calculation.</p>
+<p><code>Shot.Noise.permil</code>: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.</p>
+<p><code>Rel.SE.permil</code>: Relative standard error of the reported ratio in permil</p>
 <p><strong>Description of options for <code>ratio.method</code>:</strong></p>
+<p>Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).</p>
 <p><code>mean</code>: arithmetic mean of ratios from individual scans.</p>
 <p><code>sum</code>: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.</p>
 <p><code>geometric.mean</code>: geometric mean of ratios from individual scans.</p>
