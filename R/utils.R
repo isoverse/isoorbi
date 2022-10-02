@@ -747,7 +747,7 @@ orbi_basepeak <- function(dataset, basepeak) {
   # Annotation: Identify `base peak` for each scan
 
   tryCatch(
-    df.sel <- dataset  %>%
+    df.sel <- dataset  %>% ungroup() %>%
       dplyr::select(.data$filename,
                     .data$compound,
                     .data$scan.no,
@@ -872,34 +872,51 @@ orbi_calculate_results <- function(dataset, ratio.method) {
   }
 
 
-  tryCatch(
 
+    #Grouping
     df.stat <- dataset  %>% ungroup() %>%
-      # column `segment` optional for processing segmented data
-      {
-        if ("segment" %in% names(.data))
-          dplyr::group_by(.data$segment, .add = TRUE)
-        else
-          .
-      } %>%
-      # column `block` optional for dual inlet data
-      {
-        if ("block" %in% names(.data))
-          dplyr::group_by(.data$block, .add = TRUE)
-        else
-          .
-      } %>%
-      # column `injection` optional for automated flow injections
-      {
-        if ("injection" %in% names(.data))
-          dplyr::group_by(.data$injection, .add = TRUE)
-        else
-          .
-      } %>%
+
       dplyr::group_by(.data$filename,
                       .data$compound,
                       .data$Basepeak,
-                      .data$isotopocule, .add = TRUE) %>%
+                      .data$isotopocule,
+                      .add = TRUE)
+
+
+      {
+        if ("block" %in% names(dataset))
+
+          #ensure block is defined as a factor
+
+          df.stat <- df.stat  %>% mutate(block = as.factor(.data$block)) %>%
+                                  dplyr::group_by(.data$block,
+                                        .add = TRUE)
+      }
+
+    {
+      if ("segment" %in% names(dataset))
+
+        #ensure segment is defined as a factor
+
+        df.stat <- df.stat  %>% mutate(segment = as.factor(.data$segment)) %>%
+        dplyr::group_by(.data$segment,
+                        .add = TRUE)
+    }
+
+    {
+      if ("injection" %in% names(dataset))
+
+        #ensure injection is defined as a factor
+
+        df.stat <- df.stat  %>% mutate(injection = as.factor(.data$injection)) %>%
+        dplyr::group_by(.data$injection,
+                        .add = TRUE)
+    }
+
+
+    tryCatch(
+
+    df.stat <- df.stat %>%
 
       dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #THE ACTUAL RATIO CALCULATION!
 
