@@ -4,23 +4,23 @@
 #' @description Read an IsoX output file (`.isox`) into a tibble data frame
 #'
 #' @param filepath Path to the `.isox` file
-#' @details Additional details on the columns:
+#' @details Additional information on the columns:
 #'
-#' **`filename`**: name of the original Thermo `.raw` file processed by IsoX
+#' * `filename`: name of the original Thermo `.raw` file processed by IsoX
 #'
-#' **`scan.no`**: scan number
+#' * `scan.no`: scan number
 #'
-#' **`time.min`**: acquisition or retention time in minutes
+#' * `time.min`: acquisition or retention time in minutes
 #'
-#' **`compound`**: name of the compound (e.g., NO3-)
+#' * `compound`: name of the compound (e.g., NO3-)
 #'
-#' **`isotopocule`**: name of the isotopocule (e.g., 15N); called `isotopolog` in `.isox`
+#' * `isotopocule`: name of the isotopocule (e.g., 15N); called `isotopolog` in `.isox`
 #'
-#' **`ions.incremental`**: estimated number of ions, in increments since it is a calculated number
+#' * `ions.incremental`: estimated number of ions, in increments since it is a calculated number
 #'
-#' **`tic`**: total ion current (TIC) of the scan
+#' * `tic`: total ion current (TIC) of the scan
 #'
-#' **`it.ms`**: scan injection time (IT) in milli seconds (ms)
+#' * `it.ms`: scan injection time (IT) in milli seconds (ms)
 #'
 #'
 #' @examples
@@ -78,7 +78,7 @@ orbi_read_isox <- function(filepath) {
 #'
 #' @param dataset IsoX data that is to be simplified
 #'
-#' @return A data frame containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
+#' @return A tiblle containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")

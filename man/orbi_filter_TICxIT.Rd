@@ -19,6 +19,7 @@ The function \code{orbi_filter_TICxIT()} removes extremely high and low intense 
 }
 \details{
 Function is intended to remove scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+
 The filter is a basic truncation that removes \verb{x \%} of scans with the largest \strong{and} \verb{x \%} of scans with the smallest ion estimates. Grouping is by columns \code{filename} and \code{compound}.
 
 The input \code{dataset} is expected to have at least these 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
