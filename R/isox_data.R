@@ -1,15 +1,33 @@
-# functions for interacting with isox data
+# functions for interacting with IsoX data
 
 #' @title Read IsoX file
-#' @description Read an IsoX output file (.isox) into a tibble
+#' @description Read an IsoX output file (`.isox`) into a tibble data frame
 #'
-#' @param filepath Path to the .isox file
+#' @param filepath Path to the `.isox` file
+#' @details Additional details on the columns:
 #'
-#' @return A data frame containing at minimum the columns named `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`
+#' **`filename`**: name of the original Thermo `.raw` file processed by IsoX
+#'
+#' **`scan.no`**: scan number
+#'
+#' **`time.min`**: acquisition or retention time in minutes
+#'
+#' **`compound`**: name of the compound (e.g., NO3-)
+#'
+#' **`isotopocule`**: name of the isotopocule (e.g., 15N); called `isotopolog` in `.isox`
+#'
+#' **`ions.incremental`**: estimated number of ions, in increments since it is a calculated number
+#'
+#' **`tic`**: total ion current (TIC) of the scan
+#'
+#' **`it.ms`**: scan injection time (IT) in milli seconds (ms)
+#'
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
 #' df <- orbi_read_isox(filepath = fpath)
+#'
+#' @return A tibble containing at minimum the columns `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`
 #'
 #' @export
 
@@ -35,8 +53,7 @@ orbi_read_isox <- function(filepath) {
         tic = readr::col_double(),
         it.ms = readr::col_double()
       )
-    ) %>% dplyr::rename(isotopocule = .data$isotopolog),
-    #isox format should change as well
+    ) %>% dplyr::rename(isotopocule = .data$isotopolog), # isox format should eventually change as well
     warning = function(w) {
       stop("file format error: ", w$message, call. = TRUE)
     }
@@ -59,7 +76,7 @@ orbi_read_isox <- function(filepath) {
 #' @title Simplify IsoX output
 #' @description Keep only columns that are directly relevant for isotopocule ratio analysis
 #'
-#' @param dataset The loaded IsoX data that is to be simplified
+#' @param dataset IsoX data that is to be simplified
 #'
 #' @return A data frame containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'

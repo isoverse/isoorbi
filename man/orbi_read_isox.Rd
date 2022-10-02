@@ -7,13 +7,32 @@
 orbi_read_isox(filepath)
 }
 \arguments{
-\item{filepath}{Path to the .isox file}
+\item{filepath}{Path to the \code{.isox} file}
 }
 \value{
-A data frame containing at minimum the columns named \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}
+A tibble containing at minimum the columns \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}
 }
 \description{
-Read an IsoX output file (.isox) into a tibble
+Read an IsoX output file (\code{.isox}) into a tibble data frame
+}
+\details{
+Additional details on the columns:
+
+\strong{\code{filename}}: name of the original Thermo \code{.raw} file processed by IsoX
+
+\strong{\code{scan.no}}: scan number
+
+\strong{\code{time.min}}: acquisition or retention time in minutes
+
+\strong{\code{compound}}: name of the compound (e.g., NO3-)
+
+\strong{\code{isotopocule}}: name of the isotopocule (e.g., 15N); called \code{isotopolog} in \code{.isox}
+
+\strong{\code{ions.incremental}}: estimated number of ions, in increments since it is a calculated number
+
+\strong{\code{tic}}: total ion current (TIC) of the scan
+
+\strong{\code{it.ms}}: scan injection time (IT) in milli seconds (ms)
 }
 \examples{
 fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")

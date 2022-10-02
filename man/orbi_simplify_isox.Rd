@@ -7,7 +7,7 @@
 orbi_simplify_isox(dataset)
 }
 \arguments{
-\item{dataset}{The loaded IsoX data that is to be simplified}
+\item{dataset}{IsoX data that is to be simplified}
 }
 \value{
 A data frame containing only the 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
