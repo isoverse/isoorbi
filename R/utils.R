@@ -105,32 +105,65 @@ orbi_filter_weak <-
     }
 
 
+
+    #Optional groupings
+
     tryCatch(
 
-      remove.df <- dataset %>% dplyr::ungroup() %>%
-        # column `segment` optional for processing segmented data
-        {
-          if ("segment" %in% names(.data))
-            dplyr::group_by(.data$segment, .add = TRUE)
-          else
-            .
-        } %>%
-        # column `block` optional for dual inlet data
-        {
-          if ("block" %in% names(.data))
-            dplyr::group_by(.data$block, .add = TRUE)
-          else
-            .
-        } %>%
-        # column `injection` optional for automated flow injections
-        {
-          if ("injection" %in% names(.data))
-            dplyr::group_by(.data$injection, .add = TRUE)
-          else
-            .
-        } %>%
+      {
+
+
+        df.group <- dataset  %>% ungroup() %>%
           dplyr::group_by(.data$filename,
-                          .data$compound, .add = TRUE) %>%
+                          .data$compound, .add = TRUE)
+
+
+        {
+          if ("block" %in% names(dataset))
+
+            #ensure block is defined as a factor
+
+            df.group <-
+            df.group  %>% mutate(block = as.factor(.data$block)) %>%
+            dplyr::group_by(.data$block,
+                            .add = TRUE)
+          }
+
+        {
+          if ("segment" %in% names(dataset))
+
+            #ensure segment is defined as a factor
+
+            df.group <-
+            df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
+            dplyr::group_by(.data$segment,
+                            .add = TRUE)
+        }
+
+        {
+          if ("injection" %in% names(dataset))
+
+            #ensure injection is defined as a factor
+
+            df.group <-
+            df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
+            dplyr::group_by(.data$injection,
+                            .add = TRUE)
+        }
+      },
+
+
+      warning = function(w) {
+        stop("something went wrong looking to add optional groupings: ",
+             w$message,
+             call. = TRUE)
+      }
+    )
+
+
+    tryCatch(
+
+      remove.df <- df.group %>%
           dplyr::mutate(max.scans = length(unique(.data$scan.no))) %>%
           dplyr::group_by(.data$isotopocule, .add = TRUE) %>%
           dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
@@ -219,30 +252,61 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
   }
 
 
-  tryCatch(  df.out <-
-               dataset %>% ungroup() %>%
-               # column `segment` optional for processing segmented data
-               {
-                 if ("segment" %in% names(.data))
-                   dplyr::group_by(.data$segment, .add = TRUE)
-                 else
-                   .
-               } %>%
-               # column `block` optional for dual inlet data
-               {
-                 if ("block" %in% names(.data))
-                   dplyr::group_by(.data$block, .add = TRUE)
-                 else
-                   .
-               } %>%
-               # column `injection` optional for automated flow injections
-               {
-                 if ("injection" %in% names(.data))
-                   dplyr::group_by(.data$injection, .add = TRUE)
-                 else
-                   .
-               } %>%
-               dplyr::group_by(.data$filename, .data$compound, .add = TRUE) %>%
+  #Optional groupings
+
+  tryCatch(
+
+    {
+
+
+      df.group <- dataset  %>% ungroup() %>%
+        dplyr::group_by(.data$filename,
+                        .data$compound, .add = TRUE)
+
+
+      {
+        if ("block" %in% names(dataset))
+
+          #ensure block is defined as a factor
+
+          df.group <-
+          df.group  %>% mutate(block = as.factor(.data$block)) %>%
+          dplyr::group_by(.data$block,
+                          .add = TRUE)
+        }
+
+      {
+        if ("segment" %in% names(dataset))
+
+          #ensure segment is defined as a factor
+
+          df.group <-
+          df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
+          dplyr::group_by(.data$segment,
+                          .add = TRUE)
+      }
+
+      {
+        if ("injection" %in% names(dataset))
+
+          #ensure injection is defined as a factor
+
+          df.group <-
+          df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
+          dplyr::group_by(.data$injection,
+                          .add = TRUE)
+      }
+    },
+
+
+    warning = function(w) {
+      stop("something went wrong looking to add optional groupings: ",
+           w$message,
+           call. = TRUE)
+    }
+  )
+
+  tryCatch(  df.out <- df.group %>%
                dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
                dplyr::filter(
                  .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
@@ -796,9 +860,6 @@ orbi_basepeak <- function(dataset, basepeak) {
 #' @description Contains the logic to generate the results table
 #' @param dataset A processed tibble produced from `IsoX` output
 #' @param ratio.method Method for computing the ratio; passed to `orbi_calculate_ratio()`
-#' @details Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-#' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
-
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -806,7 +867,27 @@ orbi_basepeak <- function(dataset, basepeak) {
 #'       orbi_simplify_isox() %>% orbi_basepeak(basepeak = "M0")  %>%
 #'       orbi_calculate_results(ratio.method = "sum")
 #'
+#' @details **Description of the output columns:**
+#'
+#' `Basepeak`: Isotopocule used as denominator in ratio calculation.
+#'
+#' `isotopocule`: Isotopocule used as numerator in ratio calculation.
+#'
+#' `Ratio.SEM`: Standard error of the mean for the ratio
+#'
+#' `No.of.scans`: Number of scans used for the final ratio calculation
+#'
+#' `Mins.to.1mio`: Time in minutes it would take to observe 1 million ions of the `isotopocule` used as numerator of the ratio calculation.
+#'
+#' `Shot.Noise.permil`: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
+#'
+#' `Rel.SE.permil`: Relative standard error of the reported ratio in permil
+#'
+#'
 #' @details **Description of options for `ratio.method`:**
+#'
+#' @details Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+#' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
 #'
 #' `mean`: arithmetic mean of ratios from individual scans.
 #'
@@ -873,8 +954,14 @@ orbi_calculate_results <- function(dataset, ratio.method) {
 
 
 
-    #Grouping
-    df.stat <- dataset  %>% ungroup() %>%
+  #Optional groupings
+
+  tryCatch(
+
+    {
+
+
+    df.group <- dataset  %>% ungroup() %>%
 
       dplyr::group_by(.data$filename,
                       .data$compound,
@@ -883,14 +970,15 @@ orbi_calculate_results <- function(dataset, ratio.method) {
                       .add = TRUE)
 
 
-      {
-        if ("block" %in% names(dataset))
+    {
+      if ("block" %in% names(dataset))
 
-          #ensure block is defined as a factor
+        #ensure block is defined as a factor
 
-          df.stat <- df.stat  %>% mutate(block = as.factor(.data$block)) %>%
-                                  dplyr::group_by(.data$block,
-                                        .add = TRUE)
+        df.group <-
+        df.group  %>% mutate(block = as.factor(.data$block)) %>%
+        dplyr::group_by(.data$block,
+                        .add = TRUE)
       }
 
     {
@@ -898,7 +986,8 @@ orbi_calculate_results <- function(dataset, ratio.method) {
 
         #ensure segment is defined as a factor
 
-        df.stat <- df.stat  %>% mutate(segment = as.factor(.data$segment)) %>%
+        df.group <-
+        df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
         dplyr::group_by(.data$segment,
                         .add = TRUE)
     }
@@ -908,15 +997,25 @@ orbi_calculate_results <- function(dataset, ratio.method) {
 
         #ensure injection is defined as a factor
 
-        df.stat <- df.stat  %>% mutate(injection = as.factor(.data$injection)) %>%
+        df.group <-
+        df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
         dplyr::group_by(.data$injection,
                         .add = TRUE)
     }
+    },
+
+
+    warning = function(w) {
+      stop("something went wrong looking to add optional groupings: ",
+           w$message,
+           call. = TRUE)
+    }
+  )
 
 
     tryCatch(
 
-    df.stat <- df.stat %>%
+    df.stat <- df.group %>%
 
       dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #THE ACTUAL RATIO CALCULATION!
 

@@ -18,10 +18,26 @@ Returns table containing \code{filename}, \code{compound},  \code{Basepeak}, \co
 Contains the logic to generate the results table
 }
 \details{
-Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
+\strong{Description of the output columns:}
+
+\code{Basepeak}: Isotopocule used as denominator in ratio calculation.
+
+\code{isotopocule}: Isotopocule used as numerator in ratio calculation.
+
+\code{Ratio.SEM}: Standard error of the mean for the ratio
+
+\code{No.of.scans}: Number of scans used for the final ratio calculation
+
+\code{Mins.to.1mio}: Time in minutes it would take to observe 1 million ions of the \code{isotopocule} used as numerator of the ratio calculation.
+
+\code{Shot.Noise.permil}: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
+
+\code{Rel.SE.permil}: Relative standard error of the reported ratio in permil
 
 \strong{Description of options for \code{ratio.method}:}
+
+Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
 
 \code{mean}: arithmetic mean of ratios from individual scans.
 

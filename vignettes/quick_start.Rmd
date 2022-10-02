@@ -37,3 +37,23 @@ df.results <- df.filtered %>% orbi_basepeak(basepeak = "M0") %>%
                              orbi_calculate_results(ratio.method = "sum")
 
 ```
+
+
+FIXME: Temp
+```{r}
+
+df.simple$segment <- NA
+df.simple$block <- NA
+df.simple$injection <- NA
+df.simple[df.simple$time.min <0.5,]$block <- "one"
+df.simple[df.simple$time.min >0.5,]$block <- "two"
+df.simple[df.simple$time.min <0.4,]$segment <- "one"
+df.simple[df.simple$time.min >0.4,]$segment <- "twoo"
+df.simple[df.simple$time.min <0.3,]$injection <- "onesy"
+df.simple[df.simple$time.min >0.3,]$injection <- "2sy"
+df.simple$block <- as.factor(df.simple$block)
+df.simple$injection <- as.factor(df.simple$injection)
+df.simple$segment <- as.factor(df.simple$segment)
+
+```
+
