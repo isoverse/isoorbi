@@ -1,116 +1,5 @@
 # Common utility functions
 
-#' @title Filter weak isotopocules
-#' @description Remove isotopocules that are not consistently detected across scans with `orbi_filter_weak()`
-#'
-#' @param dataset A simplified IsoX data frame to be processed
-#' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (relative to the most observed isotopocule of the compound)
-#'
-#' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>%
-#'                      orbi_simplify_isox() %>%
-#'                      orbi_filter_weak(min_percent = 2)
-#'
-#' @return Filtered data frame (tibble)
-#' @export
-orbi_filter_weak <-
-  function(dataset, min_percent) {
-
-    # safety checks
-    if (missing(dataset))
-      stop("no dataset supplied", call. = TRUE)
-    if (is.data.frame(dataset) == FALSE)
-      stop("dataset must be a data frame",  call. = TRUE)
-    if (ncol(dataset) < 8)
-      stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
-    if (nrow(dataset) < 1)
-      stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
-
-    if (missing(min_percent))
-      stop("value for min_percent missing", call. = TRUE)
-
-    if (!(is.numeric(min_percent)))
-      stop("min_percent needs to be a number", call. = TRUE)
-    if (!(min_percent >= 0 && min_percent <=90))
-      stop("min_percent needs to be between 0 and 90 ", call. = TRUE)
-
-
-    # check that requires columns are present
-    req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
-
-    missing_cols <- setdiff(req_cols, names(dataset))
-
-    if (length(missing_cols) > 0) {
-      paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
-        stop(call. = FALSE)
-    }
-
-
-    tryCatch(
-
-      remove.df <- dataset %>%
-        # segmented data
-        {
-          if ("segment" %in% names(.data))
-            dplyr::group_by(.data$segment)
-          else
-            .
-        } %>%
-        # blocks for dual inlet data
-        {
-          if ("block" %in% names(.data))
-            dplyr::group_by(.data$block)
-          else
-            .
-        } %>%
-        # injection for automated flow injections
-        {
-          if ("injection" %in% names(.data))
-            dplyr::group_by(.data$injection)
-          else
-            .
-        } %>%
-        dplyr::group_by(.data$filename,
-                        .data$compound,
-                        .data$isotopocule) %>%
-        dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
-        dplyr::group_by(.data$filename, .data$compound) %>%
-        dplyr::mutate(max.scans = max(.data$obs.scans)) %>%
-        dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
-        dplyr::select(-.data$obs.scans,-.data$max.scans) %>% droplevels() %>% as.data.frame(),
-      warning = function(w) {
-        stop("something went wrong: ", w$message, call. = TRUE)
-      }
-    )
-
-
-    tryCatch(
-      df.out <-
-        dplyr::anti_join(
-          dataset,
-          remove.df,
-          by = c(
-            "filename",
-            "scan.no",
-            "time.min",
-            "compound",
-            "isotopocule",
-            "ions.incremental",
-            "tic",
-            "it.ms"
-          )
-        ),
-             warning = function(w) {
-               stop("something went wrong: ", w$message, call. = TRUE)
-             }
-    )
-
-    return(df.out)
-
-  }
-
-
 
 #' @title Filter to remove minor satellite peaks
 #' @description Remove minor signals (e.g., satellite peaks) that were reported by IsoX
@@ -151,7 +40,7 @@ orbi_filter_satellitePeaks <- function(dataset) {
   }
 
   tryCatch(
-    df.out <- dataset %>%
+    df.out <- dataset %>% ungroup %>%
       dplyr::group_by(.data$filename,
                       .data$compound,
                       .data$scan.no,
@@ -166,13 +55,128 @@ orbi_filter_satellitePeaks <- function(dataset) {
 }
 
 
-#' @title Filter to remove extreme scans
-#' @description Remove extremely high and low intense scans based on TIC x Injection time with `orbi_filter_TICxIT()`
-#' @param dataset Simplified IsoX file to have `TICxIT` outliers removed
-#' @param truncate_extreme A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.
-#' @details The `orbi_filter_TICxIT()` function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
-#' The filter is a basic truncation that removed x % of scans with maximal **and** x % of scans with minimal ion estimates. Grouping is by `filename` and `compound`.
+
+#' @title Filter weak isotopocules
+#' @description The function `orbi_filter_weak()` removes isotopocules that are not consistently detected in most scans
 #'
+#' @param dataset A simplified IsoX data frame to be processed
+#' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of the compound)
+#'
+#' @examples
+#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' df <- orbi_read_isox(filepath = fpath) %>%
+#'                      orbi_simplify_isox() %>%
+#'                      orbi_filter_weak(min_percent = 2)
+#'
+#' @details The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
+#'
+#' @return Filtered tibble
+#' @export
+orbi_filter_weak <-
+  function(dataset, min_percent) {
+
+    # safety checks
+    if (missing(dataset))
+      stop("no dataset supplied", call. = TRUE)
+    if (is.data.frame(dataset) == FALSE)
+      stop("dataset must be a data frame",  call. = TRUE)
+    if (ncol(dataset) < 8)
+      stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+    if (nrow(dataset) < 1)
+      stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+
+    if (missing(min_percent))
+      stop("value for min_percent missing", call. = TRUE)
+
+    if (!(is.numeric(min_percent)))
+      stop("min_percent needs to be a number", call. = TRUE)
+    if (!(min_percent >= 0 && min_percent <=90))
+      stop("min_percent needs to be between 0 and 90 ", call. = TRUE)
+
+
+    # check that requires columns are present
+    req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+
+    missing_cols <- setdiff(req_cols, names(dataset))
+
+    if (length(missing_cols) > 0) {
+      paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+        stop(call. = FALSE)
+    }
+
+
+    tryCatch(
+
+      remove.df <- dataset %>% dplyr::ungroup() %>%
+        # column `segment` optional for processing segmented data
+        {
+          if ("segment" %in% names(.data))
+            dplyr::group_by(.data$segment, .add = TRUE)
+          else
+            .
+        } %>%
+        # column `block` optional for dual inlet data
+        {
+          if ("block" %in% names(.data))
+            dplyr::group_by(.data$block, .add = TRUE)
+          else
+            .
+        } %>%
+        # column `injection` optional for automated flow injections
+        {
+          if ("injection" %in% names(.data))
+            dplyr::group_by(.data$injection, .add = TRUE)
+          else
+            .
+        } %>%
+          dplyr::group_by(.data$filename,
+                          .data$compound, .add = TRUE) %>%
+          dplyr::mutate(max.scans = length(unique(.data$scan.no))) %>%
+          dplyr::group_by(.data$isotopocule, .add = TRUE) %>%
+          dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
+          dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
+          dplyr::select(-.data$obs.scans,-.data$max.scans) %>% droplevels() %>% as.data.frame(),
+        warning = function(w) {
+          stop("something went wrong applying filter min_percent: ", w$message, call. = TRUE)
+
+      }
+    )
+
+
+    tryCatch(
+      df.out <-
+        dplyr::anti_join(
+          dataset,
+          remove.df,
+          by = c(
+            "filename",
+            "scan.no",
+            "time.min",
+            "compound",
+            "isotopocule",
+            "ions.incremental",
+            "tic",
+            "it.ms"
+          )
+        ),
+             warning = function(w) {
+               stop("something went wrong: ", w$message, call. = TRUE)
+             }
+    )
+
+    return(df.out)
+
+  }
+
+
+#' @title Filter to remove extreme scans
+#' @description The function `orbi_filter_TICxIT()` removes extremely high and low intense scans based on TIC x injection time (i.e., ion intensity)
+#' @param dataset Simplified IsoX dataset to have `TICxIT` outliers removed
+#' @param truncate_extreme A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.
+#' @details Function is intended to remove scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' The filter is a basic truncation that removes `x %` of scans with the largest **and** `x %` of scans with the smallest ion estimates. Grouping is by columns `filename` and `compound`.
+#'
+#' The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #'@examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -180,7 +184,7 @@ orbi_filter_satellitePeaks <- function(dataset) {
 #' orbi_simplify_isox() %>%
 #' orbi_filter_TICxIT(truncate_extreme = 1)
 #'
-#' @return Filtered data frame (tibble)
+#' @return Filtered tibble
 #' @export
 orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 
@@ -216,29 +220,29 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 
 
   tryCatch(  df.out <-
-               dataset %>%
-               # segmented data
+               dataset %>% ungroup() %>%
+               # column `segment` optional for processing segmented data
                {
                  if ("segment" %in% names(.data))
-                   dplyr::group_by(.data$segment)
+                   dplyr::group_by(.data$segment, .add = TRUE)
                  else
                    .
                } %>%
-               # blocks for dual inlet data
+               # column `block` optional for dual inlet data
                {
                  if ("block" %in% names(.data))
-                   dplyr::group_by(.data$block)
+                   dplyr::group_by(.data$block, .add = TRUE)
                  else
                    .
                } %>%
-               # injection for automated flow injections
+               # column `injection` optional for automated flow injections
                {
                  if ("injection" %in% names(.data))
-                   dplyr::group_by(.data$injection)
+                   dplyr::group_by(.data$injection, .add = TRUE)
                  else
                    .
                } %>%
-               dplyr::group_by(.data$filename, .data$compound) %>% #FIX: segments, blocks, injections
+               dplyr::group_by(.data$filename, .data$compound, .add = TRUE) %>%
                dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
                dplyr::filter(
                  .data$TICxIT > stats::quantile(.data$TICxIT, truncate_extreme / 100) &
@@ -254,14 +258,14 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 }
 
 
-#' @title Basic filtering of IsoX data
+#' @title Basic generic filter for IsoX data
 #' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges
-#' @param dataset The data frame to be filtered
-#' @param filenames Vector of file names to select
-#' @param compounds Vector of compounds to select
-#' @param isotopocules Vector of isotopocules to select
-#' @param time_min Minimum time in minutes
-#' @param time_max Maximum time in minutes
+#' @param dataset The IsoX data to be filtered
+#' @param filenames Vector of file names to keep; also accepts `"all"`
+#' @param compounds Vector of compounds to keep; also accepts `"all"`
+#' @param isotopocules Vector of isotopocules to keep; also accepts `"all"`
+#' @param time_min Minimum retention time in minutes (`time.min`)
+#' @param time_max Maximum retention time in minutes (`time.min`)
 #'
 #'@examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -273,9 +277,9 @@ orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
 #' time_min = "all",
 #' time_max = "all")
 #'
-#' @return  Filtered data frame (tibble)
+#' @return  Filtered tibble
 #' @export
-orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_min, time_max) {
+orbi_filter_isox <- function(dataset, filenames, compounds, isotopocules, time_min, time_max) {
 
   # safety checks
   if (missing(dataset))
@@ -287,14 +291,13 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
   if (nrow(dataset) < 1)
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
-  if (missing(isotopocules))
-    stop("input for isotopocules missing", call. = TRUE)
-  if (missing(filenames))
-    stop("input for filenames missing", call. = TRUE)
+
   if (missing(filenames))
     stop("input for filenames missing", call. = TRUE)
   if (missing(compounds))
     stop("input for compounds missing", call. = TRUE)
+  if (missing(isotopocules))
+    stop("input for isotopocules missing", call. = TRUE)
   if (missing(time_min))
     stop("input for time_min missing", call. = TRUE)
   if (missing(time_max))
@@ -326,35 +329,36 @@ orbi_filter_isox <- function(dataset, filenames, isotopocules, compounds, time_m
 
 
   tryCatch(df.out <- dataset %>%
-             # isotopocule filter
-             {
-               if (!"all" %in% isotopocules)
-                 dplyr::filter(., .data$isotopocule %in% isotopocules)
-               else
-                 .
-             } %>%
-             # # file name filter
+
+             # file: filenames
              {
                if (!"all" %in% filenames)
                  dplyr::filter(., .data$filename %in% filenames)
                else
                  .
              } %>%
-             # # compounds filter
+             # filter: compounds
              {
                if (!"all" %in% compounds)
                  dplyr::filter(., .data$compound %in% compounds)
                else
                  .
              } %>%
-             # time_min  filter
+             # filter: isotopocules
+             {
+               if (!"all" %in% isotopocules)
+                 dplyr::filter(., .data$isotopocule %in% isotopocules)
+               else
+                 .
+             } %>%
+             # filter: time_min
              {
                if (time_min != "all")
                  dplyr::filter(., .data$time.min >= time_min)
                else
                  .
              } %>%
-             # time_max  filter
+             # filter: time_max
              {
                if (time_max != "all")
                  dplyr::filter(., .data$time.min <= time_max)
@@ -488,15 +492,14 @@ calculate_gse <- function(x) {
     }
   )
 
-
 }
 
 # @title Internal function for ratio.method `slope`
 # @description  The function `calculate_slope()` is used to estimate the slope of x, y values used in a ratio
 # @keywords internal
-# @param x A vector of values used as ratio nominator
-# @param y A vector of values used as ratio denominator
-# @details The slope is calculates from a linear model that is weighted by the nominator x, using `stats::lm(x ~ y + 0, weights = x)`
+# @param x Vector of values used as ratio nominator
+# @param y Vector of values used as ratio denominator
+# @details The slope is calculated from a linear regression model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`
 # @return The calculated slope, an estimate of the ratio x/y
 calculate_slope <- function(x, y) {
 
@@ -615,8 +618,8 @@ calculate_weighted.sum <- function(x, y) {
 #
 # `slope`: The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`.
 #
-# `weighted.sum`: The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-# i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+# `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+# i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #
 # @examples
 # fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -700,8 +703,8 @@ orbi_calculate_ratio <-
 
 #' @title Assign the base peak
 #' @description `orbi_basepeak()` assigns one isotopocule in the data frame as the base peak
-#' @param dataset A data frame from a an IsoX output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, `ions.incremental`.
-#' @param basepeak The isotopocule used as base peak in `orbi_calculate_ratio()`
+#' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, `ions.incremental`.
+#' @param basepeak The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -750,7 +753,7 @@ orbi_basepeak <- function(dataset, basepeak) {
                     .data$scan.no,
                     .data$isotopocule,
                     .data$ions.incremental) %>%
-      dplyr::group_by(.data$filename, .data$compound, .data$scan.no) %>% #FIX: OK for LC?
+      dplyr::group_by(.data$filename, .data$compound, .data$scan.no) %>%
       dplyr::filter(.data$isotopocule == basepeak) %>%
       dplyr::mutate(Basepeak = factor(.data$isotopocule),
                     Basepeak.Ions = .data$ions.incremental) %>%
@@ -771,7 +774,7 @@ orbi_basepeak <- function(dataset, basepeak) {
     df.out <- merge(df.sel, dataset, all = TRUE),
 
     warning = function(w) {
-      stop("something went wrong merging data: ", w$message, call. = TRUE)
+      stop("something went wrong when merging data: ", w$message, call. = TRUE)
     }
   )
 
@@ -781,19 +784,21 @@ orbi_basepeak <- function(dataset, basepeak) {
       df.out %>% dplyr::filter(.data$isotopocule != basepeak) %>% droplevels(),
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong removing the base peak isotopocule: ", w$message, call. = TRUE)
     }
   )
-
 
   return(df.out)
 }
 
 
-#' @title Calculate the results table
+#' @title Generate the results table
 #' @description Contains the logic to generate the results table
-#' @param dataset A processed data frame from IsoX output
-#' @param ratio.method Method  for computing the ratio; passed to `orbi_calculate_ratio()`
+#' @param dataset A processed tibble produced from `IsoX` output
+#' @param ratio.method Method for computing the ratio; passed to `orbi_calculate_ratio()`
+#' @details Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+#' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
+
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -801,7 +806,7 @@ orbi_basepeak <- function(dataset, basepeak) {
 #'       orbi_simplify_isox() %>% orbi_basepeak(basepeak = "M0")  %>%
 #'       orbi_calculate_results(ratio.method = "sum")
 #'
-#' @details Description of options for ratio.method:
+#' @details **Description of options for `ratio.method`:**
 #'
 #' `mean`: arithmetic mean of ratios from individual scans.
 #'
@@ -809,10 +814,10 @@ orbi_basepeak <- function(dataset, basepeak) {
 #'
 #' `geometric.mean`: geometric mean of ratios from individual scans.
 #'
-#' `slope`: The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using stats::lm(x ~ y + 0, weights = x).
+#' `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
 #'
-#' `weighted.sum`: The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-#' i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+#' `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
 #' @return Returns table containing `filename`, `compound`,  `Basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `Shot.Noise.permil`, `No.of.Scans`, `Mins.to.1mio`
 #' @export
@@ -867,44 +872,43 @@ orbi_calculate_results <- function(dataset, ratio.method) {
   }
 
 
-
   tryCatch(
 
-    df.stat <- dataset  %>%
-      # segmented data
+    df.stat <- dataset  %>% ungroup() %>%
+      # column `segment` optional for processing segmented data
       {
         if ("segment" %in% names(.data))
-          dplyr::group_by(.data$segment)
+          dplyr::group_by(.data$segment, .add = TRUE)
         else
           .
       } %>%
-      # blocks for dual inlet data
+      # column `block` optional for dual inlet data
       {
         if ("block" %in% names(.data))
-          dplyr::group_by(.data$block)
+          dplyr::group_by(.data$block, .add = TRUE)
         else
           .
       } %>%
-      # injection for automated flow injections
+      # column `injection` optional for automated flow injections
       {
         if ("injection" %in% names(.data))
-          dplyr::group_by(.data$injection)
+          dplyr::group_by(.data$injection, .add = TRUE)
         else
           .
       } %>%
       dplyr::group_by(.data$filename,
                       .data$compound,
                       .data$Basepeak,
-                      .data$isotopocule) %>%
+                      .data$isotopocule, .add = TRUE) %>%
 
-      dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #RATIO CALCULATION!
+      dplyr::mutate(Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)) %>% #THE ACTUAL RATIO CALCULATION!
 
       dplyr::mutate(Ratio.SEM = calculate_se(.data$ions.incremental / .data$Basepeak.Ions)),
     #For simplicity use basic standard error for all options
 
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong in the ratio calculations: ", w$message, call. = TRUE)
     }
   )
 
@@ -914,7 +918,7 @@ orbi_calculate_results <- function(dataset, ratio.method) {
     df.stat <- df.stat %>% dplyr::mutate(
 
       No.of.scans = length(.data$Ratio),
-      Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
+      Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)), #FIXME: could be better!
       Shot.Noise.permil = 1000 * (sqrt((
         sum(.data$ions.incremental) + sum(.data$Basepeak.Ions)
       ) / (
@@ -941,14 +945,12 @@ orbi_calculate_results <- function(dataset, ratio.method) {
         -.data$tic
       ) %>%
       unique() %>%
-      arrange(.data$filename, .data$isotopocule),
+      arrange(.data$filename, .data$compound, .data$isotopocule),
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong in compiling the final results table: ", w$message, call. = TRUE)
     }
   )
-
-
 
 
   df.stat <- as.data.frame(df.stat)

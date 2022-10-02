@@ -2,14 +2,14 @@
 % Please edit documentation in R/utils.R
 \name{orbi_calculate_results}
 \alias{orbi_calculate_results}
-\title{Calculate the results table}
+\title{Generate the results table}
 \usage{
 orbi_calculate_results(dataset, ratio.method)
 }
 \arguments{
-\item{dataset}{A processed data frame from IsoX output}
+\item{dataset}{A processed tibble produced from \code{IsoX} output}
 
-\item{ratio.method}{Method  for computing the ratio; passed to \code{orbi_calculate_ratio()}}
+\item{ratio.method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
 }
 \value{
 Returns table containing \code{filename}, \code{compound},  \code{Basepeak}, \code{Isotopocule}, \code{Ratio}, \code{Ratio.SEM}, \code{relSE.permil}, \code{Shot.Noise.permil}, \code{No.of.Scans}, \code{Mins.to.1mio}
@@ -18,7 +18,10 @@ Returns table containing \code{filename}, \code{compound},  \code{Basepeak}, \co
 Contains the logic to generate the results table
 }
 \details{
-Description of options for ratio.method:
+Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
+
+\strong{Description of options for \code{ratio.method}:}
 
 \code{mean}: arithmetic mean of ratios from individual scans.
 
@@ -26,10 +29,10 @@ Description of options for ratio.method:
 
 \code{geometric.mean}: geometric mean of ratios from individual scans.
 
-\code{slope}: The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using stats::lm(x ~ y + 0, weights = x).
+\code{slope}: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the \verb{numerator x}, using \code{stats::lm(x ~ y + 0, weights = x)}.
 
-\code{weighted.sum}: The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+\code{weighted.sum}: A derivative of the \code{sum} option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total \code{sum} of \code{x} and \code{y} that is used to calculate \code{x/y}.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")

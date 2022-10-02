@@ -7,19 +7,21 @@
 orbi_filter_TICxIT(dataset, truncate_extreme)
 }
 \arguments{
-\item{dataset}{Simplified IsoX file to have \code{TICxIT} outliers removed}
+\item{dataset}{Simplified IsoX dataset to have \code{TICxIT} outliers removed}
 
 \item{truncate_extreme}{A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.}
 }
 \value{
-Filtered data frame (tibble)
+Filtered tibble
 }
 \description{
-Remove extremely high and low intense scans based on TIC x Injection time with \code{orbi_filter_TICxIT()}
+The function \code{orbi_filter_TICxIT()} removes extremely high and low intense scans based on TIC x injection time (i.e., ion intensity)
 }
 \details{
-The \code{orbi_filter_TICxIT()} function removes scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
-The filter is a basic truncation that removed x \% of scans with maximal \strong{and} x \% of scans with minimal ion estimates. Grouping is by \code{filename} and \code{compound}.
+Function is intended to remove scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+The filter is a basic truncation that removes \verb{x \%} of scans with the largest \strong{and} \verb{x \%} of scans with the smallest ion estimates. Grouping is by columns \code{filename} and \code{compound}.
+
+The input \code{dataset} is expected to have at least these 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")

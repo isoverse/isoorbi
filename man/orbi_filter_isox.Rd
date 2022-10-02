@@ -2,32 +2,32 @@
 % Please edit documentation in R/utils.R
 \name{orbi_filter_isox}
 \alias{orbi_filter_isox}
-\title{Basic filtering of IsoX data}
+\title{Basic generic filter for IsoX data}
 \usage{
 orbi_filter_isox(
   dataset,
   filenames,
-  isotopocules,
   compounds,
+  isotopocules,
   time_min,
   time_max
 )
 }
 \arguments{
-\item{dataset}{The data frame to be filtered}
+\item{dataset}{The IsoX data to be filtered}
 
-\item{filenames}{Vector of file names to select}
+\item{filenames}{Vector of file names to keep; also accepts \code{"all"}}
 
-\item{isotopocules}{Vector of isotopocules to select}
+\item{compounds}{Vector of compounds to keep; also accepts \code{"all"}}
 
-\item{compounds}{Vector of compounds to select}
+\item{isotopocules}{Vector of isotopocules to keep; also accepts \code{"all"}}
 
-\item{time_min}{Minimum time in minutes}
+\item{time_min}{Minimum retention time in minutes (\code{time.min})}
 
-\item{time_max}{Maximum time in minutes}
+\item{time_max}{Maximum retention time in minutes (\code{time.min})}
 }
 \value{
-Filtered data frame (tibble)
+Filtered tibble
 }
 \description{
 A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges

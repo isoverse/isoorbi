@@ -31,9 +31,10 @@ df.filtered <- df.simple %>% orbi_filter_isox(filename = c("s3744", "ac6"),
                              orbi_filter_satellitePeaks() %>% 
                              orbi_filter_weak(min_percent = 10) %>% 
                              orbi_filter_TICxIT(truncate_extreme = 1)
-
-# df.simple$block <- 1
-# df.simple[df.simple$time.min<0.5, ]$block <- 2
+#FIXME
+# df.simple$block <- "A1"
+# df.simple[df.simple$time.min<0.5, ]$block <- "B21"
+# df.simple
 
 # Define base peak and calculate the results table
 df.results <- df.filtered %>% orbi_basepeak(basepeak = "M0") %>% 

@@ -7,9 +7,9 @@
 orbi_basepeak(dataset, basepeak)
 }
 \arguments{
-\item{dataset}{A data frame from a an IsoX output. Needs to contain columns for \code{filename}, \code{compound}, \code{scan.no}, \code{isotopocule}, \code{ions.incremental}.}
+\item{dataset}{A tibble from a \code{IsoX} output. Needs to contain columns for \code{filename}, \code{compound}, \code{scan.no}, \code{isotopocule}, \code{ions.incremental}.}
 
-\item{basepeak}{The isotopocule used as base peak in \code{orbi_calculate_ratio()}}
+\item{basepeak}{The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios}
 }
 \value{
 Input data frame plus two columns called \code{Basepeak} and \code{Basepeak.Ions}
