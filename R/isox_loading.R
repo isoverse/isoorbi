@@ -78,7 +78,7 @@ orbi_read_isox <- function(filepath) {
 #'
 #' @param dataset IsoX data that is to be simplified
 #'
-#' @return A tiblle containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
+#' @return A tibble containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")

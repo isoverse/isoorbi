@@ -545,8 +545,8 @@ calculate_weighted.sum <- function(x, y) {
 #
 # Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
 #
-# @param numerator Isotopocule(s) used as numerator
-# @param denominator Isotopocule used as denominator
+# @param numerator Column(s) used as numerator; contains ion counts
+# @param denominator Column used as denominator; contains ion counts
 # @param ratio.method The desired method of computing the ratio
 # @details Description of options for ratio.method:
 #
