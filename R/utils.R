@@ -701,7 +701,7 @@ orbi_calculate_ratio <-
     )
   }
 
-#' @title Assign the base peak
+#' @title Assign the base peak (ratio denominator)
 #' @description `orbi_basepeak()` assigns one isotopocule in the data frame as the base peak
 #' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, `ions.incremental`.
 #' @param basepeak The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios
