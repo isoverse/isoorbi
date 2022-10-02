@@ -73,7 +73,7 @@ orbi_read_isox <- function(filepath) {
 
 }
 
-#' @title Simplify IsoX output
+#' @title Simplify IsoX data
 #' @description Keep only columns that are directly relevant for isotopocule ratio analysis
 #'
 #' @param dataset IsoX data that is to be simplified
