@@ -565,8 +565,8 @@ calculate_weighted.sum <- function(x, y) {
 # fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 # df <- orbi_read_isox(filepath = fpath) %>%
 #                      orbi_simplify_isox() %>%
-#                      orbi_define_basepeak(basepeak = "M0")
-# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$Basepeak.Ions, ratio_method =  "sum")
+#                      orbi_define_basepeak(base_peak = "M0")
+# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$basepeak.Ions, ratio_method =  "sum")
 #
 # @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 # @export
@@ -638,17 +638,17 @@ orbi_calculate_ratio <- function(numerator,
 #' @title Define and assign the base peak
 #' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator)
 #' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, `ions.incremental`.
-#' @param basepeak The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios
+#' @param base_peak The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
-#'                      orbi_define_basepeak(basepeak = "M0")
+#'                      orbi_define_basepeak(base_peak = "M0")
 #'
-#' @returns Input data frame plus two columns called `Basepeak` and `Basepeak.Ions`
+#' @returns Input data frame plus two columns called `basepeak` and `basepeak.Ions`
 #' @export
-orbi_define_basepeak <- function(dataset, basepeak) {
+orbi_define_basepeak <- function(dataset, base_peak) {
 
   #basic checks
   if (missing(dataset))
@@ -657,13 +657,13 @@ orbi_define_basepeak <- function(dataset, basepeak) {
   if (is.data.frame(dataset) == FALSE)
     stop("dataset must be a data frame",  call. = TRUE)
 
-  if (missing(basepeak))
+  if (missing(base_peak))
     stop(" no input for basepeak supplied", call. = TRUE)
 
-  if (is.character(basepeak) == FALSE)
+  if (is.character(base_peak) == FALSE)
     stop("denominator must be a basepeak vector",  call. = TRUE)
 
-  if (length(basepeak) > 1)
+  if (length(base_peak) > 1)
     stop("only one baspeak can be assigned",  call. = TRUE)
 
 
@@ -693,15 +693,15 @@ orbi_define_basepeak <- function(dataset, basepeak) {
       dplyr::group_by(.data$filename,
                       .data$compound,
                       .data$scan.no) %>%
-      dplyr::filter(.data$isotopocule == basepeak) %>%
-      dplyr::mutate(Basepeak = factor(.data$isotopocule),
-                    Basepeak.Ions = .data$ions.incremental
+      dplyr::filter(.data$isotopocule == base_peak) %>%
+      dplyr::mutate(basepeak = factor(.data$isotopocule),
+                    basepeak.Ions = .data$ions.incremental
       ) %>%
       dplyr::select(.data$filename,
                     .data$compound,
                     .data$scan.no,
-                    .data$Basepeak,
-                    .data$Basepeak.Ions) %>%
+                    .data$basepeak,
+                    .data$basepeak.Ions) %>%
       as.data.frame(),
 
     warning = function(w) {
@@ -720,7 +720,7 @@ orbi_define_basepeak <- function(dataset, basepeak) {
 
 
   tryCatch(
-    df.out <- df.out %>% dplyr::filter(.data$isotopocule != basepeak) %>% droplevels(),
+    df.out <- df.out %>% dplyr::filter(.data$isotopocule != base_peak) %>% droplevels(),
 
     warning = function(w) {
       stop("something went wrong removing the base peak isotopocule: ", w$message, call. = TRUE)
@@ -739,12 +739,12 @@ orbi_define_basepeak <- function(dataset, basepeak) {
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
-#'       orbi_simplify_isox() %>% orbi_define_basepeak(basepeak = "M0")  %>%
+#'       orbi_simplify_isox() %>% orbi_define_basepeak(base_peak = "M0")  %>%
 #'       orbi_calculate_results(ratio_method = "sum")
 #'
 #' @details **Description of the output columns:**
 #'
-#' * `Basepeak`: Isotopocule used as denominator in ratio calculation.
+#' * `basepeak`: Isotopocule used as denominator in ratio calculation.
 #'
 #' * `isotopocule`: Isotopocule used as numerator in ratio calculation.
 #'
@@ -775,7 +775,7 @@ orbi_define_basepeak <- function(dataset, basepeak) {
 #' * `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
-#' @return Returns a results table containing `filename`, `compound`,  `Basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `Shot.Noise.permil`, `No.of.Scans`, `Mins.to.1mio`
+#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `Shot.Noise.permil`, `No.of.Scans`, `Mins.to.1mio`
 #' @export
 orbi_calculate_results <- function(dataset, ratio_method) {
 
@@ -815,7 +815,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       "time.min",
       "isotopocule",
       "ions.incremental",
-      "Basepeak"
+      "basepeak"
     )
 
   missing_cols <- setdiff(req_cols, names(dataset))
@@ -835,7 +835,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
 
       dplyr::group_by(.data$filename,
                       .data$compound,
-                      .data$Basepeak,
+                      .data$basepeak,
                       .data$isotopocule,
                       .add = TRUE)
 
@@ -883,11 +883,11 @@ orbi_calculate_results <- function(dataset, ratio_method) {
     df.stat <- df.group %>%
 
       dplyr::mutate(
-        Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio_method = ratio_method)
+        Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak.Ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
       dplyr::mutate(Ratio.SEM = calculate_se(
-        .data$ions.incremental / .data$Basepeak.Ions
+        .data$ions.incremental / .data$basepeak.Ions
       )),
 
     #For simplicity use basic standard error for all options
@@ -908,9 +908,9 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
       #FIXME: could be better!
       Shot.Noise.permil = 1000 * (sqrt((
-        sum(.data$ions.incremental) + sum(.data$Basepeak.Ions)
+        sum(.data$ions.incremental) + sum(.data$basepeak.Ions)
       ) / (
-        sum(.data$ions.incremental) * sum(.data$Basepeak.Ions)
+        sum(.data$ions.incremental) * sum(.data$basepeak.Ions)
       ))),
       relSE.permil = 1000 * (.data$Ratio.SEM / .data$Ratio)
     ) %>%
@@ -926,7 +926,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
 
       dplyr::select(
         -.data$ions.incremental,
-        -.data$Basepeak.Ions,
+        -.data$basepeak.Ions,
         -.data$time.min,
         -.data$scan.no,
         -.data$it.ms,

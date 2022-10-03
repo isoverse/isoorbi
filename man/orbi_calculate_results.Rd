@@ -12,7 +12,7 @@ orbi_calculate_results(dataset, ratio_method)
 \item{ratio_method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
 }
 \value{
-Returns a results table containing \code{filename}, \code{compound},  \code{Basepeak}, \code{Isotopocule}, \code{Ratio}, \code{Ratio.SEM}, \code{relSE.permil}, \code{Shot.Noise.permil}, \code{No.of.Scans}, \code{Mins.to.1mio}
+Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{Ratio}, \code{Ratio.SEM}, \code{relSE.permil}, \code{Shot.Noise.permil}, \code{No.of.Scans}, \code{Mins.to.1mio}
 }
 \description{
 Contains the logic to generate the results table
@@ -20,7 +20,7 @@ Contains the logic to generate the results table
 \details{
 \strong{Description of the output columns:}
 \itemize{
-\item \code{Basepeak}: Isotopocule used as denominator in ratio calculation.
+\item \code{basepeak}: Isotopocule used as denominator in ratio calculation.
 \item \code{isotopocule}: Isotopocule used as numerator in ratio calculation.
 \item \code{Ratio.SEM}: Standard error of the mean for the ratio
 \item \code{No.of.scans}: Number of scans used for the final ratio calculation
@@ -45,7 +45,7 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
-      orbi_simplify_isox() \%>\% orbi_define_basepeak(basepeak = "M0")  \%>\%
+      orbi_simplify_isox() \%>\% orbi_define_basepeak(base_peak = "M0")  \%>\%
       orbi_calculate_results(ratio_method = "sum")
 
 }
