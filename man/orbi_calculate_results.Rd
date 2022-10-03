@@ -36,9 +36,9 @@ The best option may depend on the type of data you are processing (e.g., MS1 ver
 \itemize{
 \item \code{mean}: arithmetic mean of ratios from individual scans.
 \item \code{sum}: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
-\item \code{geometric.mean}: geometric mean of ratios from individual scans.
+\item \code{geometric_mean}: geometric mean of ratios from individual scans.
 \item \code{slope}: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the \verb{numerator x}, using \code{stats::lm(x ~ y + 0, weights = x)}.
-\item \code{weighted.sum}: A derivative of the \code{sum} option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+\item \code{weighted_sum}: A derivative of the \code{sum} option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total \code{sum} of \code{x} and \code{y} that is used to calculate \code{x/y}.
 }
 }

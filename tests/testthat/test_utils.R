@@ -95,9 +95,9 @@ test_that("calculate_weighted.vector.sum() tests", {
   #success
   x<- c(2,4,6)
   y<- c(3,5,7)
-  expect_type(calculate_weighted.sum(x,y), "double")
+  expect_type(calculate_weighted_sum(x,y), "double")
   #failure
-  expect_error(calculate_weighted.sum(), "input vector for x supplied")
+  expect_error(calculate_weighted_sum(), "input vector for x supplied")
 })
 
   # orbi_calculate_ratio
@@ -112,14 +112,14 @@ test_that("orbi_calculate_ratio() tests", {
   expect_equal(orbi_calculate_ratio(a,b,"sum"), 1)
     #slope
   expect_equal(orbi_calculate_ratio(a,b,"slope"),1)
-    #geometric.mean
-  expect_equal(orbi_calculate_ratio(a,b,"geometric.mean"),1)
-    #weighted.sum
-  expect_equal(orbi_calculate_ratio(a,b,"weighted.sum"),1)
+    #geometric_mean
+  expect_equal(orbi_calculate_ratio(a,b,"geometric_mean"),1)
+    #weighted_sum
+  expect_equal(orbi_calculate_ratio(a,b,"weighted_sum"),1)
     #median
   expect_equal(orbi_calculate_ratio(a,b,"median"), 1)
 
-  expect_equal(orbi_calculate_ratio(a,b,"median2"), "`ratio_method` has to be `mean`, `sum`, `median`, `geometric.mean`, `slope` or `weighted.sum`")
+  expect_equal(orbi_calculate_ratio(a,b,"median2"), "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`")
 
   #failure
   expect_error(orbi_calculate_ratio(), "no input for numerator supplied")

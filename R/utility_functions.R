@@ -482,15 +482,15 @@ calculate_slope <- function(x, y) {
   return(sl)
 }
 
-# @title Internal function for ratio_method `weighted.sum`
-# @description The function `calculate_weighted.sum()` is used to calculate ratios by weighted sums of x and y values
+# @title Internal function for ratio_method `weighted_sum`
+# @description The function `calculate_weighted_sum()` is used to calculate ratios by weighted sums of x and y values
 # @keywords internal
 # @param x A vector of values used as ratio nominator
 # @param y A vector of values used as ratio denominator
 # @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 # i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
 # @return The calculated ratio x/y
-calculate_weighted.sum <- function(x, y) {
+calculate_weighted_sum <- function(x, y) {
 
   if (missing(x))
     stop("input vector for x supplied", call. = TRUE)
@@ -554,11 +554,11 @@ calculate_weighted.sum <- function(x, y) {
 #
 # `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
 #
-# `geometric.mean`: geometric mean of ratios from individual scans.
+# `geometric_mean`: geometric mean of ratios from individual scans.
 #
 # `slope`: The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`.
 #
-# `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+# `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 # i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #
 # @examples
@@ -576,9 +576,9 @@ orbi_calculate_ratio <- function(numerator,
                                  ratio_method = c("mean",
                                                   "sum",
                                                   "median",
-                                                  "geometric.mean",
+                                                  "geometric_mean",
                                                   "slope",
-                                                  "weighted.sum")) {
+                                                  "weighted_sum")) {
   if (missing(numerator))
     stop("no input for numerator supplied", call. = TRUE)
 
@@ -605,12 +605,12 @@ orbi_calculate_ratio <- function(numerator,
           o <-  base::sum(numerator) / sum(denominator)
           o
         } else{
-          if (ratio_method == "geometric.mean") {
+          if (ratio_method == "geometric_mean") {
             o <- calculate_gmean(numerator / denominator)
             o
           } else{
-            if (ratio_method == "weighted.sum") {
-              o <- calculate_weighted.sum(numerator, denominator)
+            if (ratio_method == "weighted_sum") {
+              o <- calculate_weighted_sum(numerator, denominator)
               o
             } else{
               if (ratio_method == "median") {
@@ -619,7 +619,7 @@ orbi_calculate_ratio <- function(numerator,
                 o
               } else{
                 print(
-                  "`ratio_method` has to be `mean`, `sum`, `median`, `geometric.mean`, `slope` or `weighted.sum`"
+                  "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`"
                 )
               }
             }
@@ -768,11 +768,11 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' * `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
 #'
-#' * `geometric.mean`: geometric mean of ratios from individual scans.
+#' * `geometric_mean`: geometric mean of ratios from individual scans.
 #'
 #' * `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
 #'
-#' * `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
 #' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
@@ -792,9 +792,9 @@ orbi_calculate_results <- function(dataset, ratio_method) {
   ratio.options <- c("mean",
                      "sum",
                      "median",
-                     "geometric.mean",
+                     "geometric_mean",
                      "slope",
-                     "weighted.sum")
+                     "weighted_sum")
 
   if (!(ratio_method %in% ratio.options))
     stop(cat(
