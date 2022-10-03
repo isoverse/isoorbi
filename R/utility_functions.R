@@ -752,7 +752,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' * `number_of_scans`: Number of scans used for the final ratio calculation
 #'
-#' * `Mins.to.1mio`: Time in minutes it would take to observe 1 million ions of the `isotopocule` used as numerator of the ratio calculation.
+#' * `minutes_to_1E6_ions`: Time in minutes it would take to observe 1 million ions of the `isotopocule` used as numerator of the ratio calculation.
 #'
 #' * `shot_noise_permil`: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
 #'
@@ -775,7 +775,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' * `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
-#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `shot_noise_permil`, `No.of.Scans`, `Mins.to.1mio`
+#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1E6_ions`
 #' @export
 orbi_calculate_results <- function(dataset, ratio_method) {
 
@@ -905,7 +905,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
 
     df.stat <- df.stat %>% dplyr::mutate(
       number_of_scans = length(.data$Ratio),
-      Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
+      minutes_to_1E6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
       #FIXME: could be better!
       shot_noise_permil = 1000 * (sqrt((
         sum(.data$ions.incremental) + sum(.data$basepeak.Ions)
@@ -921,7 +921,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
         Ratio.SEM = round(.data$Ratio.SEM, 8),
         shot_noise_permil = round(.data$shot_noise_permil, 3),
         relSE.permil = round(.data$relSE.permil, 3),
-        Mins.to.1mio = round(.data$Mins.to.1mio, 2)
+        minutes_to_1E6_ions = round(.data$minutes_to_1E6_ions, 2)
       ) %>%
 
       dplyr::select(
