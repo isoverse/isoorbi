@@ -754,7 +754,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' * `Mins.to.1mio`: Time in minutes it would take to observe 1 million ions of the `isotopocule` used as numerator of the ratio calculation.
 #'
-#' * `Shot.Noise.permil`: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
+#' * `shot_noise_permil`: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
 #'
 #' * `Rel.SE.permil`: Relative standard error of the reported ratio in permil
 #'
@@ -775,7 +775,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' * `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
-#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `Shot.Noise.permil`, `No.of.Scans`, `Mins.to.1mio`
+#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `shot_noise_permil`, `No.of.Scans`, `Mins.to.1mio`
 #' @export
 orbi_calculate_results <- function(dataset, ratio_method) {
 
@@ -907,7 +907,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       No.of.scans = length(.data$Ratio),
       Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
       #FIXME: could be better!
-      Shot.Noise.permil = 1000 * (sqrt((
+      shot_noise_permil = 1000 * (sqrt((
         sum(.data$ions.incremental) + sum(.data$basepeak.Ions)
       ) / (
         sum(.data$ions.incremental) * sum(.data$basepeak.Ions)
@@ -919,7 +919,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       dplyr::mutate(
         Ratio = round(.data$Ratio, 8),
         Ratio.SEM = round(.data$Ratio.SEM, 8),
-        Shot.Noise.permil = round(.data$Shot.Noise.permil, 3),
+        shot_noise_permil = round(.data$shot_noise_permil, 3),
         relSE.permil = round(.data$relSE.permil, 3),
         Mins.to.1mio = round(.data$Mins.to.1mio, 2)
       ) %>%
