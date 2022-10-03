@@ -748,7 +748,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' * `isotopocule`: Isotopocule used as numerator in ratio calculation.
 #'
-#' * `Ratio.SEM`: Standard error of the mean for the ratio
+#' * `ratio_sem`: Standard error of the mean for the ratio
 #'
 #' * `number_of_scans`: Number of scans used for the final ratio calculation
 #'
@@ -775,7 +775,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' * `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
-#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1E6_ions`
+#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `ratio_sem`, `relSE.permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1E6_ions`
 #' @export
 orbi_calculate_results <- function(dataset, ratio_method) {
 
@@ -886,7 +886,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
         Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak.Ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
-      dplyr::mutate(Ratio.SEM = calculate_se(
+      dplyr::mutate(ratio_sem = calculate_se(
         .data$ions.incremental / .data$basepeak.Ions
       )),
 
@@ -912,13 +912,13 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       ) / (
         sum(.data$ions.incremental) * sum(.data$basepeak.Ions)
       ))),
-      relSE.permil = 1000 * (.data$Ratio.SEM / .data$Ratio)
+      relSE.permil = 1000 * (.data$ratio_sem / .data$Ratio)
     ) %>%
 
       #Round values for output
       dplyr::mutate(
         Ratio = round(.data$Ratio, 8),
-        Ratio.SEM = round(.data$Ratio.SEM, 8),
+        ratio_sem = round(.data$ratio_sem, 8),
         shot_noise_permil = round(.data$shot_noise_permil, 3),
         relSE.permil = round(.data$relSE.permil, 3),
         minutes_to_1E6_ions = round(.data$minutes_to_1E6_ions, 2)

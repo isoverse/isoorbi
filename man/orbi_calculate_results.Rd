@@ -12,7 +12,7 @@ orbi_calculate_results(dataset, ratio_method)
 \item{ratio_method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
 }
 \value{
-Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{Ratio}, \code{Ratio.SEM}, \code{relSE.permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1E6_ions}
+Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{Ratio}, \code{ratio_sem}, \code{relSE.permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1E6_ions}
 }
 \description{
 Contains the logic to generate the results table
@@ -22,7 +22,7 @@ Contains the logic to generate the results table
 \itemize{
 \item \code{basepeak}: Isotopocule used as denominator in ratio calculation.
 \item \code{isotopocule}: Isotopocule used as numerator in ratio calculation.
-\item \code{Ratio.SEM}: Standard error of the mean for the ratio
+\item \code{ratio_sem}: Standard error of the mean for the ratio
 \item \code{number_of_scans}: Number of scans used for the final ratio calculation
 \item \code{minutes_to_1E6_ions}: Time in minutes it would take to observe 1 million ions of the \code{isotopocule} used as numerator of the ratio calculation.
 \item \code{shot_noise_permil}: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
