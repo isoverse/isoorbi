@@ -756,7 +756,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' * `shot_noise_permil`: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
 #'
-#' * `Rel.SE.permil`: Relative standard error of the reported ratio in permil
+#' * `ratio_relative_sem_permil`: Relative standard error of the reported ratio in permil
 #'
 #'
 #' @details **Description of options for `ratio_method`:**
@@ -775,7 +775,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' * `weighted.sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
-#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `ratio_sem`, `relSE.permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1E6_ions`
+#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1E6_ions`
 #' @export
 orbi_calculate_results <- function(dataset, ratio_method) {
 
@@ -912,7 +912,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       ) / (
         sum(.data$ions.incremental) * sum(.data$basepeak.Ions)
       ))),
-      relSE.permil = 1000 * (.data$ratio_sem / .data$Ratio)
+      ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$Ratio)
     ) %>%
 
       #Round values for output
@@ -920,7 +920,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
         Ratio = round(.data$Ratio, 8),
         ratio_sem = round(.data$ratio_sem, 8),
         shot_noise_permil = round(.data$shot_noise_permil, 3),
-        relSE.permil = round(.data$relSE.permil, 3),
+        ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
         minutes_to_1E6_ions = round(.data$minutes_to_1E6_ions, 2)
       ) %>%
 
