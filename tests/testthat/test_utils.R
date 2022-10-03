@@ -7,12 +7,12 @@ context("utils")
 
 
 
-  # orbi_filter_weak
-test_that("orbi_filter_weak() tests", {
+  # orbi_filter_weak_isotopocules
+test_that("orbi_filter_weak_isotopocules() tests", {
   #success
   # ...
   #failure
-  expect_error(orbi_filter_weak(), "no dataset supplied")
+  expect_error(orbi_filter_weak_isotopocules(), "no dataset supplied")
 })
 
   # orbi_filter_satellitePeaks

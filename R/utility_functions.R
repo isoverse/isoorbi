@@ -57,7 +57,7 @@ orbi_filter_satellite_peaks <- function(dataset) {
 
 
 #' @title Filter to remove weak isotopocules
-#' @description The function `orbi_filter_weak()` removes isotopocules that are not consistently detected in most scans
+#' @description The function `orbi_filter_weak_isotopocules()` removes isotopocules that are not consistently detected in most scans
 #'
 #' @param dataset A simplified IsoX data frame to be processed
 #' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of the compound)
@@ -66,13 +66,13 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
-#'                      orbi_filter_weak(min_percent = 2)
+#'                      orbi_filter_weak_isotopocules(min_percent = 2)
 #'
 #' @details The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #' @return Filtered tibble
 #' @export
-orbi_filter_weak <-
+orbi_filter_weak_isotopocules <-
   function(dataset, min_percent) {
 
     # safety checks
