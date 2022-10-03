@@ -750,7 +750,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' * `Ratio.SEM`: Standard error of the mean for the ratio
 #'
-#' * `No.of.scans`: Number of scans used for the final ratio calculation
+#' * `number_of_scans`: Number of scans used for the final ratio calculation
 #'
 #' * `Mins.to.1mio`: Time in minutes it would take to observe 1 million ions of the `isotopocule` used as numerator of the ratio calculation.
 #'
@@ -904,7 +904,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
   tryCatch(
 
     df.stat <- df.stat %>% dplyr::mutate(
-      No.of.scans = length(.data$Ratio),
+      number_of_scans = length(.data$Ratio),
       Mins.to.1mio = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
       #FIXME: could be better!
       shot_noise_permil = 1000 * (sqrt((

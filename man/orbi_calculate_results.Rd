@@ -23,7 +23,7 @@ Contains the logic to generate the results table
 \item \code{basepeak}: Isotopocule used as denominator in ratio calculation.
 \item \code{isotopocule}: Isotopocule used as numerator in ratio calculation.
 \item \code{Ratio.SEM}: Standard error of the mean for the ratio
-\item \code{No.of.scans}: Number of scans used for the final ratio calculation
+\item \code{number_of_scans}: Number of scans used for the final ratio calculation
 \item \code{Mins.to.1mio}: Time in minutes it would take to observe 1 million ions of the \code{isotopocule} used as numerator of the ratio calculation.
 \item \code{shot_noise_permil}: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.
 \item \code{Rel.SE.permil}: Relative standard error of the reported ratio in permil
