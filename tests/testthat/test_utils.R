@@ -16,12 +16,12 @@ test_that("orbi_filter_weak() tests", {
 })
 
   # orbi_filter_satellitePeaks
-test_that("orbi_filter_satellitePeaks() tests", {
+test_that("orbi_filter_satellite_peaks() tests", {
   #succcess
   df <- orbi_read_isox(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))
-  expect_true(is.tbl(orbi_filter_satellitePeaks(orbi_simplify_isox(df))))
+  expect_true(is.tbl(orbi_filter_satellite_peaks(orbi_simplify_isox(df))))
   #failure
-  expect_error(orbi_filter_satellitePeaks(), "no dataset supplied")
+  expect_error(orbi_filter_satellite_peaks(), "no dataset supplied")
 })
 
   # orbi_filter_TICxIT
