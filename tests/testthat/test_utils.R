@@ -25,10 +25,10 @@ test_that("orbi_filter_satellite_peaks() tests", {
 })
 
   # orbi_filter_TICxIT
-test_that("orbi_filter_TICxIT() tests", {
+test_that("orbi_filter_scan_intensity() tests", {
   #success
   #failure
-  expect_error(orbi_filter_TICxIT(), "no dataset supplied")
+  expect_error(orbi_filter_scan_intensity(), "no dataset supplied")
 })
 
   # orbi_filter_isox

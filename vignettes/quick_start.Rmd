@@ -32,7 +32,7 @@ df.filtered <- df.simple %>% orbi_filter_isox(filename = c("s3744", "ac6"),
                                               isotopocules = c("M0", "34S", "33S", "17O", "18O"))%>% 
                              orbi_filter_satellite_peaks() %>% 
                              orbi_filter_weak(min_percent = 10) %>% 
-                             orbi_filter_TICxIT(truncate_extreme = 1)
+                             orbi_filter_scan_intensity(truncate_extreme = 1)
 
 # Define base peak and calculate the results table
 df.results <- df.filtered %>% orbi_define_basepeak(basepeak = "M0") %>% 

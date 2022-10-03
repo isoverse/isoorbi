@@ -200,7 +200,7 @@ orbi_filter_weak <-
 
 
 #' @title Filter to remove extreme scans
-#' @description The function `orbi_filter_TICxIT()` removes extremely high and low intense scans based on TIC x injection time (i.e., ion intensity)
+#' @description The function `orbi_filter_scan_intensity()` removes extremely high and low intense scans based on TIC x injection time (i.e., ion intensity)
 #' @param dataset Simplified IsoX dataset to have `TICxIT` outliers removed
 #' @param truncate_extreme A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.
 #' @details Function is intended to remove scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
@@ -213,11 +213,11 @@ orbi_filter_weak <-
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
-#' orbi_filter_TICxIT(truncate_extreme = 1)
+#' orbi_filter_scan_intensity(truncate_extreme = 1)
 #'
 #' @return Filtered tibble
 #' @export
-orbi_filter_TICxIT <- function(dataset, truncate_extreme) {
+orbi_filter_scan_intensity <- function(dataset, truncate_extreme) {
 
   # safety checks
   if (missing(dataset))
