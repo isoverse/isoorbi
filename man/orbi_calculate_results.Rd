@@ -4,12 +4,12 @@
 \alias{orbi_calculate_results}
 \title{Generate the results table}
 \usage{
-orbi_calculate_results(dataset, ratio.method)
+orbi_calculate_results(dataset, ratio_method)
 }
 \arguments{
 \item{dataset}{A processed tibble produced from \code{IsoX} output}
 
-\item{ratio.method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
+\item{ratio_method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
 }
 \value{
 Returns a results table containing \code{filename}, \code{compound},  \code{Basepeak}, \code{Isotopocule}, \code{Ratio}, \code{Ratio.SEM}, \code{relSE.permil}, \code{Shot.Noise.permil}, \code{No.of.Scans}, \code{Mins.to.1mio}
@@ -29,7 +29,7 @@ Contains the logic to generate the results table
 \item \code{Rel.SE.permil}: Relative standard error of the reported ratio in permil
 }
 
-\strong{Description of options for \code{ratio.method}:}
+\strong{Description of options for \code{ratio_method}:}
 
 Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
 The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
@@ -46,6 +46,6 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
       orbi_simplify_isox() \%>\% orbi_define_basepeak(basepeak = "M0")  \%>\%
-      orbi_calculate_results(ratio.method = "sum")
+      orbi_calculate_results(ratio_method = "sum")
 
 }

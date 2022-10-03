@@ -434,7 +434,7 @@ calculate_gse <- function(x) {
 
 }
 
-# @title Internal function for ratio.method `slope`
+# @title Internal function for ratio_method `slope`
 # @description  The function `calculate_slope()` is used to estimate the slope of x, y values used in a ratio
 # @keywords internal
 # @param x Vector of values used as ratio nominator
@@ -482,7 +482,7 @@ calculate_slope <- function(x, y) {
   return(sl)
 }
 
-# @title Internal function for ratio.method `weighted.sum`
+# @title Internal function for ratio_method `weighted.sum`
 # @description The function `calculate_weighted.sum()` is used to calculate ratios by weighted sums of x and y values
 # @keywords internal
 # @param x A vector of values used as ratio nominator
@@ -547,8 +547,8 @@ calculate_weighted.sum <- function(x, y) {
 #
 # @param numerator Column(s) used as numerator; contains ion counts
 # @param denominator Column used as denominator; contains ion counts
-# @param ratio.method The desired method of computing the ratio
-# @details Description of options for ratio.method:
+# @param ratio_method The desired method of computing the ratio
+# @details Description of options for ratio_method:
 #
 # `mean`: arithmetic mean of ratios from individual scans.
 #
@@ -566,14 +566,14 @@ calculate_weighted.sum <- function(x, y) {
 # df <- orbi_read_isox(filepath = fpath) %>%
 #                      orbi_simplify_isox() %>%
 #                      orbi_define_basepeak(basepeak = "M0")
-# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$Basepeak.Ions, ratio.method =  "sum")
+# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$Basepeak.Ions, ratio_method =  "sum")
 #
 # @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 # @export
 
 orbi_calculate_ratio <- function(numerator,
                                  denominator,
-                                 ratio.method = c("mean",
+                                 ratio_method = c("mean",
                                                   "sum",
                                                   "median",
                                                   "geometric.mean",
@@ -593,33 +593,33 @@ orbi_calculate_ratio <- function(numerator,
 
 
   tryCatch({
-    if (ratio.method == "mean") {
+    if (ratio_method == "mean") {
       o <- base::mean(numerator / denominator)
       o
     } else {
-      if (ratio.method == "slope") {
+      if (ratio_method == "slope") {
         o <- calculate_slope(numerator, denominator)
         o
       } else{
-        if (ratio.method == "sum") {
+        if (ratio_method == "sum") {
           o <-  base::sum(numerator) / sum(denominator)
           o
         } else{
-          if (ratio.method == "geometric.mean") {
+          if (ratio_method == "geometric.mean") {
             o <- calculate_gmean(numerator / denominator)
             o
           } else{
-            if (ratio.method == "weighted.sum") {
+            if (ratio_method == "weighted.sum") {
               o <- calculate_weighted.sum(numerator, denominator)
               o
             } else{
-              if (ratio.method == "median") {
+              if (ratio_method == "median") {
                 o <-
                   stats::median(numerator / denominator)
                 o
               } else{
                 print(
-                  "`ratio.method` has to be `mean`, `sum`, `median`, `geometric.mean`, `slope` or `weighted.sum`"
+                  "`ratio_method` has to be `mean`, `sum`, `median`, `geometric.mean`, `slope` or `weighted.sum`"
                 )
               }
             }
@@ -734,13 +734,13 @@ orbi_define_basepeak <- function(dataset, basepeak) {
 #' @title Generate the results table
 #' @description Contains the logic to generate the results table
 #' @param dataset A processed tibble produced from `IsoX` output
-#' @param ratio.method Method for computing the ratio; passed to `orbi_calculate_ratio()`
+#' @param ratio_method Method for computing the ratio; passed to `orbi_calculate_ratio()`
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'       orbi_simplify_isox() %>% orbi_define_basepeak(basepeak = "M0")  %>%
-#'       orbi_calculate_results(ratio.method = "sum")
+#'       orbi_calculate_results(ratio_method = "sum")
 #'
 #' @details **Description of the output columns:**
 #'
@@ -759,7 +759,7 @@ orbi_define_basepeak <- function(dataset, basepeak) {
 #' * `Rel.SE.permil`: Relative standard error of the reported ratio in permil
 #'
 #'
-#' @details **Description of options for `ratio.method`:**
+#' @details **Description of options for `ratio_method`:**
 #'
 #' @details Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
 #' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
@@ -777,7 +777,7 @@ orbi_define_basepeak <- function(dataset, basepeak) {
 #'
 #' @return Returns a results table containing `filename`, `compound`,  `Basepeak`, `Isotopocule`, `Ratio`, `Ratio.SEM`, `relSE.permil`, `Shot.Noise.permil`, `No.of.Scans`, `Mins.to.1mio`
 #' @export
-orbi_calculate_results <- function(dataset, ratio.method) {
+orbi_calculate_results <- function(dataset, ratio_method) {
 
   # basic checks
   if (missing(dataset))
@@ -786,8 +786,8 @@ orbi_calculate_results <- function(dataset, ratio.method) {
   if (is.data.frame(dataset) == FALSE)
     stop("dataset must be a data frame",  call. = TRUE)
 
-  if (missing(ratio.method))
-    stop("no input for ratio.method supplied", call. = TRUE)
+  if (missing(ratio_method))
+    stop("no input for ratio_method supplied", call. = TRUE)
 
   ratio.options <- c("mean",
                      "sum",
@@ -796,9 +796,9 @@ orbi_calculate_results <- function(dataset, ratio.method) {
                      "slope",
                      "weighted.sum")
 
-  if (!(ratio.method %in% ratio.options))
+  if (!(ratio_method %in% ratio.options))
     stop(cat(
-      "ratio.method must be on of the following: ",
+      "ratio_method must be on of the following: ",
       ratio.options,
       "\n",
       sep = " "
@@ -883,7 +883,7 @@ orbi_calculate_results <- function(dataset, ratio.method) {
     df.stat <- df.group %>%
 
       dplyr::mutate(
-        Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio.method = ratio.method)
+        Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$Basepeak.Ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
       dplyr::mutate(Ratio.SEM = calculate_se(
