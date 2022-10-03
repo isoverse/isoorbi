@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.isoverse.org/isoorbi/404.html</loc>
+    <loc>https://isoorbi.isoverse.org/404.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/LICENSE-text.html</loc>
+    <loc>https://isoorbi.isoverse.org/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/LICENSE.html</loc>
+    <loc>https://isoorbi.isoverse.org/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/articles/index.html</loc>
+    <loc>https://isoorbi.isoverse.org/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/articles/quick_start.html</loc>
+    <loc>https://isoorbi.isoverse.org/articles/quick_start.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/authors.html</loc>
+    <loc>https://isoorbi.isoverse.org/authors.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/index.html</loc>
+    <loc>https://isoorbi.isoverse.org/index.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/index.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/isoorbi-package.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_calculate_results.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_results.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_define_basepeak.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_filter_TICxIT.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_TICxIT.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_filter_isox.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_filter_satellitePeaks.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_satellitePeaks.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_filter_weak.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_read_isox.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_read_isox.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/orbi_simplify_isox.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html</loc>
   </url>
   <url>
-    <loc>https://www.isoverse.org/isoorbi/reference/reexports.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/reexports.html</loc>
   </url>
 </urlset>
