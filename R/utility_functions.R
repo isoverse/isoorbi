@@ -592,48 +592,37 @@ orbi_calculate_ratio <- function(numerator,
     stop("denominator must be a numeric vector",  call. = TRUE)
 
 
-  tryCatch({
-    if (ratio_method == "mean") {
-      o <- base::mean(numerator / denominator)
-      o
-    } else {
-      if (ratio_method == "slope") {
-        o <- calculate_slope(numerator, denominator)
-        o
-      } else{
-        if (ratio_method == "sum") {
-          o <-  base::sum(numerator) / sum(denominator)
-          o
-        } else{
-          if (ratio_method == "geometric_mean") {
-            o <- calculate_gmean(numerator / denominator)
-            o
-          } else{
-            if (ratio_method == "weighted_sum") {
-              o <- calculate_weighted_sum(numerator, denominator)
-              o
-            } else{
-              if (ratio_method == "median") {
-                o <-
-                  stats::median(numerator / denominator)
-                o
-              } else{
-                print(
-                  "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`"
-                )
-              }
-            }
-          }
-        }
-      }
-    }
-  },
+  tryCatch({ o <-  {
+     if (ratio_method == "mean") {
+       base::mean(numerator / denominator)
+     } else if (ratio_method == "slope") {
+       calculate_slope(numerator, denominator)
+     } else if (ratio_method == "sum") {
+       base::sum(numerator) / sum(denominator)
+     } else if (ratio_method == "geometric_mean") {
+       calculate_gmean(numerator / denominator)
+     } else if (ratio_method == "weighted_sum") {
+       calculate_weighted_sum(numerator, denominator)
+     } else if (ratio_method == "median") {
+       stats::median(numerator / denominator)
+     } else{
+       stop(
+         "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`",
+         call. = FALSE
+       )
+     }
+   }
 
+   warning = function(w) {
+     stop("something went wrong calculating ratios:", w$message, call. = TRUE)
 
-  warning = function(w) {
-    stop("something went wrong: ", w$message, call. = TRUE)
+  }
   })
+
+  return(o)
+
 }
+
 
 #' @title Define and assign the base peak
 #' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator)
