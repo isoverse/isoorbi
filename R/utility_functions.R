@@ -701,8 +701,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
                     .data$compound,
                     .data$scan.no,
                     .data$basepeak,
-                    .data$basepeak_ions) %>%
-      as.data.frame(),
+                    .data$basepeak_ions),
 
     warning = function(w) {
       stop("something went wrong: ", w$message, call. = TRUE)
