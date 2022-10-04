@@ -740,7 +740,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'       orbi_simplify_isox() %>% orbi_define_basepeak(base_peak = "M0")  %>%
-#'       orbi_calculate_results(ratio_method = "sum")
+#'       orbi_summarize_results(ratio_method = "sum")
 #'
 #' @details **Description of the output columns:**
 #'
@@ -777,7 +777,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #'
 #' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
 #' @export
-orbi_calculate_results <- function(dataset, ratio_method) {
+orbi_summarize_results <- function(dataset, ratio_method) {
 
   # basic checks
   if (missing(dataset))

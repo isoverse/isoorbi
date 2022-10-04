@@ -36,7 +36,7 @@ df.filtered <- df.simple %>% orbi_filter_isox(filename = c("s3744", "ac6"),
 
 # Define base peak and calculate the results table
 df.results <- df.filtered %>% orbi_define_basepeak(base_peak = "M0") %>% 
-                             orbi_calculate_results(ratio_method = "sum")
+                             orbi_summarize_results(ratio_method = "sum")
 
 ```
 
