@@ -566,7 +566,7 @@ calculate_weighted_sum <- function(x, y) {
 # df <- orbi_read_isox(filepath = fpath) %>%
 #                      orbi_simplify_isox() %>%
 #                      orbi_define_basepeak(base_peak = "M0")
-# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$basepeak.Ions, ratio_method =  "sum")
+# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$basepeak_ions, ratio_method =  "sum")
 #
 # @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 # @export
@@ -646,7 +646,7 @@ orbi_calculate_ratio <- function(numerator,
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_define_basepeak(base_peak = "M0")
 #'
-#' @returns Input data frame plus two columns called `basepeak` and `basepeak.Ions`
+#' @returns Input data frame plus two columns called `basepeak` and `basepeak_ions`
 #' @export
 orbi_define_basepeak <- function(dataset, base_peak) {
 
@@ -695,13 +695,13 @@ orbi_define_basepeak <- function(dataset, base_peak) {
                       .data$scan.no) %>%
       dplyr::filter(.data$isotopocule == base_peak) %>%
       dplyr::mutate(basepeak = factor(.data$isotopocule),
-                    basepeak.Ions = .data$ions.incremental
+                    basepeak_ions = .data$ions.incremental
       ) %>%
       dplyr::select(.data$filename,
                     .data$compound,
                     .data$scan.no,
                     .data$basepeak,
-                    .data$basepeak.Ions) %>%
+                    .data$basepeak_ions) %>%
       as.data.frame(),
 
     warning = function(w) {
@@ -883,11 +883,11 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     df.stat <- df.group %>%
 
       dplyr::mutate(
-        ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak.Ions, ratio_method = ratio_method)
+        ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
       dplyr::mutate(ratio_sem = calculate_se(
-        .data$ions.incremental / .data$basepeak.Ions
+        .data$ions.incremental / .data$basepeak_ions
       )),
 
     #For simplicity use basic standard error for all options
@@ -908,9 +908,9 @@ orbi_summarize_results <- function(dataset, ratio_method) {
       minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
       #FIXME: could be better!
       shot_noise_permil = 1000 * (sqrt((
-        sum(.data$ions.incremental) + sum(.data$basepeak.Ions)
+        sum(.data$ions.incremental) + sum(.data$basepeak_ions)
       ) / (
-        sum(.data$ions.incremental) * sum(.data$basepeak.Ions)
+        sum(.data$ions.incremental) * sum(.data$basepeak_ions)
       ))),
       ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)
     ) %>%
@@ -926,7 +926,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
       dplyr::select(
         -.data$ions.incremental,
-        -.data$basepeak.Ions,
+        -.data$basepeak_ions,
         -.data$time.min,
         -.data$scan.no,
         -.data$it.ms,

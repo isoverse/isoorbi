@@ -12,7 +12,7 @@ orbi_define_basepeak(dataset, base_peak)
 \item{base_peak}{The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios}
 }
 \value{
-Input data frame plus two columns called \code{basepeak} and \code{basepeak.Ions}
+Input data frame plus two columns called \code{basepeak} and \code{basepeak_ions}
 }
 \description{
 \code{orbi_define_basepeak()} sets one isotopocule in the data frame as the base peak (ratio denominator)
