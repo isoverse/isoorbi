@@ -12,7 +12,7 @@ orbi_calculate_results(dataset, ratio_method)
 \item{ratio_method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
 }
 \value{
-Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{Ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
+Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
 }
 \description{
 Contains the logic to generate the results table

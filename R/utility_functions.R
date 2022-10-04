@@ -775,7 +775,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
-#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `Ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
+#' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
 #' @export
 orbi_calculate_results <- function(dataset, ratio_method) {
 
@@ -883,7 +883,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
     df.stat <- df.group %>%
 
       dplyr::mutate(
-        Ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak.Ions, ratio_method = ratio_method)
+        ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak.Ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
       dplyr::mutate(ratio_sem = calculate_se(
@@ -904,7 +904,7 @@ orbi_calculate_results <- function(dataset, ratio_method) {
   tryCatch(
 
     df.stat <- df.stat %>% dplyr::mutate(
-      number_of_scans = length(.data$Ratio),
+      number_of_scans = length(.data$ratio),
       minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
       #FIXME: could be better!
       shot_noise_permil = 1000 * (sqrt((
@@ -912,12 +912,12 @@ orbi_calculate_results <- function(dataset, ratio_method) {
       ) / (
         sum(.data$ions.incremental) * sum(.data$basepeak.Ions)
       ))),
-      ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$Ratio)
+      ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)
     ) %>%
 
       #Round values for output
       dplyr::mutate(
-        Ratio = round(.data$Ratio, 8),
+        ratio = round(.data$ratio, 8),
         ratio_sem = round(.data$ratio_sem, 8),
         shot_noise_permil = round(.data$shot_noise_permil, 3),
         ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
