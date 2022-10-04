@@ -18,6 +18,8 @@
 #' @export
 orbi_filter_satellite_peaks <- function(dataset) {
 
+  message("orbi_filter_satellite_peaks(): remove minor signals (e.g., satellite peaks) that were reported by IsoX...")
+
   # safety checks
   if (missing(dataset))
     stop("no dataset supplied", call. = TRUE)
@@ -74,6 +76,8 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #' @export
 orbi_filter_weak_isotopocules <-
   function(dataset, min_percent) {
+
+    message("orbi_filter_weak_isotopocules(): remove isotopocules that are not consistently detected in most scans")
 
     # safety checks
     if (missing(dataset))
@@ -218,6 +222,8 @@ orbi_filter_weak_isotopocules <-
 #' @return Filtered tibble
 #' @export
 orbi_filter_scan_intensity <- function(dataset, truncate_extreme) {
+
+  message("orbi_filter_scan_intensity(): remove extremely high and low intense scans...")
 
   # safety checks
   if (missing(dataset))
@@ -540,36 +546,42 @@ calculate_weighted_sum <- function(x, y) {
   return(ratio)
 }
 
-# @title Internal function to calculate ratio
-# @description Ratio calculation between isotopocules of interest.
-#
-# Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-#
-# @param numerator Column(s) used as numerator; contains ion counts
-# @param denominator Column used as denominator; contains ion counts
-# @param ratio_method The desired method of computing the ratio
-# @details Description of options for ratio_method:
-#
-# `mean`: arithmetic mean of ratios from individual scans.
-#
-# `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
-#
-# `geometric_mean`: geometric mean of ratios from individual scans.
-#
-# `slope`: The ratio is calculated using the slope from a linear model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`.
-#
-# `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-# i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
-#
-# @examples
-# fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
-# df <- orbi_read_isox(filepath = fpath) %>%
-#                      orbi_simplify_isox() %>%
-#                      orbi_define_basepeak(base_peak = "M0")
-# df2 <- orbi_calculate_ratio(numerator = df$ions.incremental, denominator = df$basepeak_ions, ratio_method =  "sum")
-#
-# @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
-# @export
+#' @title Calculate isotopocule ratios
+#' @description Ratio calculation between isotopocules and base peak defined by `orbi_define_basepeak()`.
+#'
+#' Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
+#' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
+#'
+#'
+#' @param numerator Column(s) used as numerator; contains ion counts
+#' @param denominator Column used as denominator; contains ion counts
+#' @param ratio_method Method for computing the ratio
+#'
+#'
+#' @details **Description of options for `ratio_method`:**
+#'
+#' * `mean`: arithmetic mean of ratios from individual scans.
+#'
+#' * `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+#'
+#' * `geometric_mean`: geometric mean of ratios from individual scans.
+#'
+#' * `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
+#'
+#' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
+#'
+#' @examples
+#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' df <- orbi_read_isox(filepath = fpath) %>%
+#'                      orbi_simplify_isox() %>%
+#'                      orbi_define_basepeak(base_peak = "M0")
+#' df2 <- orbi_calculate_ratio(numerator = df$ions.incremental,
+#'                           denominator = df$basepeak_ions,
+#'                          ratio_method =  "sum")
+#'
+#' @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
+#' @export
 
 orbi_calculate_ratio <- function(numerator,
                                  denominator,
@@ -579,6 +591,8 @@ orbi_calculate_ratio <- function(numerator,
                                                   "geometric_mean",
                                                   "slope",
                                                   "weighted_sum")) {
+
+
   if (missing(numerator))
     stop("no input for numerator supplied", call. = TRUE)
 
@@ -638,6 +652,8 @@ orbi_calculate_ratio <- function(numerator,
 #' @returns Input data frame plus two columns called `basepeak` and `basepeak_ions`
 #' @export
 orbi_define_basepeak <- function(dataset, base_peak) {
+
+  message("orbi_define_basepeak(): set one isotopocule in the data frame as the ratio denominator...")
 
   #basic checks
   if (missing(dataset))
@@ -747,22 +763,6 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 #' * `ratio_relative_sem_permil`: Relative standard error of the reported ratio in permil
 #'
 #'
-#' @details **Description of options for `ratio_method`:**
-#'
-#' @details Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-#' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
-#'
-#' * `mean`: arithmetic mean of ratios from individual scans.
-#'
-#' * `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
-#'
-#' * `geometric_mean`: geometric mean of ratios from individual scans.
-#'
-#' * `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
-#'
-#' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-#' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
-#'
 #' @return Returns a results table containing `filename`, `compound`,  `basepeak`, `Isotopocule`, `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
 #' @export
 orbi_summarize_results <- function(dataset, ratio_method) {
@@ -867,6 +867,10 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   })
 
 
+
+  message(paste0("calculating ratios using orbi_calculate_ratio() using ratio_method: ", ratio_method))
+
+
   tryCatch(
     df.stat <- df.group %>%
 
@@ -887,6 +891,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     }
   )
 
+  message(paste0("summarizing ratios for the results table"))
 
 
   tryCatch(

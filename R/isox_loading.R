@@ -32,12 +32,17 @@
 #' @export
 
 orbi_read_isox <- function(filepath) {
+
+  message("orbi_read_isox(): Read .isox test data...")
+
   # safety checks
   if (missing(filepath)) stop("no file path supplied", call. = TRUE)
   if (length(filepath) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(filepath), call. = TRUE)
   if (!file.exists(filepath)) stop("this file does not exist: ", filepath, call. = TRUE)
   ext <- stringr::str_extract(basename(filepath), "\\.[^.]+$")
   if (is.na(ext) || ext != ".isox") stop("unrecognized file extension: ", ext, call. = TRUE)
+
+
 
   tryCatch(
 
@@ -87,6 +92,9 @@ orbi_read_isox <- function(filepath) {
 #' @export
 
 orbi_simplify_isox <- function(dataset) {
+
+  message("orbi_simplify_isox(): keep only most important columns...")
+
   # safety checks
   if (missing(dataset))
     stop("no dataset supplied", call. = TRUE)
@@ -148,6 +156,8 @@ orbi_simplify_isox <- function(dataset) {
 #' @return  Filtered tibble
 #' @export
 orbi_filter_isox <- function(dataset, filenames, compounds, isotopocules, time_min, time_max) {
+
+  message("orbi_filter_isox(): keep only certain filenames, compounds, isotopocules and time range for analysis...")
 
   # safety checks
   if (missing(dataset))
