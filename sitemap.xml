@@ -28,28 +28,28 @@
     <loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc>
   </url>
   <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_results.html</loc>
-  </url>
-  <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_TICxIT.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc>
   </url>
   <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_satellitePeaks.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_satellite_peaks.html</loc>
   </url>
   <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_scan_intensity.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak_isotopocules.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_read_isox.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_summarize_results.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/reexports.html</loc>
