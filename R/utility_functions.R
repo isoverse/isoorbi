@@ -704,7 +704,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
                     .data$basepeak_ions),
 
     warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
+      stop("something went wrong identifying the base peak for each scan: ", w$message, call. = TRUE)
     }
   )
 
