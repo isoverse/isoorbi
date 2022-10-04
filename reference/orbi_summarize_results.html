@@ -61,7 +61,7 @@
 
 
 <dt>ratio_method</dt>
-<dd><p>Method for computing the ratio; passed to <code>orbi_calculate_ratio()</code></p></dd>
+<dd><p>Method for computing the ratio; passed to <code><a href="orbi_calculate_ratio.html">orbi_calculate_ratio()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -81,14 +81,6 @@
 <li><p><code>minutes_to_1e6_ions</code>: Time in minutes it would take to observe 1 million ions of the <code>isotopocule</code> used as numerator of the ratio calculation.</p></li>
 <li><p><code>shot_noise_permil</code>: Estimate of the shot noise (more correctly thermal noise) of the reported ratio in permil.</p></li>
 <li><p><code>ratio_relative_sem_permil</code>: Relative standard error of the reported ratio in permil</p></li>
-</ul><p><strong>Description of options for <code>ratio_method</code>:</strong></p>
-<p>Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
-The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).</p><ul><li><p><code>mean</code>: arithmetic mean of ratios from individual scans.</p></li>
-<li><p><code>sum</code>: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.</p></li>
-<li><p><code>geometric_mean</code>: geometric mean of ratios from individual scans.</p></li>
-<li><p><code>slope</code>: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the <code>numerator x</code>, using <code>stats::lm(x ~ y + 0, weights = x)</code>.</p></li>
-<li><p><code>weighted_sum</code>: A derivative of the <code>sum</code> option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total <code>sum</code> of <code>x</code> and <code>y</code> that is used to calculate <code>x/y</code>.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -97,7 +89,12 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>filepath <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>      <span class="fu"><a href="orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>base_peak <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>      <span class="fu">orbi_summarize_results</span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_define_basepeak(): set one isotopocule in the data frame as the ratio denominator...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox(): keep only most important columns...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox(): Read .isox test data...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = c("filename", "compound", "scan.no")</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> calculating ratios using orbi_calculate_ratio() using ratio_method: sum</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> summarizing ratios for the results table</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
