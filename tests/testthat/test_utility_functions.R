@@ -7,28 +7,28 @@ context("utils")
 
 
 
-  # orbi_filter_weak
-test_that("orbi_filter_weak() tests", {
+  # orbi_filter_weak_isotopocules
+test_that("orbi_filter_weak_isotopocules() tests", {
   #success
   # ...
   #failure
-  expect_error(orbi_filter_weak(), "no dataset supplied")
+  expect_error(orbi_filter_weak_isotopocules(), "no dataset supplied")
 })
 
-  # orbi_filter_satellitePeaks
-test_that("orbi_filter_satellitePeaks() tests", {
+  # orbi_filter_satellite_peaks
+test_that("orbi_filter_satellite_peaks() tests", {
   #succcess
   df <- orbi_read_isox(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))
-  expect_true(is.tbl(orbi_filter_satellitePeaks(orbi_simplify_isox(df))))
+  expect_true(is.tbl(orbi_filter_satellite_peaks(orbi_simplify_isox(df))))
   #failure
-  expect_error(orbi_filter_satellitePeaks(), "no dataset supplied")
+  expect_error(orbi_filter_satellite_peaks(), "no dataset supplied")
 })
 
-  # orbi_filter_TICxIT
-test_that("orbi_filter_TICxIT() tests", {
+  # orbi_filter_scan_intensity
+test_that("orbi_filter_scan_intensity() tests", {
   #success
   #failure
-  expect_error(orbi_filter_TICxIT(), "no dataset supplied")
+  expect_error(orbi_filter_scan_intensity(), "no dataset supplied")
 })
 
   # orbi_filter_isox
@@ -95,9 +95,9 @@ test_that("calculate_weighted.vector.sum() tests", {
   #success
   x<- c(2,4,6)
   y<- c(3,5,7)
-  expect_type(calculate_weighted.sum(x,y), "double")
+  expect_type(calculate_weighted_sum(x,y), "double")
   #failure
-  expect_error(calculate_weighted.sum(), "input vector for x supplied")
+  expect_error(calculate_weighted_sum(), "input vector for x supplied")
 })
 
   # orbi_calculate_ratio
@@ -112,14 +112,14 @@ test_that("orbi_calculate_ratio() tests", {
   expect_equal(orbi_calculate_ratio(a,b,"sum"), 1)
     #slope
   expect_equal(orbi_calculate_ratio(a,b,"slope"),1)
-    #geometric.mean
-  expect_equal(orbi_calculate_ratio(a,b,"geometric.mean"),1)
-    #weighted.sum
-  expect_equal(orbi_calculate_ratio(a,b,"weighted.sum"),1)
+    #geometric_mean
+  expect_equal(orbi_calculate_ratio(a,b,"geometric_mean"),1)
+    #weighted_sum
+  expect_equal(orbi_calculate_ratio(a,b,"weighted_sum"),1)
     #median
   expect_equal(orbi_calculate_ratio(a,b,"median"), 1)
 
-  expect_equal(orbi_calculate_ratio(a,b,"median2"), "`ratio.method` has to be `mean`, `sum`, `median`, `geometric.mean`, `slope` or `weighted.sum`")
+  expect_equal(orbi_calculate_ratio(a,b,"median2"), "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`")
 
   #failure
   expect_error(orbi_calculate_ratio(), "no input for numerator supplied")
