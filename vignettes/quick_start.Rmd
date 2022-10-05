@@ -17,7 +17,7 @@ file_path <-system.file("extdata", "testfile_Flow_Exploration_small.isox", packa
 ```
 
 A basic data processing example
-```{r, echo=FALSE, message=FALSE}
+```{r, message=FALSE}
 # Read .isox test data
 df <- orbi_read_isox(file_path) 
 
