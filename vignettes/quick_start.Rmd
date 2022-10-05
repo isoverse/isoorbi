@@ -17,7 +17,7 @@ file_path <-system.file("extdata", "testfile_Flow_Exploration_small.isox", packa
 ```
 
 A basic data processing example
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 # Read .isox test data
 df <- orbi_read_isox(file_path) 
 
@@ -46,7 +46,7 @@ df.results <- df.clean %>% orbi_define_basepeak(base_peak = "M0") %>%
 
 
 
-```{r, include=FALSE, echo=FALSE} 
+```{r, include=FALSE, echo=FALSE, message=FALSE} 
 #Temporary tests for optional grouping
 df.simple$segment <- NA
 df.simple$block <- NA
