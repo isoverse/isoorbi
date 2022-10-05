@@ -89,16 +89,6 @@
 <span><span class="co"># Load a path to a system test file</span></span>
 <span><span class="va">file_path</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_Flow_Exploration_small.isox"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span></span></code></pre></div>
 <p>A basic data processing example</p>
-<pre><code><span><span class="co">## orbi_read_isox(): Read .isox test data...</span></span></code></pre>
-<pre><code><span><span class="co">## orbi_simplify_isox(): keep only most important columns...</span></span></code></pre>
-<pre><code><span><span class="co">## orbi_filter_isox(): keep only certain filenames, compounds, isotopocules and time range for analysis...</span></span></code></pre>
-<pre><code><span><span class="co">## orbi_filter_scan_intensity(): remove extremely high and low intense scans...</span></span></code></pre>
-<pre><code><span><span class="co">## orbi_filter_weak_isotopocules(): remove isotopocules that are not consistently detected in most scans</span></span></code></pre>
-<pre><code><span><span class="co">## orbi_filter_satellite_peaks(): remove minor signals (e.g., satellite peaks) that were reported by IsoX...</span></span></code></pre>
-<pre><code><span><span class="co">## orbi_define_basepeak(): set one isotopocule in the data frame as the ratio denominator...</span></span></code></pre>
-<pre><code><span><span class="co">## Joining, by = c("filename", "compound", "scan.no")</span></span>
-<span><span class="co">## calculating ratios using orbi_calculate_ratio() using ratio_method: sum</span></span>
-<span><span class="co">## summarizing ratios for the results table</span></span></code></pre>
   </main>
 </div>
 
