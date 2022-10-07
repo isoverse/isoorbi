@@ -592,14 +592,14 @@ calculate_weighted_sum <- function(x, y) {
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_define_basepeak(base_peak = "M0")
-#' df2 <- orbi_calculate_ratio(numerator = df$ions.incremental,
+#' ratio <- orbi_calculate_ratios(numerator = df$ions.incremental,
 #'                           denominator = df$basepeak_ions,
 #'                          ratio_method =  "sum")
 #'
 #' @return Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 #' @export
 
-orbi_calculate_ratio <- function(numerator,
+orbi_calculate_ratios <- function(numerator,
                                  denominator,
                                  ratio_method = c("mean",
                                                   "sum",
@@ -757,9 +757,9 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 
 
 #' @title Generate the results table
-#' @description Contains the logic to generate the results table
+#' @description Contains the logic to generate the results table. See the \code{\link{orbi_calculate_ratios}} function for details on the different options for the \code{ratio_method} parameter.
 #' @param dataset A processed tibble produced from `IsoX` output
-#' @param ratio_method Method for computing the ratio; passed to `orbi_calculate_ratio()`
+#' @inheritParams orbi_calculate_ratios
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
@@ -837,7 +837,31 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
 
 
- # optional groupings
+ # determine groupings
+
+  all_groups <- c("filename", "compound", "basepeak", "isotopocule")
+  if ("block" %in% names(dataset))
+    all_groups <- c(all_groups, "block")
+  if ("segment" %in% names(dataset))
+    all_groups <- c(all_groups, "segment")
+
+  sprintf("orbi_summarize_results() is grouping the data (by %s) and summarizing ratios using the '%s' method...",
+          paste(all_groups, collapse = ", "), ratio_method) %>%
+    message()
+
+  # execute grouping
+  df.group <- dataset %>%
+    dplyr::group_by(!!!lapply(x, rlang::sym))
+
+  # run calculations
+  df.out <- df.group %>%
+    summarize(
+      ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method),
+      ratio_sem = calculate_se(.data$ions.incremental / .data$basepeak_ions),
+      ...,
+      .groups = "drop"
+    )
+
 
   tryCatch({
     df.group <- dataset  %>% dplyr::ungroup() %>%
@@ -922,7 +946,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
   message(
     paste0(
-      "orbi_calculate_ratio() is calculating ratios, using the ratio_method: ",
+      "orbi_calculate_ratios() is calculating ratios, using the ratio_method: ",
       ratio_method
     )
   )
@@ -932,7 +956,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     df.stat <- df.group %>%
 
       dplyr::mutate(
-        ratio = orbi_calculate_ratio(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method)
+        ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
       dplyr::mutate(ratio_sem = calculate_se(

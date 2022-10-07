@@ -20,3 +20,21 @@ navbar:
   right:
   - icon: fa-github fa-lg
     href: https://github.com/isoverse/isoorbi
+
+reference:
+- title: Main functions
+  contents:
+  - orbi_define_basepeak
+  - orbi_summarize_results
+
+- title: Internal functions
+  desc: >
+    These functions are used internally and not commonly called diretly by the users of this package.
+  contents:
+  - orbi_calculate_ratios
+  - orbi_filter_isox
+  - orbi_filter_satellite_peaks
+  - orbi_filter_scan_intensity
+  - orbi_filter_weak_isotopocules
+  - orbi_read_isox
+  - orbi_simplify_isox

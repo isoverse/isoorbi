@@ -4,6 +4,7 @@
 # import functions/packages used so frequently we don't want to always refer to the namespace explicitly
 #' @import dplyr
 #' @import tidyr
+#' @importFrom rlang !!! !!
 
 #' @importFrom magrittr %>%
 #' @export
