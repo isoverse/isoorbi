@@ -81,9 +81,10 @@
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>filepath <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>                     <span class="fu"><a href="orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>                     <span class="fu">orbi_filter_weak_isotopocules</span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_filter_weak_isotopocules(): remove isotopocules that are not consistently detected in most scans</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox(): keep only most important columns...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox(): Read .isox test data...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox() is loading .isox data from file path: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> /home/runner/work/_temp/Library/isoorbi/extdata/testfile_Flow_Exploration_small.isox</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox() is applied to dataset .. Will keep only most important columns...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_filter_weak_isotopocules() is remove isotopocules that are detected in less than 2% of scans (in each grouping)...</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
