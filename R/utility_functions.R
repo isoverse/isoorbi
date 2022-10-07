@@ -129,7 +129,7 @@ orbi_filter_weak_isotopocules <-
       {
 
 
-        df.group <- dataset  %>% ungroup() %>%
+        df.group <- dataset  %>% dplyr::ungroup() %>%
           dplyr::group_by(.data$filename,
                           .data$compound, .add = TRUE)
 
@@ -276,7 +276,7 @@ orbi_filter_scan_intensity <- function(dataset, truncate_extreme) {
 
   tryCatch(
 
-    {df.group <- dataset  %>% ungroup() %>%
+    {df.group <- dataset  %>% dplyr::ungroup() %>%
         dplyr::group_by(.data$filename,
                         .data$compound, .add = TRUE)
 
@@ -708,7 +708,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 
   tryCatch(
 
-    df.sel <- dataset  %>% ungroup() %>%
+    df.sel <- dataset  %>% dplyr::ungroup() %>%
       dplyr::select(
         .data$filename,
         .data$compound,
@@ -840,7 +840,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
  # optional groupings
 
   tryCatch({
-    df.group <- dataset  %>% ungroup() %>%
+    df.group <- dataset  %>% dplyr::ungroup() %>%
 
       dplyr::group_by(.data$filename,
                       .data$compound,
@@ -856,23 +856,25 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     )
 
 
-    {if ("block" %in% names(dataset))
+    {if ("block" %in% names(dataset)) {
 
-        #ensure block is defined as a factor
+      #ensure block is defined as a factor
 
-        df.group <-
+      df.group <-
         df.group  %>% mutate(block = as.factor(.data$block)) %>%
         dplyr::group_by(.data$block,
                         .add = TRUE)
 
       message(paste0(
         "orbi_summarize_results() is adding a grouping",
-        #deparse(substitute(dataset)), #FIXME: add name of data frame object?
+        # deparse(substitute(dataset)), #FIXME: add name of data frame object?
         ": block"
       ))
+    }
+
       }
 
-    {if ("segment" %in% names(dataset))
+    {if ("segment" %in% names(dataset)) {
 
         #ensure segment is defined as a factor
 
@@ -886,14 +888,14 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         #deparse(substitute(dataset)), #FIXME: add name of data frame object?
         ": segment"
       ))
+    }
 
     }
 
-    {if ("injection" %in% names(dataset))
+    {if ("injection" %in% names(dataset)) {
+      #ensure injection is defined as a factor
 
-        #ensure injection is defined as a factor
-
-        df.group <-
+      df.group <-
         df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
         dplyr::group_by(.data$injection,
                         .add = TRUE)
@@ -903,6 +905,8 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         #deparse(substitute(dataset)), #FIXME: add name of data frame object?
         ": injection"
       ))
+
+    }
 
     }
   },
