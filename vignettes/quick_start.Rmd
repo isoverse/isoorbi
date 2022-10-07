@@ -25,7 +25,6 @@ df <- orbi_read_isox(file_path)
 df.simple <- orbi_simplify_isox(dataset = df)
 
 # Filter the data
-
 df.filtered <- df.simple %>% 
                   orbi_filter_isox(filenames = "all",
                                    time_min = 0.1, 
