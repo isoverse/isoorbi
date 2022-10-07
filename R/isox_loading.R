@@ -33,8 +33,6 @@
 
 orbi_read_isox <- function(filepath) {
 
-  message("orbi_read_isox(): Read .isox test data...")
-
   # safety checks
   if (missing(filepath)) stop("no file path supplied", call. = TRUE)
   if (length(filepath) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(filepath), call. = TRUE)
@@ -42,6 +40,8 @@ orbi_read_isox <- function(filepath) {
   ext <- stringr::str_extract(basename(filepath), "\\.[^.]+$")
   if (is.na(ext) || ext != ".isox") stop("unrecognized file extension: ", ext, call. = TRUE)
 
+  message(paste0("orbi_read_isox() is loading .isox data from file path: \n",
+                 filepath))
 
 
   tryCatch(
@@ -93,8 +93,6 @@ orbi_read_isox <- function(filepath) {
 
 orbi_simplify_isox <- function(dataset) {
 
-  message("orbi_simplify_isox(): keep only most important columns...")
-
   # safety checks
   if (missing(dataset))
     stop("no dataset supplied", call. = TRUE)
@@ -114,6 +112,11 @@ orbi_simplify_isox <- function(dataset) {
     paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
+
+  message("orbi_simplify_isox() is applied to dataset ",
+          deparse(substitute(dataset)),
+          ". Will keep only most important columns...")
+
 
 
   tryCatch(
@@ -155,9 +158,8 @@ orbi_simplify_isox <- function(dataset) {
 #'
 #' @return  Filtered tibble
 #' @export
-orbi_filter_isox <- function(dataset, filenames, compounds, isotopocules, time_min, time_max) {
+orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isotopocules ="all", time_min = "all", time_max = "all") {
 
-  message("orbi_filter_isox(): keep only certain filenames, compounds, isotopocules and time range for analysis...")
 
   # safety checks
   if (missing(dataset))
@@ -170,15 +172,15 @@ orbi_filter_isox <- function(dataset, filenames, compounds, isotopocules, time_m
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
 
-  if (missing(filenames))
+  if (missing(filenames) && filenames!="all")
     stop("input for filenames missing", call. = TRUE)
-  if (missing(compounds))
+  if (missing(compounds) && compounds!="all")
     stop("input for compounds missing", call. = TRUE)
-  if (missing(isotopocules))
+  if (missing(isotopocules) && isotopocules!="all")
     stop("input for isotopocules missing", call. = TRUE)
-  if (missing(time_min))
+  if (missing(time_min) && time_min!="all")
     stop("input for time_min missing", call. = TRUE)
-  if (missing(time_max))
+  if (missing(time_max)  && time_max!="all")
     stop("input for time_max missing", call. = TRUE)
 
 
@@ -203,6 +205,73 @@ orbi_filter_isox <- function(dataset, filenames, compounds, isotopocules, time_m
   if (length(missing_cols) > 0) {
     paste0("missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
+  }
+
+
+  message(
+    paste0(
+      "orbi_filter_isox() is applied to dataset"#,
+      #deparse(substitute(dataset)), #FIXME: How to print dataframe name here?
+    )
+  )
+
+
+  message(
+    paste0("Keep filename: ",
+           as.character(filenames), "\n")
+  )
+
+
+  message(
+    paste0("Keep compound: ",
+           as.character(compounds), "\n")
+  )
+
+  message(
+      paste0("Keep isotopocule: ",
+      as.character(isotopocules), "\n")
+    )
+
+
+  if (time_min=="all"){
+
+    message(
+      paste0("No filter for `time_min` applied."
+        ))
+
+  }
+
+  if (time_min!="all"){
+
+    message(
+      paste0(
+        "Keep retention times >",
+        time_min,
+        " minutes"
+      )
+      )
+
+  }
+
+
+  if (time_max=="all"){
+
+    message(
+      paste0("No filter for `time_max` applied."
+      ))
+
+  }
+
+  if (time_max!="all"){
+
+    message(
+      paste0(
+        "Keep retention times <",
+        time_max,
+        " minutes"
+      )
+    )
+
   }
 
 
