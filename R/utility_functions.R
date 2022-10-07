@@ -18,7 +18,6 @@
 #' @export
 orbi_filter_satellite_peaks <- function(dataset) {
 
-  message("orbi_filter_satellite_peaks(): remove minor signals (e.g., satellite peaks) that were reported by IsoX...")
 
   # safety checks
   if (missing(dataset))
@@ -40,6 +39,13 @@ orbi_filter_satellite_peaks <- function(dataset) {
     paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
+
+  message(
+    paste0(
+      "orbi_filter_satellite_peaks() is removing minor signals (e.g., satellite peaks) that were reported by IsoX..."
+    )
+  )
+
 
   tryCatch(
     df.out <- dataset %>% ungroup %>%
@@ -77,7 +83,6 @@ orbi_filter_satellite_peaks <- function(dataset) {
 orbi_filter_weak_isotopocules <-
   function(dataset, min_percent) {
 
-    message("orbi_filter_weak_isotopocules(): remove isotopocules that are not consistently detected in most scans")
 
     # safety checks
     if (missing(dataset))
@@ -108,6 +113,13 @@ orbi_filter_weak_isotopocules <-
         stop(call. = FALSE)
     }
 
+    message(paste0(
+      "orbi_filter_weak_isotopocules() is remove isotopocules ",
+      # deparse(substitute(dataset)), #FIXME: How to print name of datatframe object?
+      "that are detected in less than ",
+      min_percent,
+      "% of scans (in each grouping)...")
+    )
 
 
     #Optional groupings
@@ -223,7 +235,6 @@ orbi_filter_weak_isotopocules <-
 #' @export
 orbi_filter_scan_intensity <- function(dataset, truncate_extreme) {
 
-  message("orbi_filter_scan_intensity(): remove extremely high and low intense scans...")
 
   # safety checks
   if (missing(dataset))
@@ -255,6 +266,11 @@ orbi_filter_scan_intensity <- function(dataset, truncate_extreme) {
       stop(call. = FALSE)
   }
 
+  message(paste0(
+    "orbi_filter_scan_intensity() is removing extremely high and low intense scans.",
+    #deparse(substitute(dataset)), # FIXME: How to print name of data frame object?
+    " A total of ", 2* truncate_extreme, "% of the scans will be removed...")
+  )
 
   #Optional groupings
 
@@ -653,7 +669,6 @@ orbi_calculate_ratio <- function(numerator,
 #' @export
 orbi_define_basepeak <- function(dataset, base_peak) {
 
-  message("orbi_define_basepeak(): set one isotopocule in the data frame as the ratio denominator...")
 
   #basic checks
   if (missing(dataset))
@@ -681,6 +696,12 @@ orbi_define_basepeak <- function(dataset, base_peak) {
     paste0("Missing expected column(s): ", paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
+
+
+  message(paste0("orbi_define_basepeak() is setting the ",
+                 base_peak,
+                 " isotopocule as the ratio denominator...")
+          )
 
 
   # Annotation: Identify `base peak` for each scan
@@ -826,6 +847,13 @@ orbi_summarize_results <- function(dataset, ratio_method) {
                       .data$basepeak,
                       .data$isotopocule,
                       .add = TRUE)
+    message(
+      paste0(
+        "orbi_summarize_results() is grouping dataset ",
+        #deparse(substitute(dataset)), #FIXME: How to print name of data frame object?
+        "by columns: filename, compound, basepeak, isotopocule"
+      )
+    )
 
 
     {if ("block" %in% names(dataset))
@@ -836,6 +864,12 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         df.group  %>% mutate(block = as.factor(.data$block)) %>%
         dplyr::group_by(.data$block,
                         .add = TRUE)
+
+      message(paste0(
+        "orbi_summarize_results() is adding a grouping",
+        #deparse(substitute(dataset)), #FIXME: add name of data frame object?
+        ": block"
+      ))
       }
 
     {if ("segment" %in% names(dataset))
@@ -846,6 +880,13 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
         dplyr::group_by(.data$segment,
                         .add = TRUE)
+
+      message(paste0(
+        "orbi_summarize_results() is adding a grouping",
+        #deparse(substitute(dataset)), #FIXME: add name of data frame object?
+        ": segment"
+      ))
+
     }
 
     {if ("injection" %in% names(dataset))
@@ -856,6 +897,13 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
         dplyr::group_by(.data$injection,
                         .add = TRUE)
+
+      message(paste0(
+        "orbi_summarize_results() is adding a grouping",
+        #deparse(substitute(dataset)), #FIXME: add name of data frame object?
+        ": injection"
+      ))
+
     }
   },
 
@@ -868,7 +916,12 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
 
 
-  message(paste0("calculating ratios using orbi_calculate_ratio() using ratio_method: ", ratio_method))
+  message(
+    paste0(
+      "orbi_calculate_ratio() is calculating ratios, using the ratio_method: ",
+      ratio_method
+    )
+  )
 
 
   tryCatch(
@@ -891,7 +944,9 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     }
   )
 
-  message(paste0("summarizing ratios for the results table"))
+  message(paste0(
+    "orbi_summarize_results() is summarizing ratios for the results table..."
+  ))
 
 
   tryCatch(
