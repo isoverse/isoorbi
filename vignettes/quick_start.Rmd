@@ -27,7 +27,7 @@ df.simple <- orbi_simplify_isox(dataset = df)
 # Filter the data
 df.filtered <- df.simple %>% 
                   orbi_filter_isox(filenames = "all",
-                                   time_min = 0.1, 
+                                   time_min = "all", 
                                    time_max = 1, 
                                    compounds = "HSO4-",
                                    isotopocules = c("M0", "34S", "33S", "17O", "18O"))

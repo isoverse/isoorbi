@@ -6,11 +6,11 @@
 \usage{
 orbi_filter_isox(
   dataset,
-  filenames,
-  compounds,
-  isotopocules,
-  time_min,
-  time_max
+  filenames = "all",
+  compounds = "all",
+  isotopocules = "all",
+  time_min = "all",
+  time_max = "all"
 )
 }
 \arguments{
