@@ -51,7 +51,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_filter_scan_intensity</span><span class="op">(</span><span class="va">dataset</span>, <span class="va">truncate_extreme</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_filter_scan_intensity</span><span class="op">(</span><span class="va">dataset</span>, <span class="va">outlier_percent</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -60,7 +60,7 @@
 <dd><p>Simplified IsoX dataset to have <code>TICxIT</code> outliers removed</p></dd>
 
 
-<dt>truncate_extreme</dt>
+<dt>outlier_percent</dt>
 <dd><p>A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.</p></dd>
 
 </dl></div>
@@ -82,7 +82,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fpath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_Flow_Exploration_small.isox"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>filepath <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span><span class="fu"><a href="orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span><span class="fu">orbi_filter_scan_intensity</span><span class="op">(</span>truncate_extreme <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">orbi_filter_scan_intensity</span><span class="op">(</span>outlier_percent <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox() is loading .isox data from file path: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> /home/runner/work/_temp/Library/isoorbi/extdata/testfile_Flow_Exploration_small.isox</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox() is applied to dataset .. Will keep only most important columns...</span>
