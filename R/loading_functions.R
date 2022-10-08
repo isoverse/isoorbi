@@ -113,9 +113,7 @@ orbi_simplify_isox <- function(dataset) {
       stop(call. = FALSE)
   }
 
-  message("orbi_simplify_isox() is applied to dataset ",
-          deparse(substitute(dataset)),
-          ". Will keep only most important columns...")
+  message("orbi_simplify_isox() is applied to dataset. Will keep only most important columns...")
 
 
 
