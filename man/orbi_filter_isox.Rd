@@ -37,8 +37,8 @@ fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
 orbi_simplify_isox() \%>\%
 orbi_filter_isox(filenames = c("s3744"),
-compounds = c("HSO4-"),
-isotopocules = "M0",
+compounds = "HSO4-",
+isotopocules = c("M0", "34S", "18O"),
 time_min = FALSE,
 time_max = FALSE)
 
