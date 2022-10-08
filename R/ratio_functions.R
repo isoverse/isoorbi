@@ -1,10 +1,10 @@
 # Functions to calculate ratios and stats --------------------------------------------
 
-# @title Internal function to calculate standard error
-# @description The function `calculate_ratio_sem()` computes a regular standard error
-# @keywords internal
-# @param ratios A numeric vector used to calculate a standard error
-# @return The calculated standard error
+#' @title Internal function to calculate standard error
+#' @description The function `calculate_ratio_sem()` computes a regular standard error
+#' @keywords internal
+#' @param ratios A numeric vector used to calculate a standard error
+#' @return The calculated standard error
 
 calculate_ratio_sem <- function(ratios) {
 
@@ -31,28 +31,28 @@ calculate_ratio_sem <- function(ratios) {
 
 }
 
-# @title Internal function to calculate geometric mean
-# @description  The function `calculate_ratio_gmean()` is used to calculate geometric means
-# @keywords internal
-# @param x A numeric vector used to calculate the geometric mean
-# @return The calculated geometric mean
+#' @title Internal function to calculate geometric mean
+#' @description  The function `calculate_ratio_gmean()` is used to calculate geometric means
+#' @keywords internal
+#' @param ratios A numeric vector of ratios used to calculate the geometric mean
+#' @return The calculated geometric mean
 
-calculate_ratio_gmean <- function(x) {
+calculate_ratio_gmean <- function(ratios) {
 
-  if (missing(x))
-    stop("input vector for x supplied", call. = TRUE)
+  if (missing(ratios))
+    stop("input vector for ratios supplied", call. = TRUE)
 
   #basic checks
-  if (!(is.vector(x)))
-    stop("x needs to be a vector", call. = TRUE)
-  if (!(is.numeric(x)))
-    stop("x needs to be a numeric vector", call. = TRUE)
+  if (!(is.vector(ratios)))
+    stop("ratios needs to be a vector", call. = TRUE)
+  if (!(is.numeric(ratios)))
+    stop("ratios needs to be a numeric vector", call. = TRUE)
 
-  if (length(x) <=1)
-    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+  if (length(ratios) <=1)
+    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
   tryCatch(
-    exp(mean(log(x))),
+    exp(mean(log(ratios))),
     warning = function(w) {
       stop("something went wrong calculating the geometic mean: ", w$message, call. = TRUE)
     }
@@ -292,7 +292,7 @@ orbi_calculate_ratios <- function(numerator,
      } else if (ratio_method == "sum") {
        base::sum(numerator) / sum(denominator)
      } else if (ratio_method == "geometric_mean") {
-       calculate_ratio_gmean(numerator / denominator)
+       calculate_ratio_gmean(ratios= numerator / denominator)
      } else if (ratio_method == "weighted_sum") {
        calculate_ratio_weighted_sum(numerator, denominator)
      } else if (ratio_method == "median") {

@@ -20,11 +20,11 @@ test_that("calculate_ratio_sem() tests", {
 test_that("calculate_ratio_gmean() tests", {
   #success
   list<- c(4,5,6)
-  expect_type(calculate_ratio_gmean(list), "double")
-  expect_equal(calculate_ratio_gmean(list), 4.9324241486609)
+  expect_type(calculate_ratio_gmean(ratios = list), "double")
+  expect_equal(calculate_ratio_gmean(ratios = list), 4.9324241486609)
 
   #failure
-  expect_error(calculate_ratio_gmean(), "input vector for x supplied")
+  expect_error(calculate_ratio_gmean(), "input vector for ratios supplied")
 })
 
   # calculate_ratio_gsd
