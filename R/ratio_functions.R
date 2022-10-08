@@ -494,7 +494,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
   # execute grouping
   df.group <- dataset %>%
-    dplyr::group_by(!!!lapply(x, rlang::sym))
+    dplyr::group_by(!!!lapply(all_groups, rlang::sym))
 
 
 
