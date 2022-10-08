@@ -408,9 +408,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
                       .add = TRUE)
     message(
       paste0(
-        "orbi_summarize_results() is grouping dataset ",
-        #deparse(substitute(dataset)), #FIXME: How to print name of data frame object?
-        "by columns: filename, compound, basepeak, isotopocule"
+        "orbi_summarize_results() is grouping data by columns: filename, compound, basepeak, isotopocule"
       )
     )
 
@@ -425,9 +423,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
                         .add = TRUE)
 
       message(paste0(
-        "orbi_summarize_results() is adding a grouping",
-        # deparse(substitute(dataset)), #FIXME: add name of data frame object?
-        ": block"
+        "orbi_summarize_results() is adding a grouping: block"
       ))
     }
 
@@ -443,9 +439,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
                         .add = TRUE)
 
       message(paste0(
-        "orbi_summarize_results() is adding a grouping",
-        #deparse(substitute(dataset)), #FIXME: add name of data frame object?
-        ": segment"
+        "orbi_summarize_results() is adding a grouping: segment"
       ))
     }
 
@@ -460,9 +454,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
                         .add = TRUE)
 
       message(paste0(
-        "orbi_summarize_results() is adding a grouping",
-        #deparse(substitute(dataset)), #FIXME: add name of data frame object?
-        ": injection"
+        "orbi_summarize_results() is adding a grouping: injection"
       ))
 
     }
@@ -517,7 +509,6 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     df.stat <- df.stat %>% dplyr::mutate(
       number_of_scans = length(.data$ratio),
       minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
-      #FIXME: could be better!
       shot_noise_permil = 1000 * (sqrt((
         sum(.data$ions.incremental) + sum(.data$basepeak_ions)
       ) / (

@@ -210,8 +210,7 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
 
   message(
     paste0(
-      "orbi_filter_isox() is applied to dataset"#,
-      #deparse(substitute(dataset)), #FIXME: How to print dataframe name here?
+      "orbi_filter_isox() is applied to dataset"
     )
   )
 

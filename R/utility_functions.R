@@ -114,9 +114,7 @@ orbi_filter_weak_isotopocules <-
     }
 
     message(paste0(
-      "orbi_filter_weak_isotopocules() is remove isotopocules ",
-      # deparse(substitute(dataset)), #FIXME: How to print name of datatframe object?
-      "that are detected in less than ",
+      "orbi_filter_weak_isotopocules() is removing isotopocules from data that are detected in less than ",
       min_percent,
       "% of scans (in each grouping)...")
     )
@@ -267,8 +265,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
   }
 
   message(paste0(
-    "orbi_filter_scan_intensity() is removing extremely high and low intense scans.",
-    #deparse(substitute(dataset)), # FIXME: How to print name of data frame object?
+    "orbi_filter_scan_intensity() is removing extremely high and low intense scans from data.",
     " A total of ", 2* outlier_percent, "% of the scans will be removed...")
   )
 
@@ -419,7 +416,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 
 
   tryCatch(
-    df.out <- dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no")), #FIXME: carefully test this is correct
+    df.out <- dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no")),
 
     warning = function(w) {
       stop("something went wrong when merging data: ", w$message, call. = TRUE)
