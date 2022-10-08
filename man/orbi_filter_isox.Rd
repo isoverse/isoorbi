@@ -16,11 +16,11 @@ orbi_filter_isox(
 \arguments{
 \item{dataset}{The IsoX data to be filtered}
 
-\item{filenames}{Vector of file names to keep; also accepts \code{"all"}}
+\item{filenames}{Vector of file names to keep}
 
-\item{compounds}{Vector of compounds to keep; also accepts \code{"all"}}
+\item{compounds}{Vector of compounds to keep}
 
-\item{isotopocules}{Vector of isotopocules to keep; also accepts \code{"all"}}
+\item{isotopocules}{Vector of isotopocules to keep}
 
 \item{time_min}{Minimum retention time in minutes (\code{time.min})}
 
@@ -30,7 +30,7 @@ orbi_filter_isox(
 Filtered tibble
 }
 \description{
-A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges
+A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges. Default value for all parameters is FALSE, i.e. no filter is applied.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")

@@ -136,11 +136,11 @@ orbi_simplify_isox <- function(dataset) {
 
 
 #' @title Basic generic filter for IsoX data
-#' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges
+#' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges. Default value for all parameters is FALSE, i.e. no filter is applied.
 #' @param dataset The IsoX data to be filtered
-#' @param filenames Vector of file names to keep; also accepts `"all"`
-#' @param compounds Vector of compounds to keep; also accepts `"all"`
-#' @param isotopocules Vector of isotopocules to keep; also accepts `"all"`
+#' @param filenames Vector of file names to keep
+#' @param compounds Vector of compounds to keep
+#' @param isotopocules Vector of isotopocules to keep
 #' @param time_min Minimum retention time in minutes (`time.min`)
 #' @param time_max Maximum retention time in minutes (`time.min`)
 #'
@@ -170,28 +170,28 @@ orbi_filter_isox <- function(dataset, filenames = FALSE, compounds = FALSE, isot
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
 
-  if (missing(filenames) && filenames!= FALSE)
+  if (missing(filenames) && !isFALSE(filenames))
     stop("input for filenames missing", call. = TRUE)
-  if (missing(compounds) && compounds!= FALSE)
+  if (missing(compounds) && !isFALSE(compounds))
     stop("input for compounds missing", call. = TRUE)
-  if (missing(isotopocules) && isotopocules!= FALSE)
+  if (missing(isotopocules) && !isFALSE(isotopocules))
     stop("input for isotopocules missing", call. = TRUE)
-  if (missing(time_min) && time_min!= FALSE)
+  if (missing(time_min) && !isFALSE(time_min))
     stop("input for time_min missing", call. = TRUE)
-  if (missing(time_max)  && time_max!= FALSE)
+  if (missing(time_max)  && !isFALSE(time_max))
     stop("input for time_max missing", call. = TRUE)
 
 
-  if (!(is.vector(filenames) | filenames == FALSE))
+  if (!(is.vector(filenames) | isFALSE(filenames)))
     stop("filenames needs to be a vector of names", call. = TRUE)
-  if (!(is.vector(isotopocules) | isotopocules == FALSE))
+  if (!(is.vector(isotopocules) | isFALSE(isotopocules)))
     stop("isotopocules needs to be a vector of names", call. = TRUE)
-  if (!(is.vector(compounds) | compounds == FALSE))
+  if (!(is.vector(compounds) | isFALSE(compounds)))
     stop("compounds needs to be a vector of names", call. = TRUE)
 
-  if (!(is.numeric(time_min) | time_min == FALSE))
+  if (!(is.numeric(time_min) | isFALSE(time_min)))
     stop("time_min needs to be a number", call. = TRUE)
-  if (!(is.numeric(time_max) | time_max == FALSE))
+  if (!(is.numeric(time_max) | isFALSE(time_max)))
     stop("time_max needs to be a number", call. = TRUE)
 
 
@@ -206,100 +206,106 @@ orbi_filter_isox <- function(dataset, filenames = FALSE, compounds = FALSE, isot
   }
 
 
-  message(
-    paste0(
-      "orbi_filter_isox() is applied to dataset..."
-    )
-  )
+  # message(
+  #   paste0(
+  #     "orbi_filter_isox() is applied to dataset..."
+  #   )
+  # )
+  #
+  #
+  # message(
+  #   paste0("Keep filename: ",
+  #          as.character(filenames), "\n")
+  # )
+  #
+  #
+  # message(
+  #   paste0("Keep compound: ",
+  #          as.character(compounds), "\n")
+  # )
+  #
+  # message(
+  #     paste0("Keep isotopocule: ",
+  #     as.character(isotopocules), "\n")
+  #   )
+  #
+  #
+  # if (time_min == FALSE){
+  #
+  #   message(
+  #     paste0("No filter for `time_min` applied."
+  #       ))
+  #
+  # }
+  #
+  # if (time_min != FALSE){
+  #
+  #   message(
+  #     paste0(
+  #       "Keep retention times >",
+  #       time_min,
+  #       " minutes"
+  #     )
+  #     )
+  #
+  # }
+  #
+  #
+  # if (time_max == FALSE){
+  #
+  #   message(
+  #     paste0("No filter for `time_max` applied."
+  #     ))
+  #
+  # }
+  #
+  # if (time_max != FALSE){
+  #
+  #   message(
+  #     paste0(
+  #       "Keep retention times <",
+  #       time_max,
+  #       " minutes"
+  #     )
+  #   )
+  #
+  # }
 
 
-  message(
-    paste0("Keep filename: ",
-           as.character(filenames), "\n")
-  )
-
-
-  message(
-    paste0("Keep compound: ",
-           as.character(compounds), "\n")
-  )
-
-  message(
-      paste0("Keep isotopocule: ",
-      as.character(isotopocules), "\n")
-    )
-
-
-  if (time_min == FALSE){
-
-    message(
-      paste0("No filter for `time_min` applied."
-        ))
-
-  }
-
-  if (time_min != FALSE){
-
-    message(
-      paste0(
-        "Keep retention times >",
-        time_min,
-        " minutes"
-      )
-      )
-
-  }
-
-
-  if (time_max == FALSE){
-
-    message(
-      paste0("No filter for `time_max` applied."
-      ))
-
-  }
-
-  if (time_max != FALSE){
-
-    message(
-      paste0(
-        "Keep retention times <",
-        time_max,
-        " minutes"
-      )
-    )
-
-  }
-
+  # {if (!"all" %in% filenames)
+  #   dplyr::filter(., .data$filename %in% filenames)
+  #   else
+  #     .
+  # } %>%
 
   tryCatch(df.out <- dataset %>%
 
              # file: filenames
-             {if (filenames != FALSE)
+             {if (!isFALSE(filenames))
                  dplyr::filter(., .data$filename %in% filenames)
                else
                  .
              } %>%
              # filter: compounds
-             {if (compounds != FALSE)
+             {if (!isFALSE(compounds))
                  dplyr::filter(., .data$compound %in% compounds)
                else
                  .
              } %>%
              # filter: isotopocules
-             {if (isotopocules != FALSE)
+             {if (!isFALSE(isotopocules))
                  dplyr::filter(., .data$isotopocule %in% isotopocules)
                else
                  .
              } %>%
              # filter: time_min
-             {if (time_min != FALSE)
+             {if (!isFALSE(time_min))
                  dplyr::filter(., .data$time.min >= time_min)
                else
                  .
              } %>%
              # filter: time_max
-             {if (time_max != FALSE)
+             {if (!isFALSE(time_max))
                  dplyr::filter(., .data$time.min <= time_max)
                else
                  .
