@@ -318,7 +318,7 @@ orbi_calculate_ratios <- function(numerator,
 #' @title Generate the results table
 #' @description Contains the logic to generate the results table. See the \code{\link{orbi_calculate_ratios}} function for details on the different options for the \code{ratio_method} parameter.
 #' @param dataset A processed tibble produced from `IsoX` output
-#' @param ratio_method Method for computing the ratio; passed to `orbi_calculate_ratios()`
+#' @inheritParams orbi_calculate_ratios
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
