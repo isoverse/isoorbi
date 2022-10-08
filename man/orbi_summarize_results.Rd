@@ -32,7 +32,7 @@ Contains the logic to generate the results table
 \examples{
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
-      orbi_simplify_isox() \%>\% orbi_define_basepeak(base_peak = "M0")  \%>\%
+      orbi_simplify_isox() \%>\% orbi_define_basepeak(basepeak_def = "M0")  \%>\%
       orbi_summarize_results(ratio_method = "sum")
 
 }

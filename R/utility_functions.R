@@ -337,17 +337,17 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 #' @title Define and assign the base peak
 #' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator)
 #' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, `ions.incremental`.
-#' @param base_peak The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios
+#' @param basepeak_def The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
-#'                      orbi_define_basepeak(base_peak = "M0")
+#'                      orbi_define_basepeak(basepeak_def = "M0")
 #'
 #' @returns Input data frame plus two columns called `basepeak` and `basepeak_ions`
 #' @export
-orbi_define_basepeak <- function(dataset, base_peak) {
+orbi_define_basepeak <- function(dataset, basepeak_def) {
 
 
   #basic checks
@@ -357,13 +357,13 @@ orbi_define_basepeak <- function(dataset, base_peak) {
   if (is.data.frame(dataset) == FALSE)
     stop("dataset must be a data frame",  call. = TRUE)
 
-  if (missing(base_peak))
+  if (missing(basepeak_def))
     stop(" no input for basepeak supplied", call. = TRUE)
 
-  if (is.character(base_peak) == FALSE)
+  if (is.character(basepeak_def) == FALSE)
     stop("denominator must be a basepeak vector",  call. = TRUE)
 
-  if (length(base_peak) > 1)
+  if (length(basepeak_def) > 1)
     stop("only one baspeak can be assigned",  call. = TRUE)
 
 
@@ -379,7 +379,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 
 
   message(paste0("orbi_define_basepeak() is setting the ",
-                 base_peak,
+                 basepeak_def,
                  " isotopocule as the ratio denominator...")
           )
 
@@ -399,7 +399,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
       dplyr::group_by(.data$filename,
                       .data$compound,
                       .data$scan.no) %>%
-      dplyr::filter(.data$isotopocule == base_peak) %>%
+      dplyr::filter(.data$isotopocule == basepeak_def) %>%
       dplyr::mutate(basepeak = factor(.data$isotopocule),
                     basepeak_ions = .data$ions.incremental
       ) %>%
@@ -425,7 +425,7 @@ orbi_define_basepeak <- function(dataset, base_peak) {
 
 
   tryCatch(
-    df.out <- df.out %>% dplyr::filter(.data$isotopocule != base_peak) %>% droplevels(),
+    df.out <- df.out %>% dplyr::filter(.data$isotopocule != basepeak_def) %>% droplevels(),
 
     warning = function(w) {
       stop("something went wrong removing the base peak isotopocule: ", w$message, call. = TRUE)

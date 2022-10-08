@@ -253,7 +253,7 @@ calculate_ratio_weighted_sum <- function(x, y) {
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
-#'                      orbi_define_basepeak(base_peak = "M0")
+#'                      orbi_define_basepeak(basepeak_def = "M0")
 #' ratio <- orbi_calculate_ratios(numerator = df$ions.incremental,
 #'                           denominator = df$basepeak_ions,
 #'                          ratio_method =  "sum")
@@ -323,7 +323,7 @@ orbi_calculate_ratios <- function(numerator,
 #' @examples
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
-#'       orbi_simplify_isox() %>% orbi_define_basepeak(base_peak = "M0")  %>%
+#'       orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "M0")  %>%
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
 #' @details **Description of the output columns:**

@@ -4,12 +4,12 @@
 \alias{orbi_define_basepeak}
 \title{Define and assign the base peak}
 \usage{
-orbi_define_basepeak(dataset, base_peak)
+orbi_define_basepeak(dataset, basepeak_def)
 }
 \arguments{
 \item{dataset}{A tibble from a \code{IsoX} output. Needs to contain columns for \code{filename}, \code{compound}, \code{scan.no}, \code{isotopocule}, \code{ions.incremental}.}
 
-\item{base_peak}{The isotopocule that gets assigned as base peak, i.e. the denominator to calculate ratios}
+\item{basepeak_def}{The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios}
 }
 \value{
 Input data frame plus two columns called \code{basepeak} and \code{basepeak_ions}
@@ -21,6 +21,6 @@ Input data frame plus two columns called \code{basepeak} and \code{basepeak_ions
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
                      orbi_simplify_isox() \%>\%
-                     orbi_define_basepeak(base_peak = "M0")
+                     orbi_define_basepeak(basepeak_def = "M0")
 
 }
