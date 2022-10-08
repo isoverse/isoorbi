@@ -433,8 +433,8 @@ orbi_summarize_results <- function(dataset, ratio_method) {
       shot_noise_permil = round(.data$shot_noise_permil, 3),
       minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
     )  %>%
-      arrange(.data$filename, .data$compound, .data$isotopocule) %>%
-      relocate(ratio_relative_sem_permil, .after = ratio),
+      dplyr::arrange(.data$filename, .data$compound, .data$isotopocule) %>%
+      dplyr::relocate(.data$ratio_relative_sem_permil, .after = .data$ratio),
 
     #For simplicity use basic standard error for all options
 

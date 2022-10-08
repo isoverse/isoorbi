@@ -6,11 +6,11 @@
 \usage{
 orbi_filter_isox(
   dataset,
-  filenames = "all",
-  compounds = "all",
-  isotopocules = "all",
-  time_min = "all",
-  time_max = "all"
+  filenames = FALSE,
+  compounds = FALSE,
+  isotopocules = FALSE,
+  time_min = FALSE,
+  time_max = FALSE
 )
 }
 \arguments{
@@ -39,7 +39,7 @@ orbi_simplify_isox() \%>\%
 orbi_filter_isox(filenames = c("s3744"),
 compounds = c("HSO4-"),
 isotopocules = "M0",
-time_min = "all",
-time_max = "all")
+time_min = FALSE,
+time_max = FALSE)
 
 }
