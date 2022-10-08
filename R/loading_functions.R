@@ -205,6 +205,7 @@ orbi_filter_isox <- function(dataset, filenames = FALSE, compounds = FALSE, isot
       stop(call. = FALSE)
   }
 
+  # message
   sprintf("orbi_filter_isox() is pre-filtering the data by filename (%s), compounds (%s), isotopocules (%s), minimum (%s) and maximum (%s) time in minutes...",
           paste(filenames, collapse = ", "),
           paste(compounds, collapse = ", "),
