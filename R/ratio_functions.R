@@ -395,91 +395,6 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   }
 
 
-
-  # # optional groupings
-  #
-  # tryCatch({
-  #   df.group <- dataset  %>% dplyr::ungroup() %>%
-  #
-  #     dplyr::group_by(.data$filename,
-  #                     .data$compound,
-  #                     .data$basepeak,
-  #                     .data$isotopocule,
-  #                     .add = TRUE)
-  #   message(
-  #     paste0(
-  #       "orbi_summarize_results() is grouping data by columns: filename, compound, basepeak, isotopocule"
-  #     )
-  #   )
-  #
-  #
-  #   {if ("block" %in% names(dataset)) {
-  #
-  #     #ensure block is defined as a factor
-  #
-  #     df.group <-
-  #       df.group  %>% mutate(block = as.factor(.data$block)) %>%
-  #       dplyr::group_by(.data$block,
-  #                       .add = TRUE)
-  #
-  #     message(paste0(
-  #       "orbi_summarize_results() is adding a grouping: block"
-  #     ))
-  #   }
-  #
-  #   }
-  #
-  #   {if ("segment" %in% names(dataset)) {
-  #
-  #     #ensure segment is defined as a factor
-  #
-  #     df.group <-
-  #       df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
-  #       dplyr::group_by(.data$segment,
-  #                       .add = TRUE)
-  #
-  #     message(paste0(
-  #       "orbi_summarize_results() is adding a grouping: segment"
-  #     ))
-  #   }
-  #
-  #   }
-  #
-  #   {if ("injection" %in% names(dataset)) {
-  #     #ensure injection is defined as a factor
-  #
-  #     df.group <-
-  #       df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
-  #       dplyr::group_by(.data$injection,
-  #                       .add = TRUE)
-  #
-  #     message(paste0(
-  #       "orbi_summarize_results() is adding a grouping: injection"
-  #     ))
-  #
-  #   }
-  #
-  #   }
-  # },
-  #
-  #
-  # warning = function(w) {
-  #   stop("something went wrong looking to add optional groupings: ",
-  #        w$message,
-  #        call. = TRUE)
-  # })
-
-
-
-  message(
-    paste0(
-      "orbi_calculate_ratios() is calculating ratios, using the ratio_method: ",
-      ratio_method
-    )
-  )
-
-
-
   # determine groupings
 
   all_groups <- c("filename", "compound", "basepeak", "isotopocule")
@@ -488,16 +403,13 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   if ("segment" %in% names(dataset))
     all_groups <- c(all_groups, "segment")
 
-  sprintf("orbi_summarize_results() is grouping the data (by %s) and summarizing ratios using the '%s' method...",
+  sprintf("orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
           paste(all_groups, collapse = ", "), ratio_method) %>%
     message()
 
   # execute grouping
   df.group <- dataset %>%
     dplyr::group_by(!!!lapply(all_groups, rlang::sym))
-
-
-
 
 
   tryCatch(
@@ -516,15 +428,11 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     #For simplicity use basic standard error for all options
 
     warning = function(w) {
-      stop("something went wrong in the ratio calculations: ",
+      stop("something went wrong summarizinf the results: ",
            w$message,
            call. = TRUE)
     }
   )
-
-  message(paste0(
-    "orbi_summarize_results() is summarizing ratios for the results table..."
-  ))
 
 
 
