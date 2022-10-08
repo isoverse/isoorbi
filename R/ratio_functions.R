@@ -435,8 +435,6 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   )
 
 
-
-
   df.stat <- as.data.frame(df.stat)
   return(df.stat)
 }
