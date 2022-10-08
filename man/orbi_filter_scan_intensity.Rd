@@ -4,12 +4,12 @@
 \alias{orbi_filter_scan_intensity}
 \title{Filter to remove extreme scans}
 \usage{
-orbi_filter_scan_intensity(dataset, truncate_extreme)
+orbi_filter_scan_intensity(dataset, outlier_percentage)
 }
 \arguments{
 \item{dataset}{Simplified IsoX dataset to have \code{TICxIT} outliers removed}
 
-\item{truncate_extreme}{A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.}
+\item{outlier_percentage}{A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.}
 }
 \value{
 Filtered tibble
@@ -28,6 +28,6 @@ The input \code{dataset} is expected to have at least these 8 columns: \code{fil
 fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
 orbi_simplify_isox() \%>\%
-orbi_filter_scan_intensity(truncate_extreme = 1)
+orbi_filter_scan_intensity(outlier_percentage = 1)
 
 }
