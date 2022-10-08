@@ -6,55 +6,55 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 context("utils")
 
 
-  # calculate_ratio_sem
-test_that("calculate_ratio_sem() tests", {
+  # calculate_ratios_sem
+test_that("calculate_ratios_sem() tests", {
   #success
-  expect_equal(calculate_ratio_sem(ratios = c(1,2,3)), 0.57735026919)
-  expect_type(calculate_ratio_sem(ratios = c(1,2,3)), "double")
+  expect_equal(calculate_ratios_sem(ratios = c(1,2,3)), 0.57735026919)
+  expect_type(calculate_ratios_sem(ratios = c(1,2,3)), "double")
 
   #failure
-  expect_error(calculate_ratio_sem(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_sem(), "input vector for ratios supplied")
 })
 
-  # calculate_ratio_gmean
-test_that("calculate_ratio_gmean() tests", {
+  # calculate_ratios_gmean
+test_that("calculate_ratios_gmean() tests", {
   #success
   list<- c(4,5,6)
-  expect_type(calculate_ratio_gmean(ratios = list), "double")
-  expect_equal(calculate_ratio_gmean(ratios = list), 4.9324241486609)
+  expect_type(calculate_ratios_gmean(ratios = list), "double")
+  expect_equal(calculate_ratios_gmean(ratios = list), 4.9324241486609)
 
   #failure
-  expect_error(calculate_ratio_gmean(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_gmean(), "input vector for ratios supplied")
 })
 
-  # calculate_ratio_gsd
-test_that("calculate_ratio_gsd() tests", {
+  # calculate_ratios_gsd
+test_that("calculate_ratios_gsd() tests", {
   #success
-  expect_type(calculate_ratio_gsd(ratios = c(1,2,3)), "double")
+  expect_type(calculate_ratios_gsd(ratios = c(1,2,3)), "double")
 
   #failure
-  expect_error(calculate_ratio_gsd(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_gsd(), "input vector for ratios supplied")
 })
 
-  # calculate_ratio_gse
-test_that("calculate_ratio_gse() tests", {
+  # calculate_ratios_gse
+test_that("calculate_ratios_gse() tests", {
   #success
-  expect_type(calculate_ratio_gse(ratios = c(4,5,6)), "double")
+  expect_type(calculate_ratios_gse(ratios = c(4,5,6)), "double")
 
   #failure
-  expect_error(calculate_ratio_gse(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_gse(), "input vector for ratios supplied")
 })
 
-  # calculate_ratio_slope
-test_that("calculate_ratio_slope() tests", {
+  # calculate_ratios_slope
+test_that("calculate_ratios_slope() tests", {
   #success
   x <- c(0,1,2,3)
   y <- c(0,1,2,3)
-  expect_type(calculate_ratio_slope(x,y), "double")
-  expect_equal(calculate_ratio_slope(x,y), 1)
+  expect_type(calculate_ratios_slope(x,y), "double")
+  expect_equal(calculate_ratios_slope(x,y), 1)
 
   #failure
-  expect_error(calculate_ratio_slope(), "input vector for x supplied")
+  expect_error(calculate_ratios_slope(), "input vector for x supplied")
 
 })
 
@@ -63,9 +63,9 @@ test_that("calculate_weighted.vector.sum() tests", {
   #success
   x<- c(2,4,6)
   y<- c(3,5,7)
-  expect_type(calculate_ratio_weighted_sum(x,y), "double")
+  expect_type(calculate_ratios_weighted_sum(x,y), "double")
   #failure
-  expect_error(calculate_ratio_weighted_sum(), "input vector for x supplied")
+  expect_error(calculate_ratios_weighted_sum(), "input vector for x supplied")
 })
 
   # orbi_calculate_ratios
