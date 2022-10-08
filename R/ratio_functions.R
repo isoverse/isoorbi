@@ -398,10 +398,13 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   # determine groupings
 
   all_groups <- c("filename", "compound", "basepeak", "isotopocule")
+  if ("sample_name" %in% names(dataset))
+    all_groups <- c(all_groups, "sample_name")
   if ("block" %in% names(dataset))
     all_groups <- c(all_groups, "block")
   if ("segment" %in% names(dataset))
     all_groups <- c(all_groups, "segment")
+
 
   sprintf("orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
           paste(all_groups, collapse = ", "), ratio_method) %>%
