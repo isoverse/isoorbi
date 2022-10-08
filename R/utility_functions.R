@@ -8,7 +8,7 @@
 #'
 #' If there are signal of high intensity or very many signals, this can indicate that the m/z and tolerance setting used for processing .raw files with IsoX were incorrect.
 #'
-#'@examples
+#' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
@@ -223,7 +223,7 @@ orbi_filter_weak_isotopocules <-
 #'
 #' The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
-#'@examples
+#' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
