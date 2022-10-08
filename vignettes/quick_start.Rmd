@@ -29,7 +29,7 @@ df.filtered <- df.simple %>%
                   orbi_filter_isox(time_min = 0, 
                                    time_max = 1, 
                                    compounds = "HSO4-",
-                                   isotopocules = FALSE)
+                                   isotopocules = c("M0", "34S", "18O"))
 
 # Clean the data by removing noise and outliers
 df.clean <- df.filtered %>% orbi_filter_satellite_peaks() %>% 

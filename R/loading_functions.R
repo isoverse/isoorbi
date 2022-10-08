@@ -205,78 +205,13 @@ orbi_filter_isox <- function(dataset, filenames = FALSE, compounds = FALSE, isot
       stop(call. = FALSE)
   }
 
-
-  # message(
-  #   paste0(
-  #     "orbi_filter_isox() is applied to dataset..."
-  #   )
-  # )
-  #
-  #
-  # message(
-  #   paste0("Keep filename: ",
-  #          as.character(filenames), "\n")
-  # )
-  #
-  #
-  # message(
-  #   paste0("Keep compound: ",
-  #          as.character(compounds), "\n")
-  # )
-  #
-  # message(
-  #     paste0("Keep isotopocule: ",
-  #     as.character(isotopocules), "\n")
-  #   )
-  #
-  #
-  # if (time_min == FALSE){
-  #
-  #   message(
-  #     paste0("No filter for `time_min` applied."
-  #       ))
-  #
-  # }
-  #
-  # if (time_min != FALSE){
-  #
-  #   message(
-  #     paste0(
-  #       "Keep retention times >",
-  #       time_min,
-  #       " minutes"
-  #     )
-  #     )
-  #
-  # }
-  #
-  #
-  # if (time_max == FALSE){
-  #
-  #   message(
-  #     paste0("No filter for `time_max` applied."
-  #     ))
-  #
-  # }
-  #
-  # if (time_max != FALSE){
-  #
-  #   message(
-  #     paste0(
-  #       "Keep retention times <",
-  #       time_max,
-  #       " minutes"
-  #     )
-  #   )
-  #
-  # }
-
-
-  # {if (!"all" %in% filenames)
-  #   dplyr::filter(., .data$filename %in% filenames)
-  #   else
-  #     .
-  # } %>%
+  sprintf("orbi_filter_isox() is pre-filtering the data by filename (%s), compounds (%s), isotopocules (%s), minimum (%s) and maximum (%s) time in minutes...",
+          paste(filenames, collapse = ", "),
+          paste(compounds, collapse = ", "),
+          paste(isotopocules, collapse = ", "),
+          paste(time_min, collapse = ", "),
+          paste(time_max, collapse = ", ")) %>%
+    message()
 
   tryCatch(df.out <- dataset %>%
 
