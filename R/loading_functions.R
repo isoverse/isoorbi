@@ -151,12 +151,12 @@ orbi_simplify_isox <- function(dataset) {
 #' orbi_filter_isox(filenames = c("s3744"),
 #' compounds = c("HSO4-"),
 #' isotopocules = "M0",
-#' time_min = "all",
-#' time_max = "all")
+#' time_min = FALSE,
+#' time_max = FALSE)
 #'
 #' @return  Filtered tibble
 #' @export
-orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isotopocules ="all", time_min = "all", time_max = "all") {
+orbi_filter_isox <- function(dataset, filenames = FALSE, compounds = FALSE, isotopocules = FALSE, time_min = FALSE, time_max = FALSE) {
 
 
   # safety checks
@@ -170,28 +170,28 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
 
-  if (missing(filenames) && filenames!="all")
+  if (missing(filenames) && filenames!= FALSE)
     stop("input for filenames missing", call. = TRUE)
-  if (missing(compounds) && compounds!="all")
+  if (missing(compounds) && compounds!= FALSE)
     stop("input for compounds missing", call. = TRUE)
-  if (missing(isotopocules) && isotopocules!="all")
+  if (missing(isotopocules) && isotopocules!= FALSE)
     stop("input for isotopocules missing", call. = TRUE)
-  if (missing(time_min) && time_min!="all")
+  if (missing(time_min) && time_min!= FALSE)
     stop("input for time_min missing", call. = TRUE)
-  if (missing(time_max)  && time_max!="all")
+  if (missing(time_max)  && time_max!= FALSE)
     stop("input for time_max missing", call. = TRUE)
 
 
-  if (!(is.vector(filenames)))
+  if (!(is.vector(filenames) | filenames == FALSE))
     stop("filenames needs to be a vector of names", call. = TRUE)
-  if (!(is.vector(isotopocules)))
+  if (!(is.vector(isotopocules) | isotopocules == FALSE))
     stop("isotopocules needs to be a vector of names", call. = TRUE)
-  if (!(is.vector(compounds)))
+  if (!(is.vector(compounds) | compounds == FALSE))
     stop("compounds needs to be a vector of names", call. = TRUE)
 
-  if (!(is.numeric(time_min) | time_min=="all"))
+  if (!(is.numeric(time_min) | time_min == FALSE))
     stop("time_min needs to be a number", call. = TRUE)
-  if (!(is.numeric(time_max) | time_max=="all"))
+  if (!(is.numeric(time_max) | time_max == FALSE))
     stop("time_max needs to be a number", call. = TRUE)
 
 
@@ -230,7 +230,7 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
     )
 
 
-  if (time_min=="all"){
+  if (time_min == FALSE){
 
     message(
       paste0("No filter for `time_min` applied."
@@ -238,7 +238,7 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
 
   }
 
-  if (time_min!="all"){
+  if (time_min != FALSE){
 
     message(
       paste0(
@@ -251,7 +251,7 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
   }
 
 
-  if (time_max=="all"){
+  if (time_max == FALSE){
 
     message(
       paste0("No filter for `time_max` applied."
@@ -259,7 +259,7 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
 
   }
 
-  if (time_max!="all"){
+  if (time_max != FALSE){
 
     message(
       paste0(
@@ -275,31 +275,31 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
   tryCatch(df.out <- dataset %>%
 
              # file: filenames
-             {if (!"all" %in% filenames)
+             {if (filenames != FALSE)
                  dplyr::filter(., .data$filename %in% filenames)
                else
                  .
              } %>%
              # filter: compounds
-             {if (!"all" %in% compounds)
+             {if (compounds != FALSE)
                  dplyr::filter(., .data$compound %in% compounds)
                else
                  .
              } %>%
              # filter: isotopocules
-             {if (!"all" %in% isotopocules)
+             {if (isotopocules != FALSE)
                  dplyr::filter(., .data$isotopocule %in% isotopocules)
                else
                  .
              } %>%
              # filter: time_min
-             {if (time_min != "all")
+             {if (time_min != FALSE)
                  dplyr::filter(., .data$time.min >= time_min)
                else
                  .
              } %>%
              # filter: time_max
-             {if (time_max != "all")
+             {if (time_max != FALSE)
                  dplyr::filter(., .data$time.min <= time_max)
                else
                  .
