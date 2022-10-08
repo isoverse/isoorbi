@@ -218,7 +218,7 @@ orbi_filter_weak_isotopocules <-
 #' @title Filter to remove extreme scans
 #' @description The function `orbi_filter_scan_intensity()` removes extremely high and low intense scans based on TIC x injection time (i.e., ion intensity)
 #' @param dataset Simplified IsoX dataset to have `TICxIT` outliers removed
-#' @param outlier_percentage A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.
+#' @param outlier_percent A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.
 #' @details Function is intended to remove scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #'
 #' The filter is a basic truncation that removes `x %` of scans with the largest **and** `x %` of scans with the smallest ion estimates. Grouping is by columns `filename` and `compound`.
@@ -229,11 +229,11 @@ orbi_filter_weak_isotopocules <-
 #' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
-#' orbi_filter_scan_intensity(outlier_percentage = 1)
+#' orbi_filter_scan_intensity(outlier_percent = 1)
 #'
 #' @return Filtered tibble
 #' @export
-orbi_filter_scan_intensity <- function(dataset, outlier_percentage) {
+orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 
 
   # safety checks
@@ -246,13 +246,13 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percentage) {
   if (nrow(dataset) < 1)
     stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
 
-  if (missing(outlier_percentage))
-    stop("value for outlier_percentage missing", call. = TRUE)
+  if (missing(outlier_percent))
+    stop("value for outlier_percent missing", call. = TRUE)
 
-  if (!(is.numeric(outlier_percentage)))
-    stop("outlier_percentage needs to be a number", call. = TRUE)
-  if (!(outlier_percentage >= 0 && outlier_percentage <=10))
-    stop("outlier_percentaget needs to be between 0 and 10 ", call. = TRUE)
+  if (!(is.numeric(outlier_percent)))
+    stop("outlier_percent needs to be a number", call. = TRUE)
+  if (!(outlier_percent >= 0 && outlier_percent <=10))
+    stop("outlier_percentt needs to be between 0 and 10 ", call. = TRUE)
 
 
 
@@ -269,7 +269,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percentage) {
   message(paste0(
     "orbi_filter_scan_intensity() is removing extremely high and low intense scans.",
     #deparse(substitute(dataset)), # FIXME: How to print name of data frame object?
-    " A total of ", 2* outlier_percentage, "% of the scans will be removed...")
+    " A total of ", 2* outlier_percent, "% of the scans will be removed...")
   )
 
   #Optional groupings
@@ -323,8 +323,8 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percentage) {
   tryCatch(  df.out <- df.group %>%
                dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
                dplyr::filter(
-                 .data$TICxIT > stats::quantile(.data$TICxIT, outlier_percentage / 100) &
-                 .data$TICxIT < stats::quantile(.data$TICxIT, 1 - outlier_percentage / 100)
+                 .data$TICxIT > stats::quantile(.data$TICxIT, outlier_percent / 100) &
+                 .data$TICxIT < stats::quantile(.data$TICxIT, 1 - outlier_percent / 100)
                ) %>%
                dplyr::select(-.data$TICxIT),
     warning = function(w) {
