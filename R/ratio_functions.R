@@ -254,7 +254,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_define_basepeak(basepeak_def = "M0")
-#' ratio <- orbi_calculate_ratios(numerator = df$ions.incremental,
+#' ratios <- orbi_calculate_ratios(numerator = df$ions.incremental,
 #'                           denominator = df$basepeak_ions,
 #'                          ratio_method =  "sum")
 #'
