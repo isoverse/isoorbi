@@ -61,27 +61,27 @@ calculate_ratio_gmean <- function(ratios) {
 }
 
 
-# @title Internal function to calculate standard deviation (geometric)
-# @description  The function `calculate_ratio_gsd()` is used to calculate geometric standard deviations
-# @keywords internal
-# @param x A numeric values used to calculate the geometric standard deviation
-# @return The calculated geometric standard deviation
-calculate_ratio_gsd <- function(x) {
+#' @title Internal function to calculate standard deviation (geometric)
+#' @description  The function `calculate_ratio_gsd()` is used to calculate geometric standard deviations
+#' @keywords internal
+#' @param ratios A numeric values used to calculate the geometric standard deviation
+#' @return The calculated geometric standard deviation
+calculate_ratio_gsd <- function(ratios) {
 
-  if (missing(x))
-    stop("input vector for x supplied", call. = TRUE)
+  if (missing(ratios))
+    stop("input vector for ratios supplied", call. = TRUE)
 
   #basic checks
-  if (!(is.vector(x)))
-    stop("x needs to be a vector", call. = TRUE)
-  if (!(is.numeric(x)))
-    stop("x needs to be a numeric vector", call. = TRUE)
+  if (!(is.vector(ratios)))
+    stop("ratios needs to be a vector", call. = TRUE)
+  if (!(is.numeric(ratios)))
+    stop("ratios needs to be a numeric vector", call. = TRUE)
 
-  if (length(x) <=1)
-    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+  if (length(ratios) <=1)
+    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
   tryCatch(
-    exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x))),
+    exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios))),
     warning = function(w) {
       stop("something went wrong calculating geometric standard deviaton: ", w$message, call. = TRUE)
     }

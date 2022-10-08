@@ -30,10 +30,10 @@ test_that("calculate_ratio_gmean() tests", {
   # calculate_ratio_gsd
 test_that("calculate_ratio_gsd() tests", {
   #success
-  expect_type(calculate_ratio_gsd(c(1,2,3)), "double")
+  expect_type(calculate_ratio_gsd(ratios = c(1,2,3)), "double")
 
   #failure
-  expect_error(calculate_ratio_gsd(), "input vector for x supplied")
+  expect_error(calculate_ratio_gsd(), "input vector for ratios supplied")
 })
 
   # calculate_ratio_gse
