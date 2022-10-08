@@ -1,12 +1,12 @@
 # Functions to calculate ratios and stats --------------------------------------------
 
 # @title Internal function to calculate standard error
-# @description The function `calculate_se()` computes a regular standard error
+# @description The function `calculate_ratio_sem()` computes a regular standard error
 # @keywords internal
 # @param x A numeric vector used to calculate a standard error
 # @return The calculated standard error
 
-calculate_se <- function(x) {
+calculate_ratio_sem <- function(x) {
 
   # safety checks
   if (missing(x))
@@ -32,12 +32,12 @@ calculate_se <- function(x) {
 }
 
 # @title Internal function to calculate geometric mean
-# @description  The function `calculate_gmean()` is used to calculate geometric means
+# @description  The function `calculate_ratio_gmean()` is used to calculate geometric means
 # @keywords internal
 # @param x A numeric vector used to calculate the geometric mean
 # @return The calculated geometric mean
 
-calculate_gmean <- function(x) {
+calculate_ratio_gmean <- function(x) {
 
   if (missing(x))
     stop("input vector for x supplied", call. = TRUE)
@@ -62,11 +62,11 @@ calculate_gmean <- function(x) {
 
 
 # @title Internal function to calculate standard deviation (geometric)
-# @description  The function `calculate_gsd()` is used to calculate geometric standard deviations
+# @description  The function `calculate_ratio_gsd()` is used to calculate geometric standard deviations
 # @keywords internal
 # @param x A numeric values used to calculate the geometric standard deviation
 # @return The calculated geometric standard deviation
-calculate_gsd <- function(x) {
+calculate_ratio_gsd <- function(x) {
 
   if (missing(x))
     stop("input vector for x supplied", call. = TRUE)
@@ -90,11 +90,11 @@ calculate_gsd <- function(x) {
 }
 
 # @title Internal function to calculate standard error (geometric)
-# @description  The function `calculate_gse()` is used to calculate geometric standard errors
+# @description  The function `calculate_ratio_gse()` is used to calculate geometric standard errors
 # @keywords internal
 # @param x A vector of values used to calculate geometric standard errors
 # @return The calculated geometric standard error
-calculate_gse <- function(x) {
+calculate_ratio_gse <- function(x) {
 
   if (missing(x))
     stop("input vector for x supplied", call. = TRUE)
@@ -118,13 +118,13 @@ calculate_gse <- function(x) {
 }
 
 # @title Internal function for ratio_method `slope`
-# @description  The function `calculate_slope()` is used to estimate the slope of x, y values used in a ratio
+# @description  The function `calculate_ratio_slope()` is used to estimate the slope of x, y values used in a ratio
 # @keywords internal
 # @param x Vector of values used as ratio nominator
 # @param y Vector of values used as ratio denominator
 # @details The slope is calculated from a linear regression model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`
 # @return The calculated slope, an estimate of the ratio x/y
-calculate_slope <- function(x, y) {
+calculate_ratio_slope <- function(x, y) {
 
   if (missing(x))
     stop("input vector for x supplied", call. = TRUE)
@@ -166,14 +166,14 @@ calculate_slope <- function(x, y) {
 }
 
 # @title Internal function for ratio_method `weighted_sum`
-# @description The function `calculate_weighted_sum()` is used to calculate ratios by weighted sums of x and y values
+# @description The function `calculate_ratio_weighted_sum()` is used to calculate ratios by weighted sums of x and y values
 # @keywords internal
 # @param x A vector of values used as ratio nominator
 # @param y A vector of values used as ratio denominator
 # @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
 # i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
 # @return The calculated ratio x/y
-calculate_weighted_sum <- function(x, y) {
+calculate_ratio_weighted_sum <- function(x, y) {
 
   if (missing(x))
     stop("input vector for x supplied", call. = TRUE)
@@ -288,13 +288,13 @@ orbi_calculate_ratios <- function(numerator,
      if (ratio_method == "mean") {
        base::mean(numerator / denominator)
      } else if (ratio_method == "slope") {
-       calculate_slope(numerator, denominator)
+       calculate_ratio_slope(numerator, denominator)
      } else if (ratio_method == "sum") {
        base::sum(numerator) / sum(denominator)
      } else if (ratio_method == "geometric_mean") {
-       calculate_gmean(numerator / denominator)
+       calculate_ratio_gmean(numerator / denominator)
      } else if (ratio_method == "weighted_sum") {
-       calculate_weighted_sum(numerator, denominator)
+       calculate_ratio_weighted_sum(numerator, denominator)
      } else if (ratio_method == "median") {
        stats::median(numerator / denominator)
      } else{
@@ -494,7 +494,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method)
       ) %>% #THE ACTUAL RATIO CALCULATION!
 
-      dplyr::mutate(ratio_sem = calculate_se(
+      dplyr::mutate(ratio_sem = calculate_ratio_sem(
         .data$ions.incremental / .data$basepeak_ions
       )),
 
