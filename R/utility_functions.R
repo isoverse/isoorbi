@@ -358,13 +358,16 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     stop("dataset must be a data frame",  call. = TRUE)
 
   if (missing(basepeak_def))
-    stop(" no input for basepeak supplied", call. = TRUE)
+    stop(" no input for basepeak_def supplied", call. = TRUE)
 
   if (is.character(basepeak_def) == FALSE)
-    stop("denominator must be a basepeak vector",  call. = TRUE)
+    stop("denominator must be a basepeak_def vector",  call. = TRUE)
 
   if (length(basepeak_def) > 1)
-    stop("only one baspeak can be assigned",  call. = TRUE)
+    stop("only one basepeak_def can be assigned",  call. = TRUE)
+
+  if (!(basepeak_def %in% levels(dataset$isotopocule)))
+    stop("basepeak_def is not found in data",  call. = TRUE)
 
 
   # check that requires columns are present
