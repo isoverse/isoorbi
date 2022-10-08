@@ -117,13 +117,13 @@ calculate_ratio_gse <- function(ratios) {
 
 }
 
-# @title Internal function for ratio_method `slope`
-# @description  The function `calculate_ratio_slope()` is used to estimate the slope of x, y values used in a ratio
-# @keywords internal
-# @param x Vector of values used as ratio numerator
-# @param y Vector of values used as ratio denominator
-# @details The slope is calculated from a linear regression model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`
-# @return The calculated slope, an estimate of the ratio x/y
+#' @title Internal function for ratio_method `slope`
+#' @description  The function `calculate_ratio_slope()` is used to estimate the slope of x, y values used in a ratio
+#' @keywords internal
+#' @param x Vector of values used as ratio numerator
+#' @param y Vector of values used as ratio denominator
+#' @details The slope is calculated from a linear regression model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`
+#' @return The calculated slope, an estimate of the ratio x/y
 calculate_ratio_slope <- function(x, y) {
 
   if (missing(x))
@@ -165,14 +165,14 @@ calculate_ratio_slope <- function(x, y) {
   return(sl)
 }
 
-# @title Internal function for ratio_method `weighted_sum`
-# @description The function `calculate_ratio_weighted_sum()` is used to calculate ratios by weighted sums of x and y values
-# @keywords internal
-# @param x A vector of values used as ratio numerator
-# @param y A vector of values used as ratio denominator
-# @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-# i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
-# @return The calculated ratio x/y
+#' @title Internal function for ratio_method `weighted_sum`
+#' @description The function `calculate_ratio_weighted_sum()` is used to calculate ratios by weighted sums of x and y values
+#' @keywords internal
+#' @param x A vector of values used as ratio numerator
+#' @param y A vector of values used as ratio denominator
+#' @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+#' @return The calculated ratio x/y
 calculate_ratio_weighted_sum <- function(x, y) {
 
   if (missing(x))
