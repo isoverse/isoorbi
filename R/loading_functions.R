@@ -113,7 +113,7 @@ orbi_simplify_isox <- function(dataset) {
       stop(call. = FALSE)
   }
 
-  message("orbi_simplify_isox() is applied to dataset. Will keep only most important columns...")
+  message("orbi_simplify_isox() will keep only the most important columns...")
 
 
 
@@ -208,7 +208,7 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
 
   message(
     paste0(
-      "orbi_filter_isox() is applied to dataset"
+      "orbi_filter_isox() is applied to dataset..."
     )
   )
 
