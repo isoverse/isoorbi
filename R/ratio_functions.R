@@ -250,7 +250,7 @@ calculate_ratio_weighted_sum <- function(x, y) {
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_define_basepeak(basepeak_def = "M0")
@@ -321,7 +321,7 @@ orbi_calculate_ratios <- function(numerator,
 #' @param ratio_method Method for computing the ratio; passed to `orbi_calculate_ratios()`
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'       orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "M0")  %>%
 #'       orbi_summarize_results(ratio_method = "sum")

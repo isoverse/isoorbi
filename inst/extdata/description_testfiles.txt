@@ -5,7 +5,7 @@ testfile_DualInlet.isox
 - method file "20220125 DI noM0 10ea_70min 15k 5uScans.meth"
 - raw file "20220125_01.raw"
 
-testfile_DualInlet_small.isox
+testfile_dual_inlet.isox
 - based on testfile_DualInlet.isox
 - 3 injections, ref-sam-ref
 - 1st injection - ref #1, scans 1-278 (0.005-1.000 min); in original file scans 1-278 (0.005-1.000 min)
@@ -18,7 +18,7 @@ testfile_FlowInjection_DataExploration.isox
 - method file "XXX.meth"
 - raw file "XXX.raw"
 
-testfile_Flow_Exploration_small.isox
+testfile_flow.isox
 - based on testile_FlowInjection_DataExploration.isox
 - 1st sample - scans 1-430 (0.002-0.999 min)
 - 2nd sample - scans 1-430 (0.002-0.999 min)

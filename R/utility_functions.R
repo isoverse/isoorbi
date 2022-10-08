@@ -9,7 +9,7 @@
 #' If there are signal of high intensity or very many signals, this can indicate that the m/z and tolerance setting used for processing .raw files with IsoX were incorrect.
 #'
 #'@examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
 #' orbi_filter_satellite_peaks()
@@ -71,7 +71,7 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of the compound)
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_filter_weak_isotopocules(min_percent = 2)
@@ -224,7 +224,7 @@ orbi_filter_weak_isotopocules <-
 #' The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #'@examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
 #' orbi_filter_scan_intensity(outlier_percent = 1)
@@ -340,7 +340,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 #' @param basepeak_def The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_define_basepeak(basepeak_def = "M0")

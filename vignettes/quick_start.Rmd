@@ -13,11 +13,11 @@ vignette: >
 library(isoorbi)
 
 # Load a path to a system test file
-file_path <-system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+file_path <-system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 ```
 
 A basic data processing example
-```{r, message=FALSE}
+```{r, message=FALSE, results='hide'}
 # Read .isox test data
 df <- orbi_read_isox(file_path) 
 

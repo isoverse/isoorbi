@@ -18,7 +18,7 @@ Input data frame plus two columns called \code{basepeak} and \code{basepeak_ions
 \code{orbi_define_basepeak()} sets one isotopocule in the data frame as the base peak (ratio denominator)
 }
 \examples{
-fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
                      orbi_simplify_isox() \%>\%
                      orbi_define_basepeak(basepeak_def = "M0")

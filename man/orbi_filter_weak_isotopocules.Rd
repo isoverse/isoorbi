@@ -21,7 +21,7 @@ The function \code{orbi_filter_weak_isotopocules()} removes isotopocules that ar
 The input \code{dataset} is expected to have at least these 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
 }
 \examples{
-fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
                      orbi_simplify_isox() \%>\%
                      orbi_filter_weak_isotopocules(min_percent = 2)

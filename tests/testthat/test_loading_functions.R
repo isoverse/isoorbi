@@ -19,7 +19,7 @@ test_that("test that isox files can be read", {
   expect_error(orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")), "file format error")
 
   # test reading a file
-  expect_true(is.tbl(df <- orbi_read_isox(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))))
+  expect_true(is.tbl(df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))))
   expect_equal(names(df), c("filename", "scan.no", "time.min", "compound", "isotopocule", "ions.incremental", "tic", "it.ms"))
   expect_equal(nrow(df), 5184)
 
@@ -35,7 +35,7 @@ test_that("orbi_filter_isox() tests",{
 # orbi_simplify_isox
 test_that("orbi_simplify_isox() tests", {
   #success
-  df <- orbi_read_isox(system.file("extdata", "testfile_DualInlet_small.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
   expect_true(is.tbl(orbi_simplify_isox(df)))
 
   # test safety checks

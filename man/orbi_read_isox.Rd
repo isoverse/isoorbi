@@ -29,7 +29,7 @@ Additional information on the columns:
 }
 }
 \examples{
-fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
+fpath <- system.file("extdata", "testfile_dual_inlet.isox", package="isoorbi")
 df <- orbi_read_isox(filepath = fpath)
 
 }

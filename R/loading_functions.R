@@ -24,7 +24,7 @@
 #'
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_DualInlet_small.isox", package="isoorbi")
+#' fpath <- system.file("extdata", "testfile_dual_inlet.isox", package="isoorbi")
 #' df <- orbi_read_isox(filepath = fpath)
 #'
 #' @return A tibble containing at minimum the columns `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`
@@ -86,7 +86,7 @@ orbi_read_isox <- function(filepath) {
 #' @return A tibble containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package="isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>% orbi_simplify_isox()
 #'
 #' @export
@@ -147,7 +147,7 @@ orbi_simplify_isox <- function(dataset) {
 #' @param time_max Maximum retention time in minutes (`time.min`)
 #'
 #'@examples
-#' fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(filepath = fpath) %>%
 #' orbi_simplify_isox() %>%
 #' orbi_filter_isox(filenames = c("s3744"),

@@ -33,7 +33,7 @@ Filtered tibble
 A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges
 }
 \examples{
-fpath <- system.file("extdata", "testfile_Flow_Exploration_small.isox", package = "isoorbi")
+fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
 orbi_simplify_isox() \%>\%
 orbi_filter_isox(filenames = c("s3744"),
