@@ -1,8 +1,8 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Iso Data
-Version: 0.2
-Date: 2022-10-02
+Version: 0.3
+Date: 2022-10-08
 Authors@R: 
     c(person(
         given = "Caj", family = "Neubauer", 

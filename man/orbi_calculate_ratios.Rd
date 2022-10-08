@@ -21,7 +21,7 @@ orbi_calculate_ratios(
 Calculated ratio between isotopocules defined as numerator(s) and denominator, using one of the ratio methods.
 }
 \description{
-Ratio calculation between isotopocules and base peak defined by \code{orbi_define_basepeak()}.
+Ratio calculation between isotopocules and base peak defined by \code{\link{orbi_define_basepeak}}. Normally this function is not called directly by the user, but via the function \code{\link{orbi_summarize_results}}
 
 Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
 The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
@@ -42,7 +42,7 @@ fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(filepath = fpath) \%>\%
                      orbi_simplify_isox() \%>\%
                      orbi_define_basepeak(basepeak_def = "M0")
-ratio <- orbi_calculate_ratios(numerator = df$ions.incremental,
+ratios <- orbi_calculate_ratios(numerator = df$ions.incremental,
                           denominator = df$basepeak_ions,
                          ratio_method =  "sum")
 

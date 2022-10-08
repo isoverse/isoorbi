@@ -225,7 +225,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
 
 
 #' @title Calculate isotopocule ratios
-#' @description Ratio calculation between isotopocules and base peak defined by `orbi_define_basepeak()`.
+#' @description Ratio calculation between isotopocules and base peak defined by \code{\link{orbi_define_basepeak}}. Normally this function is not called directly by the user, but via the function \code{\link{orbi_summarize_results}}
 #'
 #' Please note well: The formula used to calculate ion ratios matters! Do not simply use arithmetic mean.
 #' The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation).
@@ -316,7 +316,7 @@ orbi_calculate_ratios <- function(numerator,
 }
 
 #' @title Generate the results table
-#' @description Contains the logic to generate the results table. See the \code{\link{orbi_calculate_ratios}} function for details on the different options for the \code{ratio_method} parameter.
+#' @description Contains the logic to generate the results table. It passes the  \code{ratio_method} parameter to the \code{\link{orbi_calculate_ratios}} function for ratio calculations.
 #' @param dataset A processed tibble produced from `IsoX` output
 #' @inheritParams orbi_calculate_ratios
 #'
