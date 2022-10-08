@@ -92,24 +92,24 @@ calculate_ratio_gsd <- function(ratios) {
 # @title Internal function to calculate standard error (geometric)
 # @description  The function `calculate_ratio_gse()` is used to calculate geometric standard errors
 # @keywords internal
-# @param x A vector of values used to calculate geometric standard errors
+# @param ratios A vector of values used to calculate geometric standard errors
 # @return The calculated geometric standard error
-calculate_ratio_gse <- function(x) {
+calculate_ratio_gse <- function(ratios) {
 
-  if (missing(x))
-    stop("input vector for x supplied", call. = TRUE)
+  if (missing(ratios))
+    stop("input vector for ratios supplied", call. = TRUE)
 
   #basic checks
-  if (!(is.vector(x)))
-    stop("x needs to be a vector", call. = TRUE)
-  if (!(is.numeric(x)))
-    stop("x needs to be a numeric vector", call. = TRUE)
+  if (!(is.vector(ratios)))
+    stop("ratios needs to be a vector", call. = TRUE)
+  if (!(is.numeric(ratios)))
+    stop("ratios needs to be a numeric vector", call. = TRUE)
 
-  if (length(x) <=1)
-    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+  if (length(ratios) <=1)
+    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
   tryCatch(
-    (exp(mean(log(x)) + stats::sd(log(x))) - exp(mean(log(x)))) / sqrt(length(x)),
+    (exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios)))) / sqrt(length(ratios)),
     warning = function(w) {
       stop("something went wrong calculating the geometric standard error: ", w$message, call. = TRUE)
     }
