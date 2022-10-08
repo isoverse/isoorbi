@@ -38,7 +38,7 @@ df.clean <- df.filtered %>% orbi_filter_satellite_peaks() %>%
                             orbi_filter_scan_intensity(outlier_percent = 10)
 
 # Define base peak and calculate the results table
-df.results <- df.clean %>% orbi_define_basepeak(basepeak_def = "M0") %>% 
+df.results <- df.clean %>% orbi_define_basepeak(basepeak_def = "M0")%>% 
                               orbi_summarize_results(ratio_method = "sum")
 
 ```

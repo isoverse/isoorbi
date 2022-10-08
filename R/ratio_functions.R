@@ -396,78 +396,78 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
 
 
-  # optional groupings
-
-  tryCatch({
-    df.group <- dataset  %>% dplyr::ungroup() %>%
-
-      dplyr::group_by(.data$filename,
-                      .data$compound,
-                      .data$basepeak,
-                      .data$isotopocule,
-                      .add = TRUE)
-    message(
-      paste0(
-        "orbi_summarize_results() is grouping data by columns: filename, compound, basepeak, isotopocule"
-      )
-    )
-
-
-    {if ("block" %in% names(dataset)) {
-
-      #ensure block is defined as a factor
-
-      df.group <-
-        df.group  %>% mutate(block = as.factor(.data$block)) %>%
-        dplyr::group_by(.data$block,
-                        .add = TRUE)
-
-      message(paste0(
-        "orbi_summarize_results() is adding a grouping: block"
-      ))
-    }
-
-    }
-
-    {if ("segment" %in% names(dataset)) {
-
-      #ensure segment is defined as a factor
-
-      df.group <-
-        df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
-        dplyr::group_by(.data$segment,
-                        .add = TRUE)
-
-      message(paste0(
-        "orbi_summarize_results() is adding a grouping: segment"
-      ))
-    }
-
-    }
-
-    {if ("injection" %in% names(dataset)) {
-      #ensure injection is defined as a factor
-
-      df.group <-
-        df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
-        dplyr::group_by(.data$injection,
-                        .add = TRUE)
-
-      message(paste0(
-        "orbi_summarize_results() is adding a grouping: injection"
-      ))
-
-    }
-
-    }
-  },
-
-
-  warning = function(w) {
-    stop("something went wrong looking to add optional groupings: ",
-         w$message,
-         call. = TRUE)
-  })
+  # # optional groupings
+  #
+  # tryCatch({
+  #   df.group <- dataset  %>% dplyr::ungroup() %>%
+  #
+  #     dplyr::group_by(.data$filename,
+  #                     .data$compound,
+  #                     .data$basepeak,
+  #                     .data$isotopocule,
+  #                     .add = TRUE)
+  #   message(
+  #     paste0(
+  #       "orbi_summarize_results() is grouping data by columns: filename, compound, basepeak, isotopocule"
+  #     )
+  #   )
+  #
+  #
+  #   {if ("block" %in% names(dataset)) {
+  #
+  #     #ensure block is defined as a factor
+  #
+  #     df.group <-
+  #       df.group  %>% mutate(block = as.factor(.data$block)) %>%
+  #       dplyr::group_by(.data$block,
+  #                       .add = TRUE)
+  #
+  #     message(paste0(
+  #       "orbi_summarize_results() is adding a grouping: block"
+  #     ))
+  #   }
+  #
+  #   }
+  #
+  #   {if ("segment" %in% names(dataset)) {
+  #
+  #     #ensure segment is defined as a factor
+  #
+  #     df.group <-
+  #       df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
+  #       dplyr::group_by(.data$segment,
+  #                       .add = TRUE)
+  #
+  #     message(paste0(
+  #       "orbi_summarize_results() is adding a grouping: segment"
+  #     ))
+  #   }
+  #
+  #   }
+  #
+  #   {if ("injection" %in% names(dataset)) {
+  #     #ensure injection is defined as a factor
+  #
+  #     df.group <-
+  #       df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
+  #       dplyr::group_by(.data$injection,
+  #                       .add = TRUE)
+  #
+  #     message(paste0(
+  #       "orbi_summarize_results() is adding a grouping: injection"
+  #     ))
+  #
+  #   }
+  #
+  #   }
+  # },
+  #
+  #
+  # warning = function(w) {
+  #   stop("something went wrong looking to add optional groupings: ",
+  #        w$message,
+  #        call. = TRUE)
+  # })
 
 
 
@@ -479,16 +479,39 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   )
 
 
+
+  # determine groupings
+
+  all_groups <- c("filename", "compound", "basepeak", "isotopocule")
+  if ("block" %in% names(dataset))
+    all_groups <- c(all_groups, "block")
+  if ("segment" %in% names(dataset))
+    all_groups <- c(all_groups, "segment")
+
+  sprintf("orbi_summarize_results() is grouping the data (by %s) and summarizing ratios using the '%s' method...",
+          paste(all_groups, collapse = ", "), ratio_method) %>%
+    message()
+
+  # execute grouping
+  df.group <- dataset %>%
+    dplyr::group_by(!!!lapply(x, rlang::sym))
+
+
+
+
+
   tryCatch(
+
+    # run calculations
     df.stat <- df.group %>%
-
-      dplyr::mutate(
-        ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method)
-      ) %>% #THE ACTUAL RATIO CALCULATION!
-
-      dplyr::mutate(ratio_sem = calculate_ratio_sem(
-        .data$ions.incremental / .data$basepeak_ions
-      )),
+      summarize(
+        ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method),
+        ratio_sem = calculate_ratio_sem(.data$ions.incremental / .data$basepeak_ions),
+        number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
+        minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
+        shot_noise_permil = 1000 * (sqrt((sum(.data$ions.incremental) + sum(.data$basepeak_ions)) / (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
+        .groups = "drop") %>%
+      mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)),
 
     #For simplicity use basic standard error for all options
 
@@ -504,45 +527,6 @@ orbi_summarize_results <- function(dataset, ratio_method) {
   ))
 
 
-  tryCatch(
-
-    df.stat <- df.stat %>% dplyr::mutate(
-      number_of_scans = length(.data$ratio),
-      minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
-      shot_noise_permil = 1000 * (sqrt((
-        sum(.data$ions.incremental) + sum(.data$basepeak_ions)
-      ) / (
-        sum(.data$ions.incremental) * sum(.data$basepeak_ions)
-      ))),
-      ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)
-    ) %>%
-
-      #Round values for output
-      dplyr::mutate(
-        ratio = round(.data$ratio, 8),
-        ratio_sem = round(.data$ratio_sem, 8),
-        shot_noise_permil = round(.data$shot_noise_permil, 3),
-        ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
-        minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
-      ) %>%
-
-      dplyr::select(
-        -.data$ions.incremental,
-        -.data$basepeak_ions,
-        -.data$time.min,
-        -.data$scan.no,
-        -.data$it.ms,
-        -.data$tic
-      ) %>%
-      unique() %>%
-      arrange(.data$filename, .data$compound, .data$isotopocule),
-
-    warning = function(w) {
-      stop("something went wrong in compiling the final results table: ",
-           w$message,
-           call. = TRUE)
-    }
-  )
 
 
   df.stat <- as.data.frame(df.stat)
