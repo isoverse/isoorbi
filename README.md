@@ -1,7 +1,7 @@
-# isoorbi <a href='https://www.isoverse.org/isoorbi'> <img src="man/figures/logo.png" align="right" height="138" /> </a>
+# isoorbi <a href='https://isoorbi.isoverse.org/'> <img src="man/figures/logo.png" align="right" height="138" /> </a>
 
 <!-- badges: start -->
-  [![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://www.isoverse.org/isoorbi)
+  [![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://isoorbi.isoverse.org/)
   [![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
 <!-- badges: end -->
 
