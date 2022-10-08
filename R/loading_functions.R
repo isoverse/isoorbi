@@ -1,4 +1,4 @@
-# functions for interacting with IsoX data
+# Functions to load, pre-filter and simplify IsoX data
 
 #' @title Read IsoX file
 #' @description Read an IsoX output file (`.isox`) into a tibble data frame
@@ -314,7 +314,3 @@ orbi_filter_isox <- function(dataset, filenames = "all", compounds ="all", isoto
 
   return(df.out)
 }
-
-
-
-
