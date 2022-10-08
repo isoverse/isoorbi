@@ -36,8 +36,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-Description: The goal of 'isoorbi' is to read and process isotopocule measurements from an Orbitrap Iso mass spectrometers. It expects '.isox' data produced by IsoX as input. 
-Citation: <doi:10.1021/acs.analchem.1c00944>.
+Description: The goal of 'isoorbi' is to read and process isotopocule measurements from an Orbitrap Iso mass spectrometers. It expects '.isox' data produced by IsoX as input. Citation: <doi:10.1021/acs.analchem.1c00944>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
