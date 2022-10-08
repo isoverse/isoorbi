@@ -194,6 +194,11 @@ orbi_filter_isox <- function(dataset, filenames = FALSE, compounds = FALSE, isot
   if (!(is.numeric(time_max) | isFALSE(time_max)))
     stop("time_max needs to be a number", call. = TRUE)
 
+  if (length(time_min) != 1)
+    stop("time_min needs to be a single number", call. = TRUE)
+  if (length(time_max) !=1)
+    stop("time_max needs to be a single number", call. = TRUE)
+
 
   # check that requires columns are present
   req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
