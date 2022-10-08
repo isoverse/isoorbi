@@ -9,11 +9,11 @@ context("utils")
   # calculate_ratio_sem
 test_that("calculate_ratio_sem() tests", {
   #success
-  expect_equal(calculate_ratio_sem(c(1,2,3)), 0.57735026919)
-  expect_type(calculate_ratio_sem(c(1,2,3)), "double")
+  expect_equal(calculate_ratio_sem(ratios = c(1,2,3)), 0.57735026919)
+  expect_type(calculate_ratio_sem(ratios = c(1,2,3)), "double")
 
   #failure
-  expect_error(calculate_ratio_sem(), "input vector for x supplied")
+  expect_error(calculate_ratio_sem(), "input vector for ratios supplied")
 })
 
   # calculate_ratio_gmean

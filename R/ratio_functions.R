@@ -3,27 +3,27 @@
 # @title Internal function to calculate standard error
 # @description The function `calculate_ratio_sem()` computes a regular standard error
 # @keywords internal
-# @param x A numeric vector used to calculate a standard error
+# @param ratios A numeric vector used to calculate a standard error
 # @return The calculated standard error
 
-calculate_ratio_sem <- function(x) {
+calculate_ratio_sem <- function(ratios) {
 
   # safety checks
-  if (missing(x))
-    stop("input vector for x supplied", call. = TRUE)
+  if (missing(ratios))
+    stop("input vector for ratios supplied", call. = TRUE)
 
   #basic checks
-  if (!(is.vector(x)))
-    stop("x needs to be a vector", call. = TRUE)
-  if (!(is.numeric(x)))
-    stop("x needs to be a numeric vector", call. = TRUE)
+  if (!(is.vector(ratios)))
+    stop("ratios needs to be a vector", call. = TRUE)
+  if (!(is.numeric(ratios)))
+    stop("ratios needs to be a numeric vector", call. = TRUE)
 
-  if (length(x) <=1)
-    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+  if (length(ratios) <=1)
+    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
 
   tryCatch(
-    stats::sd(x) / sqrt(length(x)),
+    stats::sd(ratios) / sqrt(length(ratios)),
     warning = function(w) {
       stop("something went wrong calculating the standard error: ", w$message, call. = TRUE)
     }
@@ -419,7 +419,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
       summarize(
         ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method),
         shot_noise_permil = 1000 * (sqrt((sum(.data$ions.incremental) + sum(.data$basepeak_ions)) / (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
-        ratio_sem = calculate_ratio_sem(.data$ions.incremental / .data$basepeak_ions),
+        ratio_sem = calculate_ratio_sem(ratios = .data$ions.incremental / .data$basepeak_ions),
         minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
         number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
         .groups = "drop") %>%
