@@ -26,7 +26,7 @@ citEntry(
   pages    = "9139–9148",
   publisher= "ACS Publications",
   doi     = "10.1021/acs.analchem.1c00944",
-  url      = "https://doi.org/10.1021/acs.analchem.1c00944",
+  url      = "https://pubs.acs.org/doi/10.1021/acs.analchem.1c00944",
   textVersion = paste("Hilkert et al. (2021)"
   )
 )
