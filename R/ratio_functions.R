@@ -404,6 +404,8 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     all_groups <- c(all_groups, "block")
   if ("segment" %in% names(dataset))
     all_groups <- c(all_groups, "segment")
+  if ("injection" %in% names(dataset))
+    all_groups <- c(all_groups, "injection")
 
 
   sprintf("orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
