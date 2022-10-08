@@ -6,6 +6,7 @@
 #' @import tidyr
 
 #' @importFrom magrittr %>%
+#' @importFrom rlang !!! !!
 #' @export
 magrittr::`%>%`
 
