@@ -418,12 +418,23 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     df.stat <- df.group %>%
       summarize(
         ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method),
-        ratio_sem = calculate_ratio_sem(.data$ions.incremental / .data$basepeak_ions),
-        number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
-        minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
         shot_noise_permil = 1000 * (sqrt((sum(.data$ions.incremental) + sum(.data$basepeak_ions)) / (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
+        ratio_sem = calculate_ratio_sem(.data$ions.incremental / .data$basepeak_ions),
+        minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) * (max(.data$time.min) - min(.data$time.min)),
+        number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
         .groups = "drop") %>%
-      mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)),
+      mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   %>%
+
+      #Round values for output
+    dplyr::mutate(
+      ratio = round(.data$ratio, 8),
+      ratio_sem = round(.data$ratio_sem, 8),
+      ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
+      shot_noise_permil = round(.data$shot_noise_permil, 3),
+      minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
+    )  %>%
+      arrange(.data$filename, .data$compound, .data$isotopocule) %>%
+      relocate(ratio_relative_sem_permil, .after = ratio),
 
     #For simplicity use basic standard error for all options
 
