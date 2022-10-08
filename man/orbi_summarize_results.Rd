@@ -9,7 +9,7 @@ orbi_summarize_results(dataset, ratio_method)
 \arguments{
 \item{dataset}{A processed tibble produced from \code{IsoX} output}
 
-\item{ratio_method}{Method for computing the ratio; passed to \code{orbi_calculate_ratio()}}
+\item{ratio_method}{Method for computing the ratio; passed to \code{orbi_calculate_ratios()}}
 }
 \value{
 Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
