@@ -58,7 +58,7 @@ orbi_read_isox <- function(file) {
         tic = readr::col_double(),
         it.ms = readr::col_double()
       )
-    ) %>% dplyr::rename(isotopocule = .data$isotopolog), # isox format should eventually change as well
+    ) %>% dplyr::rename(isotopocule = "isotopolog"), # isox format should eventually change as well
     warning = function(w) {
       stop("file format error: ", w$message, call. = TRUE)
     }
@@ -119,14 +119,14 @@ orbi_simplify_isox <- function(dataset) {
 
   tryCatch(
     dataset %>% dplyr::select(
-      .data$filename,
-      .data$compound,
-      .data$scan.no,
-      .data$time.min,
-      .data$isotopocule,
-      .data$ions.incremental,
-      .data$tic,
-      .data$it.ms
+      "filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental",
+      "tic",
+      "it.ms"
     ),
     warning = function(w) {
       stop("format error: ", w$message, call. = FALSE)

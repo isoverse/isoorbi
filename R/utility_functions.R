@@ -179,7 +179,7 @@ orbi_filter_weak_isotopocules <-
           dplyr::group_by(.data$isotopocule, .add = TRUE) %>%
           dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
           dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
-          dplyr::select(-.data$obs.scans,-.data$max.scans) %>% droplevels() %>% as.data.frame(),
+          dplyr::select(-"obs.scans", -"max.scans") %>% droplevels() %>% as.data.frame(),
         warning = function(w) {
           stop("something went wrong applying filter min_percent: ", w$message, call. = TRUE)
 
@@ -323,7 +323,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
                  .data$TICxIT > stats::quantile(.data$TICxIT, outlier_percent / 100) &
                  .data$TICxIT < stats::quantile(.data$TICxIT, 1 - outlier_percent / 100)
                ) %>%
-               dplyr::select(-.data$TICxIT),
+               dplyr::select(-"TICxIT"),
     warning = function(w) {
       stop("something went wrong: ", w$message, call. = TRUE)
     }
@@ -393,11 +393,11 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
 
     df.sel <- dataset  %>% dplyr::ungroup() %>%
       dplyr::select(
-        .data$filename,
-        .data$compound,
-        .data$scan.no,
-        .data$isotopocule,
-        .data$ions.incremental
+        "filename",
+        "compound",
+        "scan.no",
+        "isotopocule",
+        "ions.incremental"
       ) %>%
       dplyr::group_by(.data$filename,
                       .data$compound,
@@ -406,11 +406,11 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
       dplyr::mutate(basepeak = factor(.data$isotopocule),
                     basepeak_ions = .data$ions.incremental
       ) %>%
-      dplyr::select(.data$filename,
-                    .data$compound,
-                    .data$scan.no,
-                    .data$basepeak,
-                    .data$basepeak_ions),
+      dplyr::select("filename",
+                    "compound",
+                    "scan.no",
+                    "basepeak",
+                    "basepeak_ions"),
 
     warning = function(w) {
       stop("something went wrong identifying the base peak for each scan: ", w$message, call. = TRUE)
