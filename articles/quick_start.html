@@ -91,7 +91,7 @@
 <p>A basic data processing example</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read .isox test data</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span><span class="va">file_path</span><span class="op">)</span> </span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">file_path</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="co"># Keep only most important columns; equivalent to simplify check box in IsoX</span></span>
 <span><span class="va">df.simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
