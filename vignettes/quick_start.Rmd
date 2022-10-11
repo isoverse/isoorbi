@@ -19,7 +19,7 @@ file_path <-system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 A basic data processing example
 ```{r, message=FALSE, results='hide'}
 # Read .isox test data
-df <- orbi_read_isox(file_path) 
+df <- orbi_read_isox(file = file_path) 
 
 # Keep only most important columns; equivalent to simplify check box in IsoX
 df.simple <- orbi_simplify_isox(dataset = df)
