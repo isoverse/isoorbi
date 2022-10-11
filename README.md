@@ -21,7 +21,7 @@ install.packages("isoorbi")
 ``` r
 library(isoorbi)
 
-orbi_read_isox(filepath)
+orbi_read_isox(file)
 ```
 
 ## Getting help

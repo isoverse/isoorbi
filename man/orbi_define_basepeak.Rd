@@ -19,7 +19,7 @@ Input data frame plus two columns called \code{basepeak} and \code{basepeak_ions
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\%
+df <- orbi_read_isox(file = fpath) \%>\%
                      orbi_simplify_isox() \%>\%
                      orbi_define_basepeak(basepeak_def = "M0")
 

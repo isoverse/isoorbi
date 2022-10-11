@@ -31,7 +31,7 @@ Contains the logic to generate the results table. It passes the  \code{ratio_met
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\%
+df <- orbi_read_isox(file = fpath) \%>\%
       orbi_simplify_isox() \%>\% orbi_define_basepeak(basepeak_def = "M0")  \%>\%
       orbi_summarize_results(ratio_method = "sum")
 

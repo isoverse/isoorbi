@@ -4,10 +4,10 @@
 \alias{orbi_read_isox}
 \title{Read IsoX file}
 \usage{
-orbi_read_isox(filepath)
+orbi_read_isox(file)
 }
 \arguments{
-\item{filepath}{Path to the \code{.isox} file}
+\item{file}{Path to the \code{.isox} file}
 }
 \value{
 A tibble containing at minimum the columns \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}
@@ -30,6 +30,6 @@ Additional information on the columns:
 }
 \examples{
 fpath <- system.file("extdata", "testfile_dual_inlet.isox", package="isoorbi")
-df <- orbi_read_isox(filepath = fpath)
+df <- orbi_read_isox(file = fpath)
 
 }

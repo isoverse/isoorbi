@@ -26,7 +26,7 @@ The input \code{dataset} is expected to have at least these 8 columns: \code{fil
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <- orbi_read_isox(filepath = fpath) \%>\%
+df <- orbi_read_isox(file = fpath) \%>\%
 orbi_simplify_isox() \%>\%
 orbi_filter_scan_intensity(outlier_percent = 1)
 

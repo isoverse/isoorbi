@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>%
+#' df <- orbi_read_isox(file = fpath) %>%
 #' orbi_simplify_isox() %>%
 #' orbi_filter_satellite_peaks()
 #'
@@ -72,7 +72,7 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>%
+#' df <- orbi_read_isox(file = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_filter_weak_isotopocules(min_percent = 2)
 #'
@@ -225,7 +225,7 @@ orbi_filter_weak_isotopocules <-
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>%
+#' df <- orbi_read_isox(file = fpath) %>%
 #' orbi_simplify_isox() %>%
 #' orbi_filter_scan_intensity(outlier_percent = 1)
 #'
@@ -341,7 +341,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>%
+#' df <- orbi_read_isox(file = fpath) %>%
 #'                      orbi_simplify_isox() %>%
 #'                      orbi_define_basepeak(basepeak_def = "M0")
 #'

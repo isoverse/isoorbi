@@ -3,7 +3,7 @@
 #' @title Read IsoX file
 #' @description Read an IsoX output file (`.isox`) into a tibble data frame
 #'
-#' @param filepath Path to the `.isox` file
+#' @param file Path to the `.isox` file
 #' @details Additional information on the columns:
 #'
 #' * `filename`: name of the original Thermo `.raw` file processed by IsoX
@@ -25,29 +25,29 @@
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_dual_inlet.isox", package="isoorbi")
-#' df <- orbi_read_isox(filepath = fpath)
+#' df <- orbi_read_isox(file = fpath)
 #'
 #' @return A tibble containing at minimum the columns `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`
 #'
 #' @export
 
-orbi_read_isox <- function(filepath) {
+orbi_read_isox <- function(file) {
 
   # safety checks
-  if (missing(filepath)) stop("no file path supplied", call. = TRUE)
-  if (length(filepath) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(filepath), call. = TRUE)
-  if (!file.exists(filepath)) stop("this file does not exist: ", filepath, call. = TRUE)
-  ext <- stringr::str_extract(basename(filepath), "\\.[^.]+$")
+  if (missing(file)) stop("no file path supplied", call. = TRUE)
+  if (length(file) != 1) stop("can only read exactly 1 file at the time, supplied paths: ", length(file), call. = TRUE)
+  if (!file.exists(file)) stop("this file does not exist: ", file, call. = TRUE)
+  ext <- stringr::str_extract(basename(file), "\\.[^.]+$")
   if (is.na(ext) || ext != ".isox") stop("unrecognized file extension: ", ext, call. = TRUE)
 
   message(paste0("orbi_read_isox() is loading .isox data from file path: \n",
-                 filepath))
+                 file))
 
 
   tryCatch(
 
     df <- readr::read_tsv(
-      filepath,
+      file,
       col_types = list(
         filename = readr::col_factor(),
         scan.no = readr::col_integer(),
@@ -87,7 +87,7 @@ orbi_read_isox <- function(filepath) {
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>% orbi_simplify_isox()
+#' df <- orbi_read_isox(file = fpath) %>% orbi_simplify_isox()
 #'
 #' @export
 
@@ -146,7 +146,7 @@ orbi_simplify_isox <- function(dataset) {
 #'
 #'@examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(filepath = fpath) %>%
+#' df <- orbi_read_isox(file = fpath) %>%
 #' orbi_simplify_isox() %>%
 #' orbi_filter_isox(filenames = c("s3744"),
 #' compounds = "HSO4-",
