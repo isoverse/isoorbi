@@ -1,7 +1,7 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Iso Data
-Version: 1.0
+Version: 1.0.0
 Date: 2022-10-08
 Authors@R: 
     c(person(
@@ -36,7 +36,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-Description: A tool to load and process isotopocule measurements from an Orbitrap Iso mass spectrometer.
+Description: A tool to load and process isotopocule data from an Orbitrap Iso mass spectrometer.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

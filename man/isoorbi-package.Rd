@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-The goal of 'isoorbi' is to read and process isotopocule measurements from an Orbitrap Iso mass spectrometers. It expects '.isox' data produced by IsoX as input. Citation: \doi{10.1021/acs.analchem.1c00944}.
+A tool to load and process isotopocule data from an Orbitrap Iso mass spectrometer.
 }
 \seealso{
 Useful links:
