@@ -46,17 +46,17 @@ orbi_read_isox <- function(file) {
 
   tryCatch(
 
-    df <- readr::read_tsv(
+    df <- vroom::vroom(
       file,
       col_types = list(
-        filename = readr::col_factor(),
-        scan.no = readr::col_integer(),
-        time.min = readr::col_double(),
-        compound = readr::col_factor(),
-        isotopolog = readr::col_factor(),
-        ions.incremental = readr::col_double(),
-        tic = readr::col_double(),
-        it.ms = readr::col_double()
+        filename = vroom::col_factor(),
+        scan.no = vroom::col_integer(),
+        time.min = vroom::col_double(),
+        compound = vroom::col_factor(),
+        isotopolog = vroom::col_factor(),
+        ions.incremental = vroom::col_double(),
+        tic = vroom::col_double(),
+        it.ms = vroom::col_double()
       )
     ) %>% dplyr::rename(isotopocule = "isotopolog"), # isox format should eventually change as well
     warning = function(w) {
