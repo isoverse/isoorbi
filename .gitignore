@@ -51,3 +51,6 @@ docs/
 
 # Pkgdown
 pkgdown/**
+
+# CRAN
+CRAN-SUBMISSION
