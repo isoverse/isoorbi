@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Load and process isotopocule data from an Orbitrap Iso mass spectrometer. Hilkert A, Böhlke JK, Mroczkowski SJ, Fort KL, Aizikov K, Wang XT, Kopf SH, Neubauer C (2021) \doi{10.1021/acs.analchem.1c00944}
+Load and process isotopocule data from an Orbitrap Iso mass spectrometer. Hilkert A, Bohlke JK, Mroczkowski SJ, Fort KL, Aizikov K, Wang XT, Kopf SH, Neubauer C (2021) \doi{10.1021/acs.analchem.1c00944}
 }
 \seealso{
 Useful links:
