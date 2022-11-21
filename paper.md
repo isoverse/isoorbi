@@ -1,5 +1,5 @@
 ---
-title: 'Isoorbi: An R package for ...'
+title: 'Isoorbi: An R package to process Orbitrap isotope data'
 tags:
 - R
 - isotopes
