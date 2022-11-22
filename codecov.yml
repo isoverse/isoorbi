@@ -1,12 +1,4 @@
-comment: false
-
 coverage:
-  status:
-    patch:
-      default:
-        target: 0
-        threshold: 100
-    project:
-      default:
-        target: 30
-        threshold: 100
+  range: 30..100
+  round: down
+  precision: 2
