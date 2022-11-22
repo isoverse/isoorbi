@@ -16,6 +16,24 @@ test_that("orbi_filter_weak_isotopocules() tests", {
   expect_error(orbi_filter_weak_isotopocules(dataset = T), "dataset must be a data frame")
 })
 
+######
+
+# corrupt files
+# expect_error(orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")), "file format error")
+
+#orbi_filter_weak_isotopocules(dataset = df.fail, min_percent = 1)
+
+
+test_that("orbi_filter_weak_isotopocules() tests", {
+
+  df <- read.csv(file.path(base_dir, "test_files", "first10rows.csv"))
+  df.fail <- df %>% select(-scan.no)
+  expect_error(orbi_filter_weak_isotopocules(dataset = df.fail, min_percent = 1))
+})
+
+
+
+######
 
   # orbi_filter_satellite_peaks
 test_that("orbi_filter_satellite_peaks() tests", {
