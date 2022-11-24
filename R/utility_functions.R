@@ -358,7 +358,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     stop("dataset must be a data frame",  call. = TRUE)
 
   if (missing(basepeak_def))
-    stop(" no input for basepeak_def supplied", call. = TRUE)
+    stop("no input for basepeak_def supplied", call. = TRUE)
 
   if (is.character(basepeak_def) == FALSE)
     stop("denominator must be a basepeak_def vector",  call. = TRUE)
