@@ -54,9 +54,7 @@ orbi_filter_satellite_peaks <- function(dataset) {
                       .data$scan.no,
                       .data$isotopocule) %>%
       dplyr::filter(.data$ions.incremental == max(.data$ions.incremental)),
-    warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
-    }
+    warning = function(w) {stop("something went wrong: ", w$message, call. = TRUE) }
   )
 
   return(df.out)
@@ -163,12 +161,7 @@ orbi_filter_weak_isotopocules <-
         }
       },
 
-
-      warning = function(w) {
-        stop("something went wrong looking to add optional groupings: ",
-             w$message,
-             call. = TRUE)
-      }
+      warning = function(w) {stop("something went wrong looking to add optional groupings: ", w$message, call. = TRUE) }
     )
 
 
@@ -180,10 +173,7 @@ orbi_filter_weak_isotopocules <-
           dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
           dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
           dplyr::select(-"obs.scans", -"max.scans") %>% droplevels() %>% as.data.frame(),
-        warning = function(w) {
-          stop("something went wrong applying filter min_percent: ", w$message, call. = TRUE)
-
-      }
+        warning = function(w) { stop("something went wrong applying filter min_percent: ", w$message, call. = TRUE) }
     )
 
 
@@ -203,9 +193,7 @@ orbi_filter_weak_isotopocules <-
             "it.ms"
           )
         ),
-             warning = function(w) {
-               stop("something went wrong: ", w$message, call. = TRUE)
-             }
+             warning = function(w) {stop("something went wrong: ", w$message, call. = TRUE) }
     )
 
     return(df.out)
@@ -310,11 +298,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
     },
 
 
-    warning = function(w) {
-      stop("something went wrong looking to add optional groupings: ",
-           w$message,
-           call. = TRUE)
-    }
+    warning = function(w) {stop("something went wrong looking to add optional groupings: ", w$message, call. = TRUE) }
   )
 
   tryCatch(  df.out <- df.group %>%
@@ -324,9 +308,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
                  .data$TICxIT < stats::quantile(.data$TICxIT, 1 - outlier_percent / 100)
                ) %>%
                dplyr::select(-"TICxIT"),
-    warning = function(w) {
-      stop("something went wrong: ", w$message, call. = TRUE)
-    }
+    warning = function(w) { stop("something went wrong: ", w$message, call. = TRUE) }
   )
 
   return(df.out)
@@ -412,27 +394,21 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
                     "basepeak",
                     "basepeak_ions"),
 
-    warning = function(w) {
-      stop("something went wrong identifying the base peak for each scan: ", w$message, call. = TRUE)
-    }
+    warning = function(w) {stop("something went wrong identifying the base peak for each scan: ", w$message, call. = TRUE)}
   )
 
 
   tryCatch(
     df.out <- dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no")),
 
-    warning = function(w) {
-      stop("something went wrong when merging data: ", w$message, call. = TRUE)
-    }
+    warning = function(w) {stop("something went wrong when merging data: ", w$message, call. = TRUE)}
   )
 
 
   tryCatch(
     df.out <- df.out %>% dplyr::filter(.data$isotopocule != basepeak_def) %>% droplevels(),
 
-    warning = function(w) {
-      stop("something went wrong removing the base peak isotopocule: ", w$message, call. = TRUE)
-    }
+    warning = function(w) {stop("something went wrong removing the base peak isotopocule: ", w$message, call. = TRUE)}
   )
 
   return(df.out)
