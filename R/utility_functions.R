@@ -27,7 +27,7 @@ orbi_filter_satellite_peaks <- function(dataset) {
   if (ncol(dataset) < 8)
     stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
   if (nrow(dataset) < 1)
-    stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+    stop("dataset contains no rows", call. = TRUE)
 
 
   # check that requires columns are present
@@ -92,7 +92,7 @@ orbi_filter_weak_isotopocules <-
     if (ncol(dataset) < 8)
       stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
     if (nrow(dataset) < 1)
-      stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+      stop("dataset contains no rows", nrow(dataset), call. = TRUE)
 
     if (missing(min_percent))
       stop("value for min_percent missing", call. = TRUE)
@@ -100,7 +100,7 @@ orbi_filter_weak_isotopocules <-
     if (!(is.numeric(min_percent)))
       stop("min_percent needs to be a number", call. = TRUE)
     if (!(min_percent >= 0 && min_percent <=90))
-      stop("min_percent needs to be between 0 and 90 ", call. = TRUE)
+      stop("min_percent needs to be between 0 and 90", call. = TRUE)
 
 
     # check that requires columns are present
@@ -242,7 +242,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
   if (ncol(dataset) < 8)
     stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
   if (nrow(dataset) < 1)
-    stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+    stop("dataset contains no rows", nrow(dataset), call. = TRUE)
 
   if (missing(outlier_percent))
     stop("value for outlier_percent missing", call. = TRUE)
@@ -250,7 +250,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
   if (!(is.numeric(outlier_percent)))
     stop("outlier_percent needs to be a number", call. = TRUE)
   if (!(outlier_percent >= 0 && outlier_percent <=10))
-    stop("outlier_percentt needs to be between 0 and 10 ", call. = TRUE)
+    stop("outlier_percentt needs to be between 0 and 10", call. = TRUE)
 
 
 
