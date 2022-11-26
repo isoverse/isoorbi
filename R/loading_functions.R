@@ -51,8 +51,7 @@ orbi_read_isox <- function(file) {
       ext != ".isox")
     stop("unrecognized file extension: ", ext, call. = TRUE)
 
-  message(paste0("orbi_read_isox() is loading .isox data from file path: \n",
-                 file))
+  message(paste0("orbi_read_isox() is loading .isox data from file path: \n", file))
 
 
   tryCatch(

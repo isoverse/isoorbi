@@ -14,29 +14,42 @@
 #' orbi_simplify_isox() %>%
 #' orbi_filter_satellite_peaks()
 #'
-#' @return Filtered data frame (tibble)
+#' @return A filtered data frame (tibble)
 #' @export
 orbi_filter_satellite_peaks <- function(dataset) {
-
 
   # safety checks
   if (missing(dataset))
     stop("no dataset supplied", call. = TRUE)
+
   if (is.data.frame(dataset) == FALSE)
     stop("dataset must be a data frame",  call. = TRUE)
+
   if (ncol(dataset) < 8)
     stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+
   if (nrow(dataset) < 1)
     stop("dataset contains no rows", call. = TRUE)
 
 
   # check that requires columns are present
-  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  req_cols <-
+    c(
+      "filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental",
+      "tic",
+      "it.ms"
+    )
 
   missing_cols <- setdiff(req_cols, names(dataset))
 
   if (length(missing_cols) > 0) {
-    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+    paste0("Missing required column(s): ",
+           paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
 
@@ -46,15 +59,18 @@ orbi_filter_satellite_peaks <- function(dataset) {
     )
   )
 
-
   tryCatch(
     df.out <- dataset %>% ungroup %>%
-      dplyr::group_by(.data$filename,
-                      .data$compound,
-                      .data$scan.no,
-                      .data$isotopocule) %>%
+      dplyr::group_by(
+        .data$filename,
+        .data$compound,
+        .data$scan.no,
+        .data$isotopocule
+      ) %>%
       dplyr::filter(.data$ions.incremental == max(.data$ions.incremental)),
-    warning = function(w) {stop("something went wrong: ", w$message, call. = TRUE) }
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
   )
 
   return(df.out)
@@ -66,7 +82,7 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #' @description The function `orbi_filter_weak_isotopocules()` removes isotopocules that are not consistently detected in most scans
 #'
 #' @param dataset A simplified IsoX data frame to be processed
-#' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of the compound)
+#' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
@@ -76,19 +92,21 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #'
 #' @details The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
-#' @return Filtered tibble
+#' @return A filtered tibble (data frame)
 #' @export
 orbi_filter_weak_isotopocules <-
   function(dataset, min_percent) {
 
-
     # safety checks
     if (missing(dataset))
       stop("no dataset supplied", call. = TRUE)
+
     if (is.data.frame(dataset) == FALSE)
       stop("dataset must be a data frame",  call. = TRUE)
+
     if (ncol(dataset) < 8)
       stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+
     if (nrow(dataset) < 1)
       stop("dataset contains no rows", nrow(dataset), call. = TRUE)
 
@@ -97,87 +115,107 @@ orbi_filter_weak_isotopocules <-
 
     if (!(is.numeric(min_percent)))
       stop("min_percent needs to be a number", call. = TRUE)
-    if (!(min_percent >= 0 && min_percent <=90))
+
+    if (!(min_percent >= 0 && min_percent <= 90))
       stop("min_percent needs to be between 0 and 90", call. = TRUE)
 
 
     # check that requires columns are present
-    req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+    req_cols <-
+      c(
+        "filename",
+        "compound",
+        "scan.no",
+        "time.min",
+        "isotopocule",
+        "ions.incremental",
+        "tic",
+        "it.ms"
+      )
 
     missing_cols <- setdiff(req_cols, names(dataset))
 
     if (length(missing_cols) > 0) {
-      paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+      paste0("Missing required column(s): ",
+             paste(missing_cols, collapse = ", ")) %>%
         stop(call. = FALSE)
     }
 
-    message(paste0(
-      "orbi_filter_weak_isotopocules() is removing isotopocules from data that are detected in less than ",
-      min_percent,
-      "% of scans (in each grouping)...")
+    message(
+      paste0(
+        "orbi_filter_weak_isotopocules() is removing isotopocules from data that are detected in less than ",
+        min_percent,
+        "% of scans (in each grouping)..."
+      )
     )
 
 
-    #Optional groupings
+    # Optional groupings
 
-    tryCatch(
+    tryCatch({
+      df.group <- dataset  %>% dplyr::ungroup() %>%
+        dplyr::group_by(.data$filename,
+                        .data$compound, .add = TRUE)
 
       {
+        if ("block" %in% names(dataset))
 
+          #ensure block is defined as a factor
 
-        df.group <- dataset  %>% dplyr::ungroup() %>%
-          dplyr::group_by(.data$filename,
-                          .data$compound, .add = TRUE)
-
-
-        {if ("block" %in% names(dataset))
-
-            #ensure block is defined as a factor
-
-            df.group <-
-            df.group  %>% mutate(block = as.factor(.data$block)) %>%
-            dplyr::group_by(.data$block,
-                            .add = TRUE)
-          }
-
-        {if ("segment" %in% names(dataset))
-
-            #ensure segment is defined as a factor
-
-            df.group <-
-            df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
-            dplyr::group_by(.data$segment,
-                            .add = TRUE)
+          df.group <-
+          df.group  %>% mutate(block = as.factor(.data$block)) %>%
+          dplyr::group_by(.data$block,
+                          .add = TRUE)
         }
 
-        {if ("injection" %in% names(dataset))
+      {
+        if ("segment" %in% names(dataset))
 
-            #ensure injection is defined as a factor
+          # ensure segment is defined as a factor
 
-            df.group <-
-            df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
-            dplyr::group_by(.data$injection,
-                            .add = TRUE)
-        }
-      },
+          df.group <-
+          df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
+          dplyr::group_by(.data$segment,
+                          .add = TRUE)
+      }
 
-      warning = function(w) {stop("something went wrong looking to add optional groupings: ", w$message, call. = TRUE) }
-    )
+      {
+        if ("injection" %in% names(dataset))
+
+          # ensure injection is defined as a factor
+
+          df.group <-
+          df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
+          dplyr::group_by(.data$injection,
+                          .add = TRUE)
+      }
+    },
+
+    warning = function(w) {
+      stop("something went wrong looking to add optional groupings: ",
+           w$message,
+           call. = TRUE)
+    })
 
 
     tryCatch(
 
       remove.df <- df.group %>%
-          dplyr::mutate(max.scans = length(unique(.data$scan.no))) %>%
-          dplyr::group_by(.data$isotopocule, .add = TRUE) %>%
-          dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
-          dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
-          dplyr::select(-"obs.scans", -"max.scans") %>% droplevels() %>% as.data.frame(),
-        warning = function(w) { stop("something went wrong applying filter min_percent: ", w$message, call. = TRUE) }
+        dplyr::mutate(max.scans = length(unique(.data$scan.no))) %>%
+        dplyr::group_by(.data$isotopocule, .add = TRUE) %>%
+        dplyr::mutate(obs.scans = length(unique(.data$scan.no))) %>%
+        dplyr::filter(.data$obs.scans < min_percent / 100 * .data$max.scans) %>%
+        dplyr::select(-"obs.scans", -"max.scans") %>% droplevels() %>% as.data.frame(),
+      warning = function(w) {
+        stop("something went wrong applying filter min_percent: ",
+             w$message,
+             call. = TRUE)
+      }
     )
 
 
     tryCatch(
+
       df.out <-
         dplyr::anti_join(
           dataset,
@@ -193,7 +231,9 @@ orbi_filter_weak_isotopocules <-
             "it.ms"
           )
         ),
-             warning = function(w) {stop("something went wrong: ", w$message, call. = TRUE) }
+      warning = function(w) {
+        stop("something went wrong: ", w$message, call. = TRUE)
+      }
     )
 
     return(df.out)
@@ -221,14 +261,16 @@ orbi_filter_weak_isotopocules <-
 #' @export
 orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 
-
   # safety checks
   if (missing(dataset))
     stop("no dataset supplied", call. = TRUE)
+
   if (is.data.frame(dataset) == FALSE)
     stop("dataset must be a data frame",  call. = TRUE)
+
   if (ncol(dataset) < 8)
     stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
+
   if (nrow(dataset) < 1)
     stop("dataset contains no rows", nrow(dataset), call. = TRUE)
 
@@ -237,78 +279,101 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 
   if (!(is.numeric(outlier_percent)))
     stop("outlier_percent needs to be a number", call. = TRUE)
-  if (!(outlier_percent >= 0 && outlier_percent <=10))
+
+  if (!(outlier_percent >= 0 && outlier_percent <= 10))
     stop("outlier_percentt needs to be between 0 and 10", call. = TRUE)
 
 
-
   # check that requires columns are present
-  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  req_cols <-
+    c(
+      "filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental",
+      "tic",
+      "it.ms"
+    )
 
   missing_cols <- setdiff(req_cols, names(dataset))
 
   if (length(missing_cols) > 0) {
-    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+    paste0("Missing required column(s): ",
+           paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
 
-  message(paste0(
-    "orbi_filter_scan_intensity() is removing extremely high and low intense scans from data.",
-    " A total of ", 2* outlier_percent, "% of the scans will be removed...")
+  message(
+    paste0(
+      "orbi_filter_scan_intensity() is removing extremely high and low intense scans from data. ",
+      "A total of ",
+      2 * outlier_percent,
+      "% of the scans will be removed..."
+    )
   )
 
   #Optional groupings
 
+  tryCatch({
+    df.group <- dataset  %>% dplyr::ungroup() %>%
+      dplyr::group_by(.data$filename,
+                      .data$compound, .add = TRUE)
+
+    {
+      if ("block" %in% names(dataset))
+
+        # ensure block is defined as a factor
+
+        df.group <-
+        df.group  %>% mutate(block = as.factor(.data$block)) %>%
+        dplyr::group_by(.data$block,
+                        .add = TRUE)
+      }
+
+    {
+      if ("segment" %in% names(dataset))
+
+        # ensure segment is defined as a factor
+
+        df.group <-
+        df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
+        dplyr::group_by(.data$segment,
+                        .add = TRUE)
+    }
+
+    {
+      if ("injection" %in% names(dataset))
+
+        # ensure injection is defined as a factor
+
+        df.group <-
+        df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
+        dplyr::group_by(.data$injection,
+                        .add = TRUE)
+    }
+  },
+
+
+  warning = function(w) {
+    stop("something went wrong looking to add optional groupings: ",
+         w$message,
+         call. = TRUE)
+  })
+
   tryCatch(
 
-    {df.group <- dataset  %>% dplyr::ungroup() %>%
-        dplyr::group_by(.data$filename,
-                        .data$compound, .add = TRUE)
-
-
-      {if ("block" %in% names(dataset))
-
-          #ensure block is defined as a factor
-
-          df.group <-
-          df.group  %>% mutate(block = as.factor(.data$block)) %>%
-          dplyr::group_by(.data$block,
-                          .add = TRUE)
-        }
-
-      {if ("segment" %in% names(dataset))
-
-          #ensure segment is defined as a factor
-
-          df.group <-
-          df.group  %>% mutate(segment = as.factor(.data$segment)) %>%
-          dplyr::group_by(.data$segment,
-                          .add = TRUE)
-      }
-
-      {if ("injection" %in% names(dataset))
-
-          #ensure injection is defined as a factor
-
-          df.group <-
-          df.group  %>% mutate(injection = as.factor(.data$injection)) %>%
-          dplyr::group_by(.data$injection,
-                          .add = TRUE)
-      }
-    },
-
-
-    warning = function(w) {stop("something went wrong looking to add optional groupings: ", w$message, call. = TRUE) }
-  )
-
-  tryCatch(  df.out <- df.group %>%
-               dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
-               dplyr::filter(
-                 .data$TICxIT > stats::quantile(.data$TICxIT, outlier_percent / 100) &
-                 .data$TICxIT < stats::quantile(.data$TICxIT, 1 - outlier_percent / 100)
-               ) %>%
-               dplyr::select(-"TICxIT"),
-    warning = function(w) { stop("something went wrong: ", w$message, call. = TRUE) }
+    df.out <- df.group %>%
+      dplyr::mutate(TICxIT = .data$tic * .data$it.ms) %>%
+      dplyr::filter(
+        .data$TICxIT > stats::quantile(.data$TICxIT, outlier_percent / 100) &
+          .data$TICxIT < stats::quantile(.data$TICxIT, 1 - outlier_percent / 100)
+      ) %>%
+      dplyr::select(-"TICxIT"),
+    warning = function(w) {
+      stop("something went wrong: ", w$message, call. = TRUE)
+    }
   )
 
   return(df.out)
@@ -316,7 +381,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 
 
 
-#' @title Define and assign the base peak
+#' @title Define and assign the denominator for ratio calculation
 #' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator)
 #' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, `ions.incremental`.
 #' @param basepeak_def The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios
@@ -331,8 +396,7 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 #' @export
 orbi_define_basepeak <- function(dataset, basepeak_def) {
 
-
-  #basic checks
+  # basic checks
   if (missing(dataset))
     stop("no input for dataset supplied", call. = TRUE)
 
@@ -353,26 +417,35 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
 
 
   # check that requires columns are present
-  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental")
+  req_cols <-
+    c("filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental")
 
   missing_cols <- setdiff(req_cols, names(dataset))
 
   if (length(missing_cols) > 0) {
-    paste0("Missing expected column(s): ", paste(missing_cols, collapse = ", ")) %>%
+    paste0("Missing expected column(s): ",
+           paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
 
 
-  message(paste0("orbi_define_basepeak() is setting the ",
-                 basepeak_def,
-                 " isotopocule as the ratio denominator...")
-          )
+  message(
+    paste0(
+      "orbi_define_basepeak() is setting the ",
+      basepeak_def,
+      " isotopocule as the ratio denominator..."
+    )
+  )
 
 
-  # Annotation: Identify `base peak` for each scan
+  # Annotation: Identify `basepeak` for each scan
 
   tryCatch(
-
     df.sel <- dataset  %>% dplyr::ungroup() %>%
       dplyr::select(
         "filename",
@@ -385,8 +458,9 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
                       .data$compound,
                       .data$scan.no) %>%
       dplyr::filter(.data$isotopocule == basepeak_def) %>%
-      dplyr::mutate(basepeak = factor(.data$isotopocule),
-                    basepeak_ions = .data$ions.incremental
+      dplyr::mutate(
+        basepeak = factor(.data$isotopocule),
+        basepeak_ions = .data$ions.incremental
       ) %>%
       dplyr::select("filename",
                     "compound",
@@ -394,21 +468,35 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
                     "basepeak",
                     "basepeak_ions"),
 
-    warning = function(w) {stop("something went wrong identifying the base peak for each scan: ", w$message, call. = TRUE)}
+    warning = function(w) {
+      stop("something went wrong identifying the base peak for each scan: ",
+           w$message,
+           call. = TRUE)
+    }
   )
 
 
   tryCatch(
-    df.out <- dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no")),
 
-    warning = function(w) {stop("something went wrong when merging data: ", w$message, call. = TRUE)}
+    df.out <-
+      dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no")),
+
+    warning = function(w) {
+      stop("something went wrong when merging data: ", w$message, call. = TRUE)
+    }
   )
 
 
   tryCatch(
-    df.out <- df.out %>% dplyr::filter(.data$isotopocule != basepeak_def) %>% droplevels(),
 
-    warning = function(w) {stop("something went wrong removing the base peak isotopocule: ", w$message, call. = TRUE)}
+    df.out <-
+      df.out %>% dplyr::filter(.data$isotopocule != basepeak_def) %>% droplevels(),
+
+    warning = function(w) {
+      stop("something went wrong removing the base peak isotopocule: ",
+           w$message,
+           call. = TRUE)
+    }
   )
 
   return(df.out)
