@@ -1,4 +1,4 @@
-# Tests: Functions to load and filter IsoX data
+# Tests: Functions to load, pre-filter and simplify IsoX data
 
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
@@ -55,6 +55,19 @@ test_that("test that isox files can be read", {
   expect_equal(nrow(df), 5184)
 
 })
+
+
+# orbi_simplify_isox
+test_that("orbi_simplify_isox() tests", {
+
+  # succcess
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+
+  expect_true(is.tbl(orbi_simplify_isox(df)))
+
+})
+
+
 
 # orbi_filter_isox()
 
