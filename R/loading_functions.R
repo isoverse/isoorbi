@@ -1,4 +1,4 @@
-# Functions to load, pre-filter and simplify IsoX data
+# Functions to load, pre-filter and simplify IsoX data ------------------------------------
 
 #' @title Read IsoX file
 #' @description Read an IsoX output file (`.isox`) into a tibble data frame
