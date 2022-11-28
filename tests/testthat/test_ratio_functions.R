@@ -67,15 +67,15 @@ test_that("calculate_ratios_gsd() tests", {
   # failure
   expect_error(calculate_ratios_gsd(), "no input vector for ratios supplied")
 
-  expect_error(calculate_ratios_gmean(ratios = matrix(1, 2, 3)),
+  expect_error(calculate_ratios_gsd(ratios = matrix(1, 2, 3)),
                "ratios need to be provided in a vector",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_gmean(ratios = c("A", "B", "C")),
+  expect_error(calculate_ratios_gsd(ratios = c("A", "B", "C")),
                "ratios need to be a numeric vector",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_gmean(ratios = numeric()),
+  expect_error(calculate_ratios_gsd(ratios = numeric()),
                "length of ratios needs to be > 1: 0",
                fixed = TRUE)
 })
@@ -88,6 +88,18 @@ test_that("calculate_ratios_gse() tests", {
 
   # failure
   expect_error(calculate_ratios_gse(), "input vector for ratios supplied")
+
+  expect_error(calculate_ratios_gse(ratios = matrix(1, 2, 3)),
+               "ratios need to be provided in a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_gse(ratios = c("A", "B", "C")),
+               "ratios need to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_gse(ratios = numeric()),
+               "length of ratios needs to be > 1: 0",
+               fixed = TRUE)
 })
 
 # calculate_ratios_slope
