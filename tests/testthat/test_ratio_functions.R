@@ -155,28 +155,46 @@ test_that("calculate_weighted.vector.sum() tests", {
   # success
   x <- c(2, 4, 6)
   y <- c(3, 5, 7)
+
   expect_type(calculate_ratios_weighted_sum(x, y), "double")
 
   # failure
   expect_error(calculate_ratios_weighted_sum(), "no input vector for x supplied")
 
-  expect_error(calculate_ratios_weighted_sum(x = c("A"), y = c(1,2,3)),
+  expect_error(calculate_ratios_weighted_sum(x = matrix(1, 2, 3),
+                                             y = c(1, 2, 3)),
+               "x needs to be a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_weighted_sum(x = c("A"),
+                                             y = c(1, 2, 3)),
                "x needs to be a numeric vector",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_weighted_sum(x = numeric(), y = c(1,2,3)),
+  expect_error(calculate_ratios_weighted_sum(x = numeric(),
+                                             y = c(1, 2, 3)),
                "length of x needs to be > 1: 0",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_weighted_sum(x = c(1,2,3), y = c("A")),
+  expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3)),
+               "no input vector for y supplied")
+
+  expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3),
+                                            y = matrix(1, 2, 3)),
+               "y needs to be a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3),
+                                             y = c("A")),
                "y needs to be a numeric vector",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_weighted_sum(x = c(1,2,3), y = numeric()),
+  expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3),
+                                             y = numeric()),
                "length of y needs to be > 1: 0",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_weighted_sum(x = c(1,2,3), y = c(1,2,3,4)),
+  expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3), y = c(1, 2, 3, 4)),
                "length of x and y need to be equal",
                fixed = TRUE)
 
@@ -199,9 +217,38 @@ test_that("orbi_calculate_ratios() tests", {
   # failure
   expect_error(
     orbi_calculate_ratios(a, b, "median2"),
-    "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`"
+    "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`",
+    fixed = TRUE
   )
 
-  expect_error(orbi_calculate_ratios(), "no input for numerator supplied")
+  expect_error(orbi_calculate_ratios(),
+               "no input for numerator supplied",
+               fixed = TRUE)
+
+  expect_error(orbi_calculate_ratios(numerator = a),
+               "no input for denominator supplied",
+               fixed = TRUE)
+
+  expect_error(orbi_calculate_ratios(numerator =  as.character(a),
+                                     denominator = b),
+               "numerator must be a numeric vector")
+
+  expect_error(orbi_calculate_ratios(numerator =  a,
+                                     denominator = as.character(b)),
+               "denominator must be a numeric vector")
 })
+
+# orbi_summarize_results
+test_that("orbi_summarize_results() tests", {
+
+  # success
+
+
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) %>% orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "15N") %>% orbi_summarize_results(ratio_method = "sum")
+
+  expect_true(is.tbl(df))
+
+
+})
+
 

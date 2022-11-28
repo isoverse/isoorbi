@@ -307,7 +307,7 @@ orbi_calculate_ratios <- function(numerator,
     stop("numerator must be a numeric vector",  call. = TRUE)
 
   if (missing(denominator))
-    stop(" no input for denominator supplied", call. = TRUE)
+    stop("no input for denominator supplied", call. = TRUE)
 
   if (is.numeric(denominator) == FALSE)
     stop("denominator must be a numeric vector",  call. = TRUE)
@@ -492,7 +492,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     }
   )
 
-  df.stat <- as.data.frame(df.stat)
+  #df.stat <- as.data.frame(df.stat)
 
   return(df.stat)
 
