@@ -14,7 +14,23 @@ test_that("calculate_ratios_sem() tests", {
   expect_type(calculate_ratios_sem(ratios = c(1, 2, 3)), "double")
 
   # failure
-  expect_error(calculate_ratios_sem(), "input vector for ratios supplied")
+
+  expect_error(calculate_ratios_sem(),
+               "no input vector for ratios supplied",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_sem(ratios = matrix(1, 2, 3)),
+              "ratios need to be provided in a vector",
+              fixed = TRUE)
+
+  expect_error(calculate_ratios_sem(ratios = c("A", "B", "C")),
+               "ratios need to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_sem(ratios = numeric()),
+               "length of ratios needs to be > 1: 0",
+               fixed = TRUE)
+
 })
 
 # calculate_ratios_gmean
@@ -27,6 +43,19 @@ test_that("calculate_ratios_gmean() tests", {
 
   # failure
   expect_error(calculate_ratios_gmean(), "input vector for ratios supplied")
+
+  expect_error(calculate_ratios_gmean(ratios = matrix(1, 2, 3)),
+               "ratios need to be provided in a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_gmean(ratios = c("A", "B", "C")),
+               "ratios need to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_gmean(ratios = numeric()),
+               "length of ratios needs to be > 1: 0",
+               fixed = TRUE)
+
 })
 
 # calculate_ratios_gsd
@@ -36,7 +65,19 @@ test_that("calculate_ratios_gsd() tests", {
   expect_type(calculate_ratios_gsd(ratios = c(1, 2, 3)), "double")
 
   # failure
-  expect_error(calculate_ratios_gsd(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_gsd(), "no input vector for ratios supplied")
+
+  expect_error(calculate_ratios_gmean(ratios = matrix(1, 2, 3)),
+               "ratios need to be provided in a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_gmean(ratios = c("A", "B", "C")),
+               "ratios need to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_gmean(ratios = numeric()),
+               "length of ratios needs to be > 1: 0",
+               fixed = TRUE)
 })
 
 # calculate_ratios_gse

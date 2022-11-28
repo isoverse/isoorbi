@@ -10,17 +10,17 @@ calculate_ratios_sem <- function(ratios) {
 
   # safety checks
   if (missing(ratios))
-    stop("input vector for ratios supplied", call. = TRUE)
+    stop("no input vector for ratios supplied", call. = TRUE)
 
   # basic checks
   if (!(is.vector(ratios)))
-    stop("ratios needs to be a vector", call. = TRUE)
+    stop("ratios need to be provided in a vector", call. = TRUE)
 
   if (!(is.numeric(ratios)))
-    stop("ratios needs to be a numeric vector", call. = TRUE)
+    stop("ratios need to be a numeric vector", call. = TRUE)
 
   if (length(ratios) <= 1)
-    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
+    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
 
   tryCatch(
@@ -48,13 +48,13 @@ calculate_ratios_gmean <- function(ratios) {
 
   # basic checks
   if (!(is.vector(ratios)))
-    stop("ratios needs to be a vector", call. = TRUE)
+    stop("ratios need to be provided in a vector", call. = TRUE)
 
   if (!(is.numeric(ratios)))
-    stop("ratios needs to be a numeric vector", call. = TRUE)
+    stop("ratios need to be a numeric vector", call. = TRUE)
 
   if (length(ratios) <= 1)
-    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
+    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
   tryCatch(
 
@@ -76,17 +76,17 @@ calculate_ratios_gmean <- function(ratios) {
 calculate_ratios_gsd <- function(ratios) {
 
   if (missing(ratios))
-    stop("input vector for ratios supplied", call. = TRUE)
+    stop("no input vector for ratios supplied", call. = TRUE)
 
   # basic checks
   if (!(is.vector(ratios)))
-    stop("ratios needs to be a vector", call. = TRUE)
+    stop("ratios need to be provided in a vector", call. = TRUE)
 
   if (!(is.numeric(ratios)))
-    stop("ratios needs to be a numeric vector", call. = TRUE)
+    stop("ratios need to be a numeric vector", call. = TRUE)
 
   if (length(ratios) <= 1)
-    stop("Length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
+    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
 
   tryCatch(
 
