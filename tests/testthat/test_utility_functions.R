@@ -9,7 +9,7 @@ context("utility functions")
 # orbi_filter_satellite_peaks
 test_that("orbi_filter_satellite_peaks() tests", {
 
-  # succcess
+  # success
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
 
   expect_true(is.tbl(orbi_filter_satellite_peaks(orbi_simplify_isox(df))))

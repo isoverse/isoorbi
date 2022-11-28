@@ -60,7 +60,7 @@ test_that("test that isox files can be read", {
 # orbi_simplify_isox
 test_that("orbi_simplify_isox() tests", {
 
-  # succcess
+  # success
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
 
   expect_true(is.tbl(orbi_simplify_isox(df)))
