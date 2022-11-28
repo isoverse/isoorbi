@@ -142,6 +142,10 @@ test_that("calculate_ratios_slope() tests", {
                "length of y needs to be > 1: 1",
                fixed = TRUE)
 
+  expect_error(calculate_ratios_slope(x = c(1,2,3), y = c(1,2,3,4)),
+               "length of x and y need to be equal",
+               fixed = TRUE)
+
 
 })
 
@@ -154,7 +158,28 @@ test_that("calculate_weighted.vector.sum() tests", {
   expect_type(calculate_ratios_weighted_sum(x, y), "double")
 
   # failure
-  expect_error(calculate_ratios_weighted_sum(), "input vector for x supplied")
+  expect_error(calculate_ratios_weighted_sum(), "no input vector for x supplied")
+
+  expect_error(calculate_ratios_weighted_sum(x = c("A"), y = c(1,2,3)),
+               "x needs to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_weighted_sum(x = numeric(), y = c(1,2,3)),
+               "length of x needs to be > 1: 0",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_weighted_sum(x = c(1,2,3), y = c("A")),
+               "y needs to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_weighted_sum(x = c(1,2,3), y = numeric()),
+               "length of y needs to be > 1: 0",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_weighted_sum(x = c(1,2,3), y = c(1,2,3,4)),
+               "length of x and y need to be equal",
+               fixed = TRUE)
+
 })
 
 # orbi_calculate_ratios

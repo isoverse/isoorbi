@@ -166,7 +166,7 @@ calculate_ratios_slope <- function(x, y) {
     stop("length of y needs to be > 1: ", length(y), call. = TRUE)
 
   if (length(x) != length(y))
-    stop("Length of x and y need to be equal", call. = TRUE)
+    stop("length of x and y need to be equal", call. = TRUE)
 
   tryCatch(
 
@@ -200,10 +200,10 @@ calculate_ratios_slope <- function(x, y) {
 calculate_ratios_weighted_sum <- function(x, y) {
 
   if (missing(x))
-    stop("input vector for x supplied", call. = TRUE)
+    stop("no input vector for x supplied", call. = TRUE)
 
   if (missing(y))
-    stop("input vector for y supplied", call. = TRUE)
+    stop("no input vector for y supplied", call. = TRUE)
 
   # basic checks
   if (!(is.vector(x)))
@@ -213,7 +213,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
     stop("x needs to be a numeric vector", call. = TRUE)
 
   if (length(x) <= 1)
-    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+    stop("length of x needs to be > 1: ", length(x), call. = TRUE)
 
   if (!(is.vector(y)))
     stop("y needs to be a vector", call. = TRUE)
@@ -222,10 +222,10 @@ calculate_ratios_weighted_sum <- function(x, y) {
     stop("y needs to be a numeric vector", call. = TRUE)
 
   if (length(y) <= 1)
-    stop("Length of x needs to be > 1: ", length(x), call. = TRUE)
+    stop("length of y needs to be > 1: ", length(y), call. = TRUE)
 
   if (length(x) != length(y))
-    stop("Length of x and y need to be equal", call. = TRUE)
+    stop("length of x and y need to be equal", call. = TRUE)
 
 
   df <- cbind(x, y)
