@@ -396,9 +396,9 @@ orbi_summarize_results <- function(dataset, ratio_method) {
                      "weighted_sum")
 
   if (!(ratio_method %in% ratio.options))
-    stop(cat(
-      "ratio_method must be on of the following: ",
-      ratio.options, "\n", sep = " "), call. = TRUE
+    stop(
+      paste0("ratio_method must be on of the following: ",
+             paste(ratio.options, collapse = ", ")), call. = TRUE
       )
 
 
@@ -494,7 +494,6 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     }
   )
 
-  #df.stat <- as.data.frame(df.stat)
 
   return(df.stat)
 

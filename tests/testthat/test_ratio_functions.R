@@ -231,11 +231,13 @@ test_that("orbi_calculate_ratios() tests", {
 
   expect_error(orbi_calculate_ratios(numerator =  as.character(a),
                                      denominator = b),
-               "numerator must be a numeric vector")
+               "numerator must be a numeric vector",
+               fixed = TRUE)
 
   expect_error(orbi_calculate_ratios(numerator =  a,
                                      denominator = as.character(b)),
-               "denominator must be a numeric vector")
+               "denominator must be a numeric vector",
+               fixed = TRUE)
 })
 
 # orbi_summarize_results
@@ -243,11 +245,26 @@ test_that("orbi_summarize_results() tests", {
 
   # success
 
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) %>% orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "15N")
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) %>% orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "15N") %>% orbi_summarize_results(ratio_method = "sum")
+  expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum")))
 
-  expect_true(is.tbl(df))
+  # failure
+  expect_error(orbi_summarize_results(),
+                "no input for dataset supplied",
+               fixed = TRUE)
 
+  expect_error(orbi_summarize_results(dataset = as.matrix(df)),
+               "dataset must be a data frame",
+               fixed = TRUE)
+
+  expect_error(orbi_summarize_results(dataset = df),
+               "no input for ratio_method supplied",
+               fixed = TRUE)
+
+  expect_error(orbi_summarize_results(dataset = df, ratio_method = "foo"),
+               "ratio_method must be on of the following: mean, sum, median, geometric_mean, slope, weighted_sum",
+               fixed = TRUE)
 
 })
 
