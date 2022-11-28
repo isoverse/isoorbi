@@ -5,9 +5,10 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("loading functions")
 
-test_that("test that isox files can be read", {
+test_that("orbi_read_isox() tests", {
 
-  # test safety checks
+
+  # safety checks
 
   expect_error(orbi_read_isox(), "no file path supplied",
                fixed = TRUE)
@@ -34,7 +35,7 @@ test_that("test that isox files can be read", {
 
   # test reading a file
 
-  df <-orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
 
   expect_true(is.tbl(df))
 
@@ -53,6 +54,7 @@ test_that("test that isox files can be read", {
   )
 
   expect_equal(nrow(df), 5184)
+
 
 })
 
