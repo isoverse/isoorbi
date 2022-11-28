@@ -112,7 +112,37 @@ test_that("calculate_ratios_slope() tests", {
   expect_equal(calculate_ratios_slope(x, y), 1)
 
   # failure
-  expect_error(calculate_ratios_slope(), "input vector for x supplied")
+  expect_error(calculate_ratios_slope(), "no input vector for x supplied")
+
+  expect_error(calculate_ratios_slope(y = 1), "no input vector for x supplied")
+
+  expect_error(calculate_ratios_slope(x = matrix(1, 2, 3), y = c(1,2,3)),
+               "x needs to be a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_slope(x = c("A"), y = c(1,2,3)),
+               "x needs to be a numeric vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_slope(x = numeric(), y = c(1,2,3)),
+               "length of x needs to be > 1: 0",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_slope(x = 1), "no input vector for y supplied")
+
+  expect_error(calculate_ratios_slope(x = c(1,2,3), y = matrix(1, 2, 3)),
+               "y needs to be a vector",
+               fixed = TRUE)
+
+  expect_error(calculate_ratios_slope(x = c(1,2,3), y = c("A")),
+               "y needs to be a numeric vector",
+               fixed = TRUE)
+  #
+  expect_error(calculate_ratios_slope(x = c(1,2,3), y = c(1)),
+               "length of y needs to be > 1: 1",
+               fixed = TRUE)
+
+
 })
 
 # calculate_weighted.vector.sum
