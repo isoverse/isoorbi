@@ -60,9 +60,7 @@ calculate_ratios_gmean <- function(ratios) {
 
     exp(mean(log(ratios))),
     warning = function(w) {
-      stop("something went wrong calculating the geometic mean: ",
-           w$message,
-           call. = TRUE)
+      stop("something went wrong calculating the geometic mean: ", w$message, call. = TRUE)
     }
   )
 }
@@ -92,9 +90,7 @@ calculate_ratios_gsd <- function(ratios) {
 
     exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios))),
     warning = function(w) {
-      stop("something went wrong calculating geometric standard deviaton: ",
-           w$message,
-           call. = TRUE)
+      stop("something went wrong calculating geometric standard deviaton: ", w$message, call. = TRUE)
     }
   )
 
@@ -123,9 +119,7 @@ calculate_ratios_gse <- function(ratios) {
   tryCatch(
     (exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios)))) / sqrt(length(ratios)),
     warning = function(w) {
-      stop("something went wrong calculating the geometric standard error: ",
-           w$message,
-           call. = TRUE)
+      stop("something went wrong calculating the geometric standard error: ", w$message, call. = TRUE)
     }
   )
 
@@ -175,11 +169,7 @@ calculate_ratios_slope <- function(x, y) {
       stats::lm(x ~ y + 0, weights = x),
 
     warning = function(w) {
-      stop(
-        "something went wrong calculating the ratio as slope using a linear model: ",
-        w$message,
-        call. = TRUE
-      )
+      stop("something went wrong calculating the ratio as slope using a linear model: ", w$message, call. = TRUE)
     }
   )
 
@@ -245,9 +235,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
 
 
     warning = function(w) {
-      stop("something went wrong calculating the ratio from weighted sums: ",
-           w$message,
-           call. = TRUE)
+      stop("something went wrong calculating the ratio from weighted sums: ", w$message, call. = TRUE)
     }
   )
 

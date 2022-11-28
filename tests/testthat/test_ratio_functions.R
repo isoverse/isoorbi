@@ -249,6 +249,17 @@ test_that("orbi_summarize_results() tests", {
 
   expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum")))
 
+  df2 <- df %>% mutate(
+    block = as.factor("block1"),
+    segment = as.factor("segment2"),
+    injection = as.factor("injection3"),
+    sample_name = as.factor("sample_name4")
+  )
+
+  expect_true(is.tbl(orbi_summarize_results(df2, ratio_method = "sum")))
+
+
+
   # failure
   expect_error(orbi_summarize_results(),
                 "no input for dataset supplied",
@@ -265,6 +276,15 @@ test_that("orbi_summarize_results() tests", {
   expect_error(orbi_summarize_results(dataset = df, ratio_method = "foo"),
                "ratio_method must be on of the following: mean, sum, median, geometric_mean, slope, weighted_sum",
                fixed = TRUE)
+
+
+  df3 <- df %>% mutate(dummy = 1) %>% select(-ions.incremental)
+
+  expect_error(
+    orbi_summarize_results(dataset = df3, ratio_method = "sum"),
+    "Missing required column(s): ions.incremental",
+    fixed = TRUE
+  )
 
 })
 
