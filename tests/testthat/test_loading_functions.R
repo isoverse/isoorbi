@@ -56,6 +56,7 @@ test_that("orbi_read_isox() tests", {
   expect_equal(nrow(df), 5184)
 
 
+
 })
 
 
@@ -67,6 +68,24 @@ test_that("orbi_simplify_isox() tests", {
 
   expect_true(is.tbl(orbi_simplify_isox(df)))
 
+  # failure
+
+  expect_error(orbi_simplify_isox(), "no dataset supplied",
+               fixed = TRUE)
+
+  expect_error(orbi_simplify_isox(dataset = as.matrix(df)), "dataset must be a data frame", fixed = TRUE)
+
+  expect_error(orbi_simplify_isox(dataset = df[,1:5]),
+               "dataset must have at least 8 columns: 5")
+
+  expect_error(orbi_simplify_isox(dataset = df[0,]),
+               "dataset contains no rows")
+
+  df2 <- df %>% mutate(dummy = "1") %>% select(-scan.no)
+  expect_error(orbi_simplify_isox(dataset = df2),
+               "Missing required column(s): scan.no", fixed = TRUE)
+
+
 })
 
 
@@ -75,16 +94,61 @@ test_that("orbi_simplify_isox() tests", {
 
 test_that("orbi_filter_isox() tests",{
 
-  # failure
-  expect_error(orbi_filter_isox(), "no dataset supplied",
-               fixed = TRUE)
-
-  expect_error(orbi_simplify_isox(), "no dataset supplied",
-               fixed = TRUE)
-
   # success
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
 
   expect_true(is.tbl(orbi_filter_isox(df)))
+
+  expect_true(is.tbl(orbi_filter_isox(df,
+                                      filenames = "20220125_01",
+                                      compounds = "NO3-",
+                                      isotopocules = c("15N", "18O"),
+                                      time_min = 0.5,
+                                      time_max = 2)))
+
+
+
+  # failure
+  expect_error(orbi_filter_isox(), "no dataset supplied",
+               fixed = TRUE)
+
+  expect_error(orbi_filter_isox(dataset = as.matrix(df)), "dataset must be a data frame",
+               fixed = TRUE)
+
+  expect_error(orbi_filter_isox(dataset = df[,1:5]),
+               "dataset must have at least 8 columns: 5")
+
+  expect_error(orbi_filter_isox(dataset = df[0,]),
+               "dataset contains no rows")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                time_min = "A"),
+               "time_min needs to be a number")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                time_max = "A"),
+               "time_max needs to be a number")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                time_min = c(0.1, 0.2)),
+               "time_min needs to be a single number")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                time_max = c(0.1, 0.2)),
+               "time_max needs to be a single number")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                filenames = as.matrix(c(1, 0))),
+               "filenames needs to be a vector of names")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                isotopocules = as.matrix(c(1, 0))),
+               "isotopocules needs to be a vector of names")
+
+  expect_error(orbi_filter_isox(dataset = df,
+                                compounds = as.matrix(c(1, 0))),
+               "compounds needs to be a vector of names")
+
+
 
 })

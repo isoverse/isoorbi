@@ -212,7 +212,7 @@ orbi_filter_isox <-
       stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
 
     if (nrow(dataset) < 1)
-      stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
+      stop("dataset contains no rows", call. = TRUE)
 
     if (missing(filenames) && !isFALSE(filenames))
       stop("input for filenames missing", call. = TRUE)

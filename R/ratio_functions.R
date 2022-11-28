@@ -470,8 +470,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
       )  %>%
       dplyr::arrange(.data$filename, .data$compound, .data$isotopocule) %>%
 
-      #Use of .data in tidyselect expressions was deprecated in tidyselect 1.2.0.
-      dplyr::relocate(ratio_relative_sem_permil, .after = ratio),
+      dplyr::relocate("ratio_relative_sem_permil", .after = "ratio"),
 
     #For simplicity use basic standard error for all options
 
