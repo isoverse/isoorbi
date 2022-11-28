@@ -481,7 +481,9 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
       )  %>%
       dplyr::arrange(.data$filename, .data$compound, .data$isotopocule) %>%
-      dplyr::relocate(.data$ratio_relative_sem_permil, .after = .data$ratio),
+
+      #Use of .data in tidyselect expressions was deprecated in tidyselect 1.2.0.
+      dplyr::relocate(ratio_relative_sem_permil, .after = ratio),
 
     #For simplicity use basic standard error for all options
 
