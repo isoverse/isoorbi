@@ -76,17 +76,6 @@ orbi_read_isox <- function(file) {
   )
 
   # check that all the most important columns are present
-<<<<<<< HEAD
-  # FIXME - I think this is already done by tryCatch above, duplicate - commented for now
-  # req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
-  #
-  # missing_cols <- setdiff(req_cols, names(df))
-  #
-  # if (length(missing_cols) > 0) {
-  #   paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
-  #     stop(call. = FALSE)
-  # }
-=======
   req_cols <-
     c(
       "filename",
@@ -106,7 +95,6 @@ orbi_read_isox <- function(file) {
            paste(missing_cols, collapse = ", ")) %>%
       stop(call. = FALSE)
   }
->>>>>>> 1a19aafb059ada784aab17f24caa2cb8fb9331b4
 
   return(df)
 
@@ -163,7 +151,6 @@ orbi_simplify_isox <- function(dataset) {
 
   message("orbi_simplify_isox() will keep only the most important columns...")
 
-
   tryCatch(
     dataset %>% dplyr::select(
       "filename",
@@ -180,7 +167,6 @@ orbi_simplify_isox <- function(dataset) {
     }
   )
 }
-
 
 #' @title Basic generic filter for IsoX data
 #' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges. Default value for all parameters is FALSE, i.e. no filter is applied.
@@ -211,7 +197,6 @@ orbi_filter_isox <-
            isotopocules = FALSE,
            time_min = FALSE,
            time_max = FALSE) {
-
 
   # safety checks
     if (missing(dataset))
@@ -261,7 +246,6 @@ orbi_filter_isox <-
 
     if (length(time_max) != 1)
       stop("time_max needs to be a single number", call. = TRUE)
-
 
   # check that requires columns are present
     req_cols <-
