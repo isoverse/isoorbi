@@ -10,7 +10,7 @@ orbi_filter_satellite_peaks(dataset)
 \item{dataset}{A data frame or tibble produced from IsoX data by \code{orbi_simplify_isox()}}
 }
 \value{
-Filtered data frame (tibble)
+A filtered data frame (tibble)
 }
 \description{
 Remove minor signals (e.g., satellite peaks) that were reported by IsoX
