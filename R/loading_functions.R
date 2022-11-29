@@ -65,14 +65,15 @@ orbi_read_isox <- function(file) {
   )
 
   # check that all the most important columns are present
-  req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
-
-  missing_cols <- setdiff(req_cols, names(df))
-
-  if (length(missing_cols) > 0) {
-    paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
-      stop(call. = FALSE)
-  }
+  # FIXME - I think this is already done by tryCatch above, duplicate - commented for now
+  # req_cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  #
+  # missing_cols <- setdiff(req_cols, names(df))
+  #
+  # if (length(missing_cols) > 0) {
+  #   paste0("Missing required column(s): ", paste(missing_cols, collapse = ", ")) %>%
+  #     stop(call. = FALSE)
+  # }
 
   return(df)
 

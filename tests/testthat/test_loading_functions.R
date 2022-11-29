@@ -8,6 +8,7 @@ context("isox data")
 test_that("test that isox files can be read", {
 
   # test safety checks
+  expect_error(orbi_read_isox(), "no file path supplied")
   expect_error(orbi_read_isox(c("one", "two")), "can only read.*1")
   expect_error(orbi_read_isox("DNE"), "does not exist")
   temp_file <- tempfile(fileext = ".wrong")
@@ -15,7 +16,7 @@ test_that("test that isox files can be read", {
   expect_error(orbi_read_isox(temp_file), "unrecognized")
   unlink(temp_file) # destroy the temp file
 
-  # corrupt files
+  # corrupt files - missing columns
   expect_error(orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")), "file format error")
 
   # test reading a file
@@ -40,7 +41,13 @@ test_that("orbi_simplify_isox() tests", {
 
   # test safety checks
   expect_error(orbi_simplify_isox(), "no dataset supplied")
-  #add 10 more tests
+  expect_error(orbi_simplify_isox(dataset = "string"), "dataset must be a data frame")
+  expect_type(df, "list")
+  dataset = subset(df, select = -c(filename))
+  expect_error(orbi_simplify_isox(dataset), "dataset must have at least 8 columns: ")
+  dataset = df[0,]
+  expect_error(orbi_simplify_isox(dataset), "dataset contains no rows: ")
+
 })
 
 
