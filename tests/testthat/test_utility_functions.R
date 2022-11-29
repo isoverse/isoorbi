@@ -122,7 +122,8 @@ test_that("orbi_filter_scan_intensity() tests", {
                fixed = TRUE)
 
 
-  df <- read.csv(file.path(base_dir, "test_files", "first10rows.csv"), stringsAsFactors = T)
+  df <- read.csv(file.path(base_dir, "test_files", "first10rows.csv"),
+                 stringsAsFactors = T)
 
   expect_error(orbi_filter_scan_intensity(dataset = df),
                "value for outlier_percent missing",
