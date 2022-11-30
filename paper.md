@@ -8,9 +8,9 @@ tags:
 - isoorbi
 date: "10 November 2022"
 affiliations:
-- name: Department of Geological Sciences, University of Colorado Boulder, Colorado, USA
-  index: 1
 - name: Institute of Arctic and Alpine Research, University of Colorado Boulder, Colorado, USA
+  index: 1
+- name: Department of Geological Sciences, University of Colorado Boulder, Colorado, USA
   index: 2
 authors:
 - name: "Cajetan Neubauer"
