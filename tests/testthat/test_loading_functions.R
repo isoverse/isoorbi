@@ -7,6 +7,13 @@ context("loading functions")
 
 test_that("orbi_read_isox() tests", {
 
+  # safety checks
+
+  expect_error(orbi_read_isox(), "no file path supplied",
+               fixed = TRUE)
+
+  # test safety checks
+  expect_error(orbi_read_isox(), "no file path supplied")
 
   # safety checks
 
@@ -27,6 +34,8 @@ test_that("orbi_read_isox() tests", {
 
   unlink(temp_file) # destroy the temp file
 
+  # corrupt files - missing columns
+  expect_error(orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")), "file format error")
   # corrupt files
   expect_error(orbi_read_isox(file.path(
     base_dir, "test_files", "missing_column.isox"
@@ -55,10 +64,7 @@ test_that("orbi_read_isox() tests", {
 
   expect_equal(nrow(df), 5184)
 
-
-
 })
-
 
 # orbi_simplify_isox
 test_that("orbi_simplify_isox() tests", {
@@ -68,6 +74,14 @@ test_that("orbi_simplify_isox() tests", {
 
   expect_true(is.tbl(orbi_simplify_isox(df)))
 
+  # test safety checks
+  expect_error(orbi_simplify_isox(), "no dataset supplied")
+  expect_error(orbi_simplify_isox(dataset = "string"), "dataset must be a data frame")
+  expect_type(df, "list")
+  dataset = subset(df, select = -c(filename))
+  expect_error(orbi_simplify_isox(dataset), "dataset must have at least 8 columns: ")
+  dataset = df[0,]
+  expect_error(orbi_simplify_isox(dataset), "dataset contains no rows: ")
   # failure
 
   expect_error(orbi_simplify_isox(), "no dataset supplied",
@@ -85,10 +99,7 @@ test_that("orbi_simplify_isox() tests", {
   expect_error(orbi_simplify_isox(dataset = df2),
                "Missing required column(s): scan.no", fixed = TRUE)
 
-
 })
-
-
 
 # orbi_filter_isox()
 
@@ -105,8 +116,6 @@ test_that("orbi_filter_isox() tests",{
                                       isotopocules = c("15N", "18O"),
                                       time_min = 0.5,
                                       time_max = 2)))
-
-
 
   # failure
   expect_error(orbi_filter_isox(), "no dataset supplied",
@@ -148,7 +157,5 @@ test_that("orbi_filter_isox() tests",{
   expect_error(orbi_filter_isox(dataset = df,
                                 compounds = as.matrix(c(1, 0))),
                "compounds needs to be a vector of names")
-
-
 
 })

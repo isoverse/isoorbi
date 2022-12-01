@@ -5,7 +5,6 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("ratio functions")
 
-
 # calculate_ratios_sem
 test_that("calculate_ratios_sem() tests", {
 
@@ -146,7 +145,6 @@ test_that("calculate_ratios_slope() tests", {
                "length of x and y need to be equal",
                fixed = TRUE)
 
-
 })
 
 # calculate_weighted.vector.sum
@@ -258,8 +256,6 @@ test_that("orbi_summarize_results() tests", {
 
   expect_true(is.tbl(orbi_summarize_results(df2, ratio_method = "sum")))
 
-
-
   # failure
   expect_error(orbi_summarize_results(),
                 "no input for dataset supplied",
@@ -277,7 +273,6 @@ test_that("orbi_summarize_results() tests", {
                "ratio_method must be on of the following: mean, sum, median, geometric_mean, slope, weighted_sum",
                fixed = TRUE)
 
-
   df3 <- df %>% mutate(dummy = 1) %>% select(-ions.incremental)
 
   expect_error(
@@ -287,5 +282,3 @@ test_that("orbi_summarize_results() tests", {
   )
 
 })
-
-
