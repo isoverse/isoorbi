@@ -12,9 +12,7 @@ vignette: >
 ```{r}
 library(isoorbi) #load isoorbi R package
 
-#load a test file (dual inlet)
-
-#create file path to dual inlet test file in isoorbi R package
+# Load a path to a system test file
 file_path <-system.file("extdata", "testfile_DualInlet.isox", package = "isoorbi")
 
 ```
@@ -41,11 +39,13 @@ df.clean <- df.filtered %>% orbi_filter_satellite_peaks() %>%
                             orbi_filter_weak_isotopocules(min_percent = 10) %>%
                             orbi_filter_scan_intensity(outlier_percent = 10)
 
+```
 
-### needs a new functionality here to process dual inlet data ####
-# load functions from definitions below!!!
+The following code block contains functionality that is specific to processing data from dual inlet experiments
 
-# define annotation table
+```{r, message=FALSE, results='hide'}
+
+# Define an annotation table
 df.annotation <- orbi_dualInlet_define(
                       reference = "ref",
                       sample = "smp",
@@ -56,11 +56,14 @@ df.annotation <- orbi_dualInlet_define(
                       segments = 1 #should segmenting data be a separate small function?
                   ) 
 
-# annotate dual inlet data
+# Annotate dual inlet data
 df.annotated <- orbi_dualInlet_annotate(data = df.clean,
                                         annotations = df.annotation)
 
+```
 
+Continue with analysis as usual
+```{r, message=FALSE, results='hide'}
 # Define base peak and calculate the results table
 df.results <-
   df.annotated  %>% orbi_define_basepeak(basepeak_def = "15N") %>%
