@@ -2,7 +2,7 @@
 
 
 # Define dual inlet experiment -------------------------------------------
-#' @title orbi_define_dualInlet
+#' @title orbi_dualInlet_define
 #' @description This function defines the experiment and ensure input has required information
 #'
 #' @param reference Name of the solution in the reference syringe (default = "ref")
@@ -16,7 +16,7 @@
 #' @return Returns a data frame used to annotate data from dual inlet analysis
 #' @export
 
-orbi_define_dualInlet <-
+orbi_dualInlet_define <-
   function(reference = "ref",
            sample = "smpl",
            number.of.blocks,
@@ -72,17 +72,17 @@ orbi_define_dualInlet <-
   }
 
 
-# Function: orbi_annotate_DualInlet(data, annotations) ------------------
+# Function: orbi_dualInlet_annotate(data, annotations) ------------------
 
-#' @title orbi_annotate_dualInlet
+#' @title orbi_dualInlet_annotate
 #' @description This function merges annotations between input data and dual inlet data
 #'
 #' @param data Filtered dual inlet data
-#' @param annotations Annotation table provided by `orbi_define_dualInlet()`
+#' @param annotations Annotation table provided by `orbi_dualInlet_define()`
 #'
 #' @return Returns an annotated data frame from dual inlet experiments
 #' @export
-orbi_annotate_dualInlet <- function(data, annotations){
+orbi_dualInlet_annotate <- function(data, annotations){
 
   # safety checks
   if (missing(data))

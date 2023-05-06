@@ -5,21 +5,21 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("dual inlet functions")
 
-test_that("orbi_define_dualInlet() tests", {
+test_that("orbi_dualInlet_define() tests", {
 
   # safety checks
 
-  expect_error(orbi_define_dualInlet(), "no value for the number of infusion blocks provided",
+  expect_error(orbi_dualInlet_define(), "no value for the number of infusion blocks provided",
                fixed = TRUE)
 
 })
 
 
-test_that("orbi_annotate_dualInlet() tests", {
+test_that("orbi_dualInlet_annotate() tests", {
 
   # safety checks
 
-  expect_error(orbi_annotate_dualInlet(), "no data provided",
+  expect_error(orbi_dualInlet_annotate(), "no data provided",
                fixed = TRUE)
 
 })

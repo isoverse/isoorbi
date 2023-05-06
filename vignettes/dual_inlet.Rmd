@@ -46,7 +46,7 @@ df.clean <- df.filtered %>% orbi_filter_satellite_peaks() %>%
 # load functions from definitions below!!!
 
 # define annotation table
-df.annotation <- orbi_define_dualInlet(
+df.annotation <- orbi_dualInlet_define(
                       reference = "ref",
                       sample = "smp",
                       number.of.blocks = 7,
@@ -57,7 +57,7 @@ df.annotation <- orbi_define_dualInlet(
                   ) 
 
 # annotate dual inlet data
-df.annotated <- orbi_annotate_dualInlet(data = df.clean,
+df.annotated <- orbi_dualInlet_annotate(data = df.clean,
                                         annotations = df.annotation)
 
 
