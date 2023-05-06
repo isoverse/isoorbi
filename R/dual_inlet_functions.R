@@ -2,7 +2,7 @@
 
 
 # Define dual inlet experiment -------------------------------------------
-#' @title orbi_dualInlet_define
+#' @title Define dual inlet experimental settings and data processing parameters
 #' @description This function defines the experiment and ensure input has required information
 #'
 #' @param reference Name of the solution in the reference syringe (default = "ref")
@@ -76,7 +76,7 @@ orbi_dualInlet_define <-
 
 # Function: orbi_dualInlet_annotate(data, annotations) ------------------
 
-#' @title orbi_dualInlet_annotate
+#' @title Merge dual inlet annotations with data
 #' @description This function merges annotations between input data and dual inlet data
 #'
 #' @param data Filtered dual inlet data
