@@ -4,7 +4,7 @@ description: >
   A minimal example for processing .isox data from a dual inlet experiments
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Quick start guide}
+  %\VignetteIndexEntry{Dual Inlet}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
