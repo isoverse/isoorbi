@@ -25,11 +25,11 @@ Additional information on the columns:
 \item \code{isotopocule}: name of the isotopocule (e.g., 15N); called \code{isotopolog} in \code{.isox}
 \item \code{ions.incremental}: estimated number of ions, in increments since it is a calculated number
 \item \code{tic}: total ion current (TIC) of the scan
-\item \code{it.ms}: scan injection time (IT) in milli seconds (ms)
+\item \code{it.ms}: scan injection time (IT) in millisecond (ms)
 }
 }
 \examples{
-fpath <- system.file("extdata", "testfile_dual_inlet.isox", package="isoorbi")
+fpath <- system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")
 df <- orbi_read_isox(file = fpath)
 
 }

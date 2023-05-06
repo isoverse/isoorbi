@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility_functions.R
 \name{orbi_define_basepeak}
 \alias{orbi_define_basepeak}
-\title{Define and assign the base peak}
+\title{Define and assign the denominator for ratio calculation}
 \usage{
 orbi_define_basepeak(dataset, basepeak_def)
 }
