@@ -2,7 +2,7 @@
 % Please edit documentation in R/dual_inlet_functions.R
 \name{orbi_dualInlet_define}
 \alias{orbi_dualInlet_define}
-\title{orbi_dualInlet_define}
+\title{Define dual inlet experimental settings and data processing parameters}
 \usage{
 orbi_dualInlet_define(
   reference = "ref",

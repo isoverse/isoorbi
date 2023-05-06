@@ -2,7 +2,7 @@
 % Please edit documentation in R/dual_inlet_functions.R
 \name{orbi_dualInlet_annotate}
 \alias{orbi_dualInlet_annotate}
-\title{orbi_dualInlet_annotate}
+\title{Merge dual inlet annotations with data}
 \usage{
 orbi_dualInlet_annotate(data, annotations)
 }
