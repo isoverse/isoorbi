@@ -16,7 +16,7 @@ test_that("orbi_dualInlet_define() tests", {
   expect_error(orbi_dualInlet_define(number.of.blocks=1, switch.time=0), "no value provided for the duration of each infusion block",
                fixed = TRUE)
 
-  expect_error(orbi_dualInlet_define(number.of.blocks="A", block.time=10, switch.time=0), "number.of.blocks needs to be an integer",
+  expect_error(orbi_dualInlet_define(number.of.blocks="A", block.time=10, switch.time=0), "number.of.blocks needs to be a number",
                fixed = TRUE)
 
 })

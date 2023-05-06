@@ -35,8 +35,8 @@ orbi_dualInlet_define <-
       stop("no value provided for the duration of each infusion block", call. = TRUE)
 
     #basic checks
-    if (!is.integer(number.of.blocks))
-      stop("number.of.blocks needs to be an integer", call. = TRUE)
+    if (!is.numeric(number.of.blocks))
+      stop("number.of.blocks needs to be a number", call. = TRUE)
 
     blocks <-
       rep(c(reference, sample), 1E3)[1:number.of.blocks] #limited to maximum 1,000 blocks
