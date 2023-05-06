@@ -90,9 +90,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/isoverse/isoorbi" class="external-link">isoorbi</a></span><span class="op">)</span> <span class="co">#load isoorbi R package</span></span>
 <span></span>
-<span><span class="co">#load a test file (dual inlet)</span></span>
-<span></span>
-<span><span class="co">#create file path to dual inlet test file in isoorbi R package</span></span>
+<span><span class="co"># Load a path to a system test file</span></span>
 <span><span class="va">file_path</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_DualInlet.isox"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span></span></code></pre></div>
 <p>A basic data processing example</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -113,14 +111,12 @@
 <span><span class="co"># Clean the data by removing noise and outliers</span></span>
 <span><span class="va">df.clean</span> <span class="op">&lt;-</span> <span class="va">df.filtered</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/orbi_filter_satellite_peaks.html">orbi_filter_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                            <span class="fu"><a href="../reference/orbi_filter_weak_isotopocules.html">orbi_filter_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>                            <span class="fu"><a href="../reference/orbi_filter_scan_intensity.html">orbi_filter_scan_intensity</a></span><span class="op">(</span>outlier_percent <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="co">### needs a new functionality here to process dual inlet data ####</span></span>
-<span><span class="co"># load functions from definitions below!!!</span></span>
-<span></span>
-<span><span class="co"># define annotation table</span></span>
-<span><span class="va">df.annotation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_define_dualInlet.html">orbi_define_dualInlet</a></span><span class="op">(</span></span>
+<span>                            <span class="fu"><a href="../reference/orbi_filter_scan_intensity.html">orbi_filter_scan_intensity</a></span><span class="op">(</span>outlier_percent <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<p>The following code block contains functionality that is specific to
+processing data from dual inlet experiments</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define an annotation table</span></span>
+<span><span class="va">df.annotation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_dualInlet_define.html">orbi_dualInlet_define</a></span><span class="op">(</span></span>
 <span>                      reference <span class="op">=</span> <span class="st">"ref"</span>,</span>
 <span>                      sample <span class="op">=</span> <span class="st">"smp"</span>,</span>
 <span>                      number.of.blocks <span class="op">=</span> <span class="fl">7</span>,</span>
@@ -130,12 +126,12 @@
 <span>                      segments <span class="op">=</span> <span class="fl">1</span> <span class="co">#should segmenting data be a separate small function?</span></span>
 <span>                  <span class="op">)</span> </span>
 <span></span>
-<span><span class="co"># annotate dual inlet data</span></span>
-<span><span class="va">df.annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_annotate_dualInlet.html">orbi_annotate_dualInlet</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df.clean</span>,</span>
-<span>                                        annotations <span class="op">=</span> <span class="va">df.annotation</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># Define base peak and calculate the results table</span></span>
+<span><span class="co"># Annotate dual inlet data</span></span>
+<span><span class="va">df.annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_dualInlet_annotate.html">orbi_dualInlet_annotate</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df.clean</span>,</span>
+<span>                                        annotations <span class="op">=</span> <span class="va">df.annotation</span><span class="op">)</span></span></code></pre></div>
+<p>Continue with analysis as usual</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define base peak and calculate the results table</span></span>
 <span><span class="va">df.results</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">df.annotated</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"15N"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></code></pre></div>
