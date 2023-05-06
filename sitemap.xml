@@ -10,6 +10,9 @@
     <loc>https://isoorbi.isoverse.org/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/articles/dual_inlet.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/articles/index.html</loc>
   </url>
   <url>
@@ -46,10 +49,16 @@
     <loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_annotate_dualInlet.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_ratios.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_define_dualInlet.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc>
