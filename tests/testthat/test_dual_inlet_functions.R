@@ -5,6 +5,18 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("dual inlet functions")
 
+
+annot.test <- orbi_dualInlet_define(
+  reference = "ref",
+  sample = "smp",
+  number.of.blocks = 7,
+  switch.time = 0,
+  block.time = 10,
+  startup.time = 0, #usually 0, time before data run starts
+  segments = 1 #should segmenting data be a separate small function?
+)
+
+
 test_that("orbi_dualInlet_define() tests", {
 
   # safety checks
@@ -19,6 +31,10 @@ test_that("orbi_dualInlet_define() tests", {
   expect_error(orbi_dualInlet_define(number.of.blocks="A", block.time=10, switch.time=0), "number.of.blocks needs to be a number",
                fixed = TRUE)
 
+
+  # success
+  expect_true(is.data.frame(annot.test))
+
 })
 
 
@@ -31,15 +47,7 @@ test_that("orbi_dualInlet_annotate() tests", {
                                    "testfile_dual_inlet.isox",
                                    package = "isoorbi"))
 
-  # annot.test <- orbi_dualInlet_define(
-  #   reference = "ref",
-  #   sample = "smp",
-  #   number.of.blocks = 7,
-  #   switch.time = 0,
-  #   block.time = 10,
-  #   startup.time = 0, #usually 0, time before data run starts
-  #   segments = 1 #should segmenting data be a separate small function?
-  # )
+
 
 
   # safety checks
@@ -59,7 +67,11 @@ test_that("orbi_dualInlet_annotate() tests", {
   expect_error(orbi_dualInlet_annotate(), "no data provided",
                fixed = TRUE)
 
+  #success
 
+  annot.test2 <- orbi_dualInlet_annotate(data = df.test, annotations = annot.test)
+
+  expect_true(is.data.frame(annot.test2))
 
 
 
