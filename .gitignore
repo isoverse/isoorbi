@@ -54,3 +54,5 @@ pkgdown/**
 
 # CRAN
 CRAN-SUBMISSION
+/doc/
+/Meta/
