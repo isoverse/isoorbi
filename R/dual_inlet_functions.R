@@ -34,7 +34,9 @@ orbi_dualInlet_define <-
     if (missing(block.time))
       stop("no value provided for the duration of each infusion block", call. = TRUE)
 
-
+    #basic checks
+    if (!is.integer(number.of.blocks))
+      stop("number.of.blocks needs to be an integer", call. = TRUE)
 
     blocks <-
       rep(c(reference, sample), 1E3)[1:number.of.blocks] #limited to maximum 1,000 blocks
@@ -87,8 +89,16 @@ orbi_dualInlet_annotate <- function(data, annotations){
   # safety checks
   if (missing(data))
     stop("no data provided", call. = TRUE)
+
+  # basic checks
+  if (!(is.data.frame(data)))
+    stop("data need to be a R data frame", call. = TRUE)
+
+
   if (missing(annotations))
     stop("no annotations provided", call. = TRUE)
+
+
 
 
 
