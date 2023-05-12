@@ -64,7 +64,6 @@ test_that("orbi_dualInlet_annotate() tests", {
                "no annotations provided",
                fixed = TRUE)
 
-
   #success
 
   annot.test2 <- orbi_dualInlet_annotate(data = df.test, annotations = annot.test)
