@@ -30,7 +30,7 @@ orbi_dualInlet_define <-
     if (missing(number.of.blocks))
       stop("no value for the number of infusion blocks provided", call. = TRUE)
     if (missing(switch.time))
-      stop("no value provided for time needed for new solution to arrive after switching the valve", call. = TRUE)
+      stop("no value provided for switch time (time needed for new solution to fully arrive at ESI source after switching the valve)", call. = TRUE)
     if (missing(block.time))
       stop("no value provided for the duration of each infusion block", call. = TRUE)
 

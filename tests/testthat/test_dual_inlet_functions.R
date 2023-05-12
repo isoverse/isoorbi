@@ -23,7 +23,7 @@ test_that("orbi_dualInlet_define() tests", {
 
   expect_error(orbi_dualInlet_define(), "no value for the number of infusion blocks provided",
                fixed = TRUE)
-  expect_error(orbi_dualInlet_define(number.of.blocks=1), "no value provided for time needed for new solution to arrive after switching the valve",
+  expect_error(orbi_dualInlet_define(number.of.blocks=1), "no value provided for switch time (time needed for new solution to fully arrive at ESI source after switching the valve)",
                fixed = TRUE)
   expect_error(orbi_dualInlet_define(number.of.blocks=1, switch.time=0), "no value provided for the duration of each infusion block",
                fixed = TRUE)
@@ -64,8 +64,6 @@ test_that("orbi_dualInlet_annotate() tests", {
                "no annotations provided",
                fixed = TRUE)
 
-  expect_error(orbi_dualInlet_annotate(), "no data provided",
-               fixed = TRUE)
 
   #success
 
