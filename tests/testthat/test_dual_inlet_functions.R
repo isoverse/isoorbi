@@ -8,7 +8,7 @@ context("dual inlet functions")
 
 annot.test <- orbi_dualInlet_define(
   reference = "ref",
-  sample = "smp",
+  sample = "sam",
   number.of.blocks = 7,
   switch.time = 0,
   block.time = 10,

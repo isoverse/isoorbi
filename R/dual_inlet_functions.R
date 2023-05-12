@@ -6,7 +6,7 @@
 #' @description This function defines the experiment and ensure input has required information
 #'
 #' @param reference Name of the solution in the reference syringe (default = "ref")
-#' @param sample Name of the solution in the sample syringe (default = "smpl")
+#' @param sample Name of the solution in the sample syringe (default = "sam")
 #' @param number.of.blocks Number of infusion blocks
 #' @param switch.time Time needed for new solution to arrive after switching the valve
 #' @param block.time Time duration of each infusion block in minutes
@@ -18,7 +18,7 @@
 
 orbi_dualInlet_define <-
   function(reference = "ref",
-           sample = "smpl",
+           sample = "sam",
            number.of.blocks,
            switch.time,
            block.time,

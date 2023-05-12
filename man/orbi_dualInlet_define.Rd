@@ -6,7 +6,7 @@
 \usage{
 orbi_dualInlet_define(
   reference = "ref",
-  sample = "smpl",
+  sample = "sam",
   number.of.blocks,
   switch.time,
   block.time,
@@ -17,7 +17,7 @@ orbi_dualInlet_define(
 \arguments{
 \item{reference}{Name of the solution in the reference syringe (default = "ref")}
 
-\item{sample}{Name of the solution in the sample syringe (default = "smpl")}
+\item{sample}{Name of the solution in the sample syringe (default = "sam")}
 
 \item{number.of.blocks}{Number of infusion blocks}
 
