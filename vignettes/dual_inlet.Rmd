@@ -48,7 +48,7 @@ The following code block contains functionality that is specific to processing d
 # Define an annotation table
 df.annotation <- orbi_dualInlet_define(
                       reference = "ref",
-                      sample = "smp",
+                      sample = "sam",
                       number.of.blocks = 7,
                       switch.time = 0,
                       block.time = 10,
