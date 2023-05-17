@@ -12,7 +12,7 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## Enhancements
 
-* 
+* removed dependency on `stringr`
 
 ## Bug fixes
 

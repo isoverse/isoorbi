@@ -45,7 +45,9 @@ orbi_read_isox <- function(file) {
   if (!file.exists(file))
     stop("this file does not exist: ", file, call. = TRUE)
 
-  ext <- stringr::str_extract(basename(file), "\\.[^.]+$")
+  # ext <- stringr::str_extract(basename(file), "\\.[^.]+$")
+  # use base r to skip stringr dependency (since it's not used elsewhere)
+  ext <- regmatches(basename(file), regexec("\\.[^.]+$", basename(file)))[[1]]
 
   if (is.na(ext) ||
       ext != ".isox")
