@@ -479,7 +479,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   tryCatch(
 
     df.out <-
-      dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no")),
+      dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no"), multiple = "all"),
 
     warning = function(w) {
       stop("something went wrong when merging data: ", w$message, call. = TRUE)
