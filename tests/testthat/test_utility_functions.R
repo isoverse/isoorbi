@@ -28,7 +28,7 @@ test_that("orbi_filter_satellite_peaks() tests", {
                "dataset contains no rows",
                fixed = TRUE)
 
-  df2 <- df %>% mutate(dummy = 1) %>% select(-scan.no)
+  df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(orbi_filter_satellite_peaks(dataset = df2),
     "Missing required column(s): scan.no",
@@ -73,11 +73,11 @@ test_that("orbi_filter_weak_isotopocules() tests", {
   expect_true(is.tbl(orbi_filter_weak_isotopocules(dataset = orbi_simplify_isox(df),
                                                    min_percent = 1)))
 
-  df2 <-read.csv(file.path(base_dir, "test_files", "first10rows.csv")) %>% select(-scan.no)
+  df2 <-read.csv(file.path(base_dir, "test_files", "first10rows.csv")) |> select(-scan.no)
 
   expect_error(orbi_filter_weak_isotopocules(dataset = df2, min_percent = 1))
 
-  df3 <- df %>% mutate(
+  df3 <- df |> mutate(
     block = as.factor("block1"),
     segment = as.factor("segment2"),
     injection = as.factor("injection3")
@@ -123,7 +123,7 @@ test_that("orbi_filter_scan_intensity() tests", {
                "dataset contains no rows",
                fixed = TRUE)
 
-  df2 <- df %>% mutate(dummy=1) %>% select(-scan.no)
+  df2 <- df |> mutate(dummy=1) |> select(-scan.no)
   expect_error(orbi_filter_scan_intensity(dataset = df2, outlier_percent = 1),
                "Missing required column(s): scan.no",
                fixed = TRUE)
@@ -132,7 +132,7 @@ test_that("orbi_filter_scan_intensity() tests", {
   expect_true(is.tbl(orbi_filter_scan_intensity(dataset = df, outlier_percent = 0)))
 
   df3 <-
-    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) %>% mutate(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> mutate(
       block = as.factor("block1"),
       segment = as.factor("segment2"),
       injection = as.factor("injection3")
@@ -175,7 +175,7 @@ test_that("orbi_define_basepeak() tests", {
     fixed = TRUE)
 
 
-  df2 <- df %>% select(-scan.no)
+  df2 <- df |> select(-scan.no)
   expect_error(orbi_define_basepeak(dataset = df2,
                                     basepeak_def = "M0"),
     "Missing expected column(s): scan.no", fixed = TRUE)

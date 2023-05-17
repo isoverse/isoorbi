@@ -95,7 +95,7 @@ test_that("orbi_simplify_isox() tests", {
   expect_error(orbi_simplify_isox(dataset = df[0,]),
                "dataset contains no rows")
 
-  df2 <- df %>% mutate(dummy = "1") %>% select(-scan.no)
+  df2 <- df |> mutate(dummy = "1") |> select(-scan.no)
   expect_error(orbi_simplify_isox(dataset = df2),
                "Missing required column(s): scan.no", fixed = TRUE)
 

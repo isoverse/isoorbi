@@ -243,11 +243,11 @@ test_that("orbi_summarize_results() tests", {
 
   # success
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) %>% orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "15N")
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N")
 
   expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum")))
 
-  df2 <- df %>% mutate(
+  df2 <- df |> mutate(
     block = as.factor("block1"),
     segment = as.factor("segment2"),
     injection = as.factor("injection3"),
@@ -273,7 +273,7 @@ test_that("orbi_summarize_results() tests", {
                "ratio_method must be on of the following: mean, sum, median, geometric_mean, slope, weighted_sum",
                fixed = TRUE)
 
-  df3 <- df %>% mutate(dummy = 1) %>% select(-ions.incremental)
+  df3 <- df |> mutate(dummy = 1) |> select(-ions.incremental)
 
   expect_error(
     orbi_summarize_results(dataset = df3, ratio_method = "sum"),

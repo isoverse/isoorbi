@@ -120,7 +120,7 @@ orbi_dualInlet_annotate <- function(data, annotations){
   }
 
 
-  df<- df.data  %>% dplyr::filter(.data$block >0) %>% dplyr::filter(.data$sample_name != "NA")
+  df<- df.data  |> dplyr::filter(.data$block >0) |> dplyr::filter(.data$sample_name != "NA")
 
   df$sample_name <- as.factor(df$sample_name)
   df$compound <- as.factor(df$compound)

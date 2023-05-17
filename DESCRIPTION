@@ -23,11 +23,10 @@ Authors@R:
 URL: https://github.com/isoverse/isoorbi
 BugReports: https://github.com/isoverse/isoorbi/issues
 Depends:
-    R (>= 4.0.0)
+    R (>= 4.1.0)
 Imports:
     tidyr (>= 1.2.0),
     dplyr (>= 1.0.0),
-    magrittr (>= 2.0.0),
     rlang (>= 1.0.0),
     readr (>= 2.1.0)
 Suggests:

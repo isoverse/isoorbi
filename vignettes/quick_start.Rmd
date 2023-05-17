@@ -25,19 +25,19 @@ df <- orbi_read_isox(file = file_path)
 df.simple <- orbi_simplify_isox(dataset = df)
 
 # Filter the data
-df.filtered <- df.simple %>% 
+df.filtered <- df.simple |> 
                   orbi_filter_isox(time_min = 0, 
                                    time_max = 1, 
                                    compounds = "HSO4-",
                                    isotopocules = c("M0", "34S", "18O"))
 
 # Clean the data by removing noise and outliers
-df.clean <- df.filtered %>% orbi_filter_satellite_peaks() %>% 
-                            orbi_filter_weak_isotopocules(min_percent = 10) %>% 
+df.clean <- df.filtered |> orbi_filter_satellite_peaks() |> 
+                            orbi_filter_weak_isotopocules(min_percent = 10) |> 
                             orbi_filter_scan_intensity(outlier_percent = 10)
 
 # Define base peak and calculate the results table
-df.results <- df.clean %>% orbi_define_basepeak(basepeak_def = "M0")%>% 
+df.results <- df.clean |> orbi_define_basepeak(basepeak_def = "M0")|> 
                               orbi_summarize_results(ratio_method = "sum")
 
 ```

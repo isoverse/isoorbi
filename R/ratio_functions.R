@@ -268,8 +268,8 @@ calculate_ratios_weighted_sum <- function(x, y) {
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(file = fpath) %>%
-#'                      orbi_simplify_isox() %>%
+#' df <- orbi_read_isox(file = fpath) |>
+#'                      orbi_simplify_isox() |>
 #'                      orbi_define_basepeak(basepeak_def = "M0")
 #' ratios <- orbi_calculate_ratios(numerator = df$ions.incremental,
 #'                           denominator = df$basepeak_ions,
@@ -340,8 +340,8 @@ orbi_calculate_ratios <- function(numerator,
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(file = fpath) %>%
-#'       orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "M0")  %>%
+#' df <- orbi_read_isox(file = fpath) |>
+#'       orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "M0")  |>
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
 #' @details **Description of the output columns:**
@@ -406,7 +406,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
   if (length(missing_cols) > 0) {
     paste0("Missing required column(s): ",
-           paste(missing_cols, collapse = ", ")) %>%
+           paste(missing_cols, collapse = ", ")) |>
       stop(call. = FALSE)
   }
 
@@ -432,17 +432,17 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
     paste(all_groups, collapse = ", "),
     ratio_method
-  ) %>%
+  ) |>
     message()
 
   # execute grouping
-  df.group <- dataset %>%
+  df.group <- dataset |>
     dplyr::group_by(!!!lapply(all_groups, rlang::sym))
 
 
   tryCatch(
     # run calculations
-    df.stat <- df.group %>%
+    df.stat <- df.group |>
 
       summarize(
         ratio = orbi_calculate_ratios(.data$ions.incremental, .data$basepeak_ions, ratio_method = ratio_method),
@@ -456,9 +456,9 @@ orbi_summarize_results <- function(dataset, ratio_method) {
 
         number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
 
-        .groups = "drop") %>%
+        .groups = "drop") |>
 
-      mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   %>%
+      mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   |>
 
       #Round values for output
       dplyr::mutate(
@@ -467,8 +467,8 @@ orbi_summarize_results <- function(dataset, ratio_method) {
         ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
         shot_noise_permil = round(.data$shot_noise_permil, 3),
         minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
-      )  %>%
-      dplyr::arrange(.data$filename, .data$compound, .data$isotopocule) %>%
+      )  |>
+      dplyr::arrange(.data$filename, .data$compound, .data$isotopocule) |>
 
       dplyr::relocate("ratio_relative_sem_permil", .after = "ratio"),
 

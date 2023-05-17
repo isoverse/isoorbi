@@ -6,10 +6,6 @@
 #' @import tidyr
 #' @importFrom rlang !!! !!
 
-#' @importFrom magrittr %>%
-#' @export
-magrittr::`%>%`
-
 # quiets concerns of R CMD check about .data in tidyverse functions (to avoid other global variables)
 #' @importFrom rlang .data
 
