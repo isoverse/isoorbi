@@ -428,6 +428,7 @@ orbi_summarize_results <- function(dataset, ratio_method) {
     all_groups <- c(all_groups, "injection")
 
 
+  # info message
   sprintf(
     "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
     paste(all_groups, collapse = ", "),

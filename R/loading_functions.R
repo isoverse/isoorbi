@@ -49,10 +49,10 @@ orbi_read_isox <- function(file) {
   # use base r to skip stringr dependency (since it's not used elsewhere)
   ext <- regmatches(basename(file), regexec("\\.[^.]+$", basename(file)))[[1]]
 
-  if (is.na(ext) ||
-      ext != ".isox")
+  if (is.na(ext) || ext != ".isox")
     stop("unrecognized file extension: ", ext, call. = TRUE)
 
+  # info
   message(paste0("orbi_read_isox() is loading .isox data from file path: \n", file))
 
 

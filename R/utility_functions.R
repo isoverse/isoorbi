@@ -87,8 +87,8 @@ orbi_filter_satellite_peaks <- function(dataset) {
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
-#'                      orbi_simplify_isox() |>
-#'                      orbi_filter_weak_isotopocules(min_percent = 2)
+#'       orbi_simplify_isox() |>
+#'       orbi_filter_weak_isotopocules(min_percent = 2)
 #'
 #' @details The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
