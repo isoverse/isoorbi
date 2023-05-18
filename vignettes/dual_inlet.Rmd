@@ -7,6 +7,8 @@ vignette: >
   %\VignetteIndexEntry{Dual Inlet}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -41,33 +43,84 @@ df.clean <- df.filtered |> orbi_filter_satellite_peaks() |>
 
 ```
 
+
+# Examples (total DRAFT) for block definitions
+
 The following code block contains functionality that is specific to processing data from dual inlet experiments
 
-```{r, message=FALSE, results='hide'}
+```{r}
+# change a global setting
+orbi_set_settings(di_ref_name = "my ref")
 
-# Define an annotation table
-df.annotation <- orbi_dualInlet_define(
-                      reference = "ref",
-                      sample = "sam",
-                      number.of.blocks = 7,
-                      switch.time = 0,
-                      block.time = 10,
-                      startup.time = 0,#usually 0, time before data run starts
-                      segments = 1 #should segmenting data be a separate small function?
-                  ) 
+# define blocks
+df_w_blocks <-
+  # broad defintion
+  orbi_define_blocks_for_dual_inlet(
+    df.simple,
+    ref_block_time.min = 10,
+    sample_block_time.min = 15,
+    startup_time.min = 3,
+    change_over_time.min = 2,
+    sample_block_name = "sample"
+  ) |> 
+  # fine adjustments
+  orbi_adjust_block(block = 1, shift_start_time.min = 2) |>
+  orbi_adjust_block(block = 4, set_start_time.min = 42, set_end_time.min = 52)
 
-# Annotate dual inlet data
-df.annotated <- orbi_dualInlet_annotate(data = df.clean,
-                                        annotations = df.annotation)
-
+# get blocks info
+blocks_info <- df_w_blocks |> orbi_get_blocks_info()
+blocks_info |> knitr::kable()
 ```
+
+## plot
+
+```{r, fig.width=8, fig.height=4}
+# visualization
+library(ggplot2)
+library(dplyr)
+
+ggplot() +
+  # blocks background
+  geom_rect(
+    data = blocks_info,
+    map = aes(
+      xmin = start_time.min,
+      xmax = end_time.min,
+      ymin = -Inf,
+      ymax = Inf,
+      fill = label
+    ), alpha = 0.5
+  ) +
+  # blocks labels
+  geom_label(
+    data = blocks_info |> filter(data_type == "data"),
+    map = aes(
+      x = (start_time.min + end_time.min) / 2,
+      y = Inf,
+      label = paste("block", block)
+    ), vjust = 1.5
+  ) +
+  # data
+  geom_line(
+    data = df_w_blocks |> filter(isotopocule == "15N"),
+    map = aes(x = time.min, y = ions.incremental),
+    alpha = 0.2
+  ) +
+  # scales
+  scale_x_continuous(breaks = scales::breaks_pretty(5), expand = c(0, 0)) +
+  theme_bw() +
+  labs(x = "time [min]", y = "intensity")
+```
+
 
 Continue with analysis as usual
-```{r, message=FALSE, results='hide'}
-# Define base peak and calculate the results table
-df.results <-
-  df.annotated  |> orbi_define_basepeak(basepeak_def = "15N") |>
-  orbi_summarize_results(ratio_method = "sum")
-```
 
+# FIXME: this needs some adjustments
+
+```{r, message=FALSE, results='hide'}
+# # Define base peak and calculate the results table
+# df.results <-
+#   df.annotated  |> orbi_define_basepeak(basepeak_def = "15N") |>
+#   orbi_summarize_results(ratio_method = "sum")
+```
 

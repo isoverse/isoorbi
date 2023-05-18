@@ -102,8 +102,9 @@ orbi_define_blocks_for_dual_inlet <- function(
     dataset |>
     dplyr::left_join(
       scans_with_blocks |>
-        dplyr::select("filename", "scan.no", "block", "sample_name",
-                      "segment", "data_group", "data_type"),
+        dplyr::select(
+          "filename", "scan.no",
+          "data_group", "block", "sample_name", "data_type", "segment"),
       by = c("filename", "scan.no")
     )
 
@@ -136,7 +137,9 @@ orbi_adjust_block <- function(
 
   # get scans with blocks and data types from the data set
   scans <- dataset |>
-    dplyr::select("filename", "scan.no", "time.min", "block":"data_type") |>
+    dplyr::select(
+      "filename", "scan.no", "time.min",
+      "data_group", "block", "sample_name", "data_type", "segment") |>
     dplyr::distinct()
 
   # filename check
@@ -334,10 +337,13 @@ orbi_adjust_block <- function(
   # combine with the whole dataset
   updated_dataset <-
     dataset |>
-    dplyr::select(-c("block":"data_type")) |>
+    dplyr::select(-"data_group", -"block", -"sample_name", -"data_type", -"segment") |>
     dplyr::left_join(
       updated_scans |>
-        dplyr::select("filename", "scan.no", "block":"data_type"),
+        dplyr::select(
+          "filename", "scan.no",
+          "data_group", "block", "sample_name", "data_type", "segment"
+        ),
       by = c("filename", "scan.no")
     )
 
@@ -361,7 +367,7 @@ orbi_get_blocks_info <- function(dataset) {
 
   # summarize block info
   dataset |>
-    dplyr::group_by(.data$filename, .data$data_group, .data$block, .data$sample_name, .data$segment, .data$data_type) |>
+    dplyr::group_by(.data$filename, .data$data_group, .data$block, .data$sample_name, .data$data_type, .data$segment) |>
     dplyr::summarise(
       start_scan.no = min(.data$scan.no),
       end_scan.no = max(.data$scan.no),

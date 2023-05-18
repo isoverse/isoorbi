@@ -8,7 +8,8 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## New features
 
-* 
+* implemented block annotation functionality (FIXME: explain more)
+* implemented package settings (FIXME: explain more)
 
 ## Enhancements
 
