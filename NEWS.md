@@ -15,6 +15,7 @@ There are no breaking changes in this release (all changes and new features are 
 
 * removed dependency on `stringr`
 * implemented native pipe `|>` (R version requirement increased to 4.1.0) and removed dependency on `magrittr`
+* added `.by` parameter for `orbi_summarize_results()` for option to manually adjust grouping
 
 ## Bug fixes
 

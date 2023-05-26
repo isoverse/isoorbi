@@ -270,8 +270,12 @@ test_that("orbi_summarize_results() tests", {
                fixed = TRUE)
 
   expect_error(orbi_summarize_results(dataset = df, ratio_method = "foo"),
-               "ratio_method must be on of the following: mean, sum, median, geometric_mean, slope, weighted_sum",
-               fixed = TRUE)
+               "ratio_method.* must be one of.*mean.*sum.*median.*geometric_mean.*slope.*weighted_sum")
+
+  expect_error(orbi_summarize_results(dataset = df, ratio_method = "sum", .by = "foo"),
+               "foo.*doesn't exist")
+  expect_error(orbi_summarize_results(dataset = df, ratio_method = "sum", .by = foo),
+               "foo.*doesn't exist")
 
   df3 <- df |> mutate(dummy = 1) |> select(-ions.incremental)
 

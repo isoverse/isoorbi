@@ -458,7 +458,8 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
                     "compound",
                     "scan.no",
                     "basepeak",
-                    "basepeak_ions"),
+                    "basepeak_ions") |>
+      dplyr::ungroup(),
 
     warning = function(w) {
       stop("something went wrong identifying the base peak for each scan: ",
