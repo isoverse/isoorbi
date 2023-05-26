@@ -381,10 +381,10 @@ orbi_filter_scan_intensity <- function(dataset, outlier_percent) {
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
-#'                      orbi_simplify_isox() |>
-#'                      orbi_define_basepeak(basepeak_def = "M0")
+#'   orbi_simplify_isox() |>
+#'   orbi_define_basepeak(basepeak_def = "M0")
 #'
-#' @returns Input data frame plus two columns called `basepeak` and `basepeak_ions`
+#' @returns Input data frame without the rows of the basepeak isotopocule and instead two new columns called `basepeak` and `basepeak_ions` holding the basepeak information
 #' @export
 orbi_define_basepeak <- function(dataset, basepeak_def) {
 

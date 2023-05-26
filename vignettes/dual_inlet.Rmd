@@ -81,30 +81,31 @@ library(dplyr)
 
 ggplot() +
   # blocks background
-  geom_rect(
-    data = blocks_info,
-    map = aes(
-      xmin = start_time.min,
-      xmax = end_time.min,
-      ymin = -Inf,
-      ymax = Inf,
-      fill = label
-    ), alpha = 0.5
-  ) +
+  # geom_rect(
+  #   data = blocks_info,
+  #   map = aes(
+  #     xmin = start_time.min,
+  #     xmax = end_time.min,
+  #     ymin = -Inf,
+  #     ymax = Inf,
+  #     fill = label
+  #   ), alpha = 0.5
+  # ) +
   # blocks labels
-  geom_label(
-    data = blocks_info |> filter(data_type == "data"),
-    map = aes(
-      x = (start_time.min + end_time.min) / 2,
-      y = Inf,
-      label = paste("block", block)
-    ), vjust = 1.5
-  ) +
+  # geom_label(
+  #   data = blocks_info |> filter(data_type == "data"),
+  #   map = aes(
+  #     x = (start_time.min + end_time.min) / 2,
+  #     y = Inf,
+  #     label = paste("block", block)
+  #   ), vjust = 1.5
+  # ) +
   # data
   geom_line(
     data = df_w_blocks |> filter(isotopocule == "15N"),
-    map = aes(x = time.min, y = ions.incremental),
-    alpha = 0.2
+    #map = aes(x = time.min, y = ions.incremental),
+    map = aes(x = time.min, y = ions.incremental, color = data_type, group = data_group)
+    #alpha = 0.2
   ) +
   # scales
   scale_x_continuous(breaks = scales::breaks_pretty(5), expand = c(0, 0)) +
