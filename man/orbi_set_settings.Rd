@@ -19,10 +19,18 @@ orbi_set_settings(
 
 \item{di_sample_name}{the text label for dual inlet sample blocks}
 
+\item{data_type_data}{the text used to flag raw data as actually being data}
+
+\item{data_type_startup}{the text used to flag raw data as being part of the startup}
+
+\item{data_type_changeover}{the text used to flag raw data as being part of a changeover}
+
+\item{data_type_unused}{the text used to flag raw data as being unused}
+
 \item{reset_all}{if set to TRUE, will reset all settings back to their defaults}
 }
 \value{
-invisible list of all settings (see \link{orbi_get_settings()})
+invisible list of all settings (see \code{\link[=orbi_get_settings]{orbi_get_settings()}})
 }
 \description{
 Use this function to change the default package settings. When calling this function, only specify the settings you want to change, everything else will remain unchanged. The default value for each parameter is what the package uses by default for each setting.

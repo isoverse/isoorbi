@@ -1,13 +1,19 @@
 # exported functions -------
 
-#'
-#' DRAFT: binning raw data into blocks for dual inlet analyses
+#' Binning raw data into blocks for dual inlet analyses
 #'
 #' @param dataset A data frame or tibble produced from IsoX data by [orbi_simplify_isox()]
+#' @param ref_block_time.min placeholder
+#' @param change_over_time.min placeholder
+#' @param sample_block_time.min placeholder
+#' @param startup_time.min placeholder
+#' @param ref_block_name placeholder
+#' @param sample_block_name placeholder
+#'
 #' @return A data frame (tibble) with block annotations in the form of the additional columns described below:
 #' * `block` is an integer counting the data blocks in each file (0 is the startup block)
 #' * `sample_name` is the name of the material being measured as defined by the `ref_block_name` and `sample_block_name` parameters
-#' * `segment` is an integer defines segments within individual blocks - this will be `NA` until the optional [orbi_segment_blocks()`] is called
+#' * `segment` is an integer defines segments within individual blocks - this will be `NA` until the optional [orbi_segment_blocks()] is called
 #' * `data_group` is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like [orbi_adjust_block()] and [orbi_segment_blocks()] will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
 #' * `data_type` is a text value describing the type of data in each `data_group` - for a list of the main categories, call `orbi_get_settings("data_type")`
 #' @export
@@ -21,18 +27,34 @@ orbi_define_blocks_for_dual_inlet <- function(
     sample_block_name = setting("di_sample_name")
     ) {
 
-  # parameter checks
-  # FIXME: needs implementation
-  # check that dataset is provided and the right data kind
-  # check that dataset has "filename", "scan.no", "time.min" columns
-  # check that ref_block_time.min is provided and a single positive number
-  # check that change over time.min is provided and a single positive number
-  # check that sample_block_time (if provided) is a single positive number
-  # check that startup_time.min is a single >= number
-  # what else?
+  # type checks
+  stopifnot(
+    "`dataset` must be a data frame or tibble" =
+      !missing(dataset) && is.data.frame(dataset),
+    "`ref_block_time.min` must be a single positive number" =
+      !missing(ref_block_time.min) && rlang::is_scalar_double(ref_block_time.min) && ref_block_time.min > 0,
+    "`change_over_time.min` must be a single positive number" =
+      !missing(change_over_time.min) && rlang::is_scalar_double(change_over_time.min) && change_over_time.min > 0,
+    "`sample_block_time.min` must be a single positive number" =
+      rlang::is_scalar_double(sample_block_time.min) && sample_block_time.min > 0,
+    "`startup_time.min` must be a single number (>= 0)" =
+      rlang::is_scalar_double(startup_time.min) && startup_time.min >= 0,
+    "`ref_block_name` must be a single string" =
+      rlang::is_scalar_character(ref_block_name),
+    "`sample_block_name` must be a single string" =
+      rlang::is_scalar_character(sample_block_name)
+  )
+
+  # dataset columns check
+  req_cols <- c("filename", "scan.no", "time.min")
+  if (length(missing <- setdiff(req_cols, names(dataset)))) {
+    sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
+      rlang::abort()
+  }
 
   # get blocks
   blocks <- dataset |>
+    dplyr::group_by(.data$filename) |>
     find_blocks(
       ref_block_time.min = ref_block_time.min,
       sample_block_time.min = sample_block_time.min,
@@ -94,7 +116,7 @@ orbi_define_blocks_for_dual_inlet <- function(
     blocks |> dplyr::filter(.data$block > 0) |> nrow(),
     blocks |> dplyr::filter(.data$block > 0, .data$sample_name == ref_block_name) |> nrow(), ref_block_name,
     blocks |> dplyr::filter(.data$block > 0, .data$sample_name == sample_block_name) |> nrow(), sample_block_name,
-    blocks |> select(filename) |> distinct() |> nrow()
+    blocks |> dplyr::select("filename") |> dplyr::distinct() |> nrow()
   ) |> message()
 
   # combine with the whole dataset
@@ -120,6 +142,14 @@ orbi_define_blocks_for_dual_inlet <- function(
 #' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
 #' @param block the block for which to adjust the start and/or end
 #' @param filename needs to be specified only if the `dataset` has more than one `filename`
+#' @param shift_start_time.min if provided, the start time of the block will be shifted by this many minutes (use negative numbers to shift back)
+#' @param shift_end_time.min if provided, the end time of the block will be shifted by this many minutes (use negative numbers to shift back)
+#' @param shift_start_scan.no if provided, the start of the block will be shifted by this many scans (use negative numbers to shift back)
+#' @param shift_end_scan.no if provided, the end of the block will be shifted by this many scans (use negative numbers to shift back)
+#' @param set_start_time.min if provided, sets the start time of the block as close as possible to this time
+#' @param set_end_time.min if provided, sets the end time of the block as close as possible to this time
+#' @param set_start_scan.no if provided, sets the start of the block to this scan number (scan must exist in the `dataset`)
+#' @param set_end_scan.no if provided, sets the end of the block to this scan number (scan must exist in the `dataset`)
 #' @return A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
 orbi_adjust_block <- function(
@@ -210,13 +240,13 @@ orbi_adjust_block <- function(
       .data$data_type == setting("data_type_data")
     )
 
-  old_start_scan <- block_scans$scan.no |> head(1)
-  old_end_scan <- block_scans$scan.no |> tail(1)
+  old_start_scan <- block_scans$scan.no |> utils::head(1)
+  old_end_scan <- block_scans$scan.no |> utils::tail(1)
   new_start_scan <- NA_integer_
   new_end_scan <- NA_integer_
 
-  old_start_time <- block_scans$time.min |> head(1)
-  old_end_time <- block_scans$time.min |> tail(1)
+  old_start_time <- block_scans$time.min |> utils::head(1)
+  old_end_time <- block_scans$time.min |> utils::tail(1)
   new_start_time <- NA_real_
   new_end_time <- NA_real_
 
@@ -226,10 +256,10 @@ orbi_adjust_block <- function(
       dplyr::filter(
         (!!which == "start" & .data$time.min >= !!time) |
           (!!which == "end" & .data$time.min < !!time)
-      ) |> dplyr::pull(scan.no)
+      ) |> dplyr::pull(.data$scan.no)
     time_scan <-
-      if (which == "start") head(time_scans, 1)
-      else tail(time_scans, 1)
+      if (which == "start") utils::head(time_scans, 1)
+      else utils::tail(time_scans, 1)
 
     # safety check
     if (rlang::is_empty(time_scan)) {
@@ -400,6 +430,10 @@ orbi_adjust_block <- function(
   return(updated_dataset)
 }
 
+#' Segment blocks
+#'
+#' @inheritParams orbi_adjust_block
+#' @export
 orbi_segment_blocks <- function(dataset) {
 
 }
@@ -408,7 +442,7 @@ orbi_segment_blocks <- function(dataset) {
 #'
 #' FIXME: fully document
 #'
-#' @inheritParams orbi_get_blocks_info
+#' @inheritParams orbi_adjust_block
 #' @export
 orbi_get_blocks_info <- function(dataset) {
 
@@ -447,15 +481,12 @@ number_data_groups <- function(dataset) {
 # helper function to find blocks (internal)
 find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min, startup_time.min) {
 
-  # add safety checks for dataset
-  # FIXME
-
   # find blocks
   dataset |>
     dplyr::group_by(.data$filename) |>
     dplyr::summarize(max_time.min = max(.data$time.min)) |>
     dplyr::mutate(
-      intervals = purrr::map(.data$max_time.min, ~{
+      intervals = map(.data$max_time.min, ~{
         # do we have a startup block?
         if (startup_time.min > 0) {
           startup_block <- dplyr::tibble(
@@ -503,14 +534,14 @@ find_intervals <- function(total_time, intervals) {
   if ( (remainder <- total_time - sum(lengths)) > 0) {
     # add a little extra add the end to make sure that interval includes all data
     lengths <- c(lengths, remainder + 1e-2)
-    idx <- c(idx, (tail(idx, 1) %% length(intervals)) + 1L)
+    idx <- c(idx, (utils::tail(idx, 1) %% length(intervals)) + 1L)
   }
 
   # assemble the totals
   dplyr::tibble(
     interval = seq_along(lengths),
     idx = idx,
-    start = c(0, cumsum(head(lengths, -1))),
+    start = c(0, cumsum(utils::head(lengths, -1))),
     length = lengths,
     end = .data$start + .data$length
   )

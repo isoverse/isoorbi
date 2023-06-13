@@ -329,7 +329,7 @@ orbi_calculate_ratios <- function(
 #' @description Contains the logic to generate the results table. It passes the  `ratio_method` parameter to the [orbi_calculate_ratios()] function for ratio calculations.
 #' @param dataset A tibble from `IsoX` output ([orbi_read_isox()]) and with a basepeak already defined (using `orbi_define_basepeak()`). Optionally, with block definitions ([orbi_define_blocks_for_dual_inlet()]) or even additional block segments ([orbi_segment_blocks()]).
 #' @inheritParams orbi_calculate_ratios
-#' @param .by additional grouping columns for the results summary (akin to [dplyr's `.by` parameter][dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
+#' @param .by additional grouping columns for the results summary (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")

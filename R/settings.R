@@ -7,8 +7,12 @@
 #'
 #' @param di_ref_name the text label for dual inlet reference blocks
 #' @param di_sample_name the text label for dual inlet sample blocks
+#' @param data_type_data the text used to flag raw data as actually being data
+#' @param data_type_startup the text used to flag raw data as being part of the startup
+#' @param data_type_changeover the text used to flag raw data as being part of a changeover
+#' @param data_type_unused the text used to flag raw data as being unused
 #' @param reset_all if set to TRUE, will reset all settings back to their defaults
-#' @return invisible list of all settings (see \link{orbi_get_settings()})
+#' @return invisible list of all settings (see [orbi_get_settings()])
 #' @export
 orbi_set_settings <- function(
     di_ref_name = "ref",
@@ -48,7 +52,7 @@ orbi_get_settings <- function(pattern = NULL) {
   all_opts <- options()
   pkg_pattern <- sprintf("^%s", get_pkg_settings_prefix())
   pkg_options <- all_opts[grepl(pkg_pattern, names(all_opts))]
-  pkg_options <- pkg_options |> setNames(gsub(pkg_pattern, "", names(pkg_options)))
+  pkg_options <- pkg_options |> stats::setNames(gsub(pkg_pattern, "", names(pkg_options)))
   if (!is.null(pattern)) {
     pkg_options <- pkg_options[grepl(pattern, names(pkg_options))]
   }
@@ -82,6 +86,6 @@ setting <- function(name) {
 
 # set package setting (internal function)
 set_setting <- function(name, value) {
-  options(list(value) |> setNames(paste0(get_pkg_settings_prefix(), name)))
+  options(list(value) |> stats::setNames(paste0(get_pkg_settings_prefix(), name)))
   return(invisible(value))
 }
