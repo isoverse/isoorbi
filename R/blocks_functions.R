@@ -11,10 +11,10 @@
 #' @param sample_block_name placeholder
 #'
 #' @return A data frame (tibble) with block annotations in the form of the additional columns described below:
+#' * `data_group` is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like [orbi_adjust_block()] and [orbi_segment_blocks()] will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
 #' * `block` is an integer counting the data blocks in each file (0 is the startup block)
 #' * `sample_name` is the name of the material being measured as defined by the `ref_block_name` and `sample_block_name` parameters
 #' * `segment` is an integer defines segments within individual blocks - this will be `NA` until the optional [orbi_segment_blocks()] is called
-#' * `data_group` is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like [orbi_adjust_block()] and [orbi_segment_blocks()] will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
 #' * `data_type` is a text value describing the type of data in each `data_group` - for a list of the main categories, call `orbi_get_settings("data_type")`
 #' @export
 orbi_define_blocks_for_dual_inlet <- function(
@@ -54,7 +54,6 @@ orbi_define_blocks_for_dual_inlet <- function(
 
   # get blocks
   blocks <- dataset |>
-    dplyr::group_by(.data$filename) |>
     find_blocks(
       ref_block_time.min = ref_block_time.min,
       sample_block_time.min = sample_block_time.min,
@@ -84,7 +83,12 @@ orbi_define_blocks_for_dual_inlet <- function(
     scans |>
     # assign blocks (all time values should be covered)
     dplyr::left_join(blocks, by = "filename", multiple = "all") |>
-    dplyr::filter(.data$time.min >= .data$start & .data$time.min < .data$end) |>
+    # find right blocks for data
+    dplyr::filter(
+      .data$time.min >= .data$start &
+        ((!.data$last & .data$time.min < .data$end) |
+           (.data$last & .data$time.min <= .data$end))
+    ) |>
     # add additional columns
     dplyr::mutate(
       # identify changeover scans
@@ -103,16 +107,16 @@ orbi_define_blocks_for_dual_inlet <- function(
         as.factor()
     ) |>
     # assign data groups
-    group_by(.data$filename) |>
-    mutate(
+    dplyr::group_by(.data$filename) |>
+    dplyr::mutate(
       .grouping = paste(.data$block, .data$segment, .data$data_type) |> factor_in_order() |> as.integer(),
       data_group = cumsum(c(0L, diff(.data$.grouping)) != 0) + 1L
     ) |>
-    ungroup()
+    dplyr::ungroup()
 
   # info message
   sprintf(
-    "orbi_define_blocks_for_dual_inlet() identified %d data blocks (%s '%s', %s '%s') in data from %d file(s)",
+    "orbi_define_blocks_for_dual_inlet() identified %d blocks (%s '%s', %s '%s') in data from %d file(s)",
     blocks |> dplyr::filter(.data$block > 0) |> nrow(),
     blocks |> dplyr::filter(.data$block > 0, .data$sample_name == ref_block_name) |> nrow(), ref_block_name,
     blocks |> dplyr::filter(.data$block > 0, .data$sample_name == sample_block_name) |> nrow(), sample_block_name,
@@ -436,6 +440,7 @@ orbi_adjust_block <- function(
 #' @export
 orbi_segment_blocks <- function(dataset) {
 
+
 }
 
 #' Summarize blocks info
@@ -470,54 +475,82 @@ orbi_get_blocks_info <- function(dataset) {
 
 # internal functions ------------
 
-# helper function to number data gruops (internal)
-number_data_groups <- function(dataset) {
-
-  # add safety checks for dataset
-  # FIXME: needs to be implemented
-
-}
-
 # helper function to find blocks (internal)
-find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min, startup_time.min) {
+find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref_block_time.min, startup_time.min = 0) {
+
+  # type checks
+  stopifnot(
+    "`dataset` must be a data frame or tibble" =
+      !missing(dataset) && is.data.frame(dataset),
+    "`ref_block_time.min` must be a single positive number" =
+      !missing(ref_block_time.min) && rlang::is_scalar_double(ref_block_time.min) && ref_block_time.min > 0,
+    "`sample_block_time.min` must be a single positive number" =
+      rlang::is_scalar_double(sample_block_time.min) && sample_block_time.min > 0,
+    "`startup_time.min` must be a single number (>= 0)" =
+      rlang::is_scalar_double(startup_time.min) && startup_time.min >= 0
+  )
+
+  # dataset columns check
+  req_cols <- c("filename", "time.min")
+  if (length(missing <- setdiff(req_cols, names(dataset)))) {
+    sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
+      rlang::abort()
+  }
 
   # find blocks
+  find_file_blocks <- function(tmin, tmax) {
+    # non-startup blocks
+    blocks <- find_intervals(
+      # only consider the total time without the startup
+      total_time = tmax - startup_time.min,
+      # just 2 blocks: ref and sample
+      intervals = c(ref_block_time.min, sample_block_time.min)
+    ) |>
+      # bring tmin and startup time back into the start/end
+      dplyr::mutate(
+        start = .data$start + startup_time.min,
+        last = dplyr::n() == dplyr::row_number()
+      )
+
+    # do we have a startup block?
+    if (startup_time.min > 0) {
+      startup_block <- dplyr::tibble(
+        interval = 0, idx = 0, start = 0,
+        length = startup_time.min, last = FALSE
+      )
+      blocks <- dplyr::bind_rows(startup_block, blocks) |>
+        dplyr::relocate("last", .after = dplyr::last_col())
+    }
+
+    # return
+    blocks |>
+      # recalculate end for all blocks
+      dplyr::mutate(end = .data$start + .data$length) |>
+      # interval for this purpose is called a block
+      dplyr::rename(block = "interval") |>
+      # exclude blocks that cannot possibily be in the file
+      dplyr::filter(.data$end > tmin)
+  }
+
+  # find blocks by filename
   dataset |>
     dplyr::group_by(.data$filename) |>
-    dplyr::summarize(max_time.min = max(.data$time.min)) |>
-    dplyr::mutate(
-      intervals = map(.data$max_time.min, ~{
-        # do we have a startup block?
-        if (startup_time.min > 0) {
-          startup_block <- dplyr::tibble(
-            interval = 0,
-            idx = 0,
-            start = 0,
-            length = startup_time.min,
-            end = startup_time.min
-          )
-        }
-        # all other blocks
-        blocks <- find_intervals(
-          # only consier for blocks the total time minus the start
-          total_time = .x - startup_time.min,
-          # just 2 blocks: ref and sample
-          intervals = c(ref_block_time.min, sample_block_time.min)
-        ) |>
-          # bring startup time back into the start/end
-          dplyr::mutate(start = .data$start + startup_time.min, end = .data$start + .data$length)
-
-        # return
-        dplyr::bind_rows(startup_block, blocks) |>
-          # interval for this purpose is called a block
-          dplyr::rename(block = "interval")
-      })
+    dplyr::summarize(
+      min_time.min = min(.data$time.min),
+      max_time.min = max(.data$time.min),
+      intervals = list(find_file_blocks(.data$min_time.min, .data$max_time.min))
     ) |>
     tidyr::unnest(.data$intervals)
 }
 
 # general helper function to divide up time into intervals (internal)
 find_intervals <- function(total_time, intervals) {
+
+  # safety checks
+  stopifnot(
+    "`total_time` must a single number" = !missing(total_time) && rlang::is_scalar_double(total_time),
+    "`intervals` must be one or more numbers" = !missing(intervals) && is.numeric(intervals) && length(intervals) >= 1L
+  )
 
   # find how many times the whole sequence of intervals fits inside the total time
   sequence_time <- sum(intervals)
@@ -531,9 +564,13 @@ find_intervals <- function(total_time, intervals) {
   idx <- c(idx, seq_along(intervals)[remaining_intervals])
 
   # check for incomplete final interval
-  if ( (remainder <- total_time - sum(lengths)) > 0) {
-    # add a little extra add the end to make sure that interval includes all data
-    lengths <- c(lengths, remainder + 1e-2)
+  if (rlang::is_empty(lengths)) {
+    # no interval fits in
+    lengths <- total_time
+    idx <- 1L
+  } else if ( (remainder <- total_time - sum(lengths)) > 0) {
+    # some residual in the last interval
+    lengths <- c(lengths, remainder)
     idx <- c(idx, (utils::tail(idx, 1) %% length(intervals)) + 1L)
   }
 
