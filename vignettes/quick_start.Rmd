@@ -44,32 +44,3 @@ df.results <- df.clean |>
   orbi_summarize_results(ratio_method = "sum")
 
 ```
-
-
-```{r}
-df.simple |>
-  orbi_define_basepeak(basepeak_def = "M0")|> 
-  mutate(block = "bla", segment = "hello") |>
-  group_by(filename, segment, compound) |>
-  orbi_summarize_results(ratio_method = "sum", starts_with("bla"))
-```
-
-
-
-```{r, include=FALSE, echo=FALSE, message=FALSE} 
-#Temporary tests for optional grouping
-df.simple$segment <- NA
-df.simple$block <- NA
-df.simple$injection <- NA
-df.simple[df.simple$time.min <0.5,]$block <- "one"
-df.simple[df.simple$time.min >0.5,]$block <- "two"
-df.simple[df.simple$time.min <0.4,]$segment <- "one"
-df.simple[df.simple$time.min >0.4,]$segment <- "twoo"
-df.simple[df.simple$time.min <0.3,]$injection <- "onesy"
-df.simple[df.simple$time.min >0.3,]$injection <- "2sy"
-df.simple$block <- as.factor(df.simple$block)
-df.simple$injection <- as.factor(df.simple$injection)
-df.simple$segment <- as.factor(df.simple$segment)
-
-```
-
