@@ -68,7 +68,7 @@ orbi_define_blocks_for_dual_inlet <- function(
       # identify changeover scans
       changeover = .data$block > 1 & (.data$time.min - .data$start) <= change_over_time.min,
       # segments (none so far)
-      segment = NA_real_,
+      segment = NA_integer_,
       # data type
       data_type =
         dplyr::case_when(
@@ -120,7 +120,7 @@ orbi_define_blocks_for_dual_inlet <- function(
 #' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
 #' @param block the block for which to adjust the start and/or end
 #' @param filename needs to be specified only if the `dataset` has more than one `filename`
-#' @return A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segement` column set to `NA`) to avoid unintended side effects.
+#' @return A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
 orbi_adjust_block <- function(
     dataset, block, filename = NULL,
@@ -130,23 +130,55 @@ orbi_adjust_block <- function(
     set_start_scan.no = NULL, set_end_scan.no = NULL
 ) {
 
-  # provide parameters safety checks
-  # dataset as data frame
-  # dataset has needed columns
-  # FIXME
+  # type checks
+  stopifnot(
+    "`dataset` must be a data frame or tibble" =
+      !missing(dataset) && is.data.frame(dataset),
+    "`block` must be a single integer" =
+      !missing(block) && rlang::is_scalar_integerish(block),
+    "if set, `filename` must be a single string" =
+      is.null(filename) || rlang::is_scalar_character(filename),
+    "if set, `shift_start_time.min` must be a single number" =
+      is.null(shift_start_time.min) || rlang::is_scalar_double(shift_start_time.min),
+    "if set, `shift_end_time.min` must be a single number" =
+      is.null(shift_end_time.min) || rlang::is_scalar_double(shift_end_time.min),
+    "if set, `shift_start_scan.no` must be a single integer" =
+      is.null(shift_start_scan.no) || rlang::is_scalar_integerish(shift_start_scan.no),
+    "if set, `shift_end_scan.no` must be a single integer" =
+      is.null(shift_end_scan.no) || rlang::is_scalar_integerish(shift_end_scan.no),
+    "if set, `set_start_time.min` must be a single number" =
+      is.null(set_start_time.min) || rlang::is_scalar_double(set_start_time.min),
+    "if set, `set_end_time.min` must be a single number" =
+      is.null(set_end_time.min) || rlang::is_scalar_double(set_end_time.min),
+    "if set, `set_start_scan.no` must be a single integer" =
+      is.null(set_start_scan.no) || rlang::is_scalar_integerish(set_start_scan.no),
+    "if set, `set_end_scan.no` must be a single integer" =
+      is.null(set_end_scan.no) || rlang::is_scalar_integerish(set_end_scan.no)
+  )
+  block <- as.integer(block)
+  shift_start_scan.no <- as.integer(shift_start_scan.no)
+  shift_end_scan.no <- as.integer(shift_end_scan.no)
+  set_start_scan.no <- as.integer(set_start_scan.no)
+  set_end_scan.no <- as.integer(set_end_scan.no)
+
+  # dataset columns check
+  req_cols <- c("filename", "scan.no", "time.min", "data_group", "block",
+                "sample_name", "data_type", "segment")
+  if (length(missing <- setdiff(req_cols, names(dataset)))) {
+    sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
+      rlang::abort()
+  }
 
   # get scans with blocks and data types from the data set
   scans <- dataset |>
-    dplyr::select(
-      "filename", "scan.no", "time.min",
-      "data_group", "block", "sample_name", "data_type", "segment") |>
+    dplyr::select(!!!req_cols) |>
     dplyr::distinct()
 
-  # filename check
+  # filename value check
   if (length(unique(scans$filename)) > 1 && is.null(filename)) {
-    stop("dataset has data from more than 1 file - specify the 'filename' parameter for block adjustment", call. = FALSE)
+    rlang::abort("`dataset` has data from more than 1 file - specify the `filename` argument for block adjustment")
   } else if (!is.null(filename) && !filename %in% scans$filename) {
-    stop("provided filename is not in this dataset", call. = FALSE)
+    rlang::abort("provided `filename` is not in this `dataset`")
   } else if (is.null(filename)) {
     # there's only one filename -- assign it
     filename <- scans$filename[1]
@@ -160,15 +192,16 @@ orbi_adjust_block <- function(
 
   # block number check
   if (!block %in% file_scans$block)
-    stop("provided block number is not in this dataset", call. = FALSE)
+    rlang::abort("provided `block` is not in this `dataset`")
 
   # start/end definitions safety checks
-  start_changes <- sum(!is.null(shift_start_time.min), !is.null(shift_start_scan.no), !is.null(set_start_time.min), !is.null(set_start_scan.no))
-  end_changes <- sum(!is.null(shift_end_time.min), !is.null(shift_end_scan.no), !is.null(set_end_time.min), !is.null(set_end_scan.no))
+  start_changes <- sum(!rlang::is_empty(shift_start_time.min), !rlang::is_empty(shift_start_scan.no), !rlang::is_empty(set_start_time.min), !rlang::is_empty(set_start_scan.no))
+  end_changes <- sum(!rlang::is_empty(shift_end_time.min), !rlang::is_empty(shift_end_scan.no), !rlang::is_empty(set_end_time.min), !rlang::is_empty(set_end_scan.no))
   if (start_changes > 1)
-    stop("only provide ONE of the following to change the block start: shift_start_time, shift_start_scan, set_start_time, set_start_scan", call. = FALSE)
+    rlang::abort("only provide ONE of the following to change the block start: `shift_start_time.min`, `shift_start_scan.no`, `set_start_time.min`, `set_start_scan.no`")
   if (end_changes > 1)
-    stop("only provide ONE of the following to change the block end: shift_end_time, shift_end_scan, set_end_time, set_end_scan", call. = FALSE)
+    rlang::abort("only provide ONE of the following to change the block end: `shift_end_time.min`, `shift_end_scan.no`, `set_end_time.min`, `set_end_scan.no`")
+
 
   # find old start/end
   block_scans <- file_scans |>
@@ -188,26 +221,39 @@ orbi_adjust_block <- function(
   new_end_time <- NA_real_
 
   # small helpers for scan <--> time interconversion
-  find_scan_from_time <- function(time, which = c("first", "last")) {
+  find_scan_from_time <- function(time, which = c("start", "end")) {
     time_scans <- file_scans |>
       dplyr::filter(
-        (!!which == "first" & .data$time.min >= !!time) |
-          (!!which == "last" & .data$time.min < !!time)
+        (!!which == "start" & .data$time.min >= !!time) |
+          (!!which == "end" & .data$time.min < !!time)
       ) |> dplyr::pull(scan.no)
-    if (which == "first") return(head(time_scans, 1))
-    else return(tail(time_scans, 1))
+    time_scan <-
+      if (which == "start") head(time_scans, 1)
+      else tail(time_scans, 1)
+
+    # safety check
+    if (rlang::is_empty(time_scan)) {
+      sprintf("invalid %s time (%s minutes) for file '%s' - the time ranges from %s to %s minutes",
+              which, signif(time), filename,
+              signif(min(file_scans$time.min)),
+              signif(max(file_scans$time.min))) |>
+        rlang::abort()
+    }
+
+    # return
+    return(time_scan)
   }
 
   # find new start
-  if (!is.null(shift_start_time.min)) {
+  if (!rlang::is_empty(shift_start_time.min)) {
     new_start_time <- old_start_time + shift_start_time.min
-    new_start_scan <- find_scan_from_time(new_start_time, "first")
-  } else if (!is.null(set_start_time.min)) {
+    new_start_scan <- find_scan_from_time(new_start_time, "start")
+  } else if (!rlang::is_empty(set_start_time.min)) {
     new_start_time <- set_start_time.min
-    new_start_scan <- find_scan_from_time(new_start_time, "first")
-  } else if (!is.null(shift_start_scan.no)) {
+    new_start_scan <- find_scan_from_time(new_start_time, "start")
+  } else if (!rlang::is_empty(shift_start_scan.no)) {
     new_start_scan <- old_start_scan + shift_start_scan.no
-  } else if (!is.null(set_start_scan.no)) {
+  } else if (!rlang::is_empty(set_start_scan.no)) {
     new_start_scan <- set_start_scan.no
   } else {
     # no change
@@ -215,15 +261,15 @@ orbi_adjust_block <- function(
   }
 
   # find new end
-  if (!is.null(shift_end_time.min)) {
+  if (!rlang::is_empty(shift_end_time.min)) {
     new_end_time <- old_end_time + shift_end_time.min
-    new_end_scan <- find_scan_from_time(new_end_time, "last")
-  } else if (!is.null(set_end_time.min)) {
+    new_end_scan <- find_scan_from_time(new_end_time, "end")
+  } else if (!rlang::is_empty(set_end_time.min)) {
     new_end_time <- set_end_time.min
-    new_end_scan <- find_scan_from_time(new_end_time, "last")
-  } else if (!is.null(shift_end_scan.no)) {
+    new_end_scan <- find_scan_from_time(new_end_time, "end")
+  } else if (!rlang::is_empty(shift_end_scan.no)) {
     new_end_scan <- old_end_scan + shift_end_scan.no
-  } else if (!is.null(set_end_scan.no)) {
+  } else if (!rlang::is_empty(set_end_scan.no)) {
     new_end_scan <- set_end_scan.no
   } else {
     # no change
@@ -232,16 +278,18 @@ orbi_adjust_block <- function(
 
   # pull out scan rows (and safety check along the way)
   get_scan_row <- function(scan) {
-    scan_row <- file_scans |>
-      dplyr::filter(.data$scan.no == !!scan)
+    if (!rlang::is_empty(scan)) {
+      scan_row <- file_scans |>
+        dplyr::filter(.data$scan.no == !!scan)
 
-    if (nrow(scan_row) == 1L)
-      return(scan_row)
+      if (nrow(scan_row) == 1L)
+        return(scan_row)
+    }
 
     # scan not found --> error
-    sprintf("file %s does not contain scan# %s - the scans range from %s to %s",
+    sprintf("file '%s' does not contain scan# %s - the scans range from %s to %s",
             filename, scan, min(file_scans$scan.no), max(file_scans$scan.no)) |>
-      stop(call. = FALSE)
+      rlang::abort()
   }
   old_start_row <- get_scan_row(old_start_scan)
   new_start_row <- get_scan_row(new_start_scan)
@@ -253,7 +301,7 @@ orbi_adjust_block <- function(
   if (new_end_scan <= new_start_scan) {
     sprintf("invalid scan range adjustment requested for block %d in file %s (start: %s end: %s) - block cannot end before it starts",
             block, filename, new_start_scan, new_end_scan) |>
-      stop(call. = FALSE)
+      rlang::abort()
   }
 
   # summarize what needs to happen
@@ -301,7 +349,8 @@ orbi_adjust_block <- function(
   # FIXME: should there be a flag to identify altered block boundaries?
   updated_file_scans <- file_scans |>
     dplyr::mutate(
-      segment = NA_real_,
+      # update segment
+      segment = NA_integer_,
       # update data type
       data_type = dplyr::case_when(
         # new data range

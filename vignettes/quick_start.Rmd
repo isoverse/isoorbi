@@ -5,8 +5,10 @@ description: >
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Quick start guide}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -37,9 +39,19 @@ df.clean <- df.filtered |> orbi_filter_satellite_peaks() |>
                             orbi_filter_scan_intensity(outlier_percent = 10)
 
 # Define base peak and calculate the results table
-df.results <- df.clean |> orbi_define_basepeak(basepeak_def = "M0")|> 
-                              orbi_summarize_results(ratio_method = "sum")
+df.results <- df.clean |> 
+  orbi_define_basepeak(basepeak_def = "M0")|> 
+  orbi_summarize_results(ratio_method = "sum")
 
+```
+
+
+```{r}
+df.simple |>
+  orbi_define_basepeak(basepeak_def = "M0")|> 
+  mutate(block = "bla", segment = "hello") |>
+  group_by(filename, segment, compound) |>
+  orbi_summarize_results(ratio_method = "sum", starts_with("bla"))
 ```
 
 
