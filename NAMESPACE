@@ -2,6 +2,7 @@
 
 export(factor_in_order)
 export(orbi_adjust_block)
+export(orbi_calculate_ratio)
 export(orbi_calculate_ratios)
 export(orbi_define_basepeak)
 export(orbi_define_blocks_for_dual_inlet)

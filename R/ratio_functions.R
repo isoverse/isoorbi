@@ -243,7 +243,8 @@ calculate_ratios_weighted_sum <- function(x, y) {
 }
 
 
-#' @title Calculate isotopocule ratios
+#' @title Calculate isotopocule ratio
+#'
 #' @description This function calculates the ratio of two isotopocules (the `numerator` and `denominator`) by averaging multiple measurements of each using the `ratio_method` and returns a single value. Normally this function is not called directly by the user, but via the function [orbi_summarize_results()], which calculates isotopocule ratios and other results for an entire dataset.
 #'
 #' @param numerator Column(s) used as numerator; contains ion counts
@@ -268,7 +269,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
 #'   orbi_simplify_isox() |>
 #'   orbi_define_basepeak(basepeak_def = "M0")
 #'
-#' ratio <- orbi_calculate_ratios(
+#' ratio <- orbi_calculate_ratio(
 #'    numerator = df$ions.incremental,
 #'    denominator = df$basepeak_ions,
 #'    ratio_method = "sum")
@@ -276,7 +277,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
 #' @return Single value ratio between the isotopocules defined as `numerator` and `denominator` calculated using the `ratio_method`.
 #'
 #' @export
-orbi_calculate_ratios <- function(
+orbi_calculate_ratio <- function(
     numerator, denominator,
     ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
 
@@ -325,8 +326,19 @@ orbi_calculate_ratios <- function(
 
 }
 
+#' Calculate isotopocule ratios
+#'
+#' `r lifecycle::badge("deprecated")` This function was renamed to [orbi_calculate_ratio()] to better reflect what it does.
+#'
+#' @param ... parameters passed on to new function orbi_calculate_ratio()
+#' @export
+orbi_calculate_ratios <- function(...) {
+  lifecycle::deprecate_warn("1.1.0", "orbi_calculate_ratios()", "orbi_calculate_ratio()")
+  orbi_calculate_ratio(...)
+}
+
 #' @title Generate the results table
-#' @description Contains the logic to generate the results table. It passes the  `ratio_method` parameter to the [orbi_calculate_ratios()] function for ratio calculations.
+#' @description Contains the logic to generate the results table. It passes the  `ratio_method` parameter to the [orbi_calculate_ratio()] function for ratio calculations.
 #' @param dataset A tibble from `IsoX` output ([orbi_read_isox()]) and with a basepeak already defined (using `orbi_define_basepeak()`). Optionally, with block definitions ([orbi_define_blocks_for_dual_inlet()]) or even additional block segments ([orbi_segment_blocks()]).
 #' @inheritParams orbi_calculate_ratios
 #' @param .by additional grouping columns for the results summary (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
@@ -417,7 +429,7 @@ orbi_summarize_results <- function(
         end_time.min = max(.data$time.min),
 
         # ratio calculation
-        ratio = orbi_calculate_ratios(
+        ratio = orbi_calculate_ratio(
           .data$ions.incremental,
           .data$basepeak_ions,
           ratio_method = !!ratio_method

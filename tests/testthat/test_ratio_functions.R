@@ -199,40 +199,40 @@ test_that("calculate_weighted.vector.sum() tests", {
 })
 
 # orbi_calculate_ratios
-test_that("orbi_calculate_ratios() tests", {
+test_that("orbi_calculate_ratio() tests", {
 
   a <- 1:10
   b <- 1:10
 
   # success
-  expect_equal(orbi_calculate_ratios(a, b, "mean"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "sum"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "slope"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "geometric_mean"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "weighted_sum"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "median"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "mean"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "sum"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "slope"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "geometric_mean"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "weighted_sum"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "median"), 1)
 
   # failure
   expect_error(
-    orbi_calculate_ratios(a, b, "median2"),
+    orbi_calculate_ratio(a, b, "median2"),
     "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`",
     fixed = TRUE
   )
 
-  expect_error(orbi_calculate_ratios(),
+  expect_error(orbi_calculate_ratio(),
                "no input for numerator supplied",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(numerator = a),
+  expect_error(orbi_calculate_ratio(numerator = a),
                "no input for denominator supplied",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(numerator =  as.character(a),
+  expect_error(orbi_calculate_ratio(numerator =  as.character(a),
                                      denominator = b),
                "numerator must be a numeric vector",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(numerator =  a,
+  expect_error(orbi_calculate_ratio(numerator =  a,
                                      denominator = as.character(b)),
                "denominator must be a numeric vector",
                fixed = TRUE)
