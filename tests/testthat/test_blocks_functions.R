@@ -225,3 +225,65 @@ test_that("test orbi_adjust_block()", {
   expect_equal(result3$data_type, test_data$data_type)
   expect_equal(result3$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 })
+
+test_that("test orbi_segment_block()", {
+
+  # type checks
+  expect_error(orbi_segment_blocks(), "`dataset` must be a data frame or tibble")
+  expect_error(orbi_segment_blocks(42), "`dataset` must be a data frame or tibble")
+  expect_error(orbi_segment_blocks(tibble(), into_segments = "42"), "`into_segments` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), into_segments = -42), "`into_segments` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), into_segments = 4.2), "`into_segments` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), into_segments = c(42, 42)), "`into_segments` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), by_scans = "42"), "`by_scans` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), by_scans = -42), "`by_scans` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), by_scans = 4.2), "`by_scans` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), by_scans = c(42, 42)), "`by_scans` must be a single positive integer")
+  expect_error(orbi_segment_blocks(tibble(), by_time_interval = "42"), "`by_time_interval` must be a single positive number")
+  expect_error(orbi_segment_blocks(tibble(), by_time_interval = -42), "`by_time_interval` must be a single positive number")
+  expect_error(orbi_segment_blocks(tibble(), by_time_interval = c(42, 42)), "`by_time_interval` must be a single positive number")
+  expect_error(orbi_segment_blocks(tibble()), "`dataset` is missing the column")
+  empty_data <- tibble(filename = character(), scan.no = integer(), time.min = numeric(), block = integer(), sample_name = character(), data_type = character())
+  expect_error(orbi_segment_blocks(empty_data), "set one of the 3 ways to segment")
+  expect_error(orbi_segment_blocks(empty_data, into_segments = 5, by_scans = 10), "only set ONE of the 3 ways to segment")
+
+  # results check
+  test_data <- tibble(
+    filename = rep(c("test1", "test2"), c(6, 4)),
+    scan.no = 1:10, time.min = scan.no^2/10,
+    block = rep(c(1L, 2L, 1L), c(4, 2, 4)),
+    sample_name = c("test"),
+    data_type = rep(c("unused", "data"), c(2, 8))
+  )
+
+  expect_message(res1 <- test_data |> orbi_segment_blocks(into_segments = 2), "segmented 3 data blocks.*2 segments")
+  expect_equal(
+    res1,
+    test_data |> dplyr::mutate(
+      data_group = c(1L, 1:5, 1L, 1L, 2L, 2L),
+      segment = c(NA, NA, 1:2, 1:2, 1L, 1L, 2L, 2L)
+    ) |> dplyr::relocate(data_group, .before = "block")
+  )
+
+  expect_message(res2 <- test_data |> orbi_segment_blocks(by_scans = 2), "segmented 3 data blocks.*2 scans")
+  expect_equal(
+    res2,
+    test_data |> dplyr::mutate(
+      data_group = rep(c(1:3, 1:2), each = 2),
+      segment = rep(c(NA, 1L, 2L), c(2, 6, 2)),
+    ) |> dplyr::relocate(data_group, .before = "block")
+  )
+
+  expect_message(res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0), "segmented 3 data blocks.*2.3 segments")
+  expect_equal(
+    res3,
+    test_data |> dplyr::mutate(
+      data_group = c(1L, 1L, 2L, 2L, 3L, 4L, 1:4),
+      segment = c(NA, NA, 1L, 1L, 1:2, 1:2, 4, 6),
+    ) |> dplyr::relocate(data_group, .before = "block")
+  )
+
+
+
+})
+

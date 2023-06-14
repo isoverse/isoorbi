@@ -410,6 +410,13 @@ orbi_summarize_results <- function(
     df.stat <- df.group |>
 
       dplyr::summarize(
+
+        # time information
+        start_time.min = min(.data$time.min),
+        mean_time.min = mean(.data$time.min),
+        end_time.min = max(.data$time.min),
+
+        # ratio calculation
         ratio = orbi_calculate_ratios(
           .data$ions.incremental,
           .data$basepeak_ions,

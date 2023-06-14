@@ -107,12 +107,7 @@ orbi_define_blocks_for_dual_inlet <- function(
         as.factor()
     ) |>
     # assign data groups
-    dplyr::group_by(.data$filename) |>
-    dplyr::mutate(
-      .grouping = paste(.data$block, .data$segment, .data$data_type) |> factor_in_order() |> as.integer(),
-      data_group = cumsum(c(0L, diff(.data$.grouping)) != 0) + 1L
-    ) |>
-    dplyr::ungroup()
+    determine_data_groups()
 
   # info message
   sprintf(
@@ -196,8 +191,7 @@ orbi_adjust_block <- function(
   set_end_scan.no <- as.integer(set_end_scan.no)
 
   # dataset columns check
-  req_cols <- c("filename", "scan.no", "time.min", "data_group", "block",
-                "sample_name", "data_type", "segment")
+  req_cols <- c("filename", "scan.no", "time.min", "block", "sample_name", "data_type")
   if (length(missing <- setdiff(req_cols, names(dataset)))) {
     sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
       rlang::abort()
@@ -205,7 +199,7 @@ orbi_adjust_block <- function(
 
   # get scans with blocks and data types from the data set
   scans <- dataset |>
-    dplyr::select(!!!req_cols) |>
+    dplyr::select(!!!req_cols, dplyr::any_of("data_group"), dplyr::any_of("segment")) |>
     dplyr::distinct()
 
   # filename value check
@@ -254,37 +248,13 @@ orbi_adjust_block <- function(
   new_start_time <- NA_real_
   new_end_time <- NA_real_
 
-  # small helpers for scan <--> time interconversion
-  find_scan_from_time <- function(time, which = c("start", "end")) {
-    time_scans <- file_scans |>
-      dplyr::filter(
-        (!!which == "start" & .data$time.min >= !!time) |
-          (!!which == "end" & .data$time.min < !!time)
-      ) |> dplyr::pull(.data$scan.no)
-    time_scan <-
-      if (which == "start") utils::head(time_scans, 1)
-      else utils::tail(time_scans, 1)
-
-    # safety check
-    if (rlang::is_empty(time_scan)) {
-      sprintf("invalid %s time (%s minutes) for file '%s' - the time ranges from %s to %s minutes",
-              which, signif(time), filename,
-              signif(min(file_scans$time.min)),
-              signif(max(file_scans$time.min))) |>
-        rlang::abort()
-    }
-
-    # return
-    return(time_scan)
-  }
-
   # find new start
   if (!rlang::is_empty(shift_start_time.min)) {
     new_start_time <- old_start_time + shift_start_time.min
-    new_start_scan <- find_scan_from_time(new_start_time, "start")
+    new_start_scan <- find_scan_from_time(file_scans, new_start_time, "start")
   } else if (!rlang::is_empty(set_start_time.min)) {
     new_start_time <- set_start_time.min
-    new_start_scan <- find_scan_from_time(new_start_time, "start")
+    new_start_scan <- find_scan_from_time(file_scans, new_start_time, "start")
   } else if (!rlang::is_empty(shift_start_scan.no)) {
     new_start_scan <- old_start_scan + shift_start_scan.no
   } else if (!rlang::is_empty(set_start_scan.no)) {
@@ -297,10 +267,10 @@ orbi_adjust_block <- function(
   # find new end
   if (!rlang::is_empty(shift_end_time.min)) {
     new_end_time <- old_end_time + shift_end_time.min
-    new_end_scan <- find_scan_from_time(new_end_time, "end")
+    new_end_scan <- find_scan_from_time(file_scans, new_end_time, "end")
   } else if (!rlang::is_empty(set_end_time.min)) {
     new_end_time <- set_end_time.min
-    new_end_scan <- find_scan_from_time(new_end_time, "end")
+    new_end_scan <- find_scan_from_time(file_scans, new_end_time, "end")
   } else if (!rlang::is_empty(shift_end_scan.no)) {
     new_end_scan <- old_end_scan + shift_end_scan.no
   } else if (!rlang::is_empty(set_end_scan.no)) {
@@ -310,24 +280,9 @@ orbi_adjust_block <- function(
     new_end_scan <- old_end_scan
   }
 
-  # pull out scan rows (and safety check along the way)
-  get_scan_row <- function(scan) {
-    if (!rlang::is_empty(scan)) {
-      scan_row <- file_scans |>
-        dplyr::filter(.data$scan.no == !!scan)
-
-      if (nrow(scan_row) == 1L)
-        return(scan_row)
-    }
-
-    # scan not found --> error
-    sprintf("file '%s' does not contain scan# %s - the scans range from %s to %s",
-            filename, scan, min(file_scans$scan.no), max(file_scans$scan.no)) |>
-      rlang::abort()
-  }
-  old_start_row <- get_scan_row(old_start_scan)
-  new_start_row <- get_scan_row(new_start_scan)
-  new_end_row <- get_scan_row(new_end_scan)
+  old_start_row <- get_scan_row(file_scans, old_start_scan)
+  new_start_row <- get_scan_row(file_scans, new_start_scan)
+  new_end_row <- get_scan_row(file_scans, new_end_scan)
   new_start_time <- new_start_row$time.min
   new_end_time <- new_end_row$time.min
 
@@ -404,11 +359,10 @@ orbi_adjust_block <- function(
       sample_name = ifelse(
         .data$scan.no >= new_start_scan & .data$scan.no <= new_end_scan,
         old_start_row$sample_name, .data$sample_name
-      ),
-      # new data groups
-      .grouping = paste(.data$block, .data$segment, .data$data_type) |> factor_in_order() |> as.integer(),
-      data_group = cumsum(c(0L, diff(.data$.grouping)) != 0) + 1L
-    )
+      )
+    ) |>
+    # determine data groups
+    determine_data_groups()
 
   # combine with scans from other files
   updated_scans <-
@@ -420,7 +374,7 @@ orbi_adjust_block <- function(
   # combine with the whole dataset
   updated_dataset <-
     dataset |>
-    dplyr::select(-"data_group", -"block", -"sample_name", -"data_type", -"segment") |>
+    dplyr::select(-"block", -"sample_name", -"data_type", -dplyr::any_of("data_group"), -dplyr::any_of("segment")) |>
     dplyr::left_join(
       updated_scans |>
         dplyr::select(
@@ -434,13 +388,109 @@ orbi_adjust_block <- function(
   return(updated_dataset)
 }
 
-#' Segment blocks
+#' Segment data blocks
+#'
+#' This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with `data_type` set to "data" (`orbi_get_settings("data_type")`) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
 #'
 #' @inheritParams orbi_adjust_block
+#' @param into_segments segment each data block into this many segments. The result will have exactly this number of segments for each data block except for if there are more segments requested than observations in a group (in which case each observation will be one segment)
+#' @param by_scans segment each data block into segments spanning this number of scans. The result will be approximately the requested number of scans per segment, depending on what is the most sensible distribution of the data. For example, in a hypothetical data block with 31 scans, if by_scans = 10, this function will create 3 segments with 11, 10 and 10 scans each (most evenly distributed), instead of 4 segments with 10, 10, 10, 1 (less evenly distributed).
+#' @param by_time_interval segment each data block into segments spanning this time interval. The result will have the requested time interval for all segments except usually the last one which is almost always shorter than the requested interval.
 #' @export
-orbi_segment_blocks <- function(dataset) {
+orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, by_time_interval = NULL) {
 
+  # type checks
+  stopifnot(
+    "`dataset` must be a data frame or tibble" =
+      !missing(dataset) && is.data.frame(dataset),
+    "if set, `into_segments` must be a single positive integer" =
+      is.null(into_segments) || (rlang::is_scalar_integerish(into_segments) && into_segments > 0L),
+    "if set, `by_scans` must be a single positive integer" =
+      is.null(by_scans) || (rlang::is_scalar_integerish(by_scans) && by_scans > 0L),
+    "if set, `by_time_interval` must be a single positive number" =
+      is.null(by_time_interval) || (rlang::is_scalar_double(by_time_interval) && by_time_interval > 0)
+  )
+  into_segments <- as.integer(into_segments)
+  by_scans <- as.integer(by_scans)
 
+  # dataset columns check
+  req_cols <- c("filename", "scan.no", "time.min", "block", "sample_name", "data_type")
+  if (length(missing <- setdiff(req_cols, names(dataset)))) {
+    sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
+      rlang::abort()
+  }
+
+  # provide exactly one argument on how to segment
+  set_args <- sum(!rlang::is_empty(into_segments), !rlang::is_empty(by_time_interval), !rlang::is_empty(by_scans))
+  if (set_args == 0)
+    rlang::abort("set one of the 3 ways to segment: `into_segments`, `by_time_interval`, `by_scans`")
+  else if (set_args > 1)
+    rlang::abort("only set ONE of the 3 ways to segment: `into_segments`, `by_time_interval`, `by_scans`")
+
+  # get scans
+  scans <- dataset |>
+    dplyr::select(!!!req_cols) |>
+    dplyr::distinct() |>
+    # make sure it's in the correct order (for data group identification later)
+    dplyr::arrange(.data$filename, .data$scan.no)
+
+  # calculate segments
+  segmented_scans <-
+    scans |>
+    # segment
+    dplyr::group_by(.data$filename, .data$block, .data$data_type) |>
+    dplyr::mutate(
+      segment =
+        if(.data$data_type[1] == setting("data_type_data")) {
+          # data type is 'data'
+          if (!rlang::is_empty(!!into_segments)) {
+            segment_by_segs(.data$scan.no, !!into_segments)
+          } else if (!rlang::is_empty(!!by_scans)) {
+            segment_by_scans(.data$scan.no, !!by_scans)
+          } else {
+            segment_by_time_interval(.data$time.min, !!by_time_interval)
+          }
+        } else {
+          NA_integer_
+        }
+    ) |>
+    dplyr::ungroup() |>
+    # determine data groups
+    determine_data_groups()
+
+  # info message
+  info_sum <- segmented_scans |>
+    dplyr::filter(.data$block > 0, .data$data_type == setting("data_type_data")) |>
+    dplyr::select("filename", "block", "segment", "scan.no") |>
+    dplyr::distinct() |>
+    dplyr::count(.data$filename, .data$block, .data$segment) |>
+    dplyr::group_by(.data$filename, .data$block) |>
+    dplyr::summarise(
+      n_segments = n(),
+      n_scans_avg = mean(n),
+      .groups = "drop"
+    )
+  sprintf(
+    "orbi_segment_blocks() segmented %d data blocks in %d file(s) into %s segments / block (on average) with %s scans / segment (on average)",
+    info_sum |> nrow(), info_sum$filename |> unique() |> length(),
+    info_sum$n_segments |> mean() |> signif(2), info_sum$n_scans_avg |> mean() |> signif(2)
+  ) |> message()
+
+  # combine with the whole dataset
+  updated_dataset <-
+    dataset |>
+    dplyr::select(-"block", -"sample_name", -"data_type", -dplyr::any_of("data_group"), -dplyr::any_of("segment")) |>
+    dplyr::left_join(
+      segmented_scans |>
+        dplyr::select(
+          "filename", "scan.no",
+          "data_group", "block", "sample_name", "data_type", "segment"
+        ),
+      by = c("filename", "scan.no")
+    )
+
+  # return new dataset
+  return(updated_dataset)
 }
 
 #' Summarize blocks info
@@ -453,6 +503,12 @@ orbi_get_blocks_info <- function(dataset) {
 
   # FIXME: implement safety check on the dataset and needed columns
 
+  # type checks
+  stopifnot(
+    "`dataset` must be a data frame or tibble" =
+      !missing(dataset) && is.data.frame(dataset)
+  )
+
   # summarize block info
   dataset |>
     dplyr::group_by(.data$filename, .data$data_group, .data$block, .data$sample_name, .data$data_type, .data$segment) |>
@@ -463,13 +519,7 @@ orbi_get_blocks_info <- function(dataset) {
       end_time.min = max(.data$time.min),
       .groups = "drop"
     ) |>
-    dplyr::arrange(.data$filename, .data$start_scan.no) |>
-    dplyr::mutate(
-      label = ifelse(
-        .data$data_type == setting("data_type_data"),
-        .data$sample_name,
-        as.character(.data$data_type))
-    )
+    dplyr::arrange(.data$filename, .data$start_scan.no)
 }
 
 
@@ -584,3 +634,87 @@ find_intervals <- function(total_time, intervals) {
   )
 }
 
+# helper to find scan noumber from time
+# @param scans must be scans from a single file
+find_scan_from_time <- function(scans, time, which = c("start", "end")) {
+  time_scans <- scans |>
+    dplyr::filter(
+      (!!which == "start" & .data$time.min >= !!time) |
+        (!!which == "end" & .data$time.min < !!time)
+    ) |> dplyr::pull(.data$scan.no)
+  time_scan <-
+    if (which == "start") utils::head(time_scans, 1)
+  else utils::tail(time_scans, 1)
+
+  # safety check
+  if (rlang::is_empty(time_scan)) {
+    sprintf("invalid %s time (%s minutes) for file '%s' - the time ranges from %s to %s minutes",
+            which, signif(time), scans$filename[1],
+            signif(min(scans$time.min)),
+            signif(max(scans$time.min))) |>
+      rlang::abort()
+  }
+
+  # return
+  return(time_scan)
+}
+
+# pull out scan rows (and safety check along the way)
+# @param scans must be scans from a single file
+get_scan_row <- function(scans, scan) {
+  if (!rlang::is_empty(scan)) {
+    scan_row <- scans |>
+      dplyr::filter(.data$scan.no == !!scan)
+
+    if (nrow(scan_row) == 1L) {
+      return(scan_row)
+    } else if (nrow(scan_row) > 1L) {
+      sprintf("scan# %s not unique! should never get to this with only one file! %s",
+              scan, paste(unique(scans$filename), collapse = ", ")) |>
+        rlang::abort()
+    }
+  }
+  # scan not found --> error
+  sprintf("file '%s' does not contain scan# %s - the scans range from %s to %s",
+          scans$filename[1], scan, min(scans$scan.no), max(scans$scan.no)) |>
+    rlang::abort()
+}
+
+# internal function to determine data groups
+# @param dataset assumes is in the correct order
+determine_data_groups <- function(dataset) {
+  dataset |>
+    # assign data groups
+    dplyr::group_by(.data$filename) |>
+    dplyr::mutate(
+      .grouping = paste(.data$block, .data$segment, .data$data_type) |> factor_in_order() |> as.integer(),
+      data_group = cumsum(c(0L, diff(.data$.grouping)) != 0) + 1L
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::select(-".grouping")
+}
+
+# internal function to segment into a specific number of segments
+segment_by_segs <- function(scan.no, into_segments) {
+  idx <- seq_along(scan.no)
+  if(into_segments >= length(scan.no)) {
+    # more segments requested than total data points
+    # --> one segment per data point
+    return(idx)
+  } else {
+    divider <- length(scan.no) / into_segments
+    out <- as.integer((idx - 1L) %/% divider + 1L)
+    return(out)
+  }
+}
+
+# internal function to segment by scans
+segment_by_scans <- function(scan.no, by_scans) {
+  # approximates number of scans
+  return(segment_by_segs(scan.no, into_segments = round(length(scan.no) / by_scans)))
+}
+
+# internal function to segment by time interval
+segment_by_time_interval <- function(time.min, time_interval) {
+  return( as.integer((time.min - min(time.min)) %/% time_interval + 1L))
+}

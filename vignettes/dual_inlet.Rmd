@@ -46,6 +46,8 @@ df.clean <- df.filtered |> orbi_filter_satellite_peaks() |>
 
 # Examples (total DRAFT) for block definitions
 
+## Calculations
+
 The following code block contains functionality that is specific to processing data from dual inlet experiments
 
 ```{r}
@@ -54,7 +56,7 @@ orbi_set_settings(di_ref_name = "my ref")
 
 # define blocks
 df_w_blocks <-
-  # broad defintion
+  # general definition
   orbi_define_blocks_for_dual_inlet(
     df.simple,
     ref_block_time.min = 10,
@@ -72,56 +74,167 @@ blocks_info <- df_w_blocks |> orbi_get_blocks_info()
 blocks_info |> knitr::kable()
 ```
 
-## plot
+
+# Raw data plots
+
+## Plot 1: signal by block
 
 ```{r, fig.width=8, fig.height=4}
 # visualization
 library(ggplot2)
 library(dplyr)
 
-ggplot() +
-  # blocks background
-  # geom_rect(
-  #   data = blocks_info,
-  #   map = aes(
-  #     xmin = start_time.min,
-  #     xmax = end_time.min,
-  #     ymin = -Inf,
-  #     ymax = Inf,
-  #     fill = label
-  #   ), alpha = 0.5
-  # ) +
-  # blocks labels
-  # geom_label(
-  #   data = blocks_info |> filter(data_type == "data"),
-  #   map = aes(
-  #     x = (start_time.min + end_time.min) / 2,
-  #     y = Inf,
-  #     label = paste("block", block)
-  #   ), vjust = 1.5
-  # ) +
+df_w_blocks |> 
+  filter(isotopocule == "15N") |>
   # data
-  geom_line(
-    data = df_w_blocks |> filter(isotopocule == "15N"),
-    #map = aes(x = time.min, y = ions.incremental),
-    map = aes(x = time.min, y = ions.incremental, color = data_type, group = data_group)
-    #alpha = 0.2
-  ) +
+  ggplot() +
+  aes(x = time.min, y = ions.incremental, group = data_group, color = data_type) +
+  geom_line() +
   # scales
-  scale_x_continuous(breaks = scales::breaks_pretty(5), expand = c(0, 0)) +
+  scale_fill_brewer(palette = "Set1") +
+  scale_x_continuous(breaks = scales::breaks_pretty(8), expand = c(0, 0)) +
   theme_bw() +
   labs(x = "time [min]", y = "intensity")
 ```
 
+## Plot 2: highlight blocks
 
-Continue with analysis as usual
-
-# FIXME: this needs some adjustments
-
-```{r, message=FALSE, results='hide'}
-# # Define base peak and calculate the results table
-# df.results <-
-#   df.annotated  |> orbi_define_basepeak(basepeak_def = "15N") |>
-#   orbi_summarize_results(ratio_method = "sum")
+```{r, fig.width=8, fig.height=4}
+ggplot() +
+  # blocks background
+  geom_rect(
+    data = blocks_info,
+    map = aes(
+      xmin = start_time.min,
+      xmax = end_time.min,
+      ymin = -Inf,
+      ymax = Inf,
+      # use sample name for data blocks, otherwise data type
+      fill = ifelse(data_type == "data", sample_name, data_type)
+    ), alpha = 0.5
+  ) +
+  # data
+  geom_line(
+    data = df_w_blocks |> filter(isotopocule == "15N"),
+    map = aes(x = time.min, y = ions.incremental, group = data_group)
+  ) +
+  # scales
+  scale_fill_brewer(palette = "Set1") +
+  scale_x_continuous(breaks = scales::breaks_pretty(8), expand = c(0, 0)) +
+  theme_bw() +
+  labs(x = "time [min]", y = "intensity", fill = "block")
 ```
+
+# Ratio data
+
+```{r}
+# calculate results
+df_results <- 
+  df_w_blocks |>
+  # define base peak
+  orbi_define_basepeak(basepeak_def = "15N") |> 
+  # segment (optional)
+  orbi_segment_blocks(into_segments = 3) |>
+  # calculate results
+  orbi_summarize_results(ratio_method = "sum")
+```
+
+## Plot 1: ratios by block and segment
+
+```{r, fig.width=8, fig.height=7}
+df_results |>
+  filter(data_type == "data") |>
+  mutate(block_seg = paste0(block, ".", segment) |> forcats::as_factor()) |>
+  # data
+  ggplot() +
+  aes(x = block_seg, y = ratio, color = sample_name) +
+  geom_point(size = 2) +
+  facet_grid(isotopocule ~ ., scales = "free_y") +
+  # scales
+  scale_color_brewer(palette = "Set1") +
+  theme_bw() +
+  labs(x = "block.segment", y = "ratio")
+```
+
+## Plot 2: with block backgrounds and raw data
+
+```{r, fig.width=8, fig.height=6}
+# demonstrate use of a base plot
+base_plot <-
+  ggplot() +
+  # blocks background
+  geom_rect(
+    data = blocks_info,
+    map = aes(
+      xmin = start_time.min, xmax = end_time.min, ymin = -Inf, ymax = Inf,
+      fill = data_type
+    ), alpha = 0.5
+  ) +
+  # data
+  geom_point(
+    data = function(df) df |> filter(panel == "ratio"),
+    map = aes(x = mean_time.min, y = ratio, shape = sample_name),
+    size = 3
+  ) +
+  geom_line(
+    data = function(df) df |> filter(panel == "intensity"),
+    map = aes(x = time.min, y = ions.incremental)
+  ) +
+  facet_grid(panel ~ ., scales = "free_y") +
+  # scales
+  scale_fill_brewer(palette = "Set1") +
+  scale_x_continuous(breaks = scales::breaks_pretty(8), expand = c(0, 0)) +
+  theme_bw() +
+  labs(x = "time [min]", y = NULL, fill = "block")
+
+# with 17O data
+df_plot <-
+  df_w_blocks |>
+  mutate(panel = "intensity") |>
+  bind_rows(df_results |> mutate(panel = "ratio"))
+
+base_plot %+% filter(df_plot, isotopocule == "17O") + labs(title = "17O/15N")
+```
+
+```{r, fig.width=8, fig.height=6}
+# same but with 18O
+base_plot %+% filter(df_plot, isotopocule == "18O") + labs(title = "18O/15N")
+```
+
+## Plot 3: small scans
+
+```{r}
+# calculate ratios segmented with 5 scans at a time
+df_ratios <- 
+  df_w_blocks |>
+  # define base peak
+  orbi_define_basepeak(basepeak_def = "15N") |> 
+  # segment (optional)
+  orbi_segment_blocks(by_scans = 5) |>
+  # calculate results
+  orbi_summarize_results(ratio_method = "mean")
+```
+
+```{r, fig.width=8, fig.height=4}
+ggplot() +
+  # blocks background
+  geom_rect(
+    data = blocks_info,
+    map = aes(
+      xmin = start_time.min, xmax = end_time.min, ymin = -Inf, ymax = Inf,
+      fill = data_type
+    ), alpha = 0.5
+  ) +
+  # data
+  geom_line(
+    data = df_ratios |> filter(data_type == "data", isotopocule == "17O"),
+    map = aes(x = mean_time.min, y = ratio, group = block)
+  ) +
+  # scales
+  scale_fill_brewer(palette = "Set1") +
+  scale_x_continuous(breaks = scales::breaks_pretty(8), expand = c(0, 0)) +
+  theme_bw() +
+  labs(x = "time [min]", y = "ratio", fill = "block")
+```
+
 
