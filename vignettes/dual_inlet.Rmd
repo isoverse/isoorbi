@@ -32,8 +32,8 @@ df.simple <- orbi_simplify_isox(dataset = df)
 df.filtered <- df.simple |> orbi_filter_isox(
                               time_min = 0,
                               time_max = 75,
-                              compounds = "NO3-",
-                              isotopocules = c("15N", "18O", "17O")
+                              compounds = "NO3",
+                              isotopocules = c("M0", "15N", "18O", "17O")
                             )
 
 # Clean the data by removing noise and outliers
