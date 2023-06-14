@@ -32,10 +32,10 @@ orbi_define_blocks_for_dual_inlet(
 \value{
 A data frame (tibble) with block annotations in the form of the additional columns described below:
 \itemize{
+\item \code{data_group} is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like \code{\link[=orbi_adjust_block]{orbi_adjust_block()}} and \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
 \item \code{block} is an integer counting the data blocks in each file (0 is the startup block)
 \item \code{sample_name} is the name of the material being measured as defined by the \code{ref_block_name} and \code{sample_block_name} parameters
 \item \code{segment} is an integer defines segments within individual blocks - this will be \code{NA} until the optional \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} is called
-\item \code{data_group} is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like \code{\link[=orbi_adjust_block]{orbi_adjust_block()}} and \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
 \item \code{data_type} is a text value describing the type of data in each \code{data_group} - for a list of the main categories, call \code{orbi_get_settings("data_type")}
 }
 }

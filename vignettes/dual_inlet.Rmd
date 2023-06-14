@@ -144,7 +144,7 @@ df_results <-
 ```{r, fig.width=8, fig.height=7}
 df_results |>
   filter(data_type == "data") |>
-  mutate(block_seg = paste0(block, ".", segment) |> forcats::as_factor()) |>
+  mutate(block_seg = paste0(block, ".", segment) |> factor_in_order()) |>
   # data
   ggplot() +
   aes(x = block_seg, y = ratio, color = sample_name) +
