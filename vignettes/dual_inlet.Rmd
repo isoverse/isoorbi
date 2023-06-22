@@ -13,6 +13,7 @@ editor_options:
 
 ```{r}
 library(isoorbi) #load isoorbi R package
+library(forcats) #better ordering of factor variables in plots
 
 # Load a path to a system test file
 file_path <-system.file("extdata", "testfile_dual_inlet_new.isox", package = "isoorbi")
@@ -132,7 +133,7 @@ ggplot() +
 df_results <- 
   df_w_blocks |>
   # define base peak
-  orbi_define_basepeak(basepeak_def = "15N") |> 
+  orbi_define_basepeak(basepeak_def = "M0") |> 
   # segment (optional)
   orbi_segment_blocks(into_segments = 3) |>
   # calculate results
@@ -189,18 +190,18 @@ base_plot <-
   theme_bw() +
   labs(x = "time [min]", y = NULL, fill = "block")
 
-# with 17O data
+# with 15N data
 df_plot <-
   df_w_blocks |>
   mutate(panel = "intensity") |>
   bind_rows(df_results |> mutate(panel = "ratio"))
 
-base_plot %+% filter(df_plot, isotopocule == "17O") + labs(title = "17O/15N")
+base_plot %+% filter(df_plot, isotopocule == "15N") + labs(title = "15N/M0")
 ```
 
 ```{r, fig.width=8, fig.height=6}
 # same but with 18O
-base_plot %+% filter(df_plot, isotopocule == "18O") + labs(title = "18O/15N")
+base_plot %+% filter(df_plot, isotopocule == "18O") + labs(title = "18O/M0")
 ```
 
 ## Plot 3: small scans
@@ -210,7 +211,7 @@ base_plot %+% filter(df_plot, isotopocule == "18O") + labs(title = "18O/15N")
 df_ratios <- 
   df_w_blocks |>
   # define base peak
-  orbi_define_basepeak(basepeak_def = "15N") |> 
+  orbi_define_basepeak(basepeak_def = "M0") |> 
   # segment (optional)
   orbi_segment_blocks(by_scans = 5) |>
   # calculate results
