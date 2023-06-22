@@ -597,7 +597,7 @@ find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref
       max_time.min = max(.data$time.min),
       intervals = list(find_file_blocks(.data$min_time.min, .data$max_time.min))
     ) |>
-    tidyr::unnest(.data$intervals)
+    tidyr::unnest("intervals")
 }
 
 # general helper function to divide up time into intervals (internal)
