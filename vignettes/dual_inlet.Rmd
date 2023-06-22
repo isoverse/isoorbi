@@ -142,9 +142,11 @@ df_results <-
 ## Plot 1: ratios by block and segment
 
 ```{r, fig.width=8, fig.height=7}
+library(forcats)
+
 df_results |>
   filter(data_type == "data") |>
-  mutate(block_seg = paste0(block, ".", segment) |> factor_in_order()) |>
+  mutate(block_seg = paste0(block, ".", segment) |> fct_inorder()) |>
   # data
   ggplot() +
   aes(x = block_seg, y = ratio, color = sample_name) +

@@ -22,3 +22,33 @@ navbar:
   right:
   - icon: fa-github fa-lg
     href: https://github.com/isoverse/isoorbi
+
+reference:
+- title: Section 1
+  desc: >
+    These functions provide ...
+  contents:
+  - orbi_adjust_block
+  - orbi_calculate_ratio
+
+- title: Section 2
+  desc: >
+    These functions provide ...
+  contents:
+  - orbi_filter_isox
+
+- title: internal
+  contents:
+  - orbi_calculate_ratios
+  - orbi_define_basepeak
+  - orbi_define_blocks_for_dual_inlet
+  - orbi_filter_satellite_peaks
+  - orbi_filter_scan_intensity
+  - orbi_filter_weak_isotopocules
+  - orbi_get_blocks_info
+  - orbi_get_settings
+  - orbi_read_isox
+  - orbi_segment_blocks
+  - orbi_set_settings
+  - orbi_simplify_isox
+  - orbi_summarize_results

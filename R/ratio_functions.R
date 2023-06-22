@@ -326,7 +326,7 @@ orbi_calculate_ratio <- function(
 
 }
 
-#' Calculate isotopocule ratios
+#' Calculate isotopocule ratios (deprecated)
 #'
 #' `r lifecycle::badge("deprecated")` This function was renamed to [orbi_calculate_ratio()] to better reflect what it does.
 #'
