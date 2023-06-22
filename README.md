@@ -1,4 +1,4 @@
-# isoorbi <a href='https://isoorbi.isoverse.org/'> <img src="man/figures/logo.png" align="right" height="138" /> </a>
+# isoorbi <a href='https://isoorbi.isoverse.org/'> <img src="inst/www/logo.png" align="right" height="138" /> </a>
 
 <!-- badges: start -->
   [![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://isoorbi.isoverse.org/)
