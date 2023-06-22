@@ -82,7 +82,7 @@ orbi_define_blocks_for_dual_inlet <- function(
   scans_with_blocks <-
     scans |>
     # assign blocks (all time values should be covered)
-    dplyr::left_join(blocks, by = "filename", multiple = "all") |>
+    dplyr::left_join(blocks, by = "filename", relationship = "many-to-many") |>
     # find right blocks for data
     dplyr::filter(
       .data$time.min >= .data$start &
