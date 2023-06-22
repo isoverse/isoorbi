@@ -2,7 +2,7 @@
 % Please edit documentation in R/ratio_functions.R
 \name{orbi_calculate_ratios}
 \alias{orbi_calculate_ratios}
-\title{Calculate isotopocule ratios}
+\title{Calculate isotopocule ratios (deprecated)}
 \usage{
 orbi_calculate_ratios(...)
 }
