@@ -1,6 +1,6 @@
 # isoorbi 1.1.0
 
-This is a major release adding substantial new features and fixing a few bugs.
+This is a minor release adding new features and fixing a few bugs.
 
 ## Breaking changes
 
@@ -8,7 +8,7 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## New features
 
-* implemented block annotation functionality for dual inlet data acquisitions, see `orbi_define_blocks_for_dual_inlet()` and `orbi_get_blocks_info()`
+* implemented functionality for dual inlet data acquisitions, see `orbi_define_blocks_for_dual_inlet()` and `orbi_get_blocks_info()`
 * implemented package settings, using internal functions `isoorbi::orbi_get_settings`, `isoorbi::orbi_set_settings`
 
 ## Enhancements
@@ -19,7 +19,7 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## Bug fixes
 
-* `dplyr` changes to joins with explicit `multiple` argument are now implemented (#10)
+* `dplyr` changes to joins with explicit `multiple` argument. `multiple` now defaults to "all", and the options of "error" and "warning" are now deprecated in favor of using `relationship`. 
 
 # isorbi 1.0.0
 
