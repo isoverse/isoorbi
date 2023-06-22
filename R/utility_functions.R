@@ -436,59 +436,26 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
 
 
   # Annotation: Identify `basepeak` for each scan
-
   tryCatch(
-    df.sel <- dataset  |> dplyr::ungroup() |>
-      dplyr::select(
-        "filename",
-        "compound",
-        "scan.no",
-        "isotopocule",
-        "ions.incremental"
-      ) |>
-      dplyr::group_by(.data$filename,
-                      .data$compound,
-                      .data$scan.no) |>
-      dplyr::filter(.data$isotopocule == basepeak_def) |>
-      dplyr::mutate(
-        basepeak = factor(.data$isotopocule),
-        basepeak_ions = .data$ions.incremental
-      ) |>
-      dplyr::select("filename",
-                    "compound",
-                    "scan.no",
-                    "basepeak",
-                    "basepeak_ions") |>
-      dplyr::ungroup(),
-
-    warning = function(w) {
-      stop("something went wrong identifying the base peak for each scan: ",
-           w$message,
-           call. = TRUE)
-    }
-  )
-
-
-  tryCatch(
-
     df.out <-
-      dplyr::full_join(df.sel, dataset, by = c("filename", "compound", "scan.no"), multiple = "all"),
-
+      dataset |>
+      dplyr::group_by(.data$filename, .data$compound, .data$scan.no) |>
+      dplyr::mutate(
+        basepeak = !!basepeak_def,
+        basepeak_ions = .data$ions.incremental[.data$isotopocule == !!basepeak_def]
+      ) |>
+      dplyr::ungroup(),
     warning = function(w) {
-      stop("something went wrong when merging data: ", w$message, call. = TRUE)
+      abort("something went wrong identifying the base peak for each scan", parent = w)
     }
   )
 
-
   tryCatch(
-
     df.out <-
       df.out |> dplyr::filter(.data$isotopocule != basepeak_def) |> droplevels(),
 
     warning = function(w) {
-      stop("something went wrong removing the base peak isotopocule: ",
-           w$message,
-           call. = TRUE)
+      abort("something went wrong removing the base peak isotopocule", parent = w)
     }
   )
 
