@@ -49,14 +49,14 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="isoorbi-110">isoorbi 1.1.0<a class="anchor" aria-label="anchor" href="#isoorbi-110"></a></h2>
-<p>This is a major release adding substantial new features and fixing a few bugs.</p>
+<p>This is a minor release adding new features and fixing a few bugs.</p>
 <div class="section level3">
 <h3 id="breaking-changes-1-1-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-1-0"></a></h3>
 <p>There are no breaking changes in this release (all changes and new features are backwards compatible).</p>
 </div>
 <div class="section level3">
 <h3 id="new-features-1-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-1-0"></a></h3>
-<ul><li>implemented block annotation functionality for dual inlet data acquisitions, see <code><a href="../reference/orbi_define_blocks_for_dual_inlet.html">orbi_define_blocks_for_dual_inlet()</a></code> and <code><a href="../reference/orbi_get_blocks_info.html">orbi_get_blocks_info()</a></code>
+<ul><li>implemented functionality for dual inlet data acquisitions, see <code><a href="../reference/orbi_define_blocks_for_dual_inlet.html">orbi_define_blocks_for_dual_inlet()</a></code> and <code><a href="../reference/orbi_get_blocks_info.html">orbi_get_blocks_info()</a></code>
 </li>
 <li>implemented package settings, using internal functions <code><a href="../reference/orbi_get_settings.html">isoorbi::orbi_get_settings</a></code>, <code><a href="../reference/orbi_set_settings.html">isoorbi::orbi_set_settings</a></code>
 </li>
@@ -72,7 +72,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-0"></a></h3>
 <ul><li>
-<code>dplyr</code> changes to joins with explicit <code>multiple</code> argument are now implemented (<a href="https://github.com/isoverse/isoorbi/issues/10" class="external-link">#10</a>)</li>
+<code>dplyr</code> changes to joins with explicit <code>multiple</code> argument. <code>multiple</code> now defaults to “all”, and the options of “error” and “warning” are now deprecated in favor of using <code>relationship</code>.</li>
 </ul></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
