@@ -4,7 +4,7 @@
 \name{isoorbi-package}
 \alias{isoorbi}
 \alias{isoorbi-package}
-\title{isoorbi: Process Orbitrap Iso Data}
+\title{isoorbi: Process Orbitrap Isotope Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
