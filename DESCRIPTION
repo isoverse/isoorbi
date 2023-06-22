@@ -1,6 +1,6 @@
 Package: isoorbi
 Type: Package
-Title: Process Orbitrap Iso Data
+Title: Process Orbitrap Isotope Data
 Version: 1.1.0
 Date: 2023-6-01
 Authors@R: 
@@ -39,7 +39,8 @@ Suggests:
     rmarkdown,
     testthat,
     scales,
-    ggplot2
+    ggplot2,
+    forcats
 Description: Read and process isotopocule data from an Orbitrap Iso mass spectrometer. Hilkert et al. (2021) <doi:10.1021/acs.analchem.1c00944>.
 License: MIT + file LICENSE
 Encoding: UTF-8
