@@ -1,7 +1,7 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Iso Data
-Version: 1.1
+Version: 1.1.0
 Date: 2023-6-01
 Authors@R: 
     c(person(
@@ -23,19 +23,23 @@ Authors@R:
 URL: https://github.com/isoverse/isoorbi
 BugReports: https://github.com/isoverse/isoorbi/issues
 Depends:
-    R (>= 4.0.0)
+    R (>= 4.1.0)
 Imports:
+    utils (>= 4.1.0),
+    stats (>= 4.1.0),
+    rlang (>= 1.0.0),
+    lifecycle (>= 1.0.0),
     tidyr (>= 1.2.0),
     dplyr (>= 1.0.0),
-    magrittr (>= 2.0.0),
-    rlang (>= 1.0.0),
     readr (>= 2.1.0),
-    stringr (>= 1.4.0)
+    tidyselect (>= 1.2.0)
 Suggests:
     devtools,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    scales,
+    ggplot2
 Description: Read and process isotopocule data from an Orbitrap Iso mass spectrometer. Hilkert et al. (2021) <doi:10.1021/acs.analchem.1c00944>.
 License: MIT + file LICENSE
 Encoding: UTF-8

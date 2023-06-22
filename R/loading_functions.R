@@ -45,12 +45,14 @@ orbi_read_isox <- function(file) {
   if (!file.exists(file))
     stop("this file does not exist: ", file, call. = TRUE)
 
-  ext <- stringr::str_extract(basename(file), "\\.[^.]+$")
+  # ext <- stringr::str_extract(basename(file), "\\.[^.]+$")
+  # use base r to skip stringr dependency (since it's not used elsewhere)
+  ext <- regmatches(basename(file), regexec("\\.[^.]+$", basename(file)))[[1]]
 
-  if (is.na(ext) ||
-      ext != ".isox")
+  if (is.na(ext) || ext != ".isox")
     stop("unrecognized file extension: ", ext, call. = TRUE)
 
+  # info
   message(paste0("orbi_read_isox() is loading .isox data from file path: \n", file))
 
 
@@ -67,7 +69,7 @@ orbi_read_isox <- function(file) {
         tic = readr::col_double(),
         it.ms = readr::col_double()
       )
-    ) %>% dplyr::rename(isotopocule = "isotopolog"),
+    ) |> dplyr::rename(isotopocule = "isotopolog"),
 
     # .isox format should eventually change as well to `isotopocule`
     warning = function(w) {
@@ -92,7 +94,7 @@ orbi_read_isox <- function(file) {
 
   if (length(missing_cols) > 0) {
     paste0("Missing required column(s): ",
-           paste(missing_cols, collapse = ", ")) %>%
+           paste(missing_cols, collapse = ", ")) |>
       stop(call. = FALSE)
   }
 
@@ -109,7 +111,7 @@ orbi_read_isox <- function(file) {
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
-#' df <- orbi_read_isox(file = fpath) %>% orbi_simplify_isox()
+#' df <- orbi_read_isox(file = fpath) |> orbi_simplify_isox()
 #'
 #' @export
 
@@ -145,14 +147,14 @@ orbi_simplify_isox <- function(dataset) {
 
   if (length(missing_cols) > 0) {
     paste0("Missing required column(s): ",
-           paste(missing_cols, collapse = ", ")) %>%
+           paste(missing_cols, collapse = ", ")) |>
       stop(call. = FALSE)
   }
 
   message("orbi_simplify_isox() will keep only the most important columns...")
 
   tryCatch(
-    dataset %>% dplyr::select(
+    dataset |> dplyr::select(
       "filename",
       "compound",
       "scan.no",
@@ -180,8 +182,8 @@ orbi_simplify_isox <- function(dataset) {
 #'
 #'@examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(file = fpath) %>%
-#' orbi_simplify_isox() %>%
+#' df <- orbi_read_isox(file = fpath) |>
+#' orbi_simplify_isox() |>
 #' orbi_filter_isox(filenames = c("s3744"),
 #' compounds = "HSO4-",
 #' isotopocules = c("M0", "34S", "18O"),
@@ -264,7 +266,7 @@ orbi_filter_isox <-
 
     if (length(missing_cols) > 0) {
       paste0("missing required column(s): ",
-             paste(missing_cols, collapse = ", ")) %>%
+             paste(missing_cols, collapse = ", ")) |>
         stop(call. = FALSE)
     }
 
@@ -276,47 +278,34 @@ orbi_filter_isox <-
       paste(isotopocules, collapse = ", "),
       paste(time_min, collapse = ", "),
       paste(time_max, collapse = ", ")
-    ) %>%
+    ) |>
       message()
 
-    tryCatch(
-      df.out <- dataset %>%
+    tryCatch({
+      df.out <- dataset
 
         # file: filenames
-        {
-          if (!isFALSE(filenames))
-            dplyr::filter(., .data$filename %in% filenames)
-          else
-            .
-        } %>%
+        if (!isFALSE(filenames))
+          df.out <- df.out |> dplyr::filter(.data$filename %in% filenames)
+
         # filter: compounds
-        {
-          if (!isFALSE(compounds))
-            dplyr::filter(., .data$compound %in% compounds)
-          else
-            .
-        } %>%
+        if (!isFALSE(compounds))
+          df.out <- df.out |> dplyr::filter(.data$compound %in% compounds)
+
         # filter: isotopocules
-        {
-          if (!isFALSE(isotopocules))
-            dplyr::filter(., .data$isotopocule %in% isotopocules)
-          else
-            .
-        } %>%
+        if (!isFALSE(isotopocules))
+          df.out <- df.out |> dplyr::filter(.data$isotopocule %in% isotopocules)
+
         # filter: time_min
-        {
-          if (!isFALSE(time_min))
-            dplyr::filter(., .data$time.min >= time_min)
-          else
-            .
-        } %>%
+        if (!isFALSE(time_min))
+          df.out <- df.out |> dplyr::filter(.data$time.min >= time_min)
+
         # filter: time_max
-        {
-          if (!isFALSE(time_max))
-            dplyr::filter(., .data$time.min <= time_max)
-          else
-            .
-        },
+        if (!isFALSE(time_max))
+          df.out <- df.out |> dplyr::filter(.data$time.min <= time_max)
+
+        df.out
+      },
       warning = function(w) {
         stop("something went wrong: ", w$message, call. = TRUE)
       }

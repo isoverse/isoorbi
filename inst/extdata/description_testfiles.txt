@@ -1,11 +1,17 @@
-testfile_DualInlet.isox
+
+testfile_dual_inlet_new.isox
+- data collected on Boulder Isoorbi on 18-May-2023 (ESI-OT Exploris 240 Isotope Solutions)
+- NO3- with M0 data, 10 microscans
+- "dual inlet": 7 blocks, 10min each, 5min at beginning added for stabilization of spray
+- 80% of data (4 out of 5 scans) were removed to keep file size small for CRAN upload
+
+
+testfile_dual_inlet.isox
 - measured on January 25th 2022 by Kristýna Kantnerová on Q Exactive HF
 - reference - USGS34
 - sample - USGS32
 - method file "20220125 DI noM0 10ea_70min 15k 5uScans.meth"
 - raw file "20220125_01.raw"
-
-testfile_dual_inlet.isox
 - based on testfile_DualInlet.isox
 - 3 injections, ref-sam-ref
 - 1st injection - ref #1, scans 1-278 (0.005-1.000 min); in original file scans 1-278 (0.005-1.000 min)

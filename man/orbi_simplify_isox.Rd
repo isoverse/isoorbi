@@ -17,6 +17,6 @@ Keep only columns that are directly relevant for isotopocule ratio analysis
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
-df <- orbi_read_isox(file = fpath) \%>\% orbi_simplify_isox()
+df <- orbi_read_isox(file = fpath) |> orbi_simplify_isox()
 
 }

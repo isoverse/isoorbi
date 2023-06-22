@@ -199,40 +199,40 @@ test_that("calculate_weighted.vector.sum() tests", {
 })
 
 # orbi_calculate_ratios
-test_that("orbi_calculate_ratios() tests", {
+test_that("orbi_calculate_ratio() tests", {
 
   a <- 1:10
   b <- 1:10
 
   # success
-  expect_equal(orbi_calculate_ratios(a, b, "mean"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "sum"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "slope"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "geometric_mean"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "weighted_sum"), 1)
-  expect_equal(orbi_calculate_ratios(a, b, "median"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "mean"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "sum"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "slope"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "geometric_mean"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "weighted_sum"), 1)
+  expect_equal(orbi_calculate_ratio(a, b, "median"), 1)
 
   # failure
   expect_error(
-    orbi_calculate_ratios(a, b, "median2"),
+    orbi_calculate_ratio(a, b, "median2"),
     "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`",
     fixed = TRUE
   )
 
-  expect_error(orbi_calculate_ratios(),
+  expect_error(orbi_calculate_ratio(),
                "no input for numerator supplied",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(numerator = a),
+  expect_error(orbi_calculate_ratio(numerator = a),
                "no input for denominator supplied",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(numerator =  as.character(a),
+  expect_error(orbi_calculate_ratio(numerator =  as.character(a),
                                      denominator = b),
                "numerator must be a numeric vector",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(numerator =  a,
+  expect_error(orbi_calculate_ratio(numerator =  a,
                                      denominator = as.character(b)),
                "denominator must be a numeric vector",
                fixed = TRUE)
@@ -243,11 +243,11 @@ test_that("orbi_summarize_results() tests", {
 
   # success
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) %>% orbi_simplify_isox() %>% orbi_define_basepeak(basepeak_def = "15N")
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N")
 
   expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum")))
 
-  df2 <- df %>% mutate(
+  df2 <- df |> mutate(
     block = as.factor("block1"),
     segment = as.factor("segment2"),
     injection = as.factor("injection3"),
@@ -270,10 +270,14 @@ test_that("orbi_summarize_results() tests", {
                fixed = TRUE)
 
   expect_error(orbi_summarize_results(dataset = df, ratio_method = "foo"),
-               "ratio_method must be on of the following: mean, sum, median, geometric_mean, slope, weighted_sum",
-               fixed = TRUE)
+               "ratio_method.* must be one of.*mean.*sum.*median.*geometric_mean.*slope.*weighted_sum")
 
-  df3 <- df %>% mutate(dummy = 1) %>% select(-ions.incremental)
+  expect_error(orbi_summarize_results(dataset = df, ratio_method = "sum", .by = "foo"),
+               "foo.*doesn't exist")
+  expect_error(orbi_summarize_results(dataset = df, ratio_method = "sum", .by = foo),
+               "foo.*doesn't exist")
+
+  df3 <- df |> mutate(dummy = 1) |> select(-ions.incremental)
 
   expect_error(
     orbi_summarize_results(dataset = df3, ratio_method = "sum"),

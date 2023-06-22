@@ -4,24 +4,31 @@
 \alias{orbi_summarize_results}
 \title{Generate the results table}
 \usage{
-orbi_summarize_results(dataset, ratio_method)
+orbi_summarize_results(
+  dataset,
+  ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum"),
+  .by = c("block", "sample_name", "segment", "data_group", "data_type", "injection")
+)
 }
 \arguments{
-\item{dataset}{A processed tibble produced from \code{IsoX} output}
+\item{dataset}{A tibble from \code{IsoX} output (\code{\link[=orbi_read_isox]{orbi_read_isox()}}) and with a basepeak already defined (using \code{orbi_define_basepeak()}). Optionally, with block definitions (\code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}}) or even additional block segments (\code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}}).}
 
-\item{ratio_method}{Method for computing the ratio}
+\item{ratio_method}{Method for computing the ratio. \strong{Please note well}: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). \code{ratio_method} can be one of the following:
+\itemize{
+\item \code{mean}: arithmetic mean of ratios from individual scans.
+\item \code{sum}: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+\item \code{geometric_mean}: geometric mean of ratios from individual scans.
+\item \code{slope}: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the \verb{numerator x}, using \code{stats::lm(x ~ y + 0, weights = x)}.
+\item \code{weighted_sum}: A derivative of the \code{sum} option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total \code{sum} of \code{x} and \code{y} that is used to calculate \code{x/y}.
+}}
+
+\item{.by}{additional grouping columns for the results summary (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.}
 }
 \value{
-Returns a results table containing \code{filename}, \code{compound},  \code{basepeak}, \code{Isotopocule}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
-}
-\description{
-Contains the logic to generate the results table. It passes the  \code{ratio_method} parameter to the \code{\link{orbi_calculate_ratios}} function for ratio calculations.
-}
-\details{
-\strong{Description of the output columns:}
+Returns a results summary table retaining the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns:  \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
 \itemize{
-\item \code{basepeak}: Isotopocule used as denominator in ratio calculation.
-\item \code{isotopocule}: Isotopocule used as numerator in ratio calculation.
+\item \code{ratio}: The isotope ratio between the \code{isotopocule} and the \code{basepeak}, calculated using the \code{ratio_method}
 \item \code{ratio_sem}: Standard error of the mean for the ratio
 \item \code{number_of_scans}: Number of scans used for the final ratio calculation
 \item \code{minutes_to_1e6_ions}: Time in minutes it would take to observe 1 million ions of the \code{isotopocule} used as numerator of the ratio calculation.
@@ -29,10 +36,13 @@ Contains the logic to generate the results table. It passes the  \code{ratio_met
 \item \code{ratio_relative_sem_permil}: Relative standard error of the reported ratio in permil
 }
 }
+\description{
+Contains the logic to generate the results table. It passes the  \code{ratio_method} parameter to the \code{\link[=orbi_calculate_ratio]{orbi_calculate_ratio()}} function for ratio calculations.
+}
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <- orbi_read_isox(file = fpath) \%>\%
-      orbi_simplify_isox() \%>\% orbi_define_basepeak(basepeak_def = "M0")  \%>\%
+df <- orbi_read_isox(file = fpath) |>
+      orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "M0")  |>
       orbi_summarize_results(ratio_method = "sum")
 
 }
