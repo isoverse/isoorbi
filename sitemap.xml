@@ -25,6 +25,9 @@
     <loc>https://isoorbi.isoverse.org/index.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/paper.html</loc>
   </url>
   <url>
@@ -43,10 +46,19 @@
     <loc>https://isoorbi.isoverse.org/reference/calculate_ratios_weighted_sum.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/reference/factor_in_order.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/reference/index.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_adjust_block.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_ratio.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_ratios.html</loc>
@@ -55,10 +67,7 @@
     <loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc>
   </url>
   <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_dualInlet_annotate.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_dualInlet_define.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc>
@@ -73,15 +82,24 @@
     <loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak_isotopocules.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_get_settings.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_read_isox.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_segment_blocks.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_set_settings.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_summarize_results.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/reexports.html</loc>
   </url>
 </urlset>

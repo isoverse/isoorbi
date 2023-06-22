@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fpath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_flow.isox"</span>, package<span class="op">=</span><span class="st">"isoorbi"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">orbi_simplify_isox</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">orbi_simplify_isox</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox() is loading .isox data from file path: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> /home/runner/work/_temp/Library/isoorbi/extdata/testfile_flow.isox</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox() will keep only the most important columns...</span>
