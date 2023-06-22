@@ -9,7 +9,7 @@
 
 ## Overview
 
-The goal of the isoorbi R package is to help you process isotopocule measurements from an **Orbitrap Iso** mass spectrometer. It expects <code>.isox</code> files created by IsoX as input.
+The goal of the isoorbi R package is to help you process isotopocule measurements from an **Orbitrap Isotope Solutions** mass spectrometer. It expects <code>.isox</code> files created by IsoX as input.
 
 ## Installation
 

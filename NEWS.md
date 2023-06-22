@@ -8,8 +8,8 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## New features
 
-* implemented block annotation functionality (FIXME: explain more)
-* implemented package settings (FIXME: explain more)
+* implemented block annotation functionality for dual inlet data acquisitions, see `orbi_define_blocks_for_dual_inlet()` and `orbi_get_blocks_info()`
+* implemented package settings, using internal functions `isoorbi::orbi_get_settings`, `isoorbi::orbi_set_settings`
 
 ## Enhancements
 

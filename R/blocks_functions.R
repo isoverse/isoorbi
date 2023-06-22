@@ -501,13 +501,20 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
 #' @export
 orbi_get_blocks_info <- function(dataset) {
 
-  # FIXME: implement safety check on the dataset and needed columns
 
   # type checks
   stopifnot(
     "`dataset` must be a data frame or tibble" =
       !missing(dataset) && is.data.frame(dataset)
   )
+
+  # dataset columns check
+  req_cols <- c("filename", "scan.no", "time.min", "block", "sample_name")   # FIXME: othercolumns needed?
+
+  if (length(missing <- setdiff(req_cols, names(dataset)))) {
+    sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
+      rlang::abort()
+  }
 
   # summarize block info
   dataset |>

@@ -24,31 +24,42 @@ navbar:
     href: https://github.com/isoverse/isoorbi
 
 reference:
-- title: Section 1
+- title: Core functions
   desc: >
     These functions provide ...
   contents:
+  - orbi_read_isox
+  - orbi_define_basepeak
+  - orbi_summarize_results
   - orbi_adjust_block
-  - orbi_calculate_ratio
 
-- title: Section 2
+- title: Removing data
   desc: >
-    These functions provide ...
+    These functions handle data selection and outlier removal
   contents:
   - orbi_filter_isox
+  - orbi_filter_satellite_peaks
+  - orbi_filter_scan_intensity
+  - orbi_filter_weak_isotopocules
+
+- title: Optional functions
+  desc: >
+    These functions are available to simplify or customize the data analysis
+  contents:
+  - orbi_simplify_isox
+  - orbi_calculate_ratio
+
+- title: Dual inlet
+  desc: >
+    These functions are useful for annotating and processing `dual inlet` data
+  contents:
+  - orbi_define_blocks_for_dual_inlet
+  - orbi_get_blocks_info
+  - orbi_segment_blocks
 
 - title: internal
   contents:
   - orbi_calculate_ratios
-  - orbi_define_basepeak
-  - orbi_define_blocks_for_dual_inlet
-  - orbi_filter_satellite_peaks
-  - orbi_filter_scan_intensity
-  - orbi_filter_weak_isotopocules
-  - orbi_get_blocks_info
   - orbi_get_settings
-  - orbi_read_isox
-  - orbi_segment_blocks
   - orbi_set_settings
-  - orbi_simplify_isox
-  - orbi_summarize_results
+

@@ -1,7 +1,7 @@
 ---
 title: "Quick start guide"
 description: >
-  A minimal example for isotopocule data processing of an Orbitrap Iso file (.isox).
+  A minimal example for isotopocule data processing of an Orbitrap Isotope Solutions file (.isox).
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Quick start guide}

@@ -4,11 +4,11 @@
 \name{isoorbi-package}
 \alias{isoorbi}
 \alias{isoorbi-package}
-\title{isoorbi: Process Orbitrap Isotope Data}
+\title{isoorbi: Process Orbitrap Isotopocule Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Read and process isotopocule data from an Orbitrap Iso mass spectrometer. Hilkert et al. (2021) \doi{10.1021/acs.analchem.1c00944}.
+Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Hilkert et al. (2021) \doi{10.1021/acs.analchem.1c00944}.
 }
 \seealso{
 Useful links:
