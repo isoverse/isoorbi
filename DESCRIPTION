@@ -30,7 +30,7 @@ Imports:
     rlang (>= 1.0.0),
     lifecycle (>= 1.0.0),
     tidyr (>= 1.2.0),
-    dplyr (>= 1.0.0),
+    dplyr (>= 1.1.1),
     readr (>= 2.1.0),
     tidyselect (>= 1.2.0)
 Suggests:
