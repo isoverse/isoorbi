@@ -17,6 +17,8 @@ navbar:
     href: articles/quick_start.html
   - text: Dual Inlet
     href: articles/dual_inlet.html
+  - text: IsoXL demo GUI
+    href: articles/isoxl_demo.html
   - text: Reference
     href: reference/index.html
   right:
