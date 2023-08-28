@@ -16,7 +16,7 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## Bug fixes
 
-* 
+* data frame groupings introduced in `orbi_filter_satellite_peaks()` is now removed again at the end of the function
 
 # isoorbi 1.1.0
 

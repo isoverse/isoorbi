@@ -67,7 +67,8 @@ orbi_filter_satellite_peaks <- function(dataset) {
         .data$scan.no,
         .data$isotopocule
       ) |>
-      dplyr::filter(.data$ions.incremental == max(.data$ions.incremental)),
+      dplyr::filter(.data$ions.incremental == max(.data$ions.incremental)) |>
+      dplyr::ungroup(),
     warning = function(w) {
       stop("something went wrong: ", w$message, call. = TRUE)
     }
