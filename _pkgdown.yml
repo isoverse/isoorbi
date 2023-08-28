@@ -26,7 +26,7 @@ navbar:
 reference:
 - title: Core functions
   desc: >
-    These functions provide ...
+    These core functions are essential to read and process isox data
   contents:
   - orbi_read_isox
   - orbi_define_basepeak
