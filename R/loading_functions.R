@@ -3,7 +3,7 @@
 #' @title Read IsoX file
 #' @description Read an IsoX output file (`.isox`) into a tibble data frame
 #'
-#' @param file Path to the `.isox` file
+#' @param file Path to the `.isox` file(s), single value or vector of paths
 #' @details Additional information on the columns:
 #'
 #' * `filename`: name of the original Thermo `.raw` file processed by IsoX
@@ -34,44 +34,49 @@
 orbi_read_isox <- function(file) {
 
   # safety checks
-  if (missing(file))
-    stop("no file path supplied", call. = TRUE)
+  stopifnot(
+    "no file path supplied" = !missing(file),
+    "`file` has to be at least one filepath" = is_character(file) && length(file) >= 1L
+  )
 
-  if (length(file) != 1)
-    stop("can only read exactly 1 file at the time, supplied paths: ",
-         length(file),
-         call. = TRUE)
-
-  if (!file.exists(file))
-    stop("this file does not exist: ", file, call. = TRUE)
+  if (any(missing <- !file.exists(file)))
+    sprintf("file does not exist: '%s'", paste(file[missing], collapse = "', '")) |>
+    abort()
 
   # ext <- stringr::str_extract(basename(file), "\\.[^.]+$")
   # use base r to skip stringr dependency (since it's not used elsewhere)
-  ext <- regmatches(basename(file), regexec("\\.[^.]+$", basename(file)))[[1]]
-
-  if (is.na(ext) || ext != ".isox")
-    stop("unrecognized file extension: ", ext, call. = TRUE)
+  ext <- sub("^.+\\.([^.]+)$", "\\1", basename(file))
+  if (any(ext != "isox"))
+    abort("unrecognized file extension, only .isox is supported")
 
   # info
-  message(paste0("orbi_read_isox() is loading .isox data from file path: \n", basename(file)))
+  sprintf("orbi_read_isox() is loading .isox data from %d files:\n - %s",
+          length(file), paste(file, collapse = "\n - ")) |>
+    message()
 
-
+  # read files
   tryCatch(
-    df <- readr::read_tsv(
-      file,
-      col_types = list(
-        filename = readr::col_factor(),
-        scan.no = readr::col_integer(),
-        time.min = readr::col_double(),
-        compound = readr::col_factor(),
-        isotopolog = readr::col_factor(),
-        ions.incremental = readr::col_double(),
-        tic = readr::col_double(),
-        it.ms = readr::col_double()
-      )
-    ) |> dplyr::rename(isotopocule = "isotopolog"),
+    df <-
+      file |>
+      map(
+        ~readr::read_tsv(
+          .x,
+          col_types = list(
+            filename = readr::col_factor(),
+            scan.no = readr::col_integer(),
+            time.min = readr::col_double(),
+            compound = readr::col_factor(),
+            isotopolog = readr::col_factor(),
+            ions.incremental = readr::col_double(),
+            tic = readr::col_double(),
+            it.ms = readr::col_double()
+          )
+        )
+      ) |>
+      dplyr::bind_rows() |>
+      # .isox format should eventually change as well to `isotopocule`
+      dplyr::rename(isotopocule = "isotopolog"),
 
-    # .isox format should eventually change as well to `isotopocule`
     warning = function(w) {
       stop("file format error: ", w$message, call. = TRUE)
     }

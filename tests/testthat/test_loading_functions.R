@@ -8,29 +8,16 @@ context("loading functions")
 test_that("orbi_read_isox() tests", {
 
   # safety checks
-
-  expect_error(orbi_read_isox(), "no file path supplied",
-               fixed = TRUE)
-
-  # test safety checks
-  expect_error(orbi_read_isox(), "no file path supplied")
-
-  # safety checks
-
-  expect_error(orbi_read_isox(), "no file path supplied",
-               fixed = TRUE)
-
-  expect_error(orbi_read_isox(c("one", "two")), "can only read.*1")
-
-  expect_error(orbi_read_isox("DNE"), "does not exist",
-               fixed = TRUE)
+  expect_error(orbi_read_isox(), "no file path supplied", fixed = TRUE)
+  expect_error(orbi_read_isox(42), "`file` has to be at least one filepath")
+  expect_error(orbi_read_isox(character()), "`file` has to be at least one filepath")
+  expect_error(orbi_read_isox("DNE"), "does not exist", fixed = TRUE)
 
   temp_file <- tempfile(fileext = ".wrong")
 
   cat("empty", file = temp_file) # create the temp file
 
-  expect_error(orbi_read_isox(temp_file), "unrecognized",
-               fixed = TRUE)
+  expect_error(orbi_read_isox(temp_file), "unrecognized file extension", fixed = TRUE)
 
   unlink(temp_file) # destroy the temp file
 
@@ -43,10 +30,9 @@ test_that("orbi_read_isox() tests", {
   fixed = TRUE)
 
   # test reading a file
-
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
-
-  expect_true(is.tbl(df))
+  expect_true(
+    is.tbl(df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")))
+  )
 
   expect_equal(
     names(df),
@@ -63,6 +49,18 @@ test_that("orbi_read_isox() tests", {
   )
 
   expect_equal(nrow(df), 5184)
+
+  # test reading multiple files
+  expect_true(
+    is.tbl(
+      df2 <-
+        orbi_read_isox(c(
+          system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"),
+          system.file("extdata", "testfile_flow.isox", package = "isoorbi")
+        ))
+    )
+  )
+  expect_equal(nrow(df2), 11633)
 
 })
 

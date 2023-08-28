@@ -1,3 +1,23 @@
+# isoorbi 1.2.0
+
+This is a minor release adding new features.
+
+## Breaking changes
+
+There are no breaking changes in this release (all changes and new features are backwards compatible).
+
+## New features
+
+* 
+
+## Enhancements
+
+* `orbi_read_isox()` now can read multiple .isox files at once
+
+## Bug fixes
+
+* 
+
 # isoorbi 1.1.0
 
 This is a minor release adding new features and fixing a few bugs.
