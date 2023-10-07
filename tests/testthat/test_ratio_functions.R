@@ -15,19 +15,19 @@ test_that("calculate_ratios_sem() tests", {
   # failure
 
   expect_error(calculate_ratios_sem(),
-               "no input vector for ratios supplied",
+               "no input vector for `ratios` supplied",
                fixed = TRUE)
 
   expect_error(calculate_ratios_sem(ratios = matrix(1, 2, 3)),
-              "ratios need to be provided in a vector",
+              "`ratios` need to be provided as a numeric vector",
               fixed = TRUE)
 
   expect_error(calculate_ratios_sem(ratios = c("A", "B", "C")),
-               "ratios need to be a numeric vector",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_sem(ratios = numeric()),
-               "length of ratios needs to be > 1: 0",
+               "length of `ratios` needs to be > 1",
                fixed = TRUE)
 
 })
@@ -41,18 +41,14 @@ test_that("calculate_ratios_gmean() tests", {
   expect_equal(calculate_ratios_gmean(ratios = list), 4.9324241486609)
 
   # failure
-  expect_error(calculate_ratios_gmean(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_gmean(), "input vector for `ratios` supplied")
 
   expect_error(calculate_ratios_gmean(ratios = matrix(1, 2, 3)),
-               "ratios need to be provided in a vector",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_gmean(ratios = c("A", "B", "C")),
-               "ratios need to be a numeric vector",
-               fixed = TRUE)
-
-  expect_error(calculate_ratios_gmean(ratios = numeric()),
-               "length of ratios needs to be > 1: 0",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
 })
@@ -64,18 +60,18 @@ test_that("calculate_ratios_gsd() tests", {
   expect_type(calculate_ratios_gsd(ratios = c(1, 2, 3)), "double")
 
   # failure
-  expect_error(calculate_ratios_gsd(), "no input vector for ratios supplied")
+  expect_error(calculate_ratios_gsd(), "no input vector for `ratios` supplied")
 
   expect_error(calculate_ratios_gsd(ratios = matrix(1, 2, 3)),
-               "ratios need to be provided in a vector",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_gsd(ratios = c("A", "B", "C")),
-               "ratios need to be a numeric vector",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_gsd(ratios = numeric()),
-               "length of ratios needs to be > 1: 0",
+               "length of `ratios` needs to be > 1",
                fixed = TRUE)
 })
 
@@ -86,18 +82,18 @@ test_that("calculate_ratios_gse() tests", {
   expect_type(calculate_ratios_gse(ratios = c(4, 5, 6)), "double")
 
   # failure
-  expect_error(calculate_ratios_gse(), "input vector for ratios supplied")
+  expect_error(calculate_ratios_gse(), "input vector for `ratios` supplied")
 
   expect_error(calculate_ratios_gse(ratios = matrix(1, 2, 3)),
-               "ratios need to be provided in a vector",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_gse(ratios = c("A", "B", "C")),
-               "ratios need to be a numeric vector",
+               "`ratios` need to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_gse(ratios = numeric()),
-               "length of ratios needs to be > 1: 0",
+               "length of `ratios` needs to be > 1",
                fixed = TRUE)
 })
 
@@ -111,38 +107,38 @@ test_that("calculate_ratios_slope() tests", {
   expect_equal(calculate_ratios_slope(x, y), 1)
 
   # failure
-  expect_error(calculate_ratios_slope(), "no input vector for x supplied")
+  expect_error(calculate_ratios_slope(), "no input vector for `x` supplied")
 
-  expect_error(calculate_ratios_slope(y = 1), "no input vector for x supplied")
+  expect_error(calculate_ratios_slope(y = 1), "no input vector for `x` supplied")
 
   expect_error(calculate_ratios_slope(x = matrix(1, 2, 3), y = c(1,2,3)),
-               "x needs to be a vector",
+               "`x` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_slope(x = c("A"), y = c(1,2,3)),
-               "x needs to be a numeric vector",
+               "`x` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_slope(x = numeric(), y = c(1,2,3)),
-               "length of x needs to be > 1: 0",
+               "length of `x` needs to be > 1",
                fixed = TRUE)
 
-  expect_error(calculate_ratios_slope(x = 1), "no input vector for y supplied")
+  expect_error(calculate_ratios_slope(x = 1), "no input vector for `y` supplied")
 
   expect_error(calculate_ratios_slope(x = c(1,2,3), y = matrix(1, 2, 3)),
-               "y needs to be a vector",
+               "`y` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_slope(x = c(1,2,3), y = c("A")),
-               "y needs to be a numeric vector",
+               "`y` needs to be provided as a numeric vector",
                fixed = TRUE)
   #
   expect_error(calculate_ratios_slope(x = c(1,2,3), y = c(1)),
-               "length of y needs to be > 1: 1",
+               "length of `y` needs to be > 1",
                fixed = TRUE)
 
   expect_error(calculate_ratios_slope(x = c(1,2,3), y = c(1,2,3,4)),
-               "length of x and y need to be equal",
+               "`x` and `y` need to be vectors of equal length",
                fixed = TRUE)
 
 })
@@ -157,43 +153,43 @@ test_that("calculate_weighted.vector.sum() tests", {
   expect_type(calculate_ratios_weighted_sum(x, y), "double")
 
   # failure
-  expect_error(calculate_ratios_weighted_sum(), "no input vector for x supplied")
+  expect_error(calculate_ratios_weighted_sum(), "no input vector for `x` supplied")
 
   expect_error(calculate_ratios_weighted_sum(x = matrix(1, 2, 3),
                                              y = c(1, 2, 3)),
-               "x needs to be a vector",
+               "`x` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_weighted_sum(x = c("A"),
                                              y = c(1, 2, 3)),
-               "x needs to be a numeric vector",
+               "`x` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_weighted_sum(x = numeric(),
                                              y = c(1, 2, 3)),
-               "length of x needs to be > 1: 0",
+               "length of `x` needs to be > 1",
                fixed = TRUE)
 
   expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3)),
-               "no input vector for y supplied")
+               "no input vector for `y` supplied")
 
   expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3),
                                             y = matrix(1, 2, 3)),
-               "y needs to be a vector",
+               "`y` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3),
                                              y = c("A")),
-               "y needs to be a numeric vector",
+               "`y` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3),
                                              y = numeric()),
-               "length of y needs to be > 1: 0",
+               "length of `y` needs to be > 1",
                fixed = TRUE)
 
   expect_error(calculate_ratios_weighted_sum(x = c(1, 2, 3), y = c(1, 2, 3, 4)),
-               "length of x and y need to be equal",
+               "`x` and `y` need to be vectors of equal length",
                fixed = TRUE)
 
 })
