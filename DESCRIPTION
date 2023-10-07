@@ -1,7 +1,7 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Isotopocule Data
-Version: 1.1.0
+Version: 1.1.9990
 Date: 2023-6-22
 Authors@R: 
     c(person(
@@ -31,6 +31,7 @@ Imports:
     lifecycle (>= 1.0.0),
     tidyr (>= 1.2.0),
     dplyr (>= 1.1.1),
+    ggplot2 (>= 3.4.0),
     readr (>= 2.1.0),
     tidyselect (>= 1.2.0)
 Suggests:
