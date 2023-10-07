@@ -15,6 +15,7 @@ orbi_summarize_results(
 
 \item{ratio_method}{Method for computing the ratio. \strong{Please note well}: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). \code{ratio_method} can be one of the following:
 \itemize{
+\item \code{direct}: no averaging, direct calculationg of numerator/denominator
 \item \code{mean}: arithmetic mean of ratios from individual scans.
 \item \code{sum}: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
 \item \code{geometric_mean}: geometric mean of ratios from individual scans.

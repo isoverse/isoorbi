@@ -7,7 +7,8 @@
 orbi_calculate_ratio(
   numerator,
   denominator,
-  ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")
+  ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope",
+    "weighted_sum")
 )
 }
 \arguments{
@@ -17,6 +18,7 @@ orbi_calculate_ratio(
 
 \item{ratio_method}{Method for computing the ratio. \strong{Please note well}: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). \code{ratio_method} can be one of the following:
 \itemize{
+\item \code{direct}: no averaging, direct calculationg of numerator/denominator
 \item \code{mean}: arithmetic mean of ratios from individual scans.
 \item \code{sum}: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
 \item \code{geometric_mean}: geometric mean of ratios from individual scans.
@@ -29,18 +31,26 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 Single value ratio between the isotopocules defined as \code{numerator} and \code{denominator} calculated using the \code{ratio_method}.
 }
 \description{
-This function calculates the ratio of two isotopocules (the \code{numerator} and \code{denominator}) by averaging multiple measurements of each using the \code{ratio_method} and returns a single value. Normally this function is not called directly by the user, but via the function \code{\link[=orbi_summarize_results]{orbi_summarize_results()}}, which calculates isotopocule ratios and other results for an entire dataset.
+This function calculates the ratio of two isotopocules (the \code{numerator} and \code{denominator}). If \code{ratio_method = "direct"}, this method calculates the vector ratios for each individual numerator and denominator value pair. For all other \code{ratio_method} values, this function averages multiple measurements of each using the \code{ratio_method} and returns a single value. Normally this function is not called directly by the user, but via the function \code{\link[=orbi_summarize_results]{orbi_summarize_results()}}, which calculates isotopocule ratios and other results for an entire dataset.
 }
 \examples{
-fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <-
-  orbi_read_isox(file = fpath) |>
-  orbi_simplify_isox() |>
-  orbi_define_basepeak(basepeak_def = "M0")
+  system.file("extdata", "testfile_flow.isox", package = "isoorbi") |>
+  orbi_read_isox()
 
-ratio <- orbi_calculate_ratio(
-   numerator = df$ions.incremental,
-   denominator = df$basepeak_ions,
-   ratio_method = "sum")
+ions_18O <- dplyr::filter(df, isotopocule == "18O")$ions.incremental
+ions_M0 <- dplyr::filter(df, isotopocule == "M0")$ions.incremental
+
+orbi_calculate_ratio(
+  numerator = ions_18O, denominator = ions_M0, ratio_method = "direct"
+) |> head()
+
+orbi_calculate_ratio(
+  numerator = ions_18O, denominator = ions_M0, ratio_method = "sum"
+)
+
+orbi_calculate_ratio(
+  numerator = ions_18O, denominator = ions_M0, ratio_method = "slope"
+)
 
 }

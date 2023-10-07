@@ -2,9 +2,13 @@
 % Please edit documentation in R/ratio_functions.R
 \name{orbi_calculate_ratios}
 \alias{orbi_calculate_ratios}
-\title{Calculate isotopocule ratios (deprecated)}
+\title{Calculate isotopocule ratios for an entire dataset}
 \usage{
-orbi_calculate_ratios(...)
+orbi_calculate_ratios(
+  dataset,
+  ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope",
+    "weighted_sum")
+)
 }
 \arguments{
 \item{...}{parameters passed on to new function orbi_calculate_ratio()}
