@@ -1,5 +1,29 @@
 # Functions to load, pre-filter and simplify IsoX data ------------------------------------
 
+#' Find isox files
+#'
+#' Finds all .isox files in a folder.
+#'
+#' @param folder path to a folder with isox files
+#' @param recursive whether to find files recursively
+#'
+#' @examples
+#'
+#' # all .isox files provided with the isoorbi package
+#' orbi_find_isox(system.file("extdata", package = "isoorbi"))
+#'
+#' @export
+orbi_find_isox <- function(folder, recursive = TRUE) {
+  # safety check
+  stopifnot(
+    "`folder` must be an existing directory" = dir.exists(folder),
+    "`recursive` must a boolean" = is_scalar_logical(recursive)
+  )
+
+  # return
+  list.files(folder, pattern = "\\.isox", full.names = TRUE, recursive = recursive)
+}
+
 #' @title Read IsoX file
 #' @description Read an IsoX output file (`.isox`) into a tibble data frame
 #'
@@ -30,7 +54,6 @@
 #' @return A tibble containing at minimum the columns `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`
 #'
 #' @export
-
 orbi_read_isox <- function(file) {
 
   # safety checks
@@ -50,36 +73,45 @@ orbi_read_isox <- function(file) {
     abort("unrecognized file extension, only .isox is supported")
 
   # info
-  sprintf("orbi_read_isox() is loading .isox data from %d files:\n - %s",
-          length(file), paste(file, collapse = "\n - ")) |>
-    message()
+  sprintf("orbi_read_isox() is loading .isox data from %d file(s)...", length(file)) |>
+    message_standalone()
 
   # read files
-  tryCatch(
-    df <-
+  df <-
+    try_catch_all(
       file |>
-      map(
-        ~readr::read_tsv(
-          .x,
-          col_types = list(
-            filename = readr::col_factor(),
-            scan.no = readr::col_integer(),
-            time.min = readr::col_double(),
-            compound = readr::col_factor(),
-            isotopolog = readr::col_factor(),
-            ions.incremental = readr::col_double(),
-            tic = readr::col_double(),
-            it.ms = readr::col_double()
-          )
-        )
-      ) |>
-      dplyr::bind_rows() |>
-      # .isox format should eventually change as well to `isotopocule`
-      dplyr::rename(isotopocule = "isotopolog"),
-
-    warning = function(w) {
-      stop("file format error: ", w$message, call. = TRUE)
-    }
+        map(
+          ~{
+            start_time <- Sys.time()
+            data <- readr::read_tsv(
+              .x,
+              col_types = list(
+                filename = readr::col_factor(),
+                scan.no = readr::col_integer(),
+                time.min = readr::col_double(),
+                compound = readr::col_factor(),
+                isotopolog = readr::col_factor(),
+                ions.incremental = readr::col_double(),
+                tic = readr::col_double(),
+                it.ms = readr::col_double()
+              )
+            )
+            end_time <- Sys.time()
+            sprintf(" - loaded %d peaks for %d compounds (%s) with %d isotopocules (%s) from %s",
+                    nrow(data),
+                    length(levels(data$compound)),
+                    paste(levels(data$compound), collapse = ", "),
+                    length(levels(data$isotopolog)),
+                    paste(levels(data$isotopolog), collapse = ", "),
+                    basename(.x)) |>
+              message_standalone(start_time = start_time)
+            data
+          }
+        ) |>
+        dplyr::bind_rows() |>
+        # .isox format should eventually change as well to `isotopocule`
+        dplyr::rename(isotopocule = "isotopolog"),
+      "file format error: "
   )
 
   # check that all the most important columns are present
@@ -100,7 +132,7 @@ orbi_read_isox <- function(file) {
   if (length(missing_cols) > 0) {
     paste0("Missing required column(s): ",
            paste(missing_cols, collapse = ", ")) |>
-      stop(call. = FALSE)
+      abort()
   }
 
   return(df)
@@ -123,56 +155,31 @@ orbi_read_isox <- function(file) {
 orbi_simplify_isox <- function(dataset) {
 
   # safety checks
-  if (missing(dataset))
-    stop("no dataset supplied", call. = TRUE)
-
-  if (is.data.frame(dataset) == FALSE)
-    stop("dataset must be a data frame",  call. = TRUE)
-
-  if (ncol(dataset) < 8)
-    stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
-
-  if (nrow(dataset) < 1)
-    stop("dataset contains no rows: ", nrow(dataset), call. = TRUE)
-
-   # check that requires columns are present
-  req_cols <-
-    c(
-      "filename",
-      "compound",
-      "scan.no",
-      "time.min",
-      "isotopocule",
-      "ions.incremental",
-      "tic",
-      "it.ms"
-    )
-
-  missing_cols <- setdiff(req_cols, names(dataset))
-
-  if (length(missing_cols) > 0) {
-    paste0("Missing required column(s): ",
-           paste(missing_cols, collapse = ", ")) |>
-      stop(call. = FALSE)
-  }
-
-  message("orbi_simplify_isox() will keep only the most important columns...")
-
-  tryCatch(
-    dataset |> dplyr::select(
-      "filename",
-      "compound",
-      "scan.no",
-      "time.min",
-      "isotopocule",
-      "ions.incremental",
-      "tic",
-      "it.ms"
-    ),
-    warning = function(w) {
-      stop("format error: ", w$message, call. = FALSE)
-    }
+  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  stopifnot(
+    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
+    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
+      all(cols %in% names(dataset))
   )
+
+  # info
+  start_time <-
+    sprintf("orbi_simplify_isox() will keep only columns '%s'... ",
+            paste(cols, collapse = "', '")) |>
+    message_start()
+
+  # select
+  dataset_out <- try_catch_all(
+    dataset |> dplyr::select(!!!cols),
+    "format error: ",
+    newline = TRUE
+  )
+
+  # info
+  sprintf("complete") |> message_finish(start_time = start_time)
+
+  # return
+  return(dataset_out)
 }
 
 #' @title Basic generic filter for IsoX data
@@ -316,5 +323,5 @@ orbi_filter_isox <-
       }
     )
 
-  return(df.out)
+  return(df.out |> droplevels())
 }
