@@ -6,6 +6,9 @@
 \usage{
 orbi_filter_satellite_peaks(...)
 }
+\arguments{
+\item{...}{parameters passed on to new function orbi_flag_satellite_peaks()}
+}
 \description{
 Function replaced by \code{orbi_flag_satellite_peaks()}
 }

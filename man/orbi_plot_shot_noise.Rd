@@ -14,6 +14,10 @@ orbi_plot_shot_noise(
 )
 }
 \arguments{
+\item{shotnoise}{a \code{shotnoise} data frame}
+
+\item{x}{x-axis for the shot noise plot, either "time.min" or "n_effective_ions"}
+
 \item{permil_target}{highlight the t}
 
 \item{color}{which column to use for the color aesthetic (must be a factor)}

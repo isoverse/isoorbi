@@ -211,26 +211,26 @@ test_that("orbi_calculate_ratio() tests", {
   # failure
   expect_error(
     orbi_calculate_ratio(a, b, "median2"),
-    "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`",
+    "`ratio_method` must be one of \"direct\", \"mean\", \"sum\", \"median\",\n\"geometric_mean\", \"slope\", or \"weighted_sum\", not \"median2\".\nℹ Did you mean \"median\"?",
     fixed = TRUE
   )
 
   expect_error(orbi_calculate_ratio(),
-               "no input for numerator supplied",
+               "no input for `numerator` supplied",
                fixed = TRUE)
 
   expect_error(orbi_calculate_ratio(numerator = a),
-               "no input for denominator supplied",
+               "no input for `denominator` supplied",
                fixed = TRUE)
 
   expect_error(orbi_calculate_ratio(numerator =  as.character(a),
                                      denominator = b),
-               "numerator must be a numeric vector",
+               "`numerator` needs to be provided as a numeric vector",
                fixed = TRUE)
 
   expect_error(orbi_calculate_ratio(numerator =  a,
                                      denominator = as.character(b)),
-               "denominator must be a numeric vector",
+               "`denominator` needs to be provided as a numeric vector",
                fixed = TRUE)
 })
 

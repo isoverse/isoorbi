@@ -161,6 +161,8 @@ orbi_simplify_isox <- function(dataset) {
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
       all(cols %in% names(dataset))
   )
+  if (nrow(dataset) < 1)
+    stop("dataset contains no rows", call. = TRUE)
 
   # info
   start_time <-

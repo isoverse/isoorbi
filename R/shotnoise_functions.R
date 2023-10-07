@@ -10,6 +10,8 @@
 #' @export
 orbi_analyze_shot_noise <- function(dataset){
 
+  ions.incremental <- basepeak_ions <- n_basepeak_ions <- n_isotopocule_ions <- ratio <- n_measurements <- ratio_mean <- ratio_se <- ratio_gmean <- n_effective_ions <- ..idx <- NULL
+
   # safety checks
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
@@ -69,7 +71,8 @@ orbi_analyze_shot_noise <- function(dataset){
 }
 
 #' plot shot noise
-#'
+#' @param shotnoise a `shotnoise` data frame
+#' @param x x-axis for the shot noise plot, either "time.min" or "n_effective_ions"
 #' @param color which column to use for the color aesthetic (must be a factor)
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
 #' @param permil_target highlight the t
@@ -80,6 +83,8 @@ orbi_plot_shot_noise <- function(
     permil_target = NA_real_,
     color = "ratio_label",
     colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666")) {
+
+  filename <- compound <- ratio_label <- ratio_rel_se.permil <- diff_target.permil <- ratio_rel_se.permil <- isotopocule <- shot_noise.permil <- element_blank <- time.min <- n_effective_ions <- NULL
 
   # safety checks
   stopifnot(

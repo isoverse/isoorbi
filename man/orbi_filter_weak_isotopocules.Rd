@@ -6,6 +6,9 @@
 \usage{
 orbi_filter_weak_isotopocules(...)
 }
+\arguments{
+\item{...}{parameters passed on to new function orbi_flag_weak_isotopocules()}
+}
 \description{
 Function replaced by \code{orbi_flag_weak_isotopocules()}
 }

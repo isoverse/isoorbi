@@ -73,29 +73,29 @@ test_that("orbi_simplify_isox() tests", {
   expect_true(is.tbl(orbi_simplify_isox(df)))
 
   # test safety checks
-  expect_error(orbi_simplify_isox(), "no dataset supplied")
-  expect_error(orbi_simplify_isox(dataset = "string"), "dataset must be a data frame")
+  expect_error(orbi_simplify_isox(), "need a `dataset` data frame")
+  expect_error(orbi_simplify_isox(dataset = "string"), "need a `dataset` data frame")
   expect_type(df, "list")
   dataset = subset(df, select = -c(filename))
-  expect_error(orbi_simplify_isox(dataset), "dataset must have at least 8 columns: ")
+  expect_error(orbi_simplify_isox(dataset), "dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
   dataset = df[0,]
-  expect_error(orbi_simplify_isox(dataset), "dataset contains no rows: ")
+  expect_error(orbi_simplify_isox(dataset), "dataset contains no rows")
   # failure
 
-  expect_error(orbi_simplify_isox(), "no dataset supplied",
+  expect_error(orbi_simplify_isox(), "need a `dataset` data frame",
                fixed = TRUE)
 
-  expect_error(orbi_simplify_isox(dataset = as.matrix(df)), "dataset must be a data frame", fixed = TRUE)
+  expect_error(orbi_simplify_isox(dataset = as.matrix(df)), "need a `dataset` data frame", fixed = TRUE)
 
   expect_error(orbi_simplify_isox(dataset = df[,1:5]),
-               "dataset must have at least 8 columns: 5")
+               "dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
 
   expect_error(orbi_simplify_isox(dataset = df[0,]),
                "dataset contains no rows")
 
   df2 <- df |> mutate(dummy = "1") |> select(-scan.no)
   expect_error(orbi_simplify_isox(dataset = df2),
-               "Missing required column(s): scan.no", fixed = TRUE)
+               "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`", fixed = TRUE)
 
 })
 

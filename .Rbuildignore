@@ -20,6 +20,8 @@
 ^paper.md$
 ^figure_01.ai$
 ^figure_01.png$
+^figure_flowchart.ai$
+^figure_flowchart.png$
 ^codecov.yml$
 ^doc$
 ^Meta$

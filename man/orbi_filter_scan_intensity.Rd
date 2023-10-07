@@ -6,6 +6,11 @@
 \usage{
 orbi_filter_scan_intensity(..., outlier_percent)
 }
+\arguments{
+\item{...}{parameters passed on to new function orbi_flag_outliers()}
+
+\item{outlier_percent}{outlier_percent needs to be between 0 and 10, flags extreme scans based on TIC x injection time (i.e., ion intensity)}
+}
 \description{
 Function replaced by \code{orbi_flag_outliers()}
 }

@@ -82,6 +82,7 @@ message_wrap <- function (..., appendLF = TRUE, width = if (!interactive()) opti
 # Common utility functions to clean and annotate data ------------------------------------
 
 #' @title Function replaced by `orbi_flag_satellite_peaks()`
+#' @param ... parameters passed on to new function orbi_flag_satellite_peaks()
 #' @export
 orbi_filter_satellite_peaks <- function(...) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_satellite_peaks()", "orbi_flag_satellite_peaks()", always = TRUE)
@@ -135,7 +136,7 @@ orbi_flag_satellite_peaks <- function(dataset) {
         ) |>
         dplyr::mutate(is_satellite_peak = .data$ions.incremental < max(.data$ions.incremental)) |>
         dplyr::ungroup(),
-      "something went wrong tying to falg satellite peaks: ",
+      "something went wrong tying to flag satellite peaks: ",
       newline = TRUE
     )
 
@@ -150,6 +151,7 @@ orbi_flag_satellite_peaks <- function(dataset) {
 }
 
 #' @title Function replaced by `orbi_flag_weak_isotopocules()`
+#' @param ... parameters passed on to new function orbi_flag_weak_isotopocules()
 #' @export
 orbi_filter_weak_isotopocules <- function(...) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_weak_isotopocules()", "orbi_flag_weak_isotopocules()", always = TRUE)
@@ -228,6 +230,8 @@ orbi_flag_weak_isotopocules <-
 
 
 #' @title Function replaced by `orbi_flag_outliers()`
+#' @param ... parameters passed on to new function orbi_flag_outliers()
+#' @param outlier_percent outlier_percent needs to be between 0 and 10, flags extreme scans based on TIC x injection time (i.e., ion intensity)
 #' @export
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity()", "orbi_flag_outliers()", always = TRUE)

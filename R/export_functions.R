@@ -4,6 +4,7 @@
 #' @inheritParams add_excel_sheet
 #' @export
 #' @return returns dataset invisibly for use in pipes
+#'
 orbi_export_data_to_excel <- function(dataset, file, dbl_digits = 2, int_format = "0", dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)) {
 
   # check for availability

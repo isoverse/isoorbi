@@ -262,11 +262,27 @@ orbi_calculate_ratio <- function(
 #'
 #' `r lifecycle::badge("deprecated")` This function was renamed to [orbi_calculate_ratio()] to better reflect what it does.
 #'
-#' @param ... parameters passed on to new function orbi_calculate_ratio()
+#' @param dataset A data frame output after running `orbi_define_basepeak()`
+#' @param ratio_method Method for computing the ratio. **Please note well**: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). `ratio_method` can be one of the following:
+#'
+#' * `direct`: no averaging, direct calculationg of numerator/denominator
+#'
+#' * `mean`: arithmetic mean of ratios from individual scans.
+#'
+#' * `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+#'
+#' * `geometric_mean`: geometric mean of ratios from individual scans.
+#'
+#' * `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
+#'
+#' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
+#'
 #' @export
 orbi_calculate_ratios <- function(
     dataset, ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
 
+  isotopocule <- NULL
   # safety checks
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
