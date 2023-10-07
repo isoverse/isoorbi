@@ -8,15 +8,21 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## New features
 
-* 
+* `orbi_find_isox()` added
+* `orbi_analyze_noise()` implemented
+* `orbi_plot_shot_noise()` implemented
+* `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()` and `orbi_flag_outliers()` together with `orbi_filter_flagged_data()` supersede `orbi_filter_satellite_peaks()`, `orbi_filter_weak_isotopocules()` and `orbi_filter_scan_intensity()`
+* `orbi_export_data_to_excel()` implemented
 
 ## Enhancements
 
+* all loading and utility functions provide more details in the info message about what has been done, what was affected, and how long it took
 * `orbi_read_isox()` now can read multiple .isox files at once
 
 ## Bug fixes
 
-* data frame groupings introduced in `orbi_filter_satellite_peaks()` is now removed again at the end of the function
+* data frame groupings introduced in flagging/filtering functions are now removed again at the end of the function
+
 
 # isoorbi 1.1.0
 
