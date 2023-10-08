@@ -1,9 +1,60 @@
-# Tests: Common utility functions to clean and annotate data ------------------------------------
+# Tests: utility functions to clean and annotate data ------------------------------------
 
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("utility functions")
+
+# Internal utility functions =============
+
+# factorize_dataset
+test_that("factorize_dataset() tests", {
+
+  # failure
+  expect_error(factorize_dataset(),
+               "argument \"dataset\" is missing, with no default")
+
+})
+
+# group_if_exists
+test_that("group_if_exists() tests", {
+
+  # failure
+  expect_error(group_if_exists(),
+               "argument \"cols\" is missing, with no default")
+
+  expect_error(group_if_exists(42),
+               "argument \"cols\" is missing, with no default")
+
+})
+
+# group_by_same_groups
+test_that("group_by_same_groups() tests", {
+
+  # failure
+  expect_error(group_by_same_groups(),
+               "argument \"target_dataset\" is missing, with no default")
+
+  expect_error(group_by_same_groups(42),
+               "no applicable method for 'group_by' applied to an object of class \"c('double', 'numeric')\"",
+               fixed = TRUE)
+
+})
+
+# count_grouped_distinct
+test_that("count_grouped_distinct() tests", {
+
+  # failure
+  expect_error(count_grouped_distinct(),
+               "argument \"dataset\" is missing, with no default")
+
+  expect_error(count_grouped_distinct(42),
+               "no applicable method for 'select' applied to an object of class \"c('double', 'numeric')\"",
+               fixed = TRUE)
+
+})
+
+# Common utility functions to clean and annotate data ------------------------------------
 
 # orbi_flag_satellite_peaks
 test_that("orbi_flag_satellite_peaks() tests", {
@@ -139,6 +190,20 @@ test_that("orbi_flag_outliers() tests", {
     )
 
   expect_true(is.tbl(orbi_flag_outliers(dataset = df3, intensity_window = c(10,90))))
+
+})
+
+# orbi_filter_flagged_data
+test_that("orbi_filter_flagged_data() tests", {
+
+  # failure
+  expect_error(orbi_filter_flagged_data(),
+               "need a `dataset` data frame", fixed = TRUE)
+
+  # success
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+
+  expect_true(is.tbl(orbi_filter_flagged_data(dataset = df)))
 
 })
 

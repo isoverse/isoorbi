@@ -283,7 +283,30 @@ test_that("test orbi_segment_block()", {
     ) |> dplyr::relocate(data_group, .before = "block")
   )
 
+})
 
+test_that("test orbi_get_blocks_info()", {
+
+  # type checks
+  expect_error(orbi_get_blocks_info(), "`dataset` must be a data frame or tibble")
+  expect_error(orbi_get_blocks_info(42), "`dataset` must be a data frame or tibble")
+
+})
+
+test_that("test find_scan_from_time()", {
+
+  # type checks
+  expect_error(find_scan_from_time(), "argument \"scans\" is missing, with no default")
+  expect_error(find_scan_from_time(scans = "c"), "no applicable method for 'filter' applied to an object of class \"character\"")
+  expect_error(find_scan_from_time(scans = TRUE), "no applicable method for 'filter' applied to an object of class \"logical\"")
+
+})
+
+test_that("test get_scan_row()", {
+
+  # type checks
+  expect_error(get_scan_row(), "argument \"scan\" is missing, with no default")
+  expect_error(get_scan_row(scans = 42), "argument \"scan\" is missing, with no default")
 
 })
 

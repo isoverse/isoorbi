@@ -6,7 +6,7 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 context("ratio functions")
 
 # calculate_ratios_sem
-test_that("calculate_ratios_sem() tests", {
+test_that("test calculate_ratios_sem()", {
 
   # success
   expect_equal(calculate_ratios_sem(ratios = c(1, 2, 3)), 0.57735026919)
@@ -33,7 +33,7 @@ test_that("calculate_ratios_sem() tests", {
 })
 
 # calculate_ratios_gmean
-test_that("calculate_ratios_gmean() tests", {
+test_that("test calculate_ratios_gmean()", {
 
   # success
   list <- c(4, 5, 6)
@@ -54,7 +54,7 @@ test_that("calculate_ratios_gmean() tests", {
 })
 
 # calculate_ratios_gsd
-test_that("calculate_ratios_gsd() tests", {
+test_that("test calculate_ratios_gsd()", {
 
   # success
   expect_type(calculate_ratios_gsd(ratios = c(1, 2, 3)), "double")
@@ -76,7 +76,7 @@ test_that("calculate_ratios_gsd() tests", {
 })
 
 # calculate_ratios_gse
-test_that("calculate_ratios_gse() tests", {
+test_that("test calculate_ratios_gse()", {
 
   # success
   expect_type(calculate_ratios_gse(ratios = c(4, 5, 6)), "double")
@@ -98,7 +98,7 @@ test_that("calculate_ratios_gse() tests", {
 })
 
 # calculate_ratios_slope
-test_that("calculate_ratios_slope() tests", {
+test_that("test calculate_ratios_slope()", {
 
   # success
   x <- c(0, 1, 2, 3)
@@ -143,8 +143,8 @@ test_that("calculate_ratios_slope() tests", {
 
 })
 
-# calculate_weighted.vector.sum
-test_that("calculate_weighted.vector.sum() tests", {
+# calculate_ratios_weighted_sum
+test_that("test calculate_ratios_weighted_sum()", {
 
   # success
   x <- c(2, 4, 6)
@@ -194,8 +194,8 @@ test_that("calculate_weighted.vector.sum() tests", {
 
 })
 
-# orbi_calculate_ratios
-test_that("orbi_calculate_ratio() tests", {
+# orbi_calculate_ratio
+test_that("test orbi_calculate_ratio()", {
 
   a <- 1:10
   b <- 1:10
@@ -234,8 +234,44 @@ test_that("orbi_calculate_ratio() tests", {
                fixed = TRUE)
 })
 
+# orbi_calculate_ratios
+test_that("test orbi_calculate_ratios()", {
+
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df_results <-
+    df |>
+    # define base peak
+    orbi_define_basepeak("15N")
+
+  # failure
+  expect_error(
+    orbi_calculate_ratios(df_results, "median2"),
+    "`ratio_method` must be one of \"direct\", \"mean\", \"sum\", \"median\",\n\"geometric_mean\", \"slope\", or \"weighted_sum\", not \"median2\".\nℹ Did you mean \"median\"?",
+    fixed = TRUE
+  )
+
+  expect_error(orbi_calculate_ratios(),
+               "need a `dataset` data frame",
+               fixed = TRUE)
+
+  expect_error(orbi_calculate_ratios(df_results, 42),
+               "`ratio_method` must be a character vector, not the number 42.",
+               fixed = TRUE)
+
+  expect_error(orbi_calculate_ratios(df_results, TRUE),
+               "`ratio_method` must be a character vector, not `TRUE`.",
+               fixed = TRUE)
+
+  df_results2 <- subset(df_results, select = -basepeak_ions)
+
+  expect_error(orbi_calculate_ratios(df_results2, "mean"),
+               "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
+               fixed = TRUE)
+
+})
+
 # orbi_summarize_results
-test_that("orbi_summarize_results() tests", {
+test_that("test orbi_summarize_results()", {
 
   # success
 
