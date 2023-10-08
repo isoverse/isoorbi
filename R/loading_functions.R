@@ -111,7 +111,8 @@ orbi_read_isox <- function(file) {
         dplyr::bind_rows() |>
         # .isox format should eventually change as well to `isotopocule`
         dplyr::rename(isotopocule = "isotopolog"),
-      "file format error: "
+      "file format error: ",
+      newline = FALSE
   )
 
   # check that all the most important columns are present
@@ -173,8 +174,7 @@ orbi_simplify_isox <- function(dataset) {
   # select
   dataset_out <- try_catch_all(
     dataset |> dplyr::select(!!!cols),
-    "format error: ",
-    newline = TRUE
+    "format error: "
   )
 
   # info
@@ -185,145 +185,105 @@ orbi_simplify_isox <- function(dataset) {
 }
 
 #' @title Basic generic filter for IsoX data
-#' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges. Default value for all parameters is FALSE, i.e. no filter is applied.
+#' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges. Default value for all parameters is NULL, i.e. no filter is applied.
 #'
 #' @param dataset The IsoX data to be filtered
-#' @param filenames Vector of file names to keep
-#' @param compounds Vector of compounds to keep
-#' @param isotopocules Vector of isotopocules to keep
-#' @param time_min Minimum retention time in minutes (`time.min`)
-#' @param time_max Maximum retention time in minutes (`time.min`)
+#' @param filenames Vector of file names to keep, keeps all if set to `NULL` (the default)
+#' @param compounds Vector of compounds to keep, keeps all if set to `NULL` (the default)
+#' @param isotopocules Vector of isotopocules to keep, keeps all if set to `NULL` (the default)
+#' @param time_min Minimum retention time in minutes (`time.min`), no minimum if set to `NULL` (the default)
+#' @param time_max Maximum retention time in minutes (`time.min`), no maximum if set to `NULL` (the default)
 #'
 #'@examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-#' df <- orbi_read_isox(file = fpath) |>
-#' orbi_simplify_isox() |>
-#' orbi_filter_isox(filenames = c("s3744"),
-#' compounds = "HSO4-",
-#' isotopocules = c("M0", "34S", "18O"),
-#' time_min = FALSE,
-#' time_max = FALSE)
+#' df <-
+#'   orbi_read_isox(file = fpath) |>
+#'   orbi_simplify_isox() |>
+#'   orbi_filter_isox(
+#'     filenames = c("s3744"),
+#'     compounds = "HSO4-",
+#'     isotopocules = c("M0", "34S", "18O")
+#'   )
 #'
-#' @return  Filtered tibble
+#' @return Filtered tibble
 #' @export
 orbi_filter_isox <-
   function(dataset,
-           filenames = FALSE,
-           compounds = FALSE,
-           isotopocules = FALSE,
-           time_min = FALSE,
-           time_max = FALSE) {
+           filenames = NULL,
+           compounds = NULL,
+           isotopocules = NULL,
+           time_min = NULL,
+           time_max = NULL) {
 
   # safety checks
-    if (missing(dataset))
-      stop("no dataset supplied", call. = TRUE)
+  cols <- c("filename", "compound", "isotopocule", "time.min")
+  stopifnot(
+    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
+    "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`" =
+      all(cols %in% names(dataset)),
+    "`filenames` must be a vector of filenames (or NULL)" = is.null(filenames) || is_character(filenames),
+    "`compounds` must be a vector of compounds (or NULL)" = is.null(compounds) || is_character(compounds),
+    "`isotopocules` must be a vector of isotopocules (or NULL)" = is.null(isotopocules) || is_character(isotopocules),
+    "`time_min` must be a single number (or NULL)" = is.null(time_min) || is_scalar_double(time_min),
+    "`time_max` must be a single number (or NULL)" = is.null(time_max) || is_scalar_double(time_max)
+  )
 
-    if (is.data.frame(dataset) == FALSE)
-      stop("dataset must be a data frame",  call. = TRUE)
+  # info
+  filters <- c()
+  if(!is.null(filenames))
+    filters <- c(filters, sprintf("filenames (%s)", paste(filenames, collapse = ", ")))
+  if(!is.null(compounds))
+    filters <- c(filters, sprintf("compounds (%s)", paste(compounds, collapse = ", ")))
+  if(!is.null(isotopocules))
+    filters <- c(filters, sprintf("isotopocules (%s)", paste(isotopocules, collapse = ", ")))
+  if(!is.null(time_min))
+    filters <- c(filters, sprintf("minimum time (%s minutes)", time_min))
+  if(!is.null(time_max))
+    filters <- c(filters, sprintf("maximum time (%s minutes)", time_min))
 
-    if (ncol(dataset) < 8)
-      stop("dataset must have at least 8 columns: ", ncol(dataset), call. = TRUE)
-
-    if (nrow(dataset) < 1)
-      stop("dataset contains no rows", call. = TRUE)
-
-    if (missing(filenames) && !isFALSE(filenames))
-      stop("input for filenames missing", call. = TRUE)
-
-    if (missing(compounds) && !isFALSE(compounds))
-      stop("input for compounds missing", call. = TRUE)
-
-    if (missing(isotopocules) && !isFALSE(isotopocules))
-      stop("input for isotopocules missing", call. = TRUE)
-
-    if (missing(time_min) && !isFALSE(time_min))
-      stop("input for time_min missing", call. = TRUE)
-
-    if (missing(time_max)  && !isFALSE(time_max))
-      stop("input for time_max missing", call. = TRUE)
-
-    if (!(is.vector(filenames) | isFALSE(filenames)))
-      stop("filenames needs to be a vector of names", call. = TRUE)
-
-    if (!(is.vector(isotopocules) | isFALSE(isotopocules)))
-      stop("isotopocules needs to be a vector of names", call. = TRUE)
-
-    if (!(is.vector(compounds) | isFALSE(compounds)))
-      stop("compounds needs to be a vector of names", call. = TRUE)
-
-    if (!(is.numeric(time_min) | isFALSE(time_min)))
-      stop("time_min needs to be a number", call. = TRUE)
-
-    if (!(is.numeric(time_max) | isFALSE(time_max)))
-      stop("time_max needs to be a number", call. = TRUE)
-
-    if (length(time_min) != 1)
-      stop("time_min needs to be a single number", call. = TRUE)
-
-    if (length(time_max) != 1)
-      stop("time_max needs to be a single number", call. = TRUE)
-
-  # check that requires columns are present
-    req_cols <-
-      c(
-        "filename",
-        "compound",
-        "scan.no",
-        "time.min",
-        "isotopocule",
-        "ions.incremental",
-        "tic",
-        "it.ms"
-      )
-
-    missing_cols <- setdiff(req_cols, names(dataset))
-
-    if (length(missing_cols) > 0) {
-      paste0("missing required column(s): ",
-             paste(missing_cols, collapse = ", ")) |>
-        stop(call. = FALSE)
-    }
-
-    # message
+  # info
+  n_row_start <- nrow(dataset)
+  start_time <-
     sprintf(
-      "orbi_filter_isox() is pre-filtering the data by filename (%s), compounds (%s), isotopocules (%s), minimum (%s) and maximum (%s) time in minutes...",
-      paste(filenames, collapse = ", "),
-      paste(compounds, collapse = ", "),
-      paste(isotopocules, collapse = ", "),
-      paste(time_min, collapse = ", "),
-      paste(time_max, collapse = ", ")
+      "orbi_filter_isox() is filtering the dataset by %s... ", paste(filters, collapse = ", ")
     ) |>
-      message()
+    message_start()
 
-    tryCatch({
-      df.out <- dataset
+  # filtering
+  dataset <-
+    try_catch_all({
+      # file: filenames
+      if (!is.null(filenames))
+        dataset <- dataset |> dplyr::filter(.data$filename %in% !!filenames)
 
-        # file: filenames
-        if (!isFALSE(filenames))
-          df.out <- df.out |> dplyr::filter(.data$filename %in% filenames)
+      # filter: compounds
+      if (!is.null(compounds))
+        dataset <- dataset |> dplyr::filter(.data$compound %in% !!compounds)
 
-        # filter: compounds
-        if (!isFALSE(compounds))
-          df.out <- df.out |> dplyr::filter(.data$compound %in% compounds)
+      # filter: isotopocules
+      if (!is.null(isotopocules))
+        dataset <- dataset |> dplyr::filter(.data$isotopocule %in% !!isotopocules)
 
-        # filter: isotopocules
-        if (!isFALSE(isotopocules))
-          df.out <- df.out |> dplyr::filter(.data$isotopocule %in% isotopocules)
+      # filter: time_min
+      if (!is.null(time_min))
+        dataset <- dataset |> dplyr::filter(.data$time.min >= !!time_min)
 
-        # filter: time_min
-        if (!isFALSE(time_min))
-          df.out <- df.out |> dplyr::filter(.data$time.min >= time_min)
+      # filter: time_max
+      if (!is.null(time_max))
+        dataset <- dataset |> dplyr::filter(.data$time.min <= !!time_max)
 
-        # filter: time_max
-        if (!isFALSE(time_max))
-          df.out <- df.out |> dplyr::filter(.data$time.min <= time_max)
+      # return
+      dataset
+    },
+    "something went wrong trying to filter dataset: "
+  )
 
-        df.out
-      },
-      warning = function(w) {
-        stop("something went wrong: ", w$message, call. = TRUE)
-      }
-    )
+  # info
+  sprintf(
+    "removed %d/%d rows (%.1f%%)",
+    n_row_start - nrow(dataset), n_row_start, (n_row_start - nrow(dataset))/n_row_start * 100) |>
+    message_finish(start_time = start_time)
 
-  return(df.out |> droplevels())
+  # return
+  return(dataset |> droplevels())
 }

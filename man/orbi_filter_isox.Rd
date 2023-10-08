@@ -6,40 +6,41 @@
 \usage{
 orbi_filter_isox(
   dataset,
-  filenames = FALSE,
-  compounds = FALSE,
-  isotopocules = FALSE,
-  time_min = FALSE,
-  time_max = FALSE
+  filenames = NULL,
+  compounds = NULL,
+  isotopocules = NULL,
+  time_min = NULL,
+  time_max = NULL
 )
 }
 \arguments{
 \item{dataset}{The IsoX data to be filtered}
 
-\item{filenames}{Vector of file names to keep}
+\item{filenames}{Vector of file names to keep, keeps all if set to \code{NULL} (the default)}
 
-\item{compounds}{Vector of compounds to keep}
+\item{compounds}{Vector of compounds to keep, keeps all if set to \code{NULL} (the default)}
 
-\item{isotopocules}{Vector of isotopocules to keep}
+\item{isotopocules}{Vector of isotopocules to keep, keeps all if set to \code{NULL} (the default)}
 
-\item{time_min}{Minimum retention time in minutes (\code{time.min})}
+\item{time_min}{Minimum retention time in minutes (\code{time.min}), no minimum if set to \code{NULL} (the default)}
 
-\item{time_max}{Maximum retention time in minutes (\code{time.min})}
+\item{time_max}{Maximum retention time in minutes (\code{time.min}), no maximum if set to \code{NULL} (the default)}
 }
 \value{
 Filtered tibble
 }
 \description{
-A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges. Default value for all parameters is FALSE, i.e. no filter is applied.
+A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges. Default value for all parameters is NULL, i.e. no filter is applied.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <- orbi_read_isox(file = fpath) |>
-orbi_simplify_isox() |>
-orbi_filter_isox(filenames = c("s3744"),
-compounds = "HSO4-",
-isotopocules = c("M0", "34S", "18O"),
-time_min = FALSE,
-time_max = FALSE)
+df <-
+  orbi_read_isox(file = fpath) |>
+  orbi_simplify_isox() |>
+  orbi_filter_isox(
+    filenames = c("s3744"),
+    compounds = "HSO4-",
+    isotopocules = c("M0", "34S", "18O")
+  )
 
 }
