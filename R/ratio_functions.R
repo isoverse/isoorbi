@@ -15,13 +15,10 @@ calculate_ratios_sem <- function(ratios) {
   )
 
   # calculation
-  tryCatch(
+  try_catch_all(
     stats::sd(ratios) / sqrt(length(ratios)),
-    warning = function(w) {
-      abort("something went wrong calculating the standard error", parent = w)
-    }
+    "something went wrong calculating the standard error: "
   )
-
 }
 
 #' @title Internal function to calculate geometric mean
@@ -38,11 +35,9 @@ calculate_ratios_gmean <- function(ratios) {
   )
 
   # calculation
-  tryCatch(
+  try_catch_all(
     exp(mean(log(ratios))),
-    warning = function(w) {
-      abort("something went wrong calculating the geometic mean: ", parent = w)
-    }
+    "something went wrong calculating the geometic mean: "
   )
 }
 
@@ -61,12 +56,9 @@ calculate_ratios_gsd <- function(ratios) {
     "length of `ratios` needs to be > 1, cannot calculate GSD with a single value" = length(ratios) > 1L
   )
 
-  tryCatch(
-
+  try_catch_all(
     exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios))),
-    warning = function(w) {
-      abort("something went wrong calculating geometric standard deviaton: ", parent = w)
-    }
+    "something went wrong calculating geometric standard deviaton: "
   )
 
 }
@@ -85,11 +77,9 @@ calculate_ratios_gse <- function(ratios) {
     "length of `ratios` needs to be > 1, cannot calculate GSE with a single value" = length(ratios) > 1L
   )
 
-  tryCatch(
+  try_catch_all(
     (exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios)))) / sqrt(length(ratios)),
-    warning = function(w) {
-      abort("something went wrong calculating the geometric standard error: ", parent = w)
-    }
+    "something went wrong calculating the geometric standard error: "
   )
 
 }
@@ -114,15 +104,12 @@ calculate_ratios_slope <- function(x, y) {
     "`x` and `y` need to be vectors of equal length" = length(x) == length(y)
   )
 
-  tryCatch(
-
-    # Note order of x and y to get correct slope!
-    model <- stats::lm(x ~ y + 0, weights = x),
-
-    warning = function(w) {
-      abort("something went wrong calculating the ratio as slope using a linear model: ", parent = w)
-    }
-  )
+  model <-
+    try_catch_all(
+      # Note order of x and y to get correct slope!
+      stats::lm(x ~ y + 0, weights = x),
+      "something went wrong calculating the ratio as slope using a linear model: "
+    )
 
   sl <- model$coefficients[[1]]
 
@@ -160,12 +147,11 @@ calculate_ratios_weighted_sum <- function(x, y) {
   weighted.x <- avg.ions / scan.ions  * as.numeric(df[, 1])
   weighted.y <- avg.ions / scan.ions  * as.numeric(df[, 2])
 
-  tryCatch(
+  ratio <-
+    try_catch_all(
     # Note order of x and y to get correct slope!
-    ratio <- sum(weighted.x) / sum(weighted.y),
-    warning = function(w) {
-      abort("something went wrong calculating the ratio from weighted sums: ", parent = w)
-    }
+    sum(weighted.x) / sum(weighted.y),
+    "something went wrong calculating the ratio from weighted sums: "
   )
 
   return(ratio)
@@ -333,7 +319,8 @@ orbi_calculate_ratios <- function(
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
-#'       orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "M0")  |>
+#'       orbi_simplify_isox() |>
+#'       orbi_define_basepeak(basepeak_def = "M0")  |>
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
 #' @return Returns a results summary table retaining the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns:  `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
@@ -397,71 +384,72 @@ orbi_summarize_results <- function(
   }
 
   # info message
-  sprintf(
-    "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
-    sprintf("'%s'", dplyr::group_vars(df.group)) |> paste(collapse = ", "),
-    ratio_method
-  ) |>
-    message()
+  start_time <-
+    sprintf(
+      "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
+      sprintf("'%s'", dplyr::group_vars(df.group)) |> paste(collapse = ", "),
+      ratio_method
+    ) |>
+    message_start()
 
-  tryCatch(
-    # run calculations
-    df.stat <- df.group |>
+  # calculations
+  df.stat <-
+    try_catch_all({
+      # run calculations
+      df.group |>
 
-      dplyr::summarize(
+        dplyr::summarize(
 
-        # time information
-        start_time.min = min(.data$time.min),
-        mean_time.min = mean(.data$time.min),
-        end_time.min = max(.data$time.min),
+          # time information
+          start_time.min = min(.data$time.min),
+          mean_time.min = mean(.data$time.min),
+          end_time.min = max(.data$time.min),
 
-        # ratio calculation
-        ratio = orbi_calculate_ratio(
-          .data$ions.incremental,
-          .data$basepeak_ions,
-          ratio_method = !!ratio_method
-        ),
+          # ratio calculation
+          ratio = orbi_calculate_ratio(
+            .data$ions.incremental,
+            .data$basepeak_ions,
+            ratio_method = !!ratio_method
+          ),
 
-        shot_noise_permil =
-          1000 * (sqrt(
-            (sum(.data$ions.incremental) + sum(.data$basepeak_ions)) /
-              (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
+          shot_noise_permil =
+            1000 * (sqrt(
+              (sum(.data$ions.incremental) + sum(.data$basepeak_ions)) /
+                (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
 
-        ratio_sem = calculate_ratios_sem(
-          ratios = .data$ions.incremental / .data$basepeak_ions),
+          ratio_sem = calculate_ratios_sem(
+            ratios = .data$ions.incremental / .data$basepeak_ions),
 
-        minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
-          (max(.data$time.min) - min(.data$time.min)),
+          minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
+            (max(.data$time.min) - min(.data$time.min)),
 
-        number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
+          number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
 
-        .groups = "drop") |>
+          .groups = "drop") |>
 
-      dplyr::mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   |>
+        dplyr::mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   |>
 
-      # round values for output
-      dplyr::mutate(
-        ratio = round(.data$ratio, 8),
-        ratio_sem = round(.data$ratio_sem, 8),
-        ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
-        shot_noise_permil = round(.data$shot_noise_permil, 3),
-        minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
-      )  |>
-      # sort table by the grouping variables
-      dplyr::arrange(!!!lapply(dplyr::group_vars(df.group), rlang::sym)) |>
-      # rearrange column order
-      dplyr::relocate("ratio_relative_sem_permil", .after = "ratio"),
+        # round values for output
+        dplyr::mutate(
+          ratio = round(.data$ratio, 8),
+          ratio_sem = round(.data$ratio_sem, 8),
+          ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
+          shot_noise_permil = round(.data$shot_noise_permil, 3),
+          minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
+        )  |>
+        # sort table by the grouping variables
+        dplyr::arrange(!!!lapply(dplyr::group_vars(df.group), rlang::sym)) |>
+        # rearrange column order
+        dplyr::relocate("ratio_relative_sem_permil", .after = "ratio")
 
-    #For simplicity use basic standard error for all options
+    },
+    "something went wrong summarizing the results: "
+    )
 
-    warning = function(w) {
-      stop("something went wrong summarizing the results: ",
-           w$message,
-           call. = TRUE)
-    }
-  )
+  # info
+  message_finish("completed", start_time = start_time)
 
-
+  # return
   return(df.stat)
 
 }
