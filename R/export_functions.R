@@ -46,7 +46,7 @@ orbi_export_data_to_excel <- function(dataset, file, dbl_digits = 2, int_format 
   openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   # info
-  message_finish("complete", start_time = start_time)
+  message_finish("completed", start_time = start_time)
 
   # return invisible
   return(invisible(dataset))

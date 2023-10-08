@@ -26,9 +26,16 @@ group_by_same_groups <- function(target_dataset, source_dataset) {
   target_dataset |> dplyr::group_by(!!!dplyr::groups(source_dataset))
 }
 
+# count distinct column respecting existing grouping
+count_grouped_distinct <- function(dataset, column) {
+  dataset |> dplyr::select(!!!c(dplyr::groups(dataset), column)) |>
+    dplyr::distinct() |> dplyr::count(!!sym(column)) |>
+    dplyr::pull(.data$n) |> sum()
+}
+
 # internal function to wrap around expressions that should throw errors whenever anything unexpected happens
 # error/warn can be text or function
-try_catch_all <- function(expr, error, warn = error, newline = FALSE) {
+try_catch_all <- function(expr, error, warn = error, newline = TRUE) {
   tryCatch(
     {{ expr }},
     error = function(p) {
@@ -51,17 +58,17 @@ message_start <- function(...) {
 }
 
 # print out info end message
-message_finish <- function(..., start_time = NULL, pre = if (!interactive()) "..." else "") {
+message_finish <- function(..., start_time = NULL, pre = if (!interactive()) "..." else "",  indent = if (interactive()) 0 else 3) {
   end_time <- Sys.time()
   time_info <-
     if (!is.null(start_time)) sprintf(" in %.2f seconds.", end_time - start_time)
     else ""
-  message_wrap(pre, ..., time_info, indent = if (interactive()) 0 else 3, exdent = 3)
+  message_wrap(pre, ..., time_info, indent = indent, exdent = 3)
 }
 
 # print out standalone info message
 message_standalone <- function(..., start_time = NULL) {
-  message_finish(..., start_time = start_time, pre = "")
+  message_finish(..., start_time = start_time, pre = "", indent = 0)
 }
 
 # print out a message that wraps in non-interactive mode (e.g. in notebooks)
@@ -118,12 +125,7 @@ orbi_flag_satellite_peaks <- function(dataset) {
   )
 
   # info
-  start_time <-
-    sprintf(
-      "orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks) from %d peaks... ",
-      nrow(dataset)
-    ) |>
-    message_start()
+  start_time <- message_start("orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)... ")
 
   # calculation
   dataset <-
@@ -137,15 +139,14 @@ orbi_flag_satellite_peaks <- function(dataset) {
         ) |>
         dplyr::mutate(is_satellite_peak = .data$ions.incremental < max(.data$ions.incremental)) |>
         dplyr::ungroup(),
-      "something went wrong tying to flag satellite peaks: ",
-      newline = TRUE
+      "something went wrong tying to flag satellite peaks: "
     )
 
   # info
   sat_peaks <- sum(dataset$is_satellite_peak)
   sprintf(
-    "%d satellite peaks flagged (%.1f%%)",
-    sat_peaks, 100 * sat_peaks/nrow(dataset)) |>
+    "flagged %d/%d as satellite peaks (%.1f%%)",
+    sat_peaks, nrow(dataset), 100 * sat_peaks/nrow(dataset)) |>
     message_finish(start_time = start_time)
 
   return(dataset)
@@ -203,6 +204,7 @@ orbi_flag_weak_isotopocules <-
         "orbi_filter_weak_isotopocules() is flagging isotopocules from data that are detected in less than %s%% of scans in %d data group(s) (based on '%s')... ",
         min_percent,  dplyr::n_groups(dataset_out), paste(dplyr::group_vars(dataset_out), collapse = "', '")) |>
       message_start()
+    starting_isotopocules <- dataset_out |> count_grouped_distinct("isotopocule")
 
     # minor peak removal
     dataset_out <-
@@ -213,17 +215,14 @@ orbi_flag_weak_isotopocules <-
           dplyr::mutate(obs.scans = length(unique(.data$scan.no))) |>
           dplyr::mutate(is_weak_isotopocule = .data$obs.scans < min_percent / 100 * .data$max.scans) |>
           dplyr::select(-"obs.scans", -"max.scans"),
-      "something went wrong applying filter min_percent: ",
-      newline = TRUE
+      "something went wrong flagging weak isotopocules: "
     )
 
     # info
-    remaining_levels <- dataset_out |> filter(!.data$is_weak_isotopocule) |> pull("isotopocule") |> droplevels() |> levels()
-    flagged <- paste(setdiff(levels(dataset$isotopocule), remaining_levels), collapse = "', '")
+    removed_isotopocules <- dataset_out |> dplyr::filter(.data$is_weak_isotopocule) |> count_grouped_distinct("isotopocule")
     sprintf(
-      "flagged %d isotopocules%s",
-      length(levels(dataset$isotopocule)) - length(remaining_levels),
-      if (nchar(flagged) > 0) sprintf(" (%s)", flagged) else "") |>
+      "flagged %d/%d isotopocules across all data groups",
+      removed_isotopocules, starting_isotopocules) |>
       message_finish(start_time = start_time)
 
     # return with restored groupings from original dataset
@@ -277,13 +276,13 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
     group_if_exists(c("filename", "block", "segment", "injection"))
 
   # info
-  n_scans <- length(unique(dataset$scan.no))
   start_time <-
     sprintf(
-      "orbi_filter_scan_intensity() is flagging the %s %% of scans with the lowest and above %s %% of scans with the highest intensities from %d scans in %d data group(s) (based on '%s')... ",
-      intensity_window[1], intensity_window[2], n_scans,
+      "orbi_filter_scan_intensity() is flagging the %s %% of scans with the lowest and above %s %% of scans with the highest intensities in %d data group(s) (based on '%s')... ",
+      intensity_window[1], intensity_window[2],
       dplyr::n_groups(dataset_out), paste(dplyr::group_vars(dataset_out), collapse = "', '")) |>
     message_start()
+  n_scans <- dataset_out |> count_grouped_distinct("scan.no")
 
   # calculation
   dataset_out <- try_catch_all(
@@ -295,14 +294,14 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
           .data$TICxIT >= stats::quantile(.data$TICxIT, intensity_window[2] / 100)
       ) |>
       dplyr::select(-"TICxIT"),
-    "something went wrong: "
+    "something went wrong flagging outliers: "
   )
 
   # info
-  n_scans_removed <- dataset_out |> dplyr::filter(.data$is_outlier) |> dplyr::pull(.data$scan.no) |> unique() |> length()
+  n_scans_removed <- dataset_out |> dplyr::filter(.data$is_outlier) |> count_grouped_distinct("scan.no")
   sprintf(
-    "flagged %d scans (%.1f%%)",
-    n_scans_removed, n_scans_removed/n_scans * 100) |>
+    "flagged %d/%d scans (%.1f%%) across all data groups",
+    n_scans_removed, n_scans, n_scans_removed/n_scans * 100) |>
     message_finish(start_time = start_time)
 
   # return with restored groupings from original dataset
@@ -339,12 +338,12 @@ orbi_filter_flagged_data <- function(dataset) {
   if ("is_weak_isotopocule" %in% names(dataset)) {
     dataset <- dataset |> filter(!.data$is_weak_isotopocule)
     nweak_isos <- nall - nsat_peaks - nrow(dataset)
-    details <- c(details, sprintf("%d weak isotopocules", nweak_isos))
+    details <- c(details, sprintf("%d weak isotopocule peaks", nweak_isos))
   }
   if ("is_outlier" %in% names(dataset)) {
     dataset <- dataset |> filter(!.data$is_outlier)
     noutliers <- nall - nsat_peaks - nweak_isos - nrow(dataset)
-    details <- c(details, sprintf("%d outliers", noutliers))
+    details <- c(details, sprintf("%d outlier peaks", noutliers))
   }
 
   # info
@@ -424,16 +423,14 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
         abort()
       else
         abort("something went wrong identifying the base peak for each scan", parent = p)
-    },
-    newline = TRUE
+    }
     )
 
   # remove basepeak from isotopocule list
   df.out <-
     try_catch_all(
       df.out |> dplyr::filter(.data$isotopocule != basepeak_def) |> droplevels(),
-      "something went wrong removing the base peak isotopocule",
-      newline = TRUE
+      "something went wrong removing the base peak isotopocule"
     )
 
   # info
