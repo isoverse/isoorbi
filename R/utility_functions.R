@@ -86,7 +86,8 @@ message_wrap <- function (..., appendLF = TRUE, width = if (!interactive()) opti
 #' @export
 orbi_filter_satellite_peaks <- function(...) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_satellite_peaks()", "orbi_flag_satellite_peaks()", always = TRUE)
-  orbi_flag_satellite_peaks(...)
+  orbi_flag_satellite_peaks(...) |>
+    orbi_filter_flagged_data()
 }
 
 #' @title Flag minor satellite peaks
@@ -155,7 +156,8 @@ orbi_flag_satellite_peaks <- function(dataset) {
 #' @export
 orbi_filter_weak_isotopocules <- function(...) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_weak_isotopocules()", "orbi_flag_weak_isotopocules()", always = TRUE)
-  orbi_flag_weak_isotopocules(...)
+  orbi_flag_weak_isotopocules(...) |>
+    orbi_filter_flagged_data()
 }
 
 #' @title Flag weak isotopocules
@@ -236,7 +238,8 @@ orbi_flag_weak_isotopocules <-
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity()", "orbi_flag_outliers()", always = TRUE)
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity(outlier_percent)", details = "the argument `outlier_percent` has been superseded by `intensity_window`")
-  orbi_flag_outliers(..., intensity_window = c(outlier_percent, 100 - outlier_percent))
+  orbi_flag_outliers(..., intensity_window = c(outlier_percent, 100 - outlier_percent)) |>
+    orbi_filter_flagged_data()
 }
 
 
