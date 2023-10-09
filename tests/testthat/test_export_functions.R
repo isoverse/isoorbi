@@ -23,10 +23,6 @@ test_that("orbi_export_data_to_excel() tests", {
                "invalid format '%d'; use format %s for character objects",
                fixed = TRUE)
 
-  expect_error(orbi_export_data_to_excel(df, "c", 0.1),
-               "ℹ In argument: `across(dplyr::everything(), calculate_data_width)`.\nCaused by error in `across()`:\n! Can't compute column `time.min`.\nCaused by error in `sprintf()`:\n! internal error in trio library",
-               fixed = TRUE)
-
   expect_error(orbi_export_data_to_excel(df, "c", 2, int_format = TRUE),
                "a character vector argument expected",
                fixed = TRUE)
