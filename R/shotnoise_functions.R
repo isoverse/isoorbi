@@ -151,7 +151,7 @@ orbi_plot_shot_noise <- function(
       text = ggplot2::element_text(size = 16),
       strip.text = ggplot2::element_text(size = 20),
       panel.grid = ggplot2::element_blank(),
-      #panel.border = element_blank(), # MAYBE
+      #panel.border = ggplot2::element_blank(), # MAYBE
       panel.background = ggplot2::element_blank(),
       plot.background = ggplot2::element_blank(),
       #axis.line.y.left = ggplot2::element_line(), # MAYBE
@@ -160,7 +160,7 @@ orbi_plot_shot_noise <- function(
       legend.position = "bottom",
       legend.direction = "vertical",
       legend.title.align = 0.5,
-      legend.background = element_blank()
+      legend.background = ggplot2::element_blank()
     ) +
     ggplot2::labs(
       y = "relative error",

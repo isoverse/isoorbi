@@ -69,10 +69,6 @@ test_that("orbi_plot_shot_noise() tests", {
                "`x` must be one of \"time.min\" or \"n_effective_ions\", not \"filename\".",
                fixed = TRUE)
 
-  expect_error(orbi_plot_shot_noise(df, "time.min", permil_target = "a"),
-               "could not find function \"element_blank\"",
-               fixed = TRUE)
-
   expect_error(orbi_plot_shot_noise(df, "time.min", permil_target = 0.5, color = 42),
                "`shotnoise` requires a factor column set for `color` aesthetic",
                fixed = TRUE)
@@ -91,10 +87,6 @@ test_that("orbi_plot_shot_noise() tests", {
 
   expect_error(orbi_plot_shot_noise(df, "time.min", colors = 42),
                "not enough `colors` provided, 5 needed for distinguishing ratio_label",
-               fixed = TRUE)
-
-  expect_error(orbi_plot_shot_noise(df, "time.min", colors = df),
-               "could not find function \"element_blank\"",
                fixed = TRUE)
 
   # success
