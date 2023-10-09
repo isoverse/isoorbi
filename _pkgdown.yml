@@ -51,7 +51,7 @@ reference:
     These functions are available to simplify or customize the data analysis.
   contents:
   - orbi_simplify_isox
-  - orbi_calculate_ratio
+  - orbi_calculate_summarized_ratio
 
 - title: Shot noise analysis
   desc: >
