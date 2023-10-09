@@ -59,6 +59,8 @@ CRAN-SUBMISSION
 
 # exclude paper
 paper/
+paper.md
 
 # exclude revdep checks
 revdep/
+docs
