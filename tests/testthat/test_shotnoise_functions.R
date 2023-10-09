@@ -101,4 +101,9 @@ test_that("orbi_plot_shot_noise() tests", {
   library(ggplot2)
   expect_type(orbi_plot_shot_noise(df, "time.min"), "list")
 
+  fig <- orbi_plot_shot_noise(df, x = "n_effective_ions")
+  expect_equal(fig$facet$vars(), character(0))
+
+  fig2 <- orbi_plot_shot_noise(df, x = "n_effective_ions", permil_target = 1)
+  expect_equal(length(fig2$layers), 5)
 })

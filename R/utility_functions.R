@@ -236,7 +236,7 @@ orbi_flag_weak_isotopocules <-
 #' @export
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity()", "orbi_flag_outliers()", always = TRUE)
-  lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity(outlier_percent)", details = "the argument `outlier_percent` has been superseded by `intensity_window`")
+  lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity(outlier_percent)", details = "the argument `outlier_percent` has been superseded by `intensity_window`", always = TRUE)
   orbi_flag_outliers(..., intensity_window = c(outlier_percent, 100 - outlier_percent)) |>
     orbi_filter_flagged_data()
 }

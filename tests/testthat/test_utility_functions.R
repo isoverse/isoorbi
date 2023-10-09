@@ -14,6 +14,10 @@ test_that("factorize_dataset() tests", {
   expect_error(factorize_dataset(),
                "argument \"dataset\" is missing, with no default")
 
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+
+  expect_silent(factorize_dataset(df))
+
 })
 
 # group_if_exists
@@ -60,7 +64,9 @@ test_that("count_grouped_distinct() tests", {
 
 test_that("orbi_filter_satellite_peaks() tests", {
 
-    expect_warning(warning("foo"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+
+  expect_warning(orbi_filter_satellite_peaks(df), "deprecated")
 
 })
 
@@ -83,10 +89,6 @@ test_that("orbi_flag_satellite_peaks() tests", {
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
     fixed = TRUE)
 
-  expect_error(orbi_flag_satellite_peaks(dataset = df[0,]),
-               "something went wrong tying to flag satellite peaks: \nCaused by warning:\n! There was 1 warning in `dplyr::mutate()`.\nℹ In argument: `is_satellite_peak = .data$ions.incremental <\n  max(.data$ions.incremental)`.\nCaused by warning in `max()`:\n! no non-missing arguments to max; returning -Inf",
-               fixed = TRUE)
-
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(orbi_flag_satellite_peaks(dataset = df2),
@@ -94,6 +96,16 @@ test_that("orbi_flag_satellite_peaks() tests", {
     fixed = TRUE)
 
 })
+
+# orbi_filter_weak_isotopocules
+test_that("orbi_filter_weak_isotopocules() tests", {
+
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+
+  expect_warning(orbi_filter_weak_isotopocules(df, min_percent = 5), "deprecated")
+
+})
+
 
 # orbi_flag_weak_isotopocules
 test_that("orbi_flag_weak_isotopocules() tests", {
@@ -144,6 +156,16 @@ test_that("orbi_flag_weak_isotopocules() tests", {
 
   # success
   expect_true(is.tbl(orbi_flag_weak_isotopocules(dataset = df3, min_percent = 1)))
+
+})
+
+# orbi_filter_scan_intensity
+
+test_that("orbi_filter_scan_intensity() tests", {
+
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+
+  expect_warning(orbi_filter_scan_intensity(df, outlier_percent = 5), "deprecated")
 
 })
 

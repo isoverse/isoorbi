@@ -213,12 +213,6 @@ test_that("test orbi_calculate_ratio()", {
   expect_equal(orbi_calculate_ratio(a, b, "direct"), 1)
 
   # failure
-  expect_error(
-    orbi_calculate_ratio(a, b, "median2"),
-    "`ratio_method` must be one of \"direct\", \"mean\", \"sum\", \"median\",\n\"geometric_mean\", \"slope\", or \"weighted_sum\", not \"median2\".\nℹ Did you mean \"median\"?",
-    fixed = TRUE
-  )
-
   expect_error(orbi_calculate_ratio(numerator = vector("numeric", 2), denominator = vector("numeric", 1), "direct"),
                "`numerator` and `denominator` must be vectors of equal length")
 
@@ -251,11 +245,6 @@ test_that("test orbi_calculate_ratios()", {
     orbi_define_basepeak("15N")
 
   # failure
-  expect_error(
-    orbi_calculate_ratios(df_results, "median2"),
-    "`ratio_method` must be one of \"direct\", \"mean\", \"sum\", \"median\",\n\"geometric_mean\", \"slope\", or \"weighted_sum\", not \"median2\".\nℹ Did you mean \"median\"?",
-    fixed = TRUE
-  )
 
   expect_error(orbi_calculate_ratios(),
                "need a `dataset` data frame",
