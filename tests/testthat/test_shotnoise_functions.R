@@ -30,8 +30,8 @@ test_that("orbi_analyze_shot_noise() tests", {
     orbi_define_basepeak("15N")
   df_results2 <- subset(df_results, select = -basepeak_ions)
 
-  expect_error(orbi_calculate_ratios(df_results2, "mean"),
-               "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
+  expect_error(orbi_calculate_ratios(df_results2),
+               "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
                fixed = TRUE)
 
   # success

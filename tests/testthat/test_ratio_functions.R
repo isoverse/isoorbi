@@ -195,41 +195,41 @@ test_that("test calculate_ratios_weighted_sum()", {
 })
 
 # orbi_calculate_ratio
-test_that("test orbi_calculate_ratio()", {
+test_that("test orbi_calculate_summarized_ratio()", {
 
   a <- 1:10
   b <- 1:10
 
   # success
-  expect_equal(orbi_calculate_ratio(a, b, "mean"), 1)
-  expect_equal(orbi_calculate_ratio(a, b, "sum"), 1)
-  expect_equal(orbi_calculate_ratio(a, b, "slope"), 1)
-  expect_equal(orbi_calculate_ratio(a, b, "geometric_mean"), 1)
-  expect_equal(orbi_calculate_ratio(a, b, "weighted_sum"), 1)
-  expect_equal(orbi_calculate_ratio(a, b, "median"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "mean"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "sum"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "slope"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "geometric_mean"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "weighted_sum"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "median"), 1)
 
   a <- 1
   b <- 1
-  expect_equal(orbi_calculate_ratio(a, b, "direct"), 1)
+  expect_equal(orbi_calculate_summarized_ratio(a, b, "direct"), 1)
 
   # failure
-  expect_error(orbi_calculate_ratio(numerator = vector("numeric", 2), denominator = vector("numeric", 1), "direct"),
+  expect_error(orbi_calculate_summarized_ratio(numerator = vector("numeric", 2), denominator = vector("numeric", 1), "direct"),
                "`numerator` and `denominator` must be vectors of equal length")
 
-  expect_error(orbi_calculate_ratio(),
+  expect_error(orbi_calculate_summarized_ratio(),
                "no input for `numerator` supplied",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratio(numerator = a),
+  expect_error(orbi_calculate_summarized_ratio(numerator = a),
                "no input for `denominator` supplied",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratio(numerator =  as.character(a),
+  expect_error(orbi_calculate_summarized_ratio(numerator =  as.character(a),
                                      denominator = b),
                "`numerator` needs to be provided as a numeric vector",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratio(numerator =  a,
+  expect_error(orbi_calculate_summarized_ratio(numerator =  a,
                                      denominator = as.character(b)),
                "`denominator` needs to be provided as a numeric vector",
                fixed = TRUE)
@@ -250,18 +250,10 @@ test_that("test orbi_calculate_ratios()", {
                "need a `dataset` data frame",
                fixed = TRUE)
 
-  expect_error(orbi_calculate_ratios(df_results, 42),
-               "`ratio_method` must be a character vector, not the number 42.",
-               fixed = TRUE)
-
-  expect_error(orbi_calculate_ratios(df_results, TRUE),
-               "`ratio_method` must be a character vector, not `TRUE`.",
-               fixed = TRUE)
-
   df_results2 <- subset(df_results, select = -basepeak_ions)
 
-  expect_error(orbi_calculate_ratios(df_results2, "mean"),
-               "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
+  expect_error(orbi_calculate_ratios(df_results2),
+               "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
                fixed = TRUE)
 
 })

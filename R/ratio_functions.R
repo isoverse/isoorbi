@@ -1,4 +1,56 @@
-# Functions to calculate ratios and stats --------------------------------------------
+# Functions to calcualte direct ratios --------------
+
+#' Calculate direct isotopocule ratios
+#'
+#' This function calculates isotopocule/base peak ratios for all isotopocules. It does not summarize or average the ratios in any way. For a summarizing version of this function, see `orbi_summarize_results()`.
+#'
+#' @param dataset A data frame output after running `orbi_define_basepeak()`
+#' @return Returns a mutated dataset with `ratio` column added.
+#' @export
+orbi_calculate_ratios <- function(dataset) {
+
+  # safety checks
+  stopifnot(
+    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
+    "`dataset` requires columns `isotopocule` and `ions.incremental`" =
+      all(c("isotopocule", "ions.incremental") %in% names(dataset)),
+    "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first" =
+      all(c("basepeak", "basepeak_ions") %in% names(dataset))
+  )
+
+  # info message
+  start_time <-
+    sprintf(
+      "orbi_calculate_ratios() is calculating all isotopocule/base peak ratios... "
+    ) |>
+    message_start()
+
+  # mutate
+  dataset <- dataset |> factorize_dataset("isotopocule")
+
+  dataset <-
+    try_catch_all(
+      dataset |>
+        dplyr::mutate(
+          ratio = .data$ions.incremental / .data$basepeak_ions,
+          .after = "ions.incremental"
+        ),
+      "something went wrong calculating ratios: "
+    )
+
+  # info message
+  sprintf(
+    "calculated %d ratios for %d isotopocules/base peak (%s)",
+    nrow(dataset),
+    length(levels(dataset$isotopocule)),
+    paste(levels(dataset$isotopocule), collapse = ", ")
+  ) |> message_finish(start_time = start_time)
+
+  # return
+  return(dataset)
+}
+
+# Functions to calculate summarized ratios and stats --------------------------------------------
 
 #' @title Internal function to calculate standard error
 #' @description The function `calculate_ratios_sem()` computes a regular standard error
@@ -160,13 +212,12 @@ calculate_ratios_weighted_sum <- function(x, y) {
 
 #' @title Calculate isotopocule ratio
 #'
-#' @description This function calculates the ratio of two isotopocules (the `numerator` and `denominator`). If `ratio_method = "direct"`, this method calculates the vector ratios for each individual numerator and denominator value pair. For all other `ratio_method` values, this function averages multiple measurements of each using the `ratio_method` and returns a single value. Normally this function is not called directly by the user, but via the function [orbi_summarize_results()], which calculates isotopocule ratios and other results for an entire dataset.
+#' @description This function calculates the ratio of two isotopocules (the `numerator` and `denominator`). This function averages multiple measurements of each using the `ratio_method` and returns a single value. Normally this function is not called directly by the user, but via the function [orbi_summarize_results()], which calculates isotopocule ratios and other results for an entire dataset.
 #'
 #' @param numerator Column(s) used as numerator; contains ion counts
 #' @param denominator Column used as denominator; contains ion counts
 #' @param ratio_method Method for computing the ratio. **Please note well**: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). `ratio_method` can be one of the following:
 #'
-#' * `direct`: no averaging, direct calculationg of numerator/denominator
 #'
 #' * `mean`: arithmetic mean of ratios from individual scans.
 #'
@@ -187,22 +238,18 @@ calculate_ratios_weighted_sum <- function(x, y) {
 #' ions_18O <- dplyr::filter(df, isotopocule == "18O")$ions.incremental
 #' ions_M0 <- dplyr::filter(df, isotopocule == "M0")$ions.incremental
 #'
-#' orbi_calculate_ratio(
-#'   numerator = ions_18O, denominator = ions_M0, ratio_method = "direct"
-#' ) |> head()
-#'
-#' orbi_calculate_ratio(
+#' orbi_calculate_summarized_ratio(
 #'   numerator = ions_18O, denominator = ions_M0, ratio_method = "sum"
 #' )
 #'
-#' orbi_calculate_ratio(
+#' orbi_calculate_summarized_ratio(
 #'   numerator = ions_18O, denominator = ions_M0, ratio_method = "slope"
 #' )
 #'
 #' @return Single value ratio between the isotopocules defined as `numerator` and `denominator` calculated using the `ratio_method`.
 #'
 #' @export
-orbi_calculate_ratio <- function(
+orbi_calculate_summarized_ratio <- function(
     numerator, denominator,
     ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
 
@@ -216,111 +263,45 @@ orbi_calculate_ratio <- function(
   )
 
   # calculation
-  tryCatch({ o <-  {
-    if (ratio_method == "direct") {
-      stopifnot("`numerator` and `denominator` must be vectors of equal length" =
-                  length(numerator) == length(denominator))
-      numerator / denominator
-    } else if (ratio_method == "mean") {
-      base::mean(numerator / denominator)
-    } else if (ratio_method == "slope") {
-      calculate_ratios_slope(numerator, denominator)
-    } else if (ratio_method == "sum") {
-      base::sum(numerator) / sum(denominator)
-    } else if (ratio_method == "geometric_mean") {
-      calculate_ratios_gmean(ratios = numerator / denominator)
-    } else if (ratio_method == "weighted_sum") {
-      calculate_ratios_weighted_sum(numerator, denominator)
-    } else if (ratio_method == "median") {
-      stats::median(numerator / denominator)
-    } else{
-      rlang::arg_match(ratio_method)
-    }
-  }
-   warning = function(w) {
-     abort("something went wrong calculating ratios:", parent = w)
-   }
-  })
+  o <-
+    try_catch_all({
+      if (ratio_method == "direct") {
+        stopifnot("`numerator` and `denominator` must be vectors of equal length" =
+                    length(numerator) == length(denominator))
+        numerator / denominator
+      } else if (ratio_method == "mean") {
+        base::mean(numerator / denominator)
+      } else if (ratio_method == "slope") {
+        calculate_ratios_slope(numerator, denominator)
+      } else if (ratio_method == "sum") {
+        base::sum(numerator) / sum(denominator)
+      } else if (ratio_method == "geometric_mean") {
+        calculate_ratios_gmean(ratios = numerator / denominator)
+      } else if (ratio_method == "weighted_sum") {
+        calculate_ratios_weighted_sum(numerator, denominator)
+      } else if (ratio_method == "median") {
+        stats::median(numerator / denominator)
+      } else{
+        rlang::arg_match(ratio_method)
+      }
+    },
+    "something went wrong calculating ratios:",
+    newline = FALSE
+    )
   return(o)
 }
 
-#' Calculate isotopocule ratios for an entire dataset
-#'
-#' `r lifecycle::badge("deprecated")` This function was renamed to [orbi_calculate_ratio()] to better reflect what it does.
-#'
-#' @param dataset A data frame output after running `orbi_define_basepeak()`
-#' @param ratio_method Method for computing the ratio. **Please note well**: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). `ratio_method` can be one of the following:
-#'
-#' * `direct`: no averaging, direct calculationg of numerator/denominator
-#'
-#' * `mean`: arithmetic mean of ratios from individual scans.
-#'
-#' * `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
-#'
-#' * `geometric_mean`: geometric mean of ratios from individual scans.
-#'
-#' * `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
-#'
-#' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-#' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
-#'
-#' @export
-orbi_calculate_ratios <- function(
-    dataset, ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
-
-  isotopocule <- NULL
-  # safety checks
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `isotopocule` and `ions.incremental`" = all(c("isotopocule", "ions.incremental") %in% names(dataset)),
-    "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first" = "basepeak_ions" %in% names(dataset),
-    "no input for `ratio_method` supplied" = !missing(ratio_method)
-  )
-  rlang::arg_match(ratio_method)
-
-  # grouping
-  existing_groups <- dataset |> dplyr::groups()
-  all_groups <- c(existing_groups, list(expr(isotopocule)))
-
-  # calculation
-  if (ratio_method == "direct") {
-    # mutate
-    dataset <- dataset |>
-      dplyr::group_by(!!!all_groups) |>
-      dplyr::mutate(
-        ratio = .data$ions.incremental / .data$basepeak_ions
-      ) |>
-      dplyr::group_by(!!!existing_groups)
-  } else {
-    # summarize
-    dataset <- dataset |>
-      dplyr::group_by(!!!all_groups) |>
-      summarize(
-        ratio = orbi_calculate_ratio(
-          .data$ions.incremental,
-          .data$basepeak_ions,
-          ratio_method = !!ratio_method
-        ),
-        .groups = "drop"
-      ) |>
-      dplyr::group_by(!!!existing_groups)
-  }
-
-  # return
-  return(dataset)
-}
-
 #' @title Generate the results table
-#' @description Contains the logic to generate the results table. It passes the  `ratio_method` parameter to the [orbi_calculate_ratio()] function for ratio calculations.
+#' @description Contains the logic to generate the results table. It passes the  `ratio_method` parameter to the [orbi_calculate_summarized_ratio()] function for ratio calculations.
 #' @param dataset A tibble from `IsoX` output ([orbi_read_isox()]) and with a basepeak already defined (using `orbi_define_basepeak()`). Optionally, with block definitions ([orbi_define_blocks_for_dual_inlet()]) or even additional block segments ([orbi_segment_blocks()]).
-#' @inheritParams orbi_calculate_ratio
+#' @inheritParams orbi_calculate_summarized_ratio
 #' @param .by additional grouping columns for the results summary (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
 #'       orbi_simplify_isox() |>
-#'       orbi_define_basepeak(basepeak_def = "M0")  |>
+#'       orbi_define_basepeak("M0")  |>
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
 #' @return Returns a results summary table retaining the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns:  `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
@@ -406,7 +387,7 @@ orbi_summarize_results <- function(
           end_time.min = max(.data$time.min),
 
           # ratio calculation
-          ratio = orbi_calculate_ratio(
+          ratio = orbi_calculate_summarized_ratio(
             .data$ions.incremental,
             .data$basepeak_ions,
             ratio_method = !!ratio_method

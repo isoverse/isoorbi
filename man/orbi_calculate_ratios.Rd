@@ -2,28 +2,16 @@
 % Please edit documentation in R/ratio_functions.R
 \name{orbi_calculate_ratios}
 \alias{orbi_calculate_ratios}
-\title{Calculate isotopocule ratios for an entire dataset}
+\title{Calculate direct isotopocule ratios}
 \usage{
-orbi_calculate_ratios(
-  dataset,
-  ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope",
-    "weighted_sum")
-)
+orbi_calculate_ratios(dataset)
 }
 \arguments{
 \item{dataset}{A data frame output after running \code{orbi_define_basepeak()}}
-
-\item{ratio_method}{Method for computing the ratio. \strong{Please note well}: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). \code{ratio_method} can be one of the following:
-\itemize{
-\item \code{direct}: no averaging, direct calculationg of numerator/denominator
-\item \code{mean}: arithmetic mean of ratios from individual scans.
-\item \code{sum}: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
-\item \code{geometric_mean}: geometric mean of ratios from individual scans.
-\item \code{slope}: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the \verb{numerator x}, using \code{stats::lm(x ~ y + 0, weights = x)}.
-\item \code{weighted_sum}: A derivative of the \code{sum} option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total \code{sum} of \code{x} and \code{y} that is used to calculate \code{x/y}.
-}}
+}
+\value{
+Returns a mutated dataset with \code{ratio} column added.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This function was renamed to \code{\link[=orbi_calculate_ratio]{orbi_calculate_ratio()}} to better reflect what it does.
+This function calculates isotopocule/base peak ratios for all isotopocules. It does not summarize or average the ratios in any way. For a summarizing version of this function, see \code{orbi_summarize_results()}.
 }
