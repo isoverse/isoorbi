@@ -291,6 +291,13 @@ test_that("test orbi_get_blocks_info()", {
   expect_error(orbi_get_blocks_info(), "`dataset` must be a data frame or tibble")
   expect_error(orbi_get_blocks_info(42), "`dataset` must be a data frame or tibble")
 
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
+
+  expect_error(orbi_get_blocks_info(df2),
+               "`dataset` is missing the column(s) 'scan.no', 'block', 'sample_name'",
+               fixed = TRUE)
+
 })
 
 test_that("test find_scan_from_time()", {

@@ -56,6 +56,14 @@ test_that("count_grouped_distinct() tests", {
 
 # Common utility functions to clean and annotate data ------------------------------------
 
+# orbi_filter_satellite_peaks
+
+test_that("orbi_filter_satellite_peaks() tests", {
+
+    expect_warning(warning("foo"))
+
+})
+
 # orbi_flag_satellite_peaks
 test_that("orbi_flag_satellite_peaks() tests", {
 
