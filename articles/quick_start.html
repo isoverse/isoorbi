@@ -115,28 +115,11 @@
 <span></span>
 <span><span class="co"># Clean the data by removing noise and outliers</span></span>
 <span><span class="va">df.clean</span> <span class="op">&lt;-</span> <span class="va">df.filtered</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_filter_satellite_peaks.html">orbi_filter_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_filter_weak_isotopocules.html">orbi_filter_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_filter_scan_intensity.html">orbi_filter_scan_intensity</a></span><span class="op">(</span>outlier_percent <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: `orbi_filter_scan_intensity()` was deprecated in isoorbi 1.2.0.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use `orbi_flag_outliers()` instead.</span></span>
-<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<pre><code><span><span class="co">## Warning: The `outlier_percent` argument of `orbi_filter_scan_intensity()` is deprecated</span></span>
-<span><span class="co">## as of isoorbi 1.2.0.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> the argument `outlier_percent` has been superseded by `intensity_window`</span></span>
-<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<pre><code><span><span class="co">## Warning: `orbi_filter_weak_isotopocules()` was deprecated in isoorbi 1.2.0.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use `orbi_flag_weak_isotopocules()` instead.</span></span>
-<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<pre><code><span><span class="co">## Warning: `orbi_filter_satellite_peaks()` was deprecated in isoorbi 1.2.0.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use `orbi_flag_satellite_peaks()` instead.</span></span>
-<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define base peak and calculate the results table</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>intensity_window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">99</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define base peak and calculate the results table</span></span>
 <span><span class="va">df.results</span> <span class="op">&lt;-</span> <span class="va">df.clean</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span><span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></code></pre></div>
