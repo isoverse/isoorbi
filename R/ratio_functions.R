@@ -5,34 +5,20 @@
 #' @keywords internal
 #' @param ratios A numeric vector used to calculate a standard error
 #' @return The calculated standard error
-
 calculate_ratios_sem <- function(ratios) {
 
   # safety checks
-  if (missing(ratios))
-    stop("no input vector for ratios supplied", call. = TRUE)
-
-  # basic checks
-  if (!(is.vector(ratios)))
-    stop("ratios need to be provided in a vector", call. = TRUE)
-
-  if (!(is.numeric(ratios)))
-    stop("ratios need to be a numeric vector", call. = TRUE)
-
-  if (length(ratios) <= 1)
-    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
-
-
-  tryCatch(
-
-    stats::sd(ratios) / sqrt(length(ratios)),
-    warning = function(w) {
-      stop("something went wrong calculating the standard error: ",
-           w$message,
-           call. = TRUE)
-    }
+  stopifnot(
+    "no input vector for `ratios` supplied" = !missing(ratios),
+    "`ratios` need to be provided as a numeric vector" = is.vector(ratios) && is.numeric(ratios),
+    "length of `ratios` needs to be > 1, cannot calculate SEM with a single value" = length(ratios) > 1L
   )
 
+  # calculation
+  try_catch_all(
+    stats::sd(ratios) / sqrt(length(ratios)),
+    "something went wrong calculating the standard error: "
+  )
 }
 
 #' @title Internal function to calculate geometric mean
@@ -40,28 +26,18 @@ calculate_ratios_sem <- function(ratios) {
 #' @keywords internal
 #' @param ratios A numeric vector of ratios used to calculate the geometric mean
 #' @return The calculated geometric mean
-
 calculate_ratios_gmean <- function(ratios) {
 
-  if (missing(ratios))
-    stop("input vector for ratios supplied", call. = TRUE)
+  # safety checks
+  stopifnot(
+    "no input vector for `ratios` supplied" = !missing(ratios),
+    "`ratios` need to be provided as a numeric vector" = is.vector(ratios) && is.numeric(ratios)
+  )
 
-  # basic checks
-  if (!(is.vector(ratios)))
-    stop("ratios need to be provided in a vector", call. = TRUE)
-
-  if (!(is.numeric(ratios)))
-    stop("ratios need to be a numeric vector", call. = TRUE)
-
-  if (length(ratios) <= 1)
-    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
-
-  tryCatch(
-
+  # calculation
+  try_catch_all(
     exp(mean(log(ratios))),
-    warning = function(w) {
-      stop("something went wrong calculating the geometic mean: ", w$message, call. = TRUE)
-    }
+    "something went wrong calculating the geometic mean: "
   )
 }
 
@@ -73,25 +49,16 @@ calculate_ratios_gmean <- function(ratios) {
 #' @return The calculated geometric standard deviation
 calculate_ratios_gsd <- function(ratios) {
 
-  if (missing(ratios))
-    stop("no input vector for ratios supplied", call. = TRUE)
+  # safety checks
+  stopifnot(
+    "no input vector for `ratios` supplied" = !missing(ratios),
+    "`ratios` need to be provided as a numeric vector" = is.vector(ratios) && is.numeric(ratios),
+    "length of `ratios` needs to be > 1, cannot calculate GSD with a single value" = length(ratios) > 1L
+  )
 
-  # basic checks
-  if (!(is.vector(ratios)))
-    stop("ratios need to be provided in a vector", call. = TRUE)
-
-  if (!(is.numeric(ratios)))
-    stop("ratios need to be a numeric vector", call. = TRUE)
-
-  if (length(ratios) <= 1)
-    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
-
-  tryCatch(
-
+  try_catch_all(
     exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios))),
-    warning = function(w) {
-      stop("something went wrong calculating geometric standard deviaton: ", w$message, call. = TRUE)
-    }
+    "something went wrong calculating geometric standard deviaton: "
   )
 
 }
@@ -103,24 +70,16 @@ calculate_ratios_gsd <- function(ratios) {
 # @return The calculated geometric standard error
 calculate_ratios_gse <- function(ratios) {
 
-  if (missing(ratios))
-    stop("input vector for ratios supplied", call. = TRUE)
+  # safety checks
+  stopifnot(
+    "no input vector for `ratios` supplied" = !missing(ratios),
+    "`ratios` need to be provided as a numeric vector" = is.vector(ratios) && is.numeric(ratios),
+    "length of `ratios` needs to be > 1, cannot calculate GSE with a single value" = length(ratios) > 1L
+  )
 
-  # basic checks
-  if (!(is.vector(ratios)))
-    stop("ratios need to be provided in a vector", call. = TRUE)
-
-  if (!(is.numeric(ratios)))
-    stop("ratios need to be a numeric vector", call. = TRUE)
-
-  if (length(ratios) <= 1)
-    stop("length of ratios needs to be > 1: ", length(ratios), call. = TRUE)
-
-  tryCatch(
+  try_catch_all(
     (exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios)))) / sqrt(length(ratios)),
-    warning = function(w) {
-      stop("something went wrong calculating the geometric standard error: ", w$message, call. = TRUE)
-    }
+    "something went wrong calculating the geometric standard error: "
   )
 
 }
@@ -134,44 +93,23 @@ calculate_ratios_gse <- function(ratios) {
 #' @return The calculated slope, an estimate of the ratio x/y
 calculate_ratios_slope <- function(x, y) {
 
-  if (missing(x))
-    stop("no input vector for x supplied", call. = TRUE)
-
-  if (missing(y))
-    stop("no input vector for y supplied", call. = TRUE)
-
-  # basic checks
-  if (!(is.vector(x)))
-    stop("x needs to be a vector", call. = TRUE)
-
-  if (!(is.numeric(x)))
-    stop("x needs to be a numeric vector", call. = TRUE)
-
-  if (length(x) <= 1)
-    stop("length of x needs to be > 1: ", length(x), call. = TRUE)
-
-  if (!(is.vector(y)))
-    stop("y needs to be a vector", call. = TRUE)
-
-  if (!(is.numeric(y)))
-    stop("y needs to be a numeric vector", call. = TRUE)
-
-  if (length(y) <=1)
-    stop("length of y needs to be > 1: ", length(y), call. = TRUE)
-
-  if (length(x) != length(y))
-    stop("length of x and y need to be equal", call. = TRUE)
-
-  tryCatch(
-
-    # Note order of x and y to get correct slope!
-    model <-
-      stats::lm(x ~ y + 0, weights = x),
-
-    warning = function(w) {
-      stop("something went wrong calculating the ratio as slope using a linear model: ", w$message, call. = TRUE)
-    }
+  # safety checks
+  stopifnot(
+    "no input vector for `x` supplied" = !missing(x),
+    "no input vector for `y` supplied" = !missing(y),
+    "`x` needs to be provided as a numeric vector" = is.vector(x) && is.numeric(x),
+    "`y` needs to be provided as a numeric vector" = is.vector(y) && is.numeric(y),
+    "length of `x` needs to be > 1, cannot calculate slope with a single value" = length(x) > 1L,
+    "length of `y` needs to be > 1, cannot calculate slope with a single value" = length(y) > 1L,
+    "`x` and `y` need to be vectors of equal length" = length(x) == length(y)
   )
+
+  model <-
+    try_catch_all(
+      # Note order of x and y to get correct slope!
+      stats::lm(x ~ y + 0, weights = x),
+      "something went wrong calculating the ratio as slope using a linear model: "
+    )
 
   sl <- model$coefficients[[1]]
 
@@ -189,34 +127,16 @@ calculate_ratios_slope <- function(x, y) {
 #' @return The calculated ratio x/y
 calculate_ratios_weighted_sum <- function(x, y) {
 
-  if (missing(x))
-    stop("no input vector for x supplied", call. = TRUE)
-
-  if (missing(y))
-    stop("no input vector for y supplied", call. = TRUE)
-
-  # basic checks
-  if (!(is.vector(x)))
-    stop("x needs to be a vector", call. = TRUE)
-
-  if (!(is.numeric(x)))
-    stop("x needs to be a numeric vector", call. = TRUE)
-
-  if (length(x) <= 1)
-    stop("length of x needs to be > 1: ", length(x), call. = TRUE)
-
-  if (!(is.vector(y)))
-    stop("y needs to be a vector", call. = TRUE)
-
-  if (!(is.numeric(y)))
-    stop("y needs to be a numeric vector", call. = TRUE)
-
-  if (length(y) <= 1)
-    stop("length of y needs to be > 1: ", length(y), call. = TRUE)
-
-  if (length(x) != length(y))
-    stop("length of x and y need to be equal", call. = TRUE)
-
+  # safety checks
+  stopifnot(
+    "no input vector for `x` supplied" = !missing(x),
+    "no input vector for `y` supplied" = !missing(y),
+    "`x` needs to be provided as a numeric vector" = is.vector(x) && is.numeric(x),
+    "`y` needs to be provided as a numeric vector" = is.vector(y) && is.numeric(y),
+    "length of `x` needs to be > 1, cannot calculate slope with a single value" = length(x) > 1L,
+    "length of `y` needs to be > 1, cannot calculate slope with a single value" = length(y) > 1L,
+    "`x` and `y` need to be vectors of equal length" = length(x) == length(y)
+  )
 
   df <- cbind(x, y)
 
@@ -227,16 +147,11 @@ calculate_ratios_weighted_sum <- function(x, y) {
   weighted.x <- avg.ions / scan.ions  * as.numeric(df[, 1])
   weighted.y <- avg.ions / scan.ions  * as.numeric(df[, 2])
 
-  tryCatch(
-
+  ratio <-
+    try_catch_all(
     # Note order of x and y to get correct slope!
-
-    ratio <-sum(weighted.x) / sum(weighted.y),
-
-
-    warning = function(w) {
-      stop("something went wrong calculating the ratio from weighted sums: ", w$message, call. = TRUE)
-    }
+    sum(weighted.x) / sum(weighted.y),
+    "something went wrong calculating the ratio from weighted sums: "
   )
 
   return(ratio)
@@ -245,11 +160,13 @@ calculate_ratios_weighted_sum <- function(x, y) {
 
 #' @title Calculate isotopocule ratio
 #'
-#' @description This function calculates the ratio of two isotopocules (the `numerator` and `denominator`) by averaging multiple measurements of each using the `ratio_method` and returns a single value. Normally this function is not called directly by the user, but via the function [orbi_summarize_results()], which calculates isotopocule ratios and other results for an entire dataset.
+#' @description This function calculates the ratio of two isotopocules (the `numerator` and `denominator`). If `ratio_method = "direct"`, this method calculates the vector ratios for each individual numerator and denominator value pair. For all other `ratio_method` values, this function averages multiple measurements of each using the `ratio_method` and returns a single value. Normally this function is not called directly by the user, but via the function [orbi_summarize_results()], which calculates isotopocule ratios and other results for an entire dataset.
 #'
 #' @param numerator Column(s) used as numerator; contains ion counts
 #' @param denominator Column used as denominator; contains ion counts
 #' @param ratio_method Method for computing the ratio. **Please note well**: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). `ratio_method` can be one of the following:
+#'
+#' * `direct`: no averaging, direct calculationg of numerator/denominator
 #'
 #' * `mean`: arithmetic mean of ratios from individual scans.
 #'
@@ -263,40 +180,48 @@ calculate_ratios_weighted_sum <- function(x, y) {
 #' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
 #'
 #' @examples
-#' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <-
-#'   orbi_read_isox(file = fpath) |>
-#'   orbi_simplify_isox() |>
-#'   orbi_define_basepeak(basepeak_def = "M0")
+#'   system.file("extdata", "testfile_flow.isox", package = "isoorbi") |>
+#'   orbi_read_isox()
 #'
-#' ratio <- orbi_calculate_ratio(
-#'    numerator = df$ions.incremental,
-#'    denominator = df$basepeak_ions,
-#'    ratio_method = "sum")
+#' ions_18O <- dplyr::filter(df, isotopocule == "18O")$ions.incremental
+#' ions_M0 <- dplyr::filter(df, isotopocule == "M0")$ions.incremental
+#'
+#' orbi_calculate_ratio(
+#'   numerator = ions_18O, denominator = ions_M0, ratio_method = "direct"
+#' ) |> head()
+#'
+#' orbi_calculate_ratio(
+#'   numerator = ions_18O, denominator = ions_M0, ratio_method = "sum"
+#' )
+#'
+#' orbi_calculate_ratio(
+#'   numerator = ions_18O, denominator = ions_M0, ratio_method = "slope"
+#' )
 #'
 #' @return Single value ratio between the isotopocules defined as `numerator` and `denominator` calculated using the `ratio_method`.
 #'
 #' @export
 orbi_calculate_ratio <- function(
     numerator, denominator,
-    ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
+    ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
 
-  if (missing(numerator))
-    stop("no input for numerator supplied", call. = TRUE)
+  # safety checks
+  stopifnot(
+    "no input for `numerator` supplied" = !missing(numerator),
+    "no input for `denominator` supplied" = !missing(denominator),
+    "`numerator` needs to be provided as a numeric vector" = is.vector(numerator) && is.numeric(numerator),
+    "`denominator` needs to be provided as a numeric vector" = is.vector(denominator) && is.numeric(denominator),
+    "no input for `ratio_method` supplied" = !missing(ratio_method)
+  )
 
-  if (is.numeric(numerator) == FALSE)
-    stop("numerator must be a numeric vector",  call. = TRUE)
-
-  if (missing(denominator))
-    stop("no input for denominator supplied", call. = TRUE)
-
-  if (is.numeric(denominator) == FALSE)
-    stop("denominator must be a numeric vector",  call. = TRUE)
-
-
+  # calculation
   tryCatch({ o <-  {
-
-    if (ratio_method == "mean") {
+    if (ratio_method == "direct") {
+      stopifnot("`numerator` and `denominator` must be vectors of equal length" =
+                  length(numerator) == length(denominator))
+      numerator / denominator
+    } else if (ratio_method == "mean") {
       base::mean(numerator / denominator)
     } else if (ratio_method == "slope") {
       calculate_ratios_slope(numerator, denominator)
@@ -309,32 +234,80 @@ orbi_calculate_ratio <- function(
     } else if (ratio_method == "median") {
       stats::median(numerator / denominator)
     } else{
-      stop(
-        "`ratio_method` has to be `mean`, `sum`, `median`, `geometric_mean`, `slope` or `weighted_sum`",
-        call. = FALSE
-      )
+      rlang::arg_match(ratio_method)
     }
   }
-
    warning = function(w) {
-     stop("something went wrong calculating ratios:", w$message, call. = TRUE)
-
-  }
+     abort("something went wrong calculating ratios:", parent = w)
+   }
   })
-
   return(o)
-
 }
 
-#' Calculate isotopocule ratios (deprecated)
+#' Calculate isotopocule ratios for an entire dataset
 #'
 #' `r lifecycle::badge("deprecated")` This function was renamed to [orbi_calculate_ratio()] to better reflect what it does.
 #'
-#' @param ... parameters passed on to new function orbi_calculate_ratio()
+#' @param dataset A data frame output after running `orbi_define_basepeak()`
+#' @param ratio_method Method for computing the ratio. **Please note well**: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). `ratio_method` can be one of the following:
+#'
+#' * `direct`: no averaging, direct calculationg of numerator/denominator
+#'
+#' * `mean`: arithmetic mean of ratios from individual scans.
+#'
+#' * `sum`: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.
+#'
+#' * `geometric_mean`: geometric mean of ratios from individual scans.
+#'
+#' * `slope`: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the `numerator x`, using `stats::lm(x ~ y + 0, weights = x)`.
+#'
+#' * `weighted_sum`: A derivative of the `sum` option. The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+#' i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total `sum` of `x` and `y` that is used to calculate `x/y`.
+#'
 #' @export
-orbi_calculate_ratios <- function(...) {
-  lifecycle::deprecate_warn("1.1.0", "orbi_calculate_ratios()", "orbi_calculate_ratio()")
-  orbi_calculate_ratio(...)
+orbi_calculate_ratios <- function(
+    dataset, ratio_method = c("direct", "mean", "sum", "median", "geometric_mean", "slope", "weighted_sum")) {
+
+  isotopocule <- NULL
+  # safety checks
+  stopifnot(
+    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
+    "`dataset` requires columns `isotopocule` and `ions.incremental`" = all(c("isotopocule", "ions.incremental") %in% names(dataset)),
+    "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first" = "basepeak_ions" %in% names(dataset),
+    "no input for `ratio_method` supplied" = !missing(ratio_method)
+  )
+  rlang::arg_match(ratio_method)
+
+  # grouping
+  existing_groups <- dataset |> dplyr::groups()
+  all_groups <- c(existing_groups, list(expr(isotopocule)))
+
+  # calculation
+  if (ratio_method == "direct") {
+    # mutate
+    dataset <- dataset |>
+      dplyr::group_by(!!!all_groups) |>
+      dplyr::mutate(
+        ratio = .data$ions.incremental / .data$basepeak_ions
+      ) |>
+      dplyr::group_by(!!!existing_groups)
+  } else {
+    # summarize
+    dataset <- dataset |>
+      dplyr::group_by(!!!all_groups) |>
+      summarize(
+        ratio = orbi_calculate_ratio(
+          .data$ions.incremental,
+          .data$basepeak_ions,
+          ratio_method = !!ratio_method
+        ),
+        .groups = "drop"
+      ) |>
+      dplyr::group_by(!!!existing_groups)
+  }
+
+  # return
+  return(dataset)
 }
 
 #' @title Generate the results table
@@ -346,7 +319,8 @@ orbi_calculate_ratios <- function(...) {
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
-#'       orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "M0")  |>
+#'       orbi_simplify_isox() |>
+#'       orbi_define_basepeak(basepeak_def = "M0")  |>
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
 #' @return Returns a results summary table retaining the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns:  `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
@@ -410,71 +384,72 @@ orbi_summarize_results <- function(
   }
 
   # info message
-  sprintf(
-    "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
-    sprintf("'%s'", dplyr::group_vars(df.group)) |> paste(collapse = ", "),
-    ratio_method
-  ) |>
-    message()
+  start_time <-
+    sprintf(
+      "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
+      sprintf("'%s'", dplyr::group_vars(df.group)) |> paste(collapse = ", "),
+      ratio_method
+    ) |>
+    message_start()
 
-  tryCatch(
-    # run calculations
-    df.stat <- df.group |>
+  # calculations
+  df.stat <-
+    try_catch_all({
+      # run calculations
+      df.group |>
 
-      dplyr::summarize(
+        dplyr::summarize(
 
-        # time information
-        start_time.min = min(.data$time.min),
-        mean_time.min = mean(.data$time.min),
-        end_time.min = max(.data$time.min),
+          # time information
+          start_time.min = min(.data$time.min),
+          mean_time.min = mean(.data$time.min),
+          end_time.min = max(.data$time.min),
 
-        # ratio calculation
-        ratio = orbi_calculate_ratio(
-          .data$ions.incremental,
-          .data$basepeak_ions,
-          ratio_method = !!ratio_method
-        ),
+          # ratio calculation
+          ratio = orbi_calculate_ratio(
+            .data$ions.incremental,
+            .data$basepeak_ions,
+            ratio_method = !!ratio_method
+          ),
 
-        shot_noise_permil =
-          1000 * (sqrt(
-            (sum(.data$ions.incremental) + sum(.data$basepeak_ions)) /
-              (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
+          shot_noise_permil =
+            1000 * (sqrt(
+              (sum(.data$ions.incremental) + sum(.data$basepeak_ions)) /
+                (sum(.data$ions.incremental) * sum(.data$basepeak_ions)))),
 
-        ratio_sem = calculate_ratios_sem(
-          ratios = .data$ions.incremental / .data$basepeak_ions),
+          ratio_sem = calculate_ratios_sem(
+            ratios = .data$ions.incremental / .data$basepeak_ions),
 
-        minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
-          (max(.data$time.min) - min(.data$time.min)),
+          minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
+            (max(.data$time.min) - min(.data$time.min)),
 
-        number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
+          number_of_scans = length(.data$ions.incremental / .data$basepeak_ions),
 
-        .groups = "drop") |>
+          .groups = "drop") |>
 
-      dplyr::mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   |>
+        dplyr::mutate(ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio))   |>
 
-      # round values for output
-      dplyr::mutate(
-        ratio = round(.data$ratio, 8),
-        ratio_sem = round(.data$ratio_sem, 8),
-        ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
-        shot_noise_permil = round(.data$shot_noise_permil, 3),
-        minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
-      )  |>
-      # sort table by the grouping variables
-      dplyr::arrange(!!!lapply(dplyr::group_vars(df.group), rlang::sym)) |>
-      # rearrange column order
-      dplyr::relocate("ratio_relative_sem_permil", .after = "ratio"),
+        # round values for output
+        dplyr::mutate(
+          ratio = round(.data$ratio, 8),
+          ratio_sem = round(.data$ratio_sem, 8),
+          ratio_relative_sem_permil = round(.data$ratio_relative_sem_permil, 3),
+          shot_noise_permil = round(.data$shot_noise_permil, 3),
+          minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
+        )  |>
+        # sort table by the grouping variables
+        dplyr::arrange(!!!lapply(dplyr::group_vars(df.group), rlang::sym)) |>
+        # rearrange column order
+        dplyr::relocate("ratio_relative_sem_permil", .after = "ratio")
 
-    #For simplicity use basic standard error for all options
+    },
+    "something went wrong summarizing the results: "
+    )
 
-    warning = function(w) {
-      stop("something went wrong summarizing the results: ",
-           w$message,
-           call. = TRUE)
-    }
-  )
+  # info
+  message_finish("completed", start_time = start_time)
 
-
+  # return
   return(df.stat)
 
 }

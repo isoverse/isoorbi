@@ -5,32 +5,28 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 context("loading functions")
 
+test_that("orbi_find_isox", {
+
+  # safety checks
+  expect_error(orbi_find_isox(), "argument \"folder\" is missing, with no default", fixed = TRUE)
+  expect_error(orbi_find_isox(42), "invalid filename argument")
+  expect_error(orbi_find_isox("DNE"), "folder` must be an existing directory", fixed = TRUE)
+
+})
+
 test_that("orbi_read_isox() tests", {
 
   # safety checks
-
-  expect_error(orbi_read_isox(), "no file path supplied",
-               fixed = TRUE)
-
-  # test safety checks
-  expect_error(orbi_read_isox(), "no file path supplied")
-
-  # safety checks
-
-  expect_error(orbi_read_isox(), "no file path supplied",
-               fixed = TRUE)
-
-  expect_error(orbi_read_isox(c("one", "two")), "can only read.*1")
-
-  expect_error(orbi_read_isox("DNE"), "does not exist",
-               fixed = TRUE)
+  expect_error(orbi_read_isox(), "no file path supplied", fixed = TRUE)
+  expect_error(orbi_read_isox(42), "`file` has to be at least one filepath")
+  expect_error(orbi_read_isox(character()), "`file` has to be at least one filepath")
+  expect_error(orbi_read_isox("DNE"), "does not exist", fixed = TRUE)
 
   temp_file <- tempfile(fileext = ".wrong")
 
   cat("empty", file = temp_file) # create the temp file
 
-  expect_error(orbi_read_isox(temp_file), "unrecognized",
-               fixed = TRUE)
+  expect_error(orbi_read_isox(temp_file), "unrecognized file extension", fixed = TRUE)
 
   unlink(temp_file) # destroy the temp file
 
@@ -43,10 +39,9 @@ test_that("orbi_read_isox() tests", {
   fixed = TRUE)
 
   # test reading a file
-
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
-
-  expect_true(is.tbl(df))
+  expect_true(
+    is.tbl(df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")))
+  )
 
   expect_equal(
     names(df),
@@ -64,6 +59,18 @@ test_that("orbi_read_isox() tests", {
 
   expect_equal(nrow(df), 5184)
 
+  # test reading multiple files
+  expect_true(
+    is.tbl(
+      df2 <-
+        orbi_read_isox(c(
+          system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"),
+          system.file("extdata", "testfile_flow.isox", package = "isoorbi")
+        ))
+    )
+  )
+  expect_equal(nrow(df2), 11633)
+
 })
 
 # orbi_simplify_isox
@@ -75,29 +82,29 @@ test_that("orbi_simplify_isox() tests", {
   expect_true(is.tbl(orbi_simplify_isox(df)))
 
   # test safety checks
-  expect_error(orbi_simplify_isox(), "no dataset supplied")
-  expect_error(orbi_simplify_isox(dataset = "string"), "dataset must be a data frame")
+  expect_error(orbi_simplify_isox(), "need a `dataset` data frame")
+  expect_error(orbi_simplify_isox(dataset = "string"), "need a `dataset` data frame")
   expect_type(df, "list")
   dataset = subset(df, select = -c(filename))
-  expect_error(orbi_simplify_isox(dataset), "dataset must have at least 8 columns: ")
+  expect_error(orbi_simplify_isox(dataset), "dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
   dataset = df[0,]
-  expect_error(orbi_simplify_isox(dataset), "dataset contains no rows: ")
+  expect_error(orbi_simplify_isox(dataset), "dataset contains no rows")
   # failure
 
-  expect_error(orbi_simplify_isox(), "no dataset supplied",
+  expect_error(orbi_simplify_isox(), "need a `dataset` data frame",
                fixed = TRUE)
 
-  expect_error(orbi_simplify_isox(dataset = as.matrix(df)), "dataset must be a data frame", fixed = TRUE)
+  expect_error(orbi_simplify_isox(dataset = as.matrix(df)), "need a `dataset` data frame", fixed = TRUE)
 
   expect_error(orbi_simplify_isox(dataset = df[,1:5]),
-               "dataset must have at least 8 columns: 5")
-
-  expect_error(orbi_simplify_isox(dataset = df[0,]),
+               "dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
+  dataset = df[0,]
+  expect_error(orbi_simplify_isox(dataset),
                "dataset contains no rows")
 
   df2 <- df |> mutate(dummy = "1") |> select(-scan.no)
   expect_error(orbi_simplify_isox(dataset = df2),
-               "Missing required column(s): scan.no", fixed = TRUE)
+               "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`", fixed = TRUE)
 
 })
 
@@ -118,44 +125,42 @@ test_that("orbi_filter_isox() tests",{
                                       time_max = 2)))
 
   # failure
-  expect_error(orbi_filter_isox(), "no dataset supplied",
+  expect_error(orbi_filter_isox(), "need a `dataset` data frame",
                fixed = TRUE)
 
-  expect_error(orbi_filter_isox(dataset = as.matrix(df)), "dataset must be a data frame",
+  expect_error(orbi_filter_isox(dataset = as.matrix(df)),
+               "need a `dataset` data frame",
                fixed = TRUE)
 
-  expect_error(orbi_filter_isox(dataset = df[,1:5]),
-               "dataset must have at least 8 columns: 5")
-
-  expect_error(orbi_filter_isox(dataset = df[0,]),
-               "dataset contains no rows")
+  expect_error(orbi_filter_isox(dataset = df[,1:2]),
+               "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`")
 
   expect_error(orbi_filter_isox(dataset = df,
                                 time_min = "A"),
-               "time_min needs to be a number")
+               "`time_min` must be a single number (or NULL)", fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df,
                                 time_max = "A"),
-               "time_max needs to be a number")
+               "`time_max` must be a single number (or NULL)", fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df,
                                 time_min = c(0.1, 0.2)),
-               "time_min needs to be a single number")
+               "`time_min` must be a single number (or NULL)", fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df,
                                 time_max = c(0.1, 0.2)),
-               "time_max needs to be a single number")
+               "`time_max` must be a single number (or NULL)", fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df,
                                 filenames = as.matrix(c(1, 0))),
-               "filenames needs to be a vector of names")
+               "`filenames` must be a vector of filenames (or NULL)", fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df,
                                 isotopocules = as.matrix(c(1, 0))),
-               "isotopocules needs to be a vector of names")
+               "`isotopocules` must be a vector of isotopocules (or NULL)", fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df,
                                 compounds = as.matrix(c(1, 0))),
-               "compounds needs to be a vector of names")
+               "`compounds` must be a vector of compounds (or NULL)", fixed = TRUE)
 
 })

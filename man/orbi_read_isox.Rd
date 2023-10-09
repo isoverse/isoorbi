@@ -7,7 +7,7 @@
 orbi_read_isox(file)
 }
 \arguments{
-\item{file}{Path to the \code{.isox} file}
+\item{file}{Path to the \code{.isox} file(s), single value or vector of paths}
 }
 \value{
 A tibble containing at minimum the columns \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}

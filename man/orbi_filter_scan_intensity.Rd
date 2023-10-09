@@ -2,32 +2,15 @@
 % Please edit documentation in R/utility_functions.R
 \name{orbi_filter_scan_intensity}
 \alias{orbi_filter_scan_intensity}
-\title{Filter to remove extreme scans}
+\title{Function replaced by \code{orbi_flag_outliers()}}
 \usage{
-orbi_filter_scan_intensity(dataset, outlier_percent)
+orbi_filter_scan_intensity(..., outlier_percent)
 }
 \arguments{
-\item{dataset}{Simplified IsoX dataset to have \code{TICxIT} outliers removed}
+\item{...}{parameters passed on to new function orbi_flag_outliers()}
 
-\item{outlier_percent}{A number between 0 and 10. Remove this percentage of scans based on TIC multiplied by injection time.}
-}
-\value{
-Filtered tibble
+\item{outlier_percent}{outlier_percent needs to be between 0 and 10, flags extreme scans based on TIC x injection time (i.e., ion intensity)}
 }
 \description{
-The function \code{orbi_filter_scan_intensity()} removes extremely high and low intense scans based on TIC x injection time (i.e., ion intensity)
-}
-\details{
-Function is intended to remove scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
-
-The filter is a basic truncation that removes \verb{x \%} of scans with the largest \strong{and} \verb{x \%} of scans with the smallest ion estimates. Grouping is by columns \code{filename} and \code{compound}.
-
-The input \code{dataset} is expected to have at least these 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
-}
-\examples{
-fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <- orbi_read_isox(file = fpath) |>
-orbi_simplify_isox() |>
-orbi_filter_scan_intensity(outlier_percent = 1)
-
+Function replaced by \code{orbi_flag_outliers()}
 }

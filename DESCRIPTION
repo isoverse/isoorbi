@@ -1,8 +1,8 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Isotopocule Data
-Version: 1.1.0
-Date: 2023-6-22
+Version: 1.2.0
+Date: 2023-10-09
 Authors@R: 
     c(person(
         given = "Caj", family = "Neubauer", 
@@ -31,15 +31,17 @@ Imports:
     lifecycle (>= 1.0.0),
     tidyr (>= 1.2.0),
     dplyr (>= 1.1.1),
+    ggplot2 (>= 3.4.0),
     readr (>= 2.1.0),
-    tidyselect (>= 1.2.0)
+    tidyselect (>= 1.2.0),
+    openxlsx,
+    purrr
 Suggests:
     devtools,
     knitr,
     rmarkdown,
     testthat,
     scales,
-    ggplot2,
     forcats
 Description: Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Hilkert et al. (2021) <doi:10.1021/acs.analchem.1c00944>.
 License: MIT + file LICENSE
