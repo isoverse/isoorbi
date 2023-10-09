@@ -2,6 +2,8 @@ on:
   push:
     branches: JOSS_paper
 
+name: paper
+
 jobs:
   paper:
     runs-on: ubuntu-latest
