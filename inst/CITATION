@@ -14,14 +14,13 @@ bibentry(
                         family = "Kof"),
               person(given = "Cajetan",
                         family = "Neubauer")),
-  title = "Exploring the potential of electrospray-Orbitrap for stable isotope analysis using nitrate as a model",
-  publisher = "ESI-Orbitrap IRMS: A Guide to Precision Isotopocule Analysis for Life and Environmental Scientists",
-  year = "",
-  journal  = "",
+  title = "ESI-Orbitrap IRMS: A Guide to Precision Isotopocule Analysis for Life and Environmental Scientists",
+  publisher = "Nature Publishing Group",
+  year = "2023",
+  journal  = "Nature Protocols",
   year     = "",
   volume   = "",
   number   = "",
   pages    = "",
-  publisher= "",
   doi     = ""
 )
