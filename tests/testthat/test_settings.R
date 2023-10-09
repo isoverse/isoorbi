@@ -12,6 +12,21 @@ test_that("orbi_set_settings() test", {
   expect_type(orbi_set_settings(di_ref_name = "std"),
                "list")
 
+  expect_type(orbi_set_settings(di_sample_name = "sample"),
+              "list")
+
+  expect_type(orbi_set_settings(data_type_data = "data"),
+              "list")
+
+  expect_type(orbi_set_settings(data_type_startup = "changeover"),
+              "list")
+
+  expect_type(orbi_set_settings(data_type_changeover = "changeover"),
+              "list")
+
+  expect_type(orbi_set_settings(data_type_unused = "data_type_unused"),
+              "list")
+
 })
 
 # setting
