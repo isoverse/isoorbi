@@ -75,9 +75,15 @@ reference:
   - orbi_export_data_to_excel
   - add_excel_sheet
 
-- title: internal
+- title: Internal
   contents:
   - orbi_calculate_ratios
   - orbi_get_settings
   - orbi_set_settings
+
+- title: Deprecated functions
+  contents:
+  - orbi_filter_satellite_peaks
+  - orbi_filter_scan_intensity
+  - orbi_filter_weak_isotopocules
 
