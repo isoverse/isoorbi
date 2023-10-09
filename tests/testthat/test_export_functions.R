@@ -28,8 +28,9 @@ test_that("orbi_export_data_to_excel() tests", {
                fixed = TRUE)
 
   # success
-  expect_type(orbi_export_data_to_excel(df, "c", 2, int_format = "0"), "list")
-
+  tmp_file <- tempfile()
+  expect_type(orbi_export_data_to_excel(df, tmp_file, 2, int_format = "0"), "list")
+  unlink(tmp_file)
 })
 
 # add_excel_sheet
