@@ -38,9 +38,9 @@ df.filtered <- df.simple |> orbi_filter_isox(
                             )
 
 # Clean the data by removing noise and outliers
-df.clean <- df.filtered |> orbi_filter_satellite_peaks() |>
-                            orbi_filter_weak_isotopocules(min_percent = 10) |>
-                            orbi_filter_scan_intensity(outlier_percent = 2)
+df.clean <- df.filtered |> orbi_flag_satellite_peaks() |>
+                            orbi_flag_weak_isotopocules(min_percent = 10) |>
+                            orbi_flag_outliers(intensity_window = c(1,99))
 
 ```
 
