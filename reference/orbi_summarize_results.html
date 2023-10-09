@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,8 @@
 
 
 <dt>ratio_method</dt>
-<dd><p>Method for computing the ratio. <strong>Please note well</strong>: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). <code>ratio_method</code> can be one of the following:</p><ul><li><p><code>mean</code>: arithmetic mean of ratios from individual scans.</p></li>
+<dd><p>Method for computing the ratio. <strong>Please note well</strong>: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). <code>ratio_method</code> can be one of the following:</p><ul><li><p><code>direct</code>: no averaging, direct calculationg of numerator/denominator</p></li>
+<li><p><code>mean</code>: arithmetic mean of ratios from individual scans.</p></li>
 <li><p><code>sum</code>: sum of all ions of the numerator across all scans divided by the sum of all ions observed for the denominator across all scans.</p></li>
 <li><p><code>geometric_mean</code>: geometric mean of ratios from individual scans.</p></li>
 <li><p><code>slope</code>: The ratio is calculated using the slope obtained from a linear regression model that is weighted by the <code>numerator x</code>, using <code>stats::lm(x ~ y + 0, weights = x)</code>.</p></li>
@@ -103,13 +104,23 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fpath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_flow.isox"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>      <span class="fu"><a href="orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span>  <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span>  <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>      <span class="fu">orbi_summarize_results</span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox() is loading .isox data from file path: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> testfile_flow.isox</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox() will keep only the most important columns...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_define_basepeak() is setting the M0 isotopocule as the ratio denominator...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_summarize_results() is grouping the data by 'filename', 'compound', 'basepeak', 'isotopocule' and summarizing ratios using the 'sum' method...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox() is loading .isox data from 1 file(s)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - loaded 6449 peaks for 1 compounds (HSO4-) with 5 isotopocules (M0, 33S,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    17O, 34S, 18O) from testfile_flow.isox in 0.03 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox() will keep only columns 'filename', 'compound',</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    'scan.no', 'time.min', 'isotopocule', 'ions.incremental', 'tic',</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    'it.ms'...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    ...complete in 0.01 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_define_basepeak() is setting the 'M0' isotopocule as the ratio</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    denominator...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    ...base peak set for 4 isotopocules ('33S', '17O', '34S', '18O') in 0.09</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_summarize_results() is grouping the data by 'filename', 'compound',</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    'basepeak', 'isotopocule' and summarizing ratios using the 'sum' method...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    ...completed in 0.04 seconds.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

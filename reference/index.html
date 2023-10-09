@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,7 @@
     <div class="section level2">
       <h2 id="core-functions">Core functions<a class="anchor" aria-label="anchor" href="#core-functions"></a></h2>
       
-      <p class="section-desc"></p><p>These core functions are essential to read and process isox data</p>
+      <p class="section-desc"></p><p>These core functions are essential to read and process isox data.</p>
 
       
     </div><div id="" class="section level2">
@@ -62,6 +62,11 @@
 
       <dl><dt>
           
+          <code><a href="orbi_find_isox.html">orbi_find_isox()</a></code> 
+        </dt>
+        <dd>Find isox files</dd>
+      </dl><dl><dt>
+          
           <code><a href="orbi_read_isox.html">orbi_read_isox()</a></code> 
         </dt>
         <dd>Read IsoX file</dd>
@@ -69,7 +74,7 @@
           
           <code><a href="orbi_define_basepeak.html">orbi_define_basepeak()</a></code> 
         </dt>
-        <dd>Define and assign the denominator for ratio calculation</dd>
+        <dd>Define the denominator for ratio calculation</dd>
       </dl><dl><dt>
           
           <code><a href="orbi_summarize_results.html">orbi_summarize_results()</a></code> 
@@ -83,7 +88,7 @@
       </dl></div><div class="section level2">
       <h2 id="removing-data">Removing data<a class="anchor" aria-label="anchor" href="#removing-data"></a></h2>
       
-      <p class="section-desc"></p><p>These functions handle data selection and outlier removal</p>
+      <p class="section-desc"></p><p>These functions handle data selection and outlier removal.</p>
 
       
     </div><div id="" class="section level2">
@@ -98,23 +103,28 @@
         <dd>Basic generic filter for IsoX data</dd>
       </dl><dl><dt>
           
-          <code><a href="orbi_filter_satellite_peaks.html">orbi_filter_satellite_peaks()</a></code> 
+          <code><a href="orbi_flag_outliers.html">orbi_flag_outliers()</a></code> 
         </dt>
-        <dd>Filter to remove minor satellite peaks</dd>
+        <dd>Flag outlier scans</dd>
       </dl><dl><dt>
           
-          <code><a href="orbi_filter_scan_intensity.html">orbi_filter_scan_intensity()</a></code> 
+          <code><a href="orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks()</a></code> 
         </dt>
-        <dd>Filter to remove extreme scans</dd>
+        <dd>Flag minor satellite peaks</dd>
       </dl><dl><dt>
           
-          <code><a href="orbi_filter_weak_isotopocules.html">orbi_filter_weak_isotopocules()</a></code> 
+          <code><a href="orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules()</a></code> 
         </dt>
-        <dd>Filter to remove weak isotopocules</dd>
+        <dd>Flag weak isotopocules</dd>
+      </dl><dl><dt>
+          
+          <code><a href="orbi_filter_flagged_data.html">orbi_filter_flagged_data()</a></code> 
+        </dt>
+        <dd>Filter out flagged data</dd>
       </dl></div><div class="section level2">
       <h2 id="optional-functions">Optional functions<a class="anchor" aria-label="anchor" href="#optional-functions"></a></h2>
       
-      <p class="section-desc"></p><p>These functions are available to simplify or customize the data analysis</p>
+      <p class="section-desc"></p><p>These functions are available to simplify or customize the data analysis.</p>
 
       
     </div><div id="" class="section level2">
@@ -133,9 +143,30 @@
         </dt>
         <dd>Calculate isotopocule ratio</dd>
       </dl></div><div class="section level2">
+      <h2 id="shot-noise-analysis">Shot noise analysis<a class="anchor" aria-label="anchor" href="#shot-noise-analysis"></a></h2>
+      
+      <p class="section-desc"></p><p>These functions are available for analysis of shot noise in collected data and creating shot noise plots.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="orbi_analyze_shot_noise.html">orbi_analyze_shot_noise()</a></code> 
+        </dt>
+        <dd>Shot noise calculation</dd>
+      </dl><dl><dt>
+          
+          <code><a href="orbi_plot_shot_noise.html">orbi_plot_shot_noise()</a></code> 
+        </dt>
+        <dd>plot shot noise</dd>
+      </dl></div><div class="section level2">
       <h2 id="dual-inlet">Dual inlet<a class="anchor" aria-label="anchor" href="#dual-inlet"></a></h2>
       
-      <p class="section-desc"></p><p>These functions are useful for annotating and processing <code>dual inlet</code> data</p>
+      <p class="section-desc"></p><p>These functions are useful for annotating and processing <code>dual inlet</code> data.</p>
 
       
     </div><div id="" class="section level2">
@@ -158,6 +189,79 @@
           <code><a href="orbi_segment_blocks.html">orbi_segment_blocks()</a></code> 
         </dt>
         <dd>Segment data blocks</dd>
+      </dl></div><div class="section level2">
+      <h2 id="export-functions">Export functions<a class="anchor" aria-label="anchor" href="#export-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>These functions serve to export data to an Excel file.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="orbi_export_data_to_excel.html">orbi_export_data_to_excel()</a></code> 
+        </dt>
+        <dd>export data frame to excel</dd>
+      </dl><dl><dt>
+          
+          <code><a href="add_excel_sheet.html">add_excel_sheet()</a></code> 
+        </dt>
+        <dd>internal function to add an excel sheet to a workbook</dd>
+      </dl></div><div class="section level2">
+      <h2 id="internal">Internal<a class="anchor" aria-label="anchor" href="#internal"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="orbi_calculate_ratios.html">orbi_calculate_ratios()</a></code> 
+        </dt>
+        <dd>Calculate isotopocule ratios for an entire dataset</dd>
+      </dl><dl><dt>
+          
+          <code><a href="orbi_get_settings.html">orbi_get_settings()</a></code> 
+        </dt>
+        <dd>Get all isoorbi package settings</dd>
+      </dl><dl><dt>
+          
+          <code><a href="orbi_set_settings.html">orbi_set_settings()</a></code> 
+        </dt>
+        <dd>Set package settings</dd>
+      </dl></div><div class="section level2">
+      <h2 id="deprecated-functions">Deprecated functions<a class="anchor" aria-label="anchor" href="#deprecated-functions"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="orbi_filter_satellite_peaks.html">orbi_filter_satellite_peaks()</a></code> 
+        </dt>
+        <dd>Function replaced by <code><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks()</a></code></dd>
+      </dl><dl><dt>
+          
+          <code><a href="orbi_filter_scan_intensity.html">orbi_filter_scan_intensity()</a></code> 
+        </dt>
+        <dd>Function replaced by <code><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers()</a></code></dd>
+      </dl><dl><dt>
+          
+          <code><a href="orbi_filter_weak_isotopocules.html">orbi_filter_weak_isotopocules()</a></code> 
+        </dt>
+        <dd>Function replaced by <code><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules()</a></code></dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

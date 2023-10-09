@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,39 @@
       <small>Source: <a href="https://github.com/isoverse/isoorbi/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.0" id="isoorbi-120">isoorbi 1.2.0<a class="anchor" aria-label="anchor" href="#isoorbi-120"></a></h2>
+<p>This is a minor release adding new features.</p>
+<div class="section level3">
+<h3 id="breaking-changes-1-2-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-2-0"></a></h3>
+<p>There are no breaking changes in this release (all changes and new features are backwards compatible).</p>
+</div>
+<div class="section level3">
+<h3 id="new-features-1-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/orbi_find_isox.html">orbi_find_isox()</a></code> added</li>
+<li>
+<code>orbi_analyze_noise()</code> implemented</li>
+<li>
+<code><a href="../reference/orbi_plot_shot_noise.html">orbi_plot_shot_noise()</a></code> implemented</li>
+<li>
+<code><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks()</a></code>, <code><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules()</a></code> and <code><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers()</a></code> together with <code><a href="../reference/orbi_filter_flagged_data.html">orbi_filter_flagged_data()</a></code> supersede <code><a href="../reference/orbi_filter_satellite_peaks.html">orbi_filter_satellite_peaks()</a></code>, <code><a href="../reference/orbi_filter_weak_isotopocules.html">orbi_filter_weak_isotopocules()</a></code> and <code><a href="../reference/orbi_filter_scan_intensity.html">orbi_filter_scan_intensity()</a></code>
+</li>
+<li>
+<code><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel()</a></code> implemented</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-1-2-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-2-0"></a></h3>
+<ul><li>all loading and utility functions provide more details in the info message about what has been done, what was affected, and how long it took</li>
+<li>all loading and utility functions catch processing errors and report the information back to the user</li>
+<li>
+<code><a href="../reference/orbi_read_isox.html">orbi_read_isox()</a></code> now can read multiple .isox files at once</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-2-0"></a></h3>
+<ul><li>data frame groupings introduced in flagging/filtering functions are now removed again at the end of the function</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="isoorbi-110">isoorbi 1.1.0<a class="anchor" aria-label="anchor" href="#isoorbi-110"></a></h2><p class="text-muted">CRAN release: 2023-06-24</p>
 <p>This is a minor release adding new features and fixing a few bugs.</p>

@@ -31,7 +31,7 @@
     <loc>https://isoorbi.isoverse.org/news/index.html</loc>
   </url>
   <url>
-    <loc>https://isoorbi.isoverse.org/paper.html</loc>
+    <loc>https://isoorbi.isoverse.org/reference/add_excel_sheet.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/calculate_ratios_gmean.html</loc>
@@ -58,6 +58,9 @@
     <loc>https://isoorbi.isoverse.org/reference/orbi_adjust_block.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_analyze_shot_noise.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_ratio.html</loc>
   </url>
   <url>
@@ -68,6 +71,12 @@
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_export_data_to_excel.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_flagged_data.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc>
@@ -82,10 +91,25 @@
     <loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak_isotopocules.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_find_isox.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_flag_outliers.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_flag_satellite_peaks.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_flag_weak_isotopocules.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_get_settings.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_plot_shot_noise.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_read_isox.html</loc>
