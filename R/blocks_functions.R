@@ -3,7 +3,7 @@
 #' Manually define a block
 #'
 #' Define a data block by either start and end time or start and end scan number.
-#' Note that mannually defining blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **after** finishing block definitions.
+#' Note that manually defining blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **after** finishing block definitions.
 #'
 #' FIXME: complete description and parameters
 #'

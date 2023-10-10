@@ -67,6 +67,8 @@ reference:
   - orbi_define_blocks_for_dual_inlet
   - orbi_get_blocks_info
   - orbi_segment_blocks
+  - orbi_add_blocks_to_plot
+  - orbi_define_block
 
 - title: Export functions
   desc: >
