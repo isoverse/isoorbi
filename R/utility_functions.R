@@ -290,8 +290,8 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
       dplyr::mutate(TICxIT = .data$tic * .data$it.ms) |>
       dplyr::mutate(
         is_outlier =
-        .data$TICxIT <= stats::quantile(.data$TICxIT, intensity_window[1] / 100) |
-          .data$TICxIT >= stats::quantile(.data$TICxIT, intensity_window[2] / 100)
+        .data$TICxIT < stats::quantile(.data$TICxIT, intensity_window[1] / 100) |
+          .data$TICxIT > stats::quantile(.data$TICxIT, intensity_window[2] / 100)
       ) |>
       dplyr::select(-"TICxIT"),
     "something went wrong flagging outliers: "
