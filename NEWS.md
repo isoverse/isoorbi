@@ -13,12 +13,15 @@ There are no breaking changes in this release (all changes and new features are 
 * `orbi_plot_shot_noise()` implemented
 * `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()` and `orbi_flag_outliers()` together with `orbi_filter_flagged_data()` supersede `orbi_filter_satellite_peaks()`, `orbi_filter_weak_isotopocules()` and `orbi_filter_scan_intensity()`
 * `orbi_export_data_to_excel()` implemented
+* `orbi_define_block()` implemented
+* `orbi_add_plots_to_plot()` implemented
 
 ## Enhancements
 
 * all loading and utility functions provide more details in the info message about what has been done, what was affected, and how long it took
 * all loading and utility functions catch processing errors and report the information back to the user
 * `orbi_read_isox()` now can read multiple .isox files at once
+* `orbi_simplify_isox()` allows addition of user-specified columns
 
 ## Bug fixes
 
