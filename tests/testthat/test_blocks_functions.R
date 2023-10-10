@@ -336,6 +336,14 @@ test_that("test orbi_get_blocks_info()", {
 
 })
 
+test_that("test orbi_add_blocks_to_plot()", {
+
+  # type checks
+  expect_error(orbi_add_blocks_to_plot(), "argument \"plot\" is missing, with no default", fixed = TRUE)
+  expect_error(orbi_add_blocks_to_plot(42), "$ operator is invalid for atomic vectors", fixed = TRUE)
+
+})
+
 test_that("test find_scan_from_time()", {
 
   # type checks
