@@ -10,8 +10,6 @@
 #' @export
 orbi_analyze_shot_noise <- function(dataset){
 
-  ions.incremental <- basepeak_ions <- n_basepeak_ions <- n_isotopocule_ions <- ratio <- n_measurements <- ratio_mean <- ratio_se <- ratio_gmean <- n_effective_ions <- ..idx <- NULL
-
   # safety checks
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
@@ -38,25 +36,25 @@ orbi_analyze_shot_noise <- function(dataset){
           # group by filename, compound, isotopocule.
           .by = c("filename", "compound", "isotopocule"),
           # cumulative ions
-          n_isotopocule_ions = cumsum(ions.incremental),
-          n_basepeak_ions = cumsum(basepeak_ions),
-          n_effective_ions = n_basepeak_ions * n_isotopocule_ions / (n_basepeak_ions + n_isotopocule_ions),
+          n_isotopocule_ions = cumsum(.data$ions.incremental),
+          n_basepeak_ions = cumsum(.data$basepeak_ions),
+          n_effective_ions = .data$n_basepeak_ions * .data$n_isotopocule_ions / (.data$n_basepeak_ions + .data$n_isotopocule_ions),
           # relative standard error
           n_measurements = 1:n(),
           ratio = .data$ions.incremental / .data$basepeak_ions,
-          ratio_mean = cumsum(ratio) / n_measurements,
-          ratio_gmean = exp(cumsum(log(ratio)) / n_measurements),
+          ratio_mean = cumsum(.data$ratio) / .data$n_measurements,
+          ratio_gmean = exp(cumsum(log(.data$ratio)) / .data$n_measurements),
           #ratio_sd = sqrt( cumsum( (ratio - ratio_mean)^2 ) / (n_measurements - 1L) ),
           # alternative std. dev. formula compatible with cumsum
           # note that adjustment for sample sdev --> sqrt(n/(n-1)) partially cancels with 1/sqrt(n) for SD to SE
-          ratio_se = sqrt(cumsum(ratio^2) / n_measurements - ratio_mean^2) * sqrt(1/(n_measurements - 1L)),
+          ratio_se = sqrt(cumsum(.data$ratio^2) / .data$n_measurements - .data$ratio_mean^2) * sqrt(1/(.data$n_measurements - 1L)),
           # Q: do you really want to use gmean here but not in the std. dev calculation?
-          ratio_rel_se.permil = 1000 * ratio_se / ratio_gmean,
+          ratio_rel_se.permil = 1000 * .data$ratio_se / .data$ratio_gmean,
           # shot noise - calc is same as 1000 * (1 / n_basepeak_ions + 1 / n_isotopocule_ions) ^ 0.5 but faster
-          shot_noise.permil = 1000 * n_effective_ions ^ -0.5
+          shot_noise.permil = 1000 * .data$n_effective_ions ^ -0.5
         ) |>
         # restor original row order
-        dplyr::arrange(..idx) |>
+        dplyr::arrange(.data$..idx) |>
         # remove columns not usually used downstream
         select(-"..idx", -"n_basepeak_ions", -"n_isotopocule_ions", -"n_measurements", -"ratio_mean", -"ratio_gmean", -"ratio_se"),
       "something went wrong analyzing shot noise",
@@ -83,8 +81,6 @@ orbi_plot_shot_noise <- function(
     permil_target = NA_real_,
     color = "ratio_label",
     colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666")) {
-
-  filename <- compound <- ratio_label <- ratio_rel_se.permil <- diff_target.permil <- ratio_rel_se.permil <- isotopocule <- shot_noise.permil <- element_blank <- time.min <- n_effective_ions <- NULL
 
   # safety checks
   stopifnot(
@@ -117,12 +113,12 @@ orbi_plot_shot_noise <- function(
   find_closest_analysis <- function(target.permil) {
     function(df) {
       df |>
-        dplyr::group_by(filename, compound, ratio_label) |>
+        dplyr::group_by(.data$filename, .data$compound, .data$ratio_label) |>
         dplyr::mutate(
           target.permil = !!target.permil,
-          diff_target.permil = abs(ratio_rel_se.permil - target.permil)
+          diff_target.permil = abs(.data$ratio_rel_se.permil - target.permil)
         ) |>
-        dplyr::arrange(diff_target.permil) |>
+        dplyr::arrange(.data$diff_target.permil) |>
         dplyr::slice_head(n = 1) |>
         dplyr::ungroup()
     }
@@ -133,9 +129,9 @@ orbi_plot_shot_noise <- function(
   plot <-
     plot_df |>
     ggplot2::ggplot() +
-    ggplot2::aes(y = ratio_rel_se.permil, color = !!sym(color), shape = !!sym(color), group = paste(filename, compound, isotopocule)) +
+    ggplot2::aes(y = .data$ratio_rel_se.permil, color = !!sym(color), shape = !!sym(color), group = paste(.data$filename, .data$compound, .data$isotopocule)) +
     ggplot2::geom_line(
-      map = ggplot2::aes(y = shot_noise.permil, linetype = !!sym(color))
+      map = ggplot2::aes(y = .data$shot_noise.permil, linetype = !!sym(color))
     ) +
     ggplot2::geom_point(size = 3) +
     ggplot2::scale_y_log10(breaks = 10^(-4:4), labels = function(x) paste(x, "\U2030")) +
@@ -186,12 +182,12 @@ orbi_plot_shot_noise <- function(
   # plots vs. time
   if (x_column == "time.min") {
     plot <- plot %+%
-      ggplot2::aes(x = time.min) +
+      ggplot2::aes(x = .data$time.min) +
       ggplot2::scale_x_log10(breaks = 10^(-2:2), labels = paste) +
       ggplot2::labs(x = "analysis time [min]")
   } else if (x_column == "n_effective_ions") {
     plot <- plot %+%
-      ggplot2::aes(x = n_effective_ions) +
+      ggplot2::aes(x = .data$n_effective_ions) +
       ggplot2::scale_x_log10(breaks = 10^(2:12), labels = scales::label_log()) +
       ggplot2::labs(x = "counts")
   }
@@ -204,7 +200,7 @@ orbi_plot_shot_noise <- function(
       ggplot2::geom_vline(
         data = find_closest_analysis(target.permil = permil_target),
         # vs. time
-        map = ggplot2::aes(xintercept = time.min, color = NULL),
+        map = ggplot2::aes(xintercept = .data$time.min, color = NULL),
         linetype = 2
       )
   }
