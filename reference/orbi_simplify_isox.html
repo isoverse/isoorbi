@@ -57,7 +57,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_simplify_isox</span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_simplify_isox</span><span class="op">(</span><span class="va">dataset</span>, add <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,12 +65,16 @@
     <dl><dt>dataset</dt>
 <dd><p>IsoX data that is to be simplified</p></dd>
 
+
+<dt>add</dt>
+<dd><p>additional columns to keep</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A tibble containing only the 8 columns: <code>filename</code>, <code>scan.no</code>, <code>time.min</code>, <code>compound</code>, <code>isotopocule</code>, <code>ions.incremental</code>, <code>tic</code>, <code>it.ms</code>.</p>
+<p>A tibble containing only the 8 columns: <code>filename</code>, <code>scan.no</code>, <code>time.min</code>, <code>compound</code>, <code>isotopocule</code>, <code>ions.incremental</code>, <code>tic</code>, <code>it.ms</code>, plus any additional columns defined in the <code>add</code> argument</p>
     </div>
 
     <div class="section level2">
@@ -79,7 +83,7 @@
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">orbi_simplify_isox</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_read_isox() is loading .isox data from 1 file(s)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> - loaded 6449 peaks for 1 compounds (HSO4-) with 5 isotopocules (M0, 33S,</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>    17O, 34S, 18O) from testfile_flow.isox in 0.02 seconds.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>    17O, 34S, 18O) from testfile_flow.isox in 0.03 seconds.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> orbi_simplify_isox() will keep only columns 'filename', 'compound',</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>    'scan.no', 'time.min', 'isotopocule', 'ions.incremental', 'tic',</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>    'it.ms'...</span>

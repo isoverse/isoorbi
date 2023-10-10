@@ -55,6 +55,9 @@
     <loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc>
   </url>
   <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.html</loc>
+  </url>
+  <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_adjust_block.html</loc>
   </url>
   <url>
@@ -68,6 +71,9 @@
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc>
+  </url>
+  <url>
+    <loc>https://isoorbi.isoverse.org/reference/orbi_define_block.html</loc>
   </url>
   <url>
     <loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.html</loc>
