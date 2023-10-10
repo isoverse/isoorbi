@@ -43,7 +43,7 @@ Suggests:
     testthat,
     scales,
     forcats
-Description: Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Hilkert et al. (2021) <doi:10.1021/acs.analchem.1c00944>.
+Description: Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Citation: Kantnerova et al. (in review)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
