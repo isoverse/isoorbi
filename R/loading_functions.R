@@ -144,8 +144,9 @@ orbi_read_isox <- function(file) {
 #' @description Keep only columns that are directly relevant for isotopocule ratio analysis
 #'
 #' @param dataset IsoX data that is to be simplified
+#' @param add additional columns to keep
 #'
-#' @return A tibble containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
+#' @return A tibble containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`, plus any additional columns defined in the `add` argument
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
@@ -153,7 +154,7 @@ orbi_read_isox <- function(file) {
 #'
 #' @export
 
-orbi_simplify_isox <- function(dataset) {
+orbi_simplify_isox <- function(dataset, add = c()) {
 
   # safety checks
   cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
@@ -162,10 +163,15 @@ orbi_simplify_isox <- function(dataset) {
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
       all(cols %in% names(dataset))
   )
+
+  if(!all(add %in% names(dataset)))
+    abort("not all `add` columns are in the dataset")
+
   if (nrow(dataset) < 1)
-    stop("dataset contains no rows", call. = TRUE)
+    abort("dataset contains no rows")
 
   # info
+  cols <- c(cols, add)
   start_time <-
     sprintf("orbi_simplify_isox() will keep only columns '%s'... ",
             paste(cols, collapse = "', '")) |>
