@@ -1,5 +1,8 @@
 # exported functions -------
 
+
+
+
 #' Binning raw data into blocks for dual inlet analyses
 #'
 #' @param dataset A data frame or tibble produced from IsoX data by [orbi_simplify_isox()]
@@ -51,6 +54,9 @@ orbi_define_blocks_for_dual_inlet <- function(
     sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
       rlang::abort()
   }
+
+  # info message
+  start_time <- message_start("orbi_define_blocks_for_dual_inlet() is assessing block structure... ")
 
   # get blocks
   blocks <- dataset |>
@@ -111,12 +117,12 @@ orbi_define_blocks_for_dual_inlet <- function(
 
   # info message
   sprintf(
-    "orbi_define_blocks_for_dual_inlet() identified %d blocks (%s '%s', %s '%s') in data from %d file(s)",
+    "identified %d blocks (%s '%s', %s '%s') in data from %d file(s)",
     blocks |> dplyr::filter(.data$block > 0) |> nrow(),
     blocks |> dplyr::filter(.data$block > 0, .data$sample_name == ref_block_name) |> nrow(), ref_block_name,
     blocks |> dplyr::filter(.data$block > 0, .data$sample_name == sample_block_name) |> nrow(), sample_block_name,
     blocks |> dplyr::select("filename") |> dplyr::distinct() |> nrow()
-  ) |> message()
+  ) |> message_finish(start_time = start_time)
 
   # combine with the whole dataset
   dataset_with_blocks <-
@@ -306,33 +312,39 @@ orbi_adjust_block <- function(
   if (!change_start && !change_end) {
     sprintf("orbi_adjust_block() is not making any changes to block %d in file %s as no actual changes were requested",
             block, filename) |>
-      message()
+      message_standalone()
     return(dataset)
   }
 
   # info message for changes
-  msg <- sprintf("orbi_adjust_block() is making the following block adjustments in file %s:", filename)
+  sprintf("orbi_adjust_block() is making the following block adjustments in file %s:", filename) |>
+    message_standalone()
+
   if (change_start) {
-    msg <- sprintf("%s\n - moving block %d start from scan %d (%.2f min) to %d (%.2f min)",
-                   msg, block, old_start_scan, old_start_time, new_start_scan, new_start_time)
+    sprintf(" - moving block %d start from scan %d (%.2f min) to %d (%.2f min)",
+            block, old_start_scan, old_start_time, new_start_scan, new_start_time) |>
+      message_standalone()
   }
   if (change_end) {
-    msg <- sprintf("%s\n - moving block %d end from scan %d (%.2f min) to %d (%.2f min)",
-                   msg, block, old_end_scan, old_end_time, new_end_scan, new_end_time)
+    sprintf(" - moving block %d end from scan %d (%.2f min) to %d (%.2f min)",
+            block, old_end_scan, old_end_time, new_end_scan, new_end_time) |>
+      message_standalone()
   }
   if (new_start_row$block < block) {
-    msg <- sprintf("%s\n - moving block %d end to the new start of block %d",
-                   msg, new_start_row$block, block)
+    sprintf(" - moving block %d end to the new start of block %d",
+            new_start_row$block, block) |>
+      message_standalone()
   }
   if (new_end_row$block > block) {
-    msg <- sprintf("%s\n - moving block %d start to the new end of block %d",
-                   msg, new_end_row$block, block)
+    sprintf(" - moving block %d start to the new end of block %d",
+            new_end_row$block, block) |>
+      message_standalone()
   }
   if (length(removed_blocks) > 0) {
-    msg <- sprintf("%s\n - removing block %s entirely, as a result of the block adjustments",
-                   msg, paste(removed_blocks, collapse = " / "))
+    sprintf(" - removing block %s entirely, as a result of the block adjustments",
+            paste(removed_blocks, collapse = " / ")) |>
+      message_standalone()
   }
-  message(msg)
 
   # actualize changes
   # FIXME: should there be a flag to identify altered block boundaries?
@@ -427,6 +439,17 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
   else if (set_args > 1)
     rlang::abort("only set ONE of the 3 ways to segment: `into_segments`, `by_time_interval`, `by_scans`")
 
+  # info
+  dataset <- dataset |> factorize_dataset("filename")
+  start_time <-
+    sprintf(
+      "orbi_segment_blocks() is segmenting %d data blocks in %d file(s)... ",
+      dataset |> dplyr::filter(.data$block > 0) |>
+        dplyr::select("filename", "block") |> dplyr::distinct() |> nrow(),
+      length(levels(dataset$filename))
+    ) |>
+    message_start()
+
   # get scans
   scans <- dataset |>
     dplyr::select(!!!req_cols) |>
@@ -471,10 +494,10 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
       .groups = "drop"
     )
   sprintf(
-    "orbi_segment_blocks() segmented %d data blocks in %d file(s) into %s segments / block (on average) with %s scans / segment (on average)",
-    info_sum |> nrow(), info_sum$filename |> unique() |> length(),
-    info_sum$n_segments |> mean() |> signif(2), info_sum$n_scans_avg |> mean() |> signif(2)
-  ) |> message()
+    "created %s segments / block (on average) with %s scans / segment (on average)",
+    info_sum$n_segments |> mean() |> signif(2),
+    info_sum$n_scans_avg |> mean() |> signif(2)
+  ) |> message_finish(start_time = start_time)
 
   # combine with the whole dataset
   updated_dataset <-
@@ -498,37 +521,109 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
 #' FIXME: fully document
 #'
 #' @inheritParams orbi_adjust_block
+#' @param .by grouping columns for block info (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset
+#' @return a block summary or if no blocks defined yet, an empty tibble (with warning)
 #' @export
-orbi_get_blocks_info <- function(dataset) {
-
+orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data_group", "block", "sample_name", "data_type", "segment")) {
 
   # type checks
   stopifnot(
     "`dataset` must be a data frame or tibble" =
-      !missing(dataset) && is.data.frame(dataset)
+      !missing(dataset) && is.data.frame(dataset),
+    "`dataset` requires columns `filename`, `scan.no` or `start/end_scan.no`, `time.min` or `start/end_time.min`" =
+      "filename" %in% names(dataset) &&
+      (all(c("scan.no", "time.min") %in% names(dataset)) ||
+         all(c("start_scan.no", "end_scan.no", "start_time.min", "end_time.min") %in% names(dataset)))
   )
 
-  # dataset columns check
-  req_cols <- c("filename", "scan.no", "time.min", "block", "sample_name")   # FIXME: othercolumns needed?
+  # empty blocks
+  empty <- dataset |>
+    dplyr::group_by(.data$filename) |>
+    dplyr::summarise(
+      data_group = NA_integer_,
+      block = NA_real_,
+      sample_name = NA_character_,
+      data_type = factor(NA_character_),
+      segment = NA_integer_,
+      start_scan.no = NA_integer_,
+      end_scan.no = NA_integer_,
+      start_time.min = NA_real_,
+      end_time.min = NA_real_
+    )
 
-  if (length(missing <- setdiff(req_cols, names(dataset)))) {
-    sprintf("`dataset` is missing the column(s) '%s'", paste(missing, collapse = "', '")) |>
-      rlang::abort()
+  # no information
+  if (nrow(dataset) == 0) return(empty)
+  if (!"block" %in% names(dataset)) {
+    rlang::warn("`dataset` does not seem to have any block definitions yet (`block` column missing)")
+    return(empty)
   }
 
   # summarize block info
-  dataset |>
-    dplyr::group_by(.data$filename, .data$data_group, .data$block, .data$sample_name, .data$data_type, .data$segment) |>
-    dplyr::summarise(
-      start_scan.no = min(.data$scan.no),
-      end_scan.no = max(.data$scan.no),
-      start_time.min = min(.data$time.min),
-      end_time.min = max(.data$time.min),
-      .groups = "drop"
-    ) |>
-    dplyr::arrange(.data$filename, .data$start_scan.no)
+  if ("start_scan.no" %in% names(dataset)) {
+    # already summarized
+    dataset |>
+      dplyr::select(dplyr::any_of(.by), "start_scan.no", "end_scan.no", "start_time.min", "end_time.min")
+  } else {
+    dataset |>
+      group_if_exists(.by) |>
+      dplyr::summarise(
+        start_scan.no = min(.data$scan.no),
+        end_scan.no = max(.data$scan.no),
+        start_time.min = min(.data$time.min),
+        end_time.min = max(.data$time.min),
+        .groups = "drop"
+      ) |>
+      dplyr::arrange(.data$filename, .data$start_scan.no)
+  }
 }
 
+#' Plot blocks background
+#' @param plot object with a dataset that has defined blocks
+#' @param data_only if set to TRUE, only the blocks flagged as "data" (`setting("data_type_data")`) are highlighted
+#' @param fill what to use for the fill aesthetic, default is the block `data_type`
+#' @param fill_colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
+#' @param fill_scale use this parameter to replace the entire fill scale rather than just the `fill_colors`
+#' @param alpha opacity settings for the background
+#' @param show.legend whether to include the background information in the legend
+#' @export
+orbi_add_blocks_to_plot <- function(
+    plot,
+    data_only = FALSE,
+    fill = .data$data_type,
+    fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
+    fill_scale = scale_fill_manual(values = fill_colors),
+    alpha = 0.5, show.legend = TRUE) {
+
+  # add the rectangle plot as underlying layer
+  plot$layers <- c(
+    ggplot2::geom_rect(
+      data = function(df) {
+        blocks <- df |> orbi_get_blocks_info()
+        if (!all(c("block", "sample_name", "data_type") %in% names(blocks))) {
+          abort("columns `block`, `sample_name`, and `data_type` required for showing block")
+        }
+        if (data_only) {
+          blocks <- blocks |> dplyr::filter(.data$data_type == setting("data_type_data"))
+        }
+        blocks |> dplyr::filter(!is.na(.data$block))
+      },
+      map = ggplot2::aes(
+        x = NULL, xmin = .data$start_time.min, xmax = .data$end_time.min,
+        y = NULL, color = NULL,  ymin = -Inf, ymax = Inf,
+        fill = {{ fill }}
+      ),
+      alpha = alpha, linetype = 0, color = NA_character_,
+      show.legend = show.legend
+    ),
+    plot$layers
+  )
+
+  # return plot
+  plot <- plot + {{ fill_scale }} +
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(fill = NA_character_))) +
+    ggplot2::guides(shape = ggplot2::guide_legend(override.aes = list(fill = NA_character_)))
+  return(plot)
+}
 
 # internal functions ------------
 

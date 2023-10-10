@@ -26,7 +26,7 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 \item{.by}{additional grouping columns for the results summary (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.}
 }
 \value{
-Returns a results summary table retaining the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns:  \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
+Returns a results summary table retaining the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns: \code{start_scan.no}, \code{end_scan.no}, \code{start_time.min}, \code{mean_time.min}, \code{end_time.min}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
 \itemize{
 \item \code{ratio}: The isotope ratio between the \code{isotopocule} and the \code{basepeak}, calculated using the \code{ratio_method}
 \item \code{ratio_sem}: Standard error of the mean for the ratio

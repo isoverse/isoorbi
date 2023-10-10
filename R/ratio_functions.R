@@ -304,7 +304,7 @@ orbi_calculate_summarized_ratio <- function(
 #'       orbi_define_basepeak("M0")  |>
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
-#' @return Returns a results summary table retaining the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns:  `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
+#' @return Returns a results summary table retaining the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns: `start_scan.no`, `end_scan.no`, `start_time.min`, `mean_time.min`, `end_time.min`, `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
 #'
 #' * `ratio`: The isotope ratio between the `isotopocule` and the `basepeak`, calculated using the `ratio_method`
 #'
@@ -380,6 +380,10 @@ orbi_summarize_results <- function(
       df.group |>
 
         dplyr::summarize(
+
+          # scan information
+          start_scan.no = min(.data$scan.no),
+          end_scan.no = max(.data$scan.no),
 
           # time information
           start_time.min = min(.data$time.min),

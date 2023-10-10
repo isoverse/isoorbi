@@ -249,14 +249,14 @@ test_that("test orbi_segment_block()", {
 
   # results check
   test_data <- tibble(
-    filename = rep(c("test1", "test2"), c(6, 4)),
+    filename = rep(c("test1", "test2"), c(6, 4)) |> forcats::as_factor(),
     scan.no = 1:10, time.min = scan.no^2/10,
     block = rep(c(1L, 2L, 1L), c(4, 2, 4)),
     sample_name = c("test"),
     data_type = rep(c("unused", "data"), c(2, 8))
   )
 
-  expect_message(res1 <- test_data |> orbi_segment_blocks(into_segments = 2), "segmented 3 data blocks.*2 segments")
+  expect_message(res1 <- test_data |> orbi_segment_blocks(into_segments = 2), "segmenting 3 data blocks")
   expect_equal(
     res1,
     test_data |> dplyr::mutate(
@@ -265,7 +265,7 @@ test_that("test orbi_segment_block()", {
     ) |> dplyr::relocate(data_group, .before = "block")
   )
 
-  expect_message(res2 <- test_data |> orbi_segment_blocks(by_scans = 2), "segmented 3 data blocks.*2 scans")
+  expect_message(res2 <- test_data |> orbi_segment_blocks(by_scans = 2), "2 scans")
   expect_equal(
     res2,
     test_data |> dplyr::mutate(
@@ -274,7 +274,7 @@ test_that("test orbi_segment_block()", {
     ) |> dplyr::relocate(data_group, .before = "block")
   )
 
-  expect_message(res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0), "segmented 3 data blocks.*2.3 segments")
+  expect_message(res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0), "2.3 segments")
   expect_equal(
     res3,
     test_data |> dplyr::mutate(
@@ -295,7 +295,7 @@ test_that("test orbi_get_blocks_info()", {
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(orbi_get_blocks_info(df2),
-               "`dataset` is missing the column(s) 'scan.no', 'block', 'sample_name'",
+               "`dataset` requires columns",
                fixed = TRUE)
 
 })
