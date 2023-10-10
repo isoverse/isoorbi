@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Hilkert et al. (2021) \doi{10.1021/acs.analchem.1c00944}.
+Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Citation: Kantnerova et al. (in review)
 }
 \seealso{
 Useful links:

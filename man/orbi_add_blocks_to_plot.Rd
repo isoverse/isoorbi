@@ -12,7 +12,7 @@ orbi_add_blocks_to_plot(
     "#A6761D", "#666666"),
   fill_scale = scale_fill_manual(values = fill_colors),
   alpha = 0.5,
-  show.legend = TRUE
+  show.legend = !data_only
 )
 }
 \arguments{
@@ -31,5 +31,5 @@ orbi_add_blocks_to_plot(
 \item{show.legend}{whether to include the background information in the legend}
 }
 \description{
-Plot blocks background
+FIXME: this should also work with scan number
 }

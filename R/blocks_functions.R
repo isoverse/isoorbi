@@ -1,6 +1,144 @@
 # exported functions -------
 
+#' Manually define a block
+#'
+#' Define a data block by either start and end time or start and end scan number.
+#' Note that mannually defining blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **after** finishing block definitions.
+#'
+#' FIXME: complete description and parameters
+#'
+#' @param dataset tibble with orbitrap data
+#' @param start_time.min set the start time of the block
+#' @param end_time.min set the end time of the block
+#' @param start_scan.no set the start scan of the block
+#' @param end_scan.no set the end scan of the block
+#' @param sample_name if provided, will be used as the `sample_name` for the block
+#' @return A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
+#' @export
+orbi_define_block <- function(
+    dataset,
+    start_time.min = NULL, end_time.min = NULL,
+    start_scan.no = NULL, end_scan.no = NULL,
+    sample_name = NULL) {
 
+  # type checks
+  stopifnot(
+    "`dataset` must be a data frame or tibble" =
+      !missing(dataset) && is.data.frame(dataset),
+    "`dataset` requires columns `filename`, `scan.no` and `time.min`" =
+      all(c("filename", "scan.no", "time.min") %in% names(dataset)),
+    "if set, `start_time.min` must be a single number" =
+      is.null(start_time.min) || rlang::is_scalar_double(start_time.min),
+    "if set, `end_time.min` must be a single number" =
+      is.null(end_time.min) || rlang::is_scalar_double(end_time.min),
+    "if set, `start_scan.no` must be a single integer" =
+      is.null(start_scan.no) || rlang::is_scalar_integerish(start_scan.no),
+    "if set, `end_scan.no` must be a single integer" =
+      is.null(end_scan.no) || rlang::is_scalar_integerish(end_scan.no)
+  )
+
+  # start/end definitions safety checks
+  set_by_time <- !rlang::is_empty(start_time.min) && !rlang::is_empty(end_time.min)
+  set_by_scan <- !rlang::is_empty(start_scan.no) && !rlang::is_empty(end_scan.no)
+  if (set_by_time && set_by_scan)
+    abort("block definition can either be by time or by scan but not both")
+  else if (!set_by_time && !set_by_scan)
+    abort("block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`")
+
+  # info message
+  dataset <-
+    dataset |>
+    factorize_dataset("filename") |>
+    dplyr::mutate(..row_id = dplyr::row_number())
+  start_time <-
+    sprintf("orbi_define_block() is adding new block (%s) to %d files... ",
+            if(set_by_time) sprintf("%s to %s min", start_time.min, end_time.min)
+            else sprintf("scan %s to %s", start_scan.no, end_scan.no),
+            length(levels(dataset$filename))) |>
+    message_start()
+
+  # get scans with blocks and data types from the data set
+  scans <- dataset |>
+    dplyr::select("filename", "scan.no", "time.min", dplyr::any_of(c("data_group", "block", "sample_name", "data_type", "segment"))) |>
+    dplyr::distinct()
+
+  # make sure columns exist
+  if (!"block" %in% names(scans))
+    scans$block <- 0L
+  if (!"sample_name" %in% names(scans))
+    scans$sample_name <- NA_character_
+  if (!"data_type" %in% names(scans))
+    scans$data_type <- setting("data_type_unused")
+
+  # nest
+  scans <- scans |> tidyr::nest(data = -"filename")
+
+  # find start scans
+  if (set_by_time) {
+    scans <- scans |>
+      dplyr::mutate(
+        start_scan.no = map_int(data, find_scan_from_time, start_time.min, "start"),
+        end_scan.no = map_int(data, find_scan_from_time, end_time.min, "end")
+      )
+  } else {
+    scans <- scans |>
+      dplyr::mutate(
+        start_scan.no = !!start_scan.no,
+        end_scan.no = !!end_scan.no
+      )
+  }
+
+  # determine new block numbers
+  scans <- scans |>
+    dplyr::mutate(
+      next_block = map_int(data, ~max(.x$block) + 1L)
+    ) |>
+    tidyr::unnest("data")
+
+  # actualize changes
+  scans <-
+    try_catch_all(
+      scans |>
+        # introduce updated segment, block, data type and samaple_name
+        dplyr::mutate(
+          new_block = ifelse(.data$scan.no >= .data$start_scan.no & .data$scan.no <= .data$end_scan.no, .data$next_block, .data$block),
+          sample_name = ifelse(!is.null(!!sample_name) & .data$new_block == .data$next_block, !!sample_name, .data$sample_name),
+          data_type = ifelse(.data$new_block == .data$next_block, setting("data_type_data"), .data$data_type),
+          segment = NA_integer_
+        ) |>
+        # determine data groups
+        determine_data_groups(),
+      "error trying to update scan blocks:"
+    )
+
+  # NOTE: should this provide more information and/or allow an argument to make
+  # the new plot definition flexible? (snap_to_blocks = TRUE?)
+  if (any(scans$block > 0L & scans$new_block > scans$block )) {
+    cat("\n")
+    abort("new block definition overlaps with existing block")
+  }
+
+  # combine with the whole dataset
+  updated_dataset <-
+    try_catch_all(
+      dataset |>
+        dplyr::select(-dplyr::any_of(c("data_group", "block", "sample_name", "data_type", "segment"))) |>
+        dplyr::left_join(
+          scans |>
+            dplyr::select(
+              "filename", "scan.no", "data_group", "block" = "new_block", "sample_name", "data_type", "segment"
+            ),
+          by = c("filename", "scan.no")
+        ),
+      "error trying to update dataset with new block: "
+    )
+
+  # info
+  message_finish("complete", start_time = start_time)
+
+  # return updated dataset (original row order restored)
+  return(updated_dataset |> dplyr::arrange(.data$..row_id) |> dplyr::select(-"..row_id"))
+}
 
 
 #' Binning raw data into blocks for dual inlet analyses
@@ -541,7 +679,7 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
     dplyr::group_by(.data$filename) |>
     dplyr::summarise(
       data_group = NA_integer_,
-      block = NA_real_,
+      block = NA_integer_,
       sample_name = NA_character_,
       data_type = factor(NA_character_),
       segment = NA_integer_,
@@ -578,6 +716,9 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 }
 
 #' Plot blocks background
+#'
+#' FIXME: this should also work with scan number
+#'
 #' @param plot object with a dataset that has defined blocks
 #' @param data_only if set to TRUE, only the blocks flagged as "data" (`setting("data_type_data")`) are highlighted
 #' @param fill what to use for the fill aesthetic, default is the block `data_type`
@@ -592,7 +733,7 @@ orbi_add_blocks_to_plot <- function(
     fill = .data$data_type,
     fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
     fill_scale = scale_fill_manual(values = fill_colors),
-    alpha = 0.5, show.legend = TRUE) {
+    alpha = 0.5, show.legend = !data_only) {
 
   # add the rectangle plot as underlying layer
   plot$layers <- c(
@@ -667,7 +808,7 @@ find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref
     # do we have a startup block?
     if (startup_time.min > 0) {
       startup_block <- dplyr::tibble(
-        interval = 0, idx = 0, start = 0,
+        interval = 0L, idx = 0, start = 0,
         length = startup_time.min, last = FALSE
       )
       blocks <- dplyr::bind_rows(startup_block, blocks) |>
