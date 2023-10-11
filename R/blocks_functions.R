@@ -1,4 +1,7 @@
 # exported functions -------
+#' @importFrom utils data
+#' @importFrom ggplot2 scale_fill_manual
+NULL
 
 #' Manually define a block
 #'

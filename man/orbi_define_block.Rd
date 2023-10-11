@@ -31,7 +31,7 @@ A data frame (tibble) with block definition added. Any data that is not part of 
 }
 \description{
 Define a data block by either start and end time or start and end scan number.
-Note that mannually defining blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{after} finishing block definitions.
+Note that manually defining blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{after} finishing block definitions.
 }
 \details{
 FIXME: complete description and parameters
