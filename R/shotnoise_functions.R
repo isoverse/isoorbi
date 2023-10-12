@@ -4,7 +4,7 @@
 #' will calculate for all combinations of `filename`, `compound`, and `isotopocule` in the provided `dataset`
 #'
 #' @title Shot noise calculation
-#' @description This function computes the shot noise calculation
+#' @description This function computes the shot noise calculation.
 #' @param dataset a data frame output after running `orbi_define_basepeak()`
 #' @return The processed data frame with new columns: `n_effective_ions`, `ratio`, `ratio_rel_se.permil`, `shot_noise.permil`
 #' @export
@@ -69,6 +69,8 @@ orbi_analyze_shot_noise <- function(dataset){
 }
 
 #' plot shot noise
+#' @title Make a shot noise plot
+#' @description This function creates a shot noise plot using a `shotnoise` data frame created by the [orbi_analyze_shot_noise()] function.
 #' @param shotnoise a `shotnoise` data frame
 #' @param x x-axis for the shot noise plot, either "time.min" or "n_effective_ions"
 #' @param color which column to use for the color aesthetic (must be a factor)

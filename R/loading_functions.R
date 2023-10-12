@@ -1,9 +1,7 @@
 # Functions to load, pre-filter and simplify IsoX data ------------------------------------
 
-#' Find isox files
-#'
-#' Finds all .isox files in a folder.
-#'
+#' @title Find isox files
+#' @description Finds all .isox files in a folder.
 #' @param folder path to a folder with isox files
 #' @param recursive whether to find files recursively
 #'
@@ -25,7 +23,7 @@ orbi_find_isox <- function(folder, recursive = TRUE) {
 }
 
 #' @title Read IsoX file
-#' @description Read an IsoX output file (`.isox`) into a tibble data frame
+#' @description Read an IsoX output file (`.isox`) into a tibble data frame.
 #'
 #' @param file Path to the `.isox` file(s), single value or vector of paths
 #' @details Additional information on the columns:
@@ -141,7 +139,7 @@ orbi_read_isox <- function(file) {
 }
 
 #' @title Simplify IsoX data
-#' @description Keep only columns that are directly relevant for isotopocule ratio analysis
+#' @description Keep only columns that are directly relevant for isotopocule ratio analysis.
 #'
 #' @param dataset IsoX data that is to be simplified
 #' @param add additional columns to keep

@@ -89,7 +89,7 @@ message_wrap <- function (..., appendLF = TRUE, width = if (!interactive()) opti
 # Common utility functions to clean and annotate data ------------------------------------
 
 #' @title Function replaced by `orbi_flag_satellite_peaks()`
-#' @param ... parameters passed on to new function orbi_flag_satellite_peaks()
+#' @param ... parameters passed on to the new function [orbi_flag_satellite_peaks()].
 #' @export
 orbi_filter_satellite_peaks <- function(...) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_satellite_peaks()", "orbi_flag_satellite_peaks()", always = TRUE)
@@ -153,7 +153,7 @@ orbi_flag_satellite_peaks <- function(dataset) {
 }
 
 #' @title Function replaced by `orbi_flag_weak_isotopocules()`
-#' @param ... parameters passed on to new function orbi_flag_weak_isotopocules()
+#' @param ... parameters passed on to the new function orbi_flag_weak_isotopocules().
 #' @export
 orbi_filter_weak_isotopocules <- function(...) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_weak_isotopocules()", "orbi_flag_weak_isotopocules()", always = TRUE)
@@ -162,7 +162,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 }
 
 #' @title Flag weak isotopocules
-#' @description The function `orbi_filter_weak_isotopocules()` flags isotopocules that are not consistently detected in most scans
+#' @description The function `orbi_filter_weak_isotopocules()` flags isotopocules that are not consistently detected in most scans.
 #'
 #' @param dataset A simplified IsoX data frame to be processed
 #' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)
@@ -231,7 +231,7 @@ orbi_flag_weak_isotopocules <-
 
 
 #' @title Function replaced by `orbi_flag_outliers()`
-#' @param ... parameters passed on to new function orbi_flag_outliers()
+#' @param ... parameters passed on to the new function [orbi_flag_outliers()].
 #' @param outlier_percent outlier_percent needs to be between 0 and 10, flags extreme scans based on TIC x injection time (i.e., ion intensity)
 #' @export
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
@@ -309,10 +309,10 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
 }
 
 
-#' Filter out flagged data
-#'
-#' @param dataset a tibble with previously flagged data from `orbi_flat_satellite_peaks()`, `orbi_filter_weak_isotopocules()`, and/or `orbi_flag_outliers()`
-#' @return the
+#' @title Filter out flagged data
+#' @description This function filters out data that have been previously flagged using functions `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()`, and/or `orbi_flag_outliers()`.
+#' @param dataset a tibble with previously flagged data from `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()`, and/or `orbi_flag_outliers()`
+#' @return a dataset with the flagged data filtered out
 #' @export
 orbi_filter_flagged_data <- function(dataset) {
 
@@ -360,7 +360,6 @@ orbi_filter_flagged_data <- function(dataset) {
 
 
 #' @title Define the denominator for ratio calculation
-#'
 #' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator)
 #' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`.
 #' @param basepeak_def The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios

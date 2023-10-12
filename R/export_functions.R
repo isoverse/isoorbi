@@ -1,4 +1,5 @@
-#' export data frame to excel
+#' @title Export data frame to excel
+#' @description This functions exports the final `dataset` into an Excel file.
 #' @param dataset data frame
 #' @param file file path to export the file
 #' @inheritParams add_excel_sheet
@@ -53,7 +54,8 @@ orbi_export_data_to_excel <- function(dataset, file, dbl_digits = 2, int_format 
 }
 
 
-#' internal function to add an excel sheet to a workbook
+#' @title Add a new sheet
+#' @description Internal function to add an excel sheet to a workbook.
 #' @param wb the workbook object
 #' @param sheet_name the name of the excel sheet
 #' @param dataset the data frame(s)

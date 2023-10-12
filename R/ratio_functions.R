@@ -1,9 +1,7 @@
-# Functions to calcualte direct ratios --------------
+# Functions to calculate direct ratios --------------
 
-#' Calculate direct isotopocule ratios
-#'
-#' This function calculates isotopocule/base peak ratios for all isotopocules. It does not summarize or average the ratios in any way. For a summarizing version of this function, see `orbi_summarize_results()`.
-#'
+#' @title Calculate direct isotopocule ratios
+#' @description This function calculates isotopocule/base peak ratios for all isotopocules. It does not summarize or average the ratios in any way. For a summarizing version of this function, see `orbi_summarize_results()`.
 #' @param dataset A data frame output after running `orbi_define_basepeak()`
 #' @return Returns a mutated dataset with `ratio` column added.
 #' @export
@@ -53,7 +51,7 @@ orbi_calculate_ratios <- function(dataset) {
 # Functions to calculate summarized ratios and stats --------------------------------------------
 
 #' @title Internal function to calculate standard error
-#' @description The function `calculate_ratios_sem()` computes a regular standard error
+#' @description The function `calculate_ratios_sem()` computes a regular standard error.
 #' @keywords internal
 #' @param ratios A numeric vector used to calculate a standard error
 #' @return The calculated standard error
@@ -74,7 +72,7 @@ calculate_ratios_sem <- function(ratios) {
 }
 
 #' @title Internal function to calculate geometric mean
-#' @description  The function `calculate_ratios_gmean()` is used to calculate geometric means
+#' @description  The function `calculate_ratios_gmean()` is used to calculate geometric means.
 #' @keywords internal
 #' @param ratios A numeric vector of ratios used to calculate the geometric mean
 #' @return The calculated geometric mean
@@ -95,7 +93,7 @@ calculate_ratios_gmean <- function(ratios) {
 
 
 #' @title Internal function to calculate standard deviation (geometric)
-#' @description  The function `calculate_ratios_gsd()` is used to calculate geometric standard deviations
+#' @description  The function `calculate_ratios_gsd()` is used to calculate geometric standard deviations.
 #' @keywords internal
 #' @param ratios A numeric values used to calculate the geometric standard deviation
 #' @return The calculated geometric standard deviation
@@ -115,11 +113,11 @@ calculate_ratios_gsd <- function(ratios) {
 
 }
 
-# @title Internal function to calculate standard error (geometric)
-# @description  The function `calculate_ratios_gse()` is used to calculate geometric standard errors
-# @keywords internal
-# @param ratios A vector of values used to calculate geometric standard errors
-# @return The calculated geometric standard error
+#' @title Internal function to calculate standard error (geometric)
+#' @description  The function `calculate_ratios_gse()` is used to calculate geometric standard errors.
+#' @keywords internal
+#' @param ratios A vector of values used to calculate geometric standard errors
+#' @return The calculated geometric standard error
 calculate_ratios_gse <- function(ratios) {
 
   # safety checks
@@ -137,7 +135,7 @@ calculate_ratios_gse <- function(ratios) {
 }
 
 #' @title Internal function for ratio_method `slope`
-#' @description  The function `calculate_ratios_slope()` is used to estimate the slope of x, y values used in a ratio
+#' @description  The function `calculate_ratios_slope()` is used to estimate the slope of x, y values used in a ratio.
 #' @keywords internal
 #' @param x Vector of values used as ratio numerator
 #' @param y Vector of values used as ratio denominator
@@ -170,7 +168,7 @@ calculate_ratios_slope <- function(x, y) {
 }
 
 #' @title Internal function for ratio_method `weighted_sum`
-#' @description The function `calculate_ratios_weighted_sum()` is used to calculate ratios by weighted sums of x and y values
+#' @description The function `calculate_ratios_weighted_sum()` is used to calculate ratios by weighted sums of x and y values.
 #' @keywords internal
 #' @param x A vector of values used as ratio numerator
 #' @param y A vector of values used as ratio denominator
@@ -211,9 +209,7 @@ calculate_ratios_weighted_sum <- function(x, y) {
 
 
 #' @title Calculate isotopocule ratio
-#'
 #' @description This function calculates the ratio of two isotopocules (the `numerator` and `denominator`). This function averages multiple measurements of each using the `ratio_method` and returns a single value. Normally this function is not called directly by the user, but via the function [orbi_summarize_results()], which calculates isotopocule ratios and other results for an entire dataset.
-#'
 #' @param numerator Column(s) used as numerator; contains ion counts
 #' @param denominator Column used as denominator; contains ion counts
 #' @param ratio_method Method for computing the ratio. **Please note well**: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). `ratio_method` can be one of the following:

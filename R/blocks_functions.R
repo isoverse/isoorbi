@@ -3,14 +3,11 @@
 #' @importFrom ggplot2 scale_fill_manual
 NULL
 
-#' Manually define a block
-#'
-#' Define a data block by either start and end time or start and end scan number.
+#' @title Manually define a block
+#' @description Define a data block by either start and end time or start and end scan number.
 #' Note that manually defining blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **after** finishing block definitions.
 #'
-#' FIXME: complete description and parameters
-#'
-#' @param dataset tibble with orbitrap data
+#' @param dataset tibble with Orbitrap data
 #' @param start_time.min set the start time of the block
 #' @param end_time.min set the end time of the block
 #' @param start_scan.no set the start scan of the block
@@ -144,15 +141,15 @@ orbi_define_block <- function(
 }
 
 
-#' Binning raw data into blocks for dual inlet analyses
-#'
+#' @title Binning raw data into blocks for dual inlet analyses
+#' @description This function sorts out (bins) data into indivual blocks of reference, sample, changeover time, and startup time.
 #' @param dataset A data frame or tibble produced from IsoX data by [orbi_simplify_isox()]
-#' @param ref_block_time.min placeholder
-#' @param change_over_time.min placeholder
-#' @param sample_block_time.min placeholder
-#' @param startup_time.min placeholder
-#' @param ref_block_name placeholder
-#' @param sample_block_name placeholder
+#' @param ref_block_time.min time where the signal is stable when reference is analyzed
+#' @param change_over_time.min time where the signal is unstable after switching from reference to sample or back
+#' @param sample_block_time.min time where the signal is stable when sample is analyzed
+#' @param startup_time.min initial time to stabilize spray
+#' @param ref_block_name the name of the reference being measured
+#' @param sample_block_name the name of the sample being measured
 #'
 #' @return A data frame (tibble) with block annotations in the form of the additional columns described below:
 #' * `data_group` is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like [orbi_adjust_block()] and [orbi_segment_blocks()] will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
@@ -280,10 +277,9 @@ orbi_define_blocks_for_dual_inlet <- function(
   return(dataset_with_blocks)
 }
 
-#' Manually adjust block delimiters
-#'
+#' @title Manually adjust block delimiters
+#' @description This function can be used to manually adjust where certain `block` starts or ends using either time or scan number.
 #' Note that adjusting blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **after** adjusting block delimiters.
-#' FIXME: complete description and parameters
 #'
 #' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
 #' @param block the block for which to adjust the start and/or end
@@ -541,10 +537,8 @@ orbi_adjust_block <- function(
   return(updated_dataset)
 }
 
-#' Segment data blocks
-#'
-#' This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with `data_type` set to "data" (`orbi_get_settings("data_type")`) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
-#'
+#' @title Segment data blocks
+#' @description This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with `data_type` set to "data" (`orbi_get_settings("data_type")`) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
 #' @inheritParams orbi_adjust_block
 #' @param into_segments segment each data block into this many segments. The result will have exactly this number of segments for each data block except for if there are more segments requested than observations in a group (in which case each observation will be one segment)
 #' @param by_scans segment each data block into segments spanning this number of scans. The result will be approximately the requested number of scans per segment, depending on what is the most sensible distribution of the data. For example, in a hypothetical data block with 31 scans, if by_scans = 10, this function will create 3 segments with 11, 10 and 10 scans each (most evenly distributed), instead of 4 segments with 10, 10, 10, 1 (less evenly distributed).
@@ -657,12 +651,10 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
   return(updated_dataset)
 }
 
-#' Summarize blocks info
-#'
-#' FIXME: fully document
-#'
+#' @title Summarize blocks info
+#' @description This function provides an overview table `blocks_info` which shows information on blocks in the dataset (block number, sample name, data type, scan number where a block starts).
 #' @inheritParams orbi_adjust_block
-#' @param .by grouping columns for block info (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset
+#' @param .by grouping columns for block info (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset.
 #' @return a block summary or if no blocks defined yet, an empty tibble (with warning)
 #' @export
 orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data_group", "block", "sample_name", "data_type", "segment")) {
@@ -718,7 +710,8 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
   }
 }
 
-#' Plot blocks background
+#' @title Plot blocks background
+#' @description This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused).
 #'
 #' FIXME: this should also work with scan number
 #'
@@ -772,6 +765,10 @@ orbi_add_blocks_to_plot <- function(
 # internal functions ------------
 
 # helper function to find blocks (internal)
+#' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
+#' @param ref_block_time.min time where the signal is stable when reference is analyzed
+#' @param sample_block_time.min time where the signal is stable when sample is analyzed
+#' @param startup_time.min initial time to stabilize spray
 find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref_block_time.min, startup_time.min = 0) {
 
   # type checks
@@ -840,6 +837,8 @@ find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref
 }
 
 # general helper function to divide up time into intervals (internal)
+#' @param total_time which time should be divided up into intervals
+#' @param intervals how many intervals
 find_intervals <- function(total_time, intervals) {
 
   # safety checks
@@ -880,8 +879,10 @@ find_intervals <- function(total_time, intervals) {
   )
 }
 
-# helper to find scan noumber from time
-# @param scans must be scans from a single file
+# helper to find scan number from time
+#' @param scans must be scans from a single file
+#' @param time time stamp where the scan number is required
+#' @param which searching towards the start or end of the file
 find_scan_from_time <- function(scans, time, which = c("start", "end")) {
   time_scans <- scans |>
     dplyr::filter(
@@ -906,7 +907,8 @@ find_scan_from_time <- function(scans, time, which = c("start", "end")) {
 }
 
 # pull out scan rows (and safety check along the way)
-# @param scans must be scans from a single file
+#' @param scans must be scans from a single file
+#' @param scan scan number
 get_scan_row <- function(scans, scan) {
   if (!rlang::is_empty(scan)) {
     scan_row <- scans |>
@@ -927,7 +929,7 @@ get_scan_row <- function(scans, scan) {
 }
 
 # internal function to determine data groups
-# @param dataset assumes is in the correct order
+#' @param dataset assumes is in the correct order
 determine_data_groups <- function(dataset) {
   dataset |>
     # assign data groups
@@ -941,6 +943,8 @@ determine_data_groups <- function(dataset) {
 }
 
 # internal function to segment into a specific number of segments
+#' @param scan.no where the segmentation starts
+#' @param into_segments how many segments
 segment_by_segs <- function(scan.no, into_segments) {
   idx <- seq_along(scan.no)
   if(into_segments >= length(scan.no)) {
@@ -955,12 +959,16 @@ segment_by_segs <- function(scan.no, into_segments) {
 }
 
 # internal function to segment by scans
+#' @param scan.no where the segmentation starts
+#' @param by_scans number of scans in each segment
 segment_by_scans <- function(scan.no, by_scans) {
   # approximates number of scans
   return(segment_by_segs(scan.no, into_segments = round(length(scan.no) / by_scans)))
 }
 
 # internal function to segment by time interval
+#' @param time.min where the segmentation starts
+#' @param time_interval length of each segment in minutes
 segment_by_time_interval <- function(time.min, time_interval) {
   return( as.integer((time.min - min(time.min)) %/% time_interval + 1L))
 }
