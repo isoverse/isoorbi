@@ -652,7 +652,7 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
 }
 
 #' @title Summarize blocks info
-#' @description This function provides an overview table `blocks_info` which shows information on blocks in the dataset (block number, sample name, data type, scan number where a block starts).
+#' @description This function provides an overview table `blocks_info` which shows information on blocks in the dataset (block number, sample name, data type, scan number and start time where a block starts, and scan number and end time where a block ends).
 #' @inheritParams orbi_adjust_block
 #' @param .by grouping columns for block info (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset.
 #' @return a block summary or if no blocks defined yet, an empty tibble (with warning)
