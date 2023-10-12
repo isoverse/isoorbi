@@ -23,7 +23,12 @@ A basic data processing example
 file_path <- system.file(package = "isoorbi", "extdata", "testfile_flow.isox")
 
 # Read .isox test data
-df <- file_path |> orbi_read_isox() 
+df <- file_path |>  orbi_read_isox() 
+
+# If there are multiple .isox files in your folder, you have to use the orbi_find_isox() function first
+# df <- "path_to_your_folder" |> 
+    # orbi_find_isox() |>
+    # orbi_read_isox()
 
 # Keep only most important columns; equivalent to simplify check box in IsoX
 df.simple <- df |> orbi_simplify_isox()
@@ -41,7 +46,8 @@ df.filtered <- df.simple |>
 df.clean <- df.filtered |> 
   orbi_flag_satellite_peaks() |> 
   orbi_flag_weak_isotopocules(min_percent = 2) |> 
-  orbi_flag_outliers(intensity_window = c(1,99))
+  orbi_flag_outliers(intensity_window = c(1,99)) |>
+  orbi_filter_flagged_data()
 
 # Define base peak and calculate the results table
 df.results <- df.clean |> 
