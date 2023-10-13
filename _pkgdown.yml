@@ -72,10 +72,9 @@ reference:
 
 - title: Export functions
   desc: >
-    These functions serve to export data to an Excel file.
+    This function serves to export data to an Excel file.
   contents:
   - orbi_export_data_to_excel
-  - add_excel_sheet
 
 - title: Internal
   contents:
