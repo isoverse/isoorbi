@@ -13,11 +13,11 @@ orbi_get_blocks_info(
 \arguments{
 \item{dataset}{tibble produced by \code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}}}
 
-\item{.by}{grouping columns for block info (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset}
+\item{.by}{grouping columns for block info (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset.}
 }
 \value{
 a block summary or if no blocks defined yet, an empty tibble (with warning)
 }
 \description{
-FIXME: fully document
+This function provides an overview table \code{blocks_info} which shows information on blocks in the dataset (block number, sample name, data type, scan number and start time where a block starts, and scan number and end time where a block ends).
 }

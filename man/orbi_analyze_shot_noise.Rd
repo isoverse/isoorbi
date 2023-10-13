@@ -13,7 +13,7 @@ orbi_analyze_shot_noise(dataset)
 The processed data frame with new columns: \code{n_effective_ions}, \code{ratio}, \code{ratio_rel_se.permil}, \code{shot_noise.permil}
 }
 \description{
-This function computes the shot noise calculation
+This function computes the shot noise calculation.
 }
 \details{
 Analyze shot noise

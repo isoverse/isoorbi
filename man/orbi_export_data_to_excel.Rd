@@ -2,7 +2,7 @@
 % Please edit documentation in R/export_functions.R
 \name{orbi_export_data_to_excel}
 \alias{orbi_export_data_to_excel}
-\title{export data frame to excel}
+\title{Export data frame to excel}
 \usage{
 orbi_export_data_to_excel(
   dataset,
@@ -27,5 +27,5 @@ orbi_export_data_to_excel(
 returns dataset invisibly for use in pipes
 }
 \description{
-export data frame to excel
+This functions exports the final \code{dataset} into an Excel file.
 }

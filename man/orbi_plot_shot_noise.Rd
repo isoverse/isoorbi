@@ -2,7 +2,7 @@
 % Please edit documentation in R/shotnoise_functions.R
 \name{orbi_plot_shot_noise}
 \alias{orbi_plot_shot_noise}
-\title{plot shot noise}
+\title{Make a shot noise plot}
 \usage{
 orbi_plot_shot_noise(
   shotnoise,
@@ -25,5 +25,8 @@ orbi_plot_shot_noise(
 \item{colors}{which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)}
 }
 \description{
+This function creates a shot noise plot using a \code{shotnoise} data frame created by the \code{\link[=orbi_analyze_shot_noise]{orbi_analyze_shot_noise()}} function.
+}
+\details{
 plot shot noise
 }

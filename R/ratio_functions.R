@@ -50,11 +50,11 @@ orbi_calculate_ratios <- function(dataset) {
 
 # Functions to calculate summarized ratios and stats --------------------------------------------
 
-#' @title Internal function to calculate standard error
-#' @description The function `calculate_ratios_sem()` computes a regular standard error.
-#' @keywords internal
-#' @param ratios A numeric vector used to calculate a standard error
-#' @return The calculated standard error
+# @title Internal function to calculate standard error
+# @description The function `calculate_ratios_sem()` computes a regular standard error.
+# @keywords internal
+# @param ratios A numeric vector used to calculate a standard error
+# @return The calculated standard error
 calculate_ratios_sem <- function(ratios) {
 
   # safety checks
@@ -71,11 +71,11 @@ calculate_ratios_sem <- function(ratios) {
   )
 }
 
-#' @title Internal function to calculate geometric mean
-#' @description  The function `calculate_ratios_gmean()` is used to calculate geometric means.
-#' @keywords internal
-#' @param ratios A numeric vector of ratios used to calculate the geometric mean
-#' @return The calculated geometric mean
+# @title Internal function to calculate geometric mean
+# @description  The function `calculate_ratios_gmean()` is used to calculate geometric means.
+# @keywords internal
+# @param ratios A numeric vector of ratios used to calculate the geometric mean
+# @return The calculated geometric mean
 calculate_ratios_gmean <- function(ratios) {
 
   # safety checks
@@ -92,11 +92,11 @@ calculate_ratios_gmean <- function(ratios) {
 }
 
 
-#' @title Internal function to calculate standard deviation (geometric)
-#' @description  The function `calculate_ratios_gsd()` is used to calculate geometric standard deviations.
-#' @keywords internal
-#' @param ratios A numeric values used to calculate the geometric standard deviation
-#' @return The calculated geometric standard deviation
+# @title Internal function to calculate standard deviation (geometric)
+# @description  The function `calculate_ratios_gsd()` is used to calculate geometric standard deviations.
+# @keywords internal
+# @param ratios A numeric values used to calculate the geometric standard deviation
+# @return The calculated geometric standard deviation
 calculate_ratios_gsd <- function(ratios) {
 
   # safety checks
@@ -113,11 +113,11 @@ calculate_ratios_gsd <- function(ratios) {
 
 }
 
-#' @title Internal function to calculate standard error (geometric)
-#' @description  The function `calculate_ratios_gse()` is used to calculate geometric standard errors.
-#' @keywords internal
-#' @param ratios A vector of values used to calculate geometric standard errors
-#' @return The calculated geometric standard error
+# @title Internal function to calculate standard error (geometric)
+# @description  The function `calculate_ratios_gse()` is used to calculate geometric standard errors.
+# @keywords internal
+# @param ratios A vector of values used to calculate geometric standard errors
+# @return The calculated geometric standard error
 calculate_ratios_gse <- function(ratios) {
 
   # safety checks
@@ -134,13 +134,13 @@ calculate_ratios_gse <- function(ratios) {
 
 }
 
-#' @title Internal function for ratio_method `slope`
-#' @description  The function `calculate_ratios_slope()` is used to estimate the slope of x, y values used in a ratio.
-#' @keywords internal
-#' @param x Vector of values used as ratio numerator
-#' @param y Vector of values used as ratio denominator
-#' @details The slope is calculated from a linear regression model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`
-#' @return The calculated slope, an estimate of the ratio x/y
+# @title Internal function for ratio_method `slope`
+# @description  The function `calculate_ratios_slope()` is used to estimate the slope of x, y values used in a ratio.
+# @keywords internal
+# @param x Vector of values used as ratio numerator
+# @param y Vector of values used as ratio denominator
+# @details The slope is calculated from a linear regression model that is weighted by the numerator x, using `stats::lm(x ~ y + 0, weights = x)`
+# @return The calculated slope, an estimate of the ratio x/y
 calculate_ratios_slope <- function(x, y) {
 
   # safety checks
@@ -167,14 +167,14 @@ calculate_ratios_slope <- function(x, y) {
 
 }
 
-#' @title Internal function for ratio_method `weighted_sum`
-#' @description The function `calculate_ratios_weighted_sum()` is used to calculate ratios by weighted sums of x and y values.
-#' @keywords internal
-#' @param x A vector of values used as ratio numerator
-#' @param y A vector of values used as ratio denominator
-#' @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
-#' i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
-#' @return The calculated ratio x/y
+# @title Internal function for ratio_method `weighted_sum`
+# @description The function `calculate_ratios_weighted_sum()` is used to calculate ratios by weighted sums of x and y values.
+# @keywords internal
+# @param x A vector of values used as ratio numerator
+# @param y A vector of values used as ratio denominator
+# @details The weighing function ensures that each scan contributes equal weight to the ratio calculation,
+# i.e. scans with more ions in the Orbitrap do not contribute disproportionally to the total sum of x and y that is used to calculate x/y.
+# @return The calculated ratio x/y
 calculate_ratios_weighted_sum <- function(x, y) {
 
   # safety checks

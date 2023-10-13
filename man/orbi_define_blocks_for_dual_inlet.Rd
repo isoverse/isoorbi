@@ -17,17 +17,17 @@ orbi_define_blocks_for_dual_inlet(
 \arguments{
 \item{dataset}{A data frame or tibble produced from IsoX data by \code{\link[=orbi_simplify_isox]{orbi_simplify_isox()}}}
 
-\item{ref_block_time.min}{placeholder}
+\item{ref_block_time.min}{time where the signal is stable when reference is analyzed}
 
-\item{change_over_time.min}{placeholder}
+\item{change_over_time.min}{time where the signal is unstable after switching from reference to sample or back}
 
-\item{sample_block_time.min}{placeholder}
+\item{sample_block_time.min}{time where the signal is stable when sample is analyzed}
 
-\item{startup_time.min}{placeholder}
+\item{startup_time.min}{initial time to stabilize spray}
 
-\item{ref_block_name}{placeholder}
+\item{ref_block_name}{the name of the reference being measured}
 
-\item{sample_block_name}{placeholder}
+\item{sample_block_name}{the name of the sample being measured}
 }
 \value{
 A data frame (tibble) with block annotations in the form of the additional columns described below:
@@ -40,5 +40,5 @@ A data frame (tibble) with block annotations in the form of the additional colum
 }
 }
 \description{
-Binning raw data into blocks for dual inlet analyses
+This function sorts out (bins) data into indivual blocks of reference, sample, changeover time, and startup time.
 }

@@ -31,5 +31,7 @@ orbi_add_blocks_to_plot(
 \item{show.legend}{whether to include the background information in the legend}
 }
 \description{
+This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused).
+
 FIXME: this should also work with scan number
 }

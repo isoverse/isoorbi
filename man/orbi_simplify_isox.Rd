@@ -15,7 +15,7 @@ orbi_simplify_isox(dataset, add = c())
 A tibble containing only the 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}, plus any additional columns defined in the \code{add} argument
 }
 \description{
-Keep only columns that are directly relevant for isotopocule ratio analysis
+Keep only columns that are directly relevant for isotopocule ratio analysis.
 }
 \examples{
 fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")

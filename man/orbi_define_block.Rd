@@ -14,7 +14,7 @@ orbi_define_block(
 )
 }
 \arguments{
-\item{dataset}{tibble with orbitrap data}
+\item{dataset}{tibble with Orbitrap data}
 
 \item{start_time.min}{set the start time of the block}
 
@@ -31,8 +31,5 @@ A data frame (tibble) with block definition added. Any data that is not part of 
 }
 \description{
 Define a data block by either start and end time or start and end scan number.
-Note that manually defining blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{after} finishing block definitions.
-}
-\details{
-FIXME: complete description and parameters
+If you want to make segments in the blocks, note that manually defining blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{only after} finishing block definitions.
 }

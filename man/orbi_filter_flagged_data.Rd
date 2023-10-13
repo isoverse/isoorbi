@@ -7,11 +7,11 @@
 orbi_filter_flagged_data(dataset)
 }
 \arguments{
-\item{dataset}{a tibble with previously flagged data from \code{orbi_flat_satellite_peaks()}, \code{orbi_filter_weak_isotopocules()}, and/or \code{orbi_flag_outliers()}}
+\item{dataset}{a tibble with previously flagged data from \code{orbi_flag_satellite_peaks()}, \code{orbi_flag_weak_isotopocules()}, and/or \code{orbi_flag_outliers()}}
 }
 \value{
-the
+a dataset with the flagged data filtered out
 }
 \description{
-Filter out flagged data
+This function filters out data that have been previously flagged using functions \code{orbi_flag_satellite_peaks()}, \code{orbi_flag_weak_isotopocules()}, and/or \code{orbi_flag_outliers()}.
 }

@@ -5,7 +5,7 @@ NULL
 
 #' @title Manually define a block
 #' @description Define a data block by either start and end time or start and end scan number.
-#' If you want to make segments in the blocks, note that manually defining blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **only after** finishing block definitions.
+#' If you want to make segments in the blocks (optional), note that this function - manually defining blocks - removes all block segmentation. Make sure to call [orbi_segment_blocks()] **only after** finishing block definitions.
 #'
 #' @param dataset tibble with Orbitrap data
 #' @param start_time.min set the start time of the block
