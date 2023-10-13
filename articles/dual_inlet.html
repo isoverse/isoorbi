@@ -123,26 +123,26 @@
 <span>  <span class="fu"><a href="../reference/orbi_filter_flagged_data.html">orbi_filter_flagged_data</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; orbi_read_isox() is loading .isox data from 1 file(s)...</span></span>
 <span><span class="co">#&gt; - loaded 9862 peaks for 1 compounds (NO3) with 4 isotopocules (M0, 15N, 17O,</span></span>
-<span><span class="co">#&gt;    18O) from testfile_dual_inlet_new.isox in 0.27 seconds.</span></span>
+<span><span class="co">#&gt;    18O) from testfile_dual_inlet_new.isox in 0.24 seconds.</span></span>
 <span><span class="co">#&gt; orbi_simplify_isox() will keep only columns 'filename', 'compound',</span></span>
 <span><span class="co">#&gt;    'scan.no', 'time.min', 'isotopocule', 'ions.incremental', 'tic',</span></span>
 <span><span class="co">#&gt;    'it.ms'...</span></span>
 <span><span class="co">#&gt;    ...complete in 0.01 seconds.</span></span>
 <span><span class="co">#&gt; orbi_filter_isox() is filtering the dataset by compounds (NO3), isotopocules</span></span>
 <span><span class="co">#&gt;    (M0, 15N, 18O, 17O), minimum time (0 minutes), maximum time (0 minutes)...</span></span>
-<span><span class="co">#&gt;    ...removed 0/9862 rows (0.0%) in 0.02 seconds.</span></span>
+<span><span class="co">#&gt;    ...removed 0/9862 rows (0.0%) in 0.01 seconds.</span></span>
 <span><span class="co">#&gt; orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)...</span></span>
-<span><span class="co">#&gt;    ...flagged 0/9862 as satellite peaks (0.0%) in 0.52 seconds.</span></span>
+<span><span class="co">#&gt;    ...flagged 0/9862 as satellite peaks (0.0%) in 0.36 seconds.</span></span>
 <span><span class="co">#&gt; orbi_filter_weak_isotopocules() is flagging isotopocules from data that are</span></span>
 <span><span class="co">#&gt;    detected in less than 10% of scans in 1 data group(s) (based on</span></span>
 <span><span class="co">#&gt;    'filename')...</span></span>
-<span><span class="co">#&gt;    ...flagged 0/4 isotopocules across all data groups in 0.07 seconds.</span></span>
+<span><span class="co">#&gt;    ...flagged 0/4 isotopocules across all data groups in 0.09 seconds.</span></span>
 <span><span class="co">#&gt; orbi_filter_scan_intensity() is flagging the 1 % of scans with the lowest and</span></span>
 <span><span class="co">#&gt;    above 99 % of scans with the highest intensities in 1 data group(s) (based</span></span>
 <span><span class="co">#&gt;    on 'filename')...</span></span>
-<span><span class="co">#&gt;    ...flagged 49/2467 scans (2.0%) across all data groups in 0.08 seconds.</span></span>
+<span><span class="co">#&gt;    ...flagged 49/2467 scans (2.0%) across all data groups in 0.07 seconds.</span></span>
 <span><span class="co">#&gt; orbi_filter_flagged_data() removed 195 flagged records (2.0%) - 0 satellite</span></span>
-<span><span class="co">#&gt;    peaks, 0 weak isotopocule peaks, 195 outlier peaks in 0.01 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt;    peaks, 0 weak isotopocule peaks, 195 outlier peaks in 0.00 seconds.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="examples-for-block-definitions">Examples for block definitions<a class="anchor" aria-label="anchor" href="#examples-for-block-definitions"></a>
@@ -170,7 +170,7 @@ processing data from dual inlet experiments</p>
 <span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">4</span>, set_start_time.min <span class="op">=</span> <span class="fl">38</span>, set_end_time.min <span class="op">=</span> <span class="fl">44</span><span class="op">)</span></span>
 <span><span class="co">#&gt; orbi_define_blocks_for_dual_inlet() is assessing block structure...</span></span>
 <span><span class="co">#&gt;    ...identified 7 blocks (4 'reference', 3 'sample') in data from 1 file(s)</span></span>
-<span><span class="co">#&gt;    in 0.18 seconds.</span></span>
+<span><span class="co">#&gt;    in 0.07 seconds.</span></span>
 <span><span class="co">#&gt; orbi_adjust_block() is making the following block adjustments in file</span></span>
 <span><span class="co">#&gt;    20230518_05_USGS32_vs_USGS34:</span></span>
 <span><span class="co">#&gt; - moving block 1 start from scan 825 (5.01 min) to 1155 (7.02 min)</span></span>
@@ -487,7 +487,7 @@ data.</p>
 <span>  <span class="fu"><a href="../reference/orbi_calculate_ratios.html">orbi_calculate_ratios</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; orbi_define_basepeak() is setting the 'M0' isotopocule as the ratio</span></span>
 <span><span class="co">#&gt;    denominator...</span></span>
-<span><span class="co">#&gt;    ...base peak set for 3 isotopocules ('15N', '17O', '18O') in 0.21 seconds.</span></span>
+<span><span class="co">#&gt;    ...base peak set for 3 isotopocules ('15N', '17O', '18O') in 0.16 seconds.</span></span>
 <span><span class="co">#&gt; orbi_calculate_ratios() is calculating all isotopocule/base peak ratios...</span></span>
 <span><span class="co">#&gt;    ...calculated 7249 ratios for 3 isotopocules/base peak (15N, 17O, 18O) in</span></span>
 <span><span class="co">#&gt;    0.01 seconds.</span></span>
@@ -505,7 +505,7 @@ data.</p>
 <span><span class="co">#&gt; orbi_summarize_results() is grouping the data by 'filename', 'compound',</span></span>
 <span><span class="co">#&gt;    'basepeak', 'isotopocule', 'block', 'sample_name', 'segment',</span></span>
 <span><span class="co">#&gt;    'data_group', 'data_type' and summarizing ratios using the 'sum' method...</span></span>
-<span><span class="co">#&gt;    ...completed in 0.08 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt;    ...completed in 0.06 seconds.</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="plot-1-ratios-summary-by-block-and-segment">Plot 1: ratios summary by block and segment<a class="anchor" aria-label="anchor" href="#plot-1-ratios-summary-by-block-and-segment"></a>
 </h3>
@@ -596,12 +596,12 @@ data.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"time [min]"</span>, y <span class="op">=</span> <span class="st">"17O/M0 ratio"</span>, color <span class="op">=</span> <span class="st">"sample"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; orbi_segment_blocks() is segmenting 7 data blocks in 1 file(s)...</span></span>
 <span><span class="co">#&gt;    ...created 50 segments / block (on average) with 5 scans / segment (on</span></span>
-<span><span class="co">#&gt;    average) in 0.06 seconds.</span></span>
+<span><span class="co">#&gt;    average) in 0.05 seconds.</span></span>
 <span><span class="co">#&gt; orbi_summarize_results() is grouping the data by 'filename', 'compound',</span></span>
 <span><span class="co">#&gt;    'basepeak', 'isotopocule', 'block', 'sample_name', 'segment',</span></span>
 <span><span class="co">#&gt;    'data_group', 'data_type' and summarizing ratios using the 'mean'</span></span>
 <span><span class="co">#&gt;    method...</span></span>
-<span><span class="co">#&gt;    ...completed in 0.59 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt;    ...completed in 0.45 seconds.</span></span></code></pre></div>
 <p><img src="dual_inlet_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 </div>
 </div>
