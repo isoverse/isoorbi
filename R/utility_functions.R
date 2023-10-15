@@ -201,7 +201,7 @@ orbi_flag_weak_isotopocules <-
     # info
     start_time <-
       sprintf(
-        "orbi_filter_weak_isotopocules() is flagging isotopocules from data that are detected in less than %s%% of scans in %d data group(s) (based on '%s')... ",
+        "orbi_flag_weak_isotopocules() is flagging isotopocules from data that are detected in less than %s%% of scans in %d data group(s) (based on '%s')... ",
         min_percent,  dplyr::n_groups(dataset_out), paste(dplyr::group_vars(dataset_out), collapse = "', '")) |>
       message_start()
     starting_isotopocules <- dataset_out |> count_grouped_distinct("isotopocule")
@@ -236,17 +236,17 @@ orbi_flag_weak_isotopocules <-
 #' @export
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
   lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity()", "orbi_flag_outliers()", always = TRUE)
-  lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity(outlier_percent)", details = "the argument `outlier_percent` has been superseded by `intensity_window`", always = TRUE)
-  orbi_flag_outliers(..., intensity_window = c(outlier_percent, 100 - outlier_percent)) |>
+  lifecycle::deprecate_warn("1.2.0", "orbi_filter_scan_intensity(outlier_percent)", details = "the argument `outlier_percent` has been superseded by `agc_window`", always = TRUE)
+  orbi_flag_outliers(..., agc_window = c(outlier_percent, 100 - outlier_percent)) |>
     orbi_filter_flagged_data()
 }
 
 
 #' @title Flag outlier scans
 #' @description The function `orbi_flag_outliers()` flags outliers. Grouping is by columns `filename` and `compound`.
-#' @param intensity_window flags extremely high and low intense scans based on TIC x injection time (i.e., ion intensity). Provide a vector with 2 numbers `c(x,y)` filtering the lowest x percent intensities and highest y percent intensities.
+#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent.
 #' @param dataset Simplified IsoX dataset to have outliers flagged
-#' @details Function is intended to flag scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' @details Function is intended to flag scans that are outliers.
 #'
 #' The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
@@ -255,11 +255,11 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 #' df <-
 #'   orbi_read_isox(file = fpath) |>
 #'   orbi_simplify_isox() |>
-#'   orbi_flag_outliers(intensity_window = c(1,99))
+#'   orbi_flag_outliers(agc_window = c(1,99))
 #'
 #' @return Filtered tibble
 #' @export
-orbi_flag_outliers <- function(dataset, intensity_window) {
+orbi_flag_outliers <- function(dataset, agc_window) {
 
   # safety checks
   cols <- c("filename", "compound", "scan.no", "tic", "it.ms")
@@ -267,7 +267,7 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`" =
       all(cols %in% names(dataset)),
-    "`intensity_window` needs to be a vector of two numbers (low and high filter) between 0 and 100" = !missing(intensity_window) && is.numeric(intensity_window) && length(intensity_window) == 2L && intensity_window[1] < intensity_window[2]
+    "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100" = !missing(agc_window) && is.numeric(agc_window) && length(agc_window) == 2L && agc_window[1] < agc_window[2]
   )
 
   # optional groupings
@@ -278,8 +278,8 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
   # info
   start_time <-
     sprintf(
-      "orbi_filter_scan_intensity() is flagging the %s %% of scans with the lowest and above %s %% of scans with the highest intensities in %d data group(s) (based on '%s')... ",
-      intensity_window[1], intensity_window[2],
+      "orbi_flag_outliers() is flagging the %s %% of scans with the lowest and above %s %% of scans with the highest number of ions (`tic` * `it.ms`) in the Orbitrap analyzer in %d data group(s) (based on '%s')... ",
+      agc_window[1], agc_window[2],
       dplyr::n_groups(dataset_out), paste(dplyr::group_vars(dataset_out), collapse = "', '")) |>
     message_start()
   n_scans <- dataset_out |> count_grouped_distinct("scan.no")
@@ -290,8 +290,8 @@ orbi_flag_outliers <- function(dataset, intensity_window) {
       dplyr::mutate(TICxIT = .data$tic * .data$it.ms) |>
       dplyr::mutate(
         is_outlier =
-        .data$TICxIT < stats::quantile(.data$TICxIT, intensity_window[1] / 100) |
-          .data$TICxIT > stats::quantile(.data$TICxIT, intensity_window[2] / 100)
+        .data$TICxIT < stats::quantile(.data$TICxIT, agc_window[1] / 100) |
+          .data$TICxIT > stats::quantile(.data$TICxIT, agc_window[2] / 100)
       ) |>
       dplyr::select(-"TICxIT"),
     "something went wrong flagging outliers: "

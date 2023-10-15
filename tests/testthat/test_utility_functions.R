@@ -185,15 +185,15 @@ test_that("orbi_flag_outliers() tests", {
 
 
   expect_error(orbi_flag_outliers(dataset = df),
-               "`intensity_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
+               "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
                fixed = TRUE)
 
-  expect_error(orbi_flag_outliers(dataset = df, intensity_window = T),
-    "`intensity_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
+  expect_error(orbi_flag_outliers(dataset = df, agc_window = T),
+    "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
     fixed = TRUE)
 
-  expect_error(orbi_flag_outliers(dataset = df, intensity_window = 1000),
-    "`intensity_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
+  expect_error(orbi_flag_outliers(dataset = df, agc_window = 1000),
+    "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
     fixed = TRUE)
 
   expect_error(orbi_flag_outliers(dataset = df[, 1:5]),
@@ -201,16 +201,16 @@ test_that("orbi_flag_outliers() tests", {
     fixed = TRUE)
 
   expect_error(orbi_flag_outliers(dataset = df[0,]),
-               "`intensity_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
+               "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
                fixed = TRUE)
 
   df2 <- df |> mutate(dummy=1) |> select(-scan.no)
-  expect_error(orbi_flag_outliers(dataset = df2, intensity_window = 1),
+  expect_error(orbi_flag_outliers(dataset = df2, agc_window = 1),
                "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`",
                fixed = TRUE)
 
   # success
-  expect_true(is.tbl(orbi_flag_outliers(dataset = df, intensity_window = c(10,90))))
+  expect_true(is.tbl(orbi_flag_outliers(dataset = df, agc_window = c(10,90))))
 
   df3 <-
     orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> mutate(
@@ -219,7 +219,7 @@ test_that("orbi_flag_outliers() tests", {
       injection = as.factor("injection3")
     )
 
-  expect_true(is.tbl(orbi_flag_outliers(dataset = df3, intensity_window = c(10,90))))
+  expect_true(is.tbl(orbi_flag_outliers(dataset = df3, agc_window = c(10,90))))
 
 })
 

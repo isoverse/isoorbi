@@ -4,12 +4,12 @@
 \alias{orbi_flag_outliers}
 \title{Flag outlier scans}
 \usage{
-orbi_flag_outliers(dataset, intensity_window)
+orbi_flag_outliers(dataset, agc_window)
 }
 \arguments{
 \item{dataset}{Simplified IsoX dataset to have outliers flagged}
 
-\item{intensity_window}{flags extremely high and low intense scans based on TIC x injection time (i.e., ion intensity). Provide a vector with 2 numbers \code{c(x,y)} filtering the lowest x percent intensities and highest y percent intensities.}
+\item{agc_window}{flags scans with a critically low or high number of ions in the Orbitrap analyzer. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. Provide a vector with 2 numbers \code{c(x,y)} flagging the lowest x percent and highest y percent.}
 }
 \value{
 Filtered tibble
@@ -18,7 +18,7 @@ Filtered tibble
 The function \code{orbi_flag_outliers()} flags outliers. Grouping is by columns \code{filename} and \code{compound}.
 }
 \details{
-Function is intended to flag scans that are outliers. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+Function is intended to flag scans that are outliers.
 
 The input \code{dataset} is expected to have at least these 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.
 }
@@ -27,6 +27,6 @@ fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <-
   orbi_read_isox(file = fpath) |>
   orbi_simplify_isox() |>
-  orbi_flag_outliers(intensity_window = c(1,99))
+  orbi_flag_outliers(agc_window = c(1,99))
 
 }
