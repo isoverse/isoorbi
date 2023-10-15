@@ -46,7 +46,7 @@ df.filtered <- df.simple |>
 df.clean <- df.filtered |> 
   orbi_flag_satellite_peaks() |> 
   orbi_flag_weak_isotopocules(min_percent = 2) |> 
-  orbi_flag_outliers(intensity_window = c(1,99)) |>
+  orbi_flag_outliers(agc_window = c(1,99)) |>
   orbi_filter_flagged_data()
 
 # Define base peak and calculate the results table
