@@ -175,7 +175,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 #'
 #' @details The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
 #'
-#' @return A data frame with new column `is_weak_isotopocule` that flags satellite peaks.
+#' @return A data frame with new column `is_weak_isotopocule` that flags weak isotopocules.
 #' @export
 orbi_flag_weak_isotopocules <-
   function(dataset, min_percent) {
@@ -421,7 +421,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     # error catching
     function(p) {
       # analyze scans (is slow so only done if error)
-      df_summary <- 
+      df_summary <-
         dataset |>
         dplyr::summarize(
           n_bp = sum(.data$isotopocule == !!basepeak_def),
@@ -433,27 +433,27 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
           n_too_many = sum(n_bp > 1L),
           .by = c("filename", "compound")
         )
-      
+
       # check abundances
       too_many_bps <- df_summary |>
         dplyr::filter(.data$n_too_many > 0)
       too_few_bps <- df_summary |>
         dplyr::filter(.data$n_too_few > 0)
-      
+
       if (nrow(too_many_bps) > 0 && !"is_satellite_peak" %in% names(dataset)) {
         # too many base peaks
         sprintf("the %s isotopocule exists multiple times in some scans, make sure to run orbi_flag_satellite_peaks() first",
                 basepeak_def) |>
           abort()
       } else if (nrow(too_few_bps) > 0) {
-        info <- 
+        info <-
           too_few_bps |>
           dplyr::mutate(
             label = sprintf("basepeak '%s' is missing in %.1f%% of scans of compound '%s' in file '%s'",
                             basepeak_def, .data$n_too_few/.data$n_scans * 100, .data$compound, .data$filename)
           ) |>
           dplyr::pull(label)
-        
+
         sprintf("the '%s' isotopocule does not exist in some scans, consider using `orbi_filter_isox()` to focus on specific file(s) and/or compound(s): \n - %s", basepeak_def,
                 paste(info, collapse = "\n - ")) |>
           abort()
