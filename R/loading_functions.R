@@ -77,36 +77,39 @@ orbi_read_isox <- function(file) {
   # read files
   df <-
     try_catch_all(
-      file |>
-        map(
-          ~{
-            start_time <- Sys.time()
-            data <- readr::read_tsv(
-              .x,
-              col_types = list(
-                filename = readr::col_factor(),
-                scan.no = readr::col_integer(),
-                time.min = readr::col_double(),
-                compound = readr::col_factor(),
-                isotopolog = readr::col_factor(),
-                ions.incremental = readr::col_double(),
-                tic = readr::col_double(),
-                it.ms = readr::col_double()
+      dplyr::tibble(filepath = file) |>
+        dplyr::mutate(
+          data = map(
+            .data$filepath,
+            ~{
+              start_time <- Sys.time()
+              data <- readr::read_tsv(
+                .x,
+                col_types = list(
+                  filename = readr::col_factor(),
+                  scan.no = readr::col_integer(),
+                  time.min = readr::col_double(),
+                  compound = readr::col_factor(),
+                  isotopolog = readr::col_factor(),
+                  ions.incremental = readr::col_double(),
+                  tic = readr::col_double(),
+                  it.ms = readr::col_double()
+                )
               )
-            )
-            end_time <- Sys.time()
-            sprintf(" - loaded %d peaks for %d compounds (%s) with %d isotopocules (%s) from %s",
-                    nrow(data),
-                    length(levels(data$compound)),
-                    paste(levels(data$compound), collapse = ", "),
-                    length(levels(data$isotopolog)),
-                    paste(levels(data$isotopolog), collapse = ", "),
-                    basename(.x)) |>
-              message_standalone(start_time = start_time)
-            data
-          }
+              end_time <- Sys.time()
+              sprintf(" - loaded %d peaks for %d compounds (%s) with %d isotopocules (%s) from %s",
+                      nrow(data),
+                      length(levels(data$compound)),
+                      paste(levels(data$compound), collapse = ", "),
+                      length(levels(data$isotopolog)),
+                      paste(levels(data$isotopolog), collapse = ", "),
+                      basename(.x)) |>
+                message_standalone(start_time = start_time)
+              data
+            }
+          )
         ) |>
-        dplyr::bind_rows() |>
+        tidyr::unnest("data") |>
         # .isox format should eventually change as well to `isotopocule`
         dplyr::rename(isotopocule = "isotopolog"),
       "file format error: ",
@@ -169,7 +172,7 @@ orbi_simplify_isox <- function(dataset, add = c()) {
     abort("dataset contains no rows")
 
   # info
-  cols <- c(cols, add)
+  cols <- names(dataset)[names(dataset) %in% c(cols, add)]
   start_time <-
     sprintf("orbi_simplify_isox() will keep only columns '%s'... ",
             paste(cols, collapse = "', '")) |>
