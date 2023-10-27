@@ -45,7 +45,7 @@ test_that("orbi_read_isox() tests", {
 
   expect_equal(
     names(df),
-    c(
+    c("filepath",
       "filename",
       "scan.no",
       "time.min",
