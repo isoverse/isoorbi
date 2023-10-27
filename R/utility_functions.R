@@ -429,8 +429,8 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
         ) |>
         dplyr::summarize(
           n_scans = dplyr::n(),
-          n_too_few = sum(n_bp == 0L),
-          n_too_many = sum(n_bp > 1L),
+          n_too_few = sum(.data$n_bp == 0L),
+          n_too_many = sum(.data$n_bp > 1L),
           .by = c("filename", "compound")
         )
 
@@ -452,7 +452,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
             label = sprintf("basepeak '%s' is missing in %.1f%% of scans of compound '%s' in file '%s'",
                             basepeak_def, .data$n_too_few/.data$n_scans * 100, .data$compound, .data$filename)
           ) |>
-          dplyr::pull(label)
+          dplyr::pull(.data$label)
 
         sprintf("the '%s' isotopocule does not exist in some scans, consider using `orbi_filter_isox()` to focus on specific file(s) and/or compound(s): \n - %s", basepeak_def,
                 paste(info, collapse = "\n - ")) |>

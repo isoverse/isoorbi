@@ -7,7 +7,7 @@
 orbi_export_data_to_excel(
   dataset,
   file,
-  dbl_digits = 2,
+  dbl_digits = 7,
   int_format = "0",
   dbl_format = sprintf(sprintf("\%\%.\%df", dbl_digits), 0)
 )
