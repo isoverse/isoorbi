@@ -12,7 +12,7 @@ orbi_flag_weak_isotopocules(dataset, min_percent)
 \item{min_percent}{A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)}
 }
 \value{
-A data frame with new column \code{is_weak_isotopocule} that flags satellite peaks.
+A data frame with new column \code{is_weak_isotopocule} that flags weak isotopocules.
 }
 \description{
 The function \code{orbi_filter_weak_isotopocules()} flags isotopocules that are not consistently detected in most scans.

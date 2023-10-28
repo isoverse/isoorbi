@@ -31,5 +31,5 @@ A data frame (tibble) with block definition added. Any data that is not part of 
 }
 \description{
 Define a data block by either start and end time or start and end scan number.
-If you want to make segments in the blocks, note that manually defining blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{only after} finishing block definitions.
+If you want to make segments in the blocks (optional), note that this function - manually defining blocks - removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{only after} finishing block definitions.
 }
