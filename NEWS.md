@@ -22,7 +22,7 @@ There are no breaking changes in this release (all changes and new features are 
 * all loading and utility functions provide more details in the info message about what has been done, what was affected, and how long it took
 * all loading and utility functions catch processing errors and report the information back to the user
 * `orbi_read_isox()` now can read multiple .isox files at once and includes the .isox `filepath` in the resulting tibble
-* `orbi_simplify_isox()` allows addition of user-specified columns
+* `orbi_simplify_isox()` now includes `intensity` by default and allows addition of user-specified columns
 
 ## Bug fixes
 

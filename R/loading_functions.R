@@ -142,12 +142,12 @@ orbi_read_isox <- function(file) {
 }
 
 #' @title Simplify IsoX data
-#' @description Keep only columns that are directly relevant for isotopocule ratio analysis.
+#' @description Keep only columns that are directly relevant for isotopocule ratio analysis. This function is optional and does not affect any downstream function calls. 
 #'
 #' @param dataset IsoX data that is to be simplified
 #' @param add additional columns to keep
 #'
-#' @return A tibble containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`, plus any additional columns defined in the `add` argument
+#' @return A tibble containing only the 9 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`, `intensity`, plus any additional columns defined in the `add` argument
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
@@ -158,7 +158,7 @@ orbi_read_isox <- function(file) {
 orbi_simplify_isox <- function(dataset, add = c()) {
 
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms", "intensity")
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
