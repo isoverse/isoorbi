@@ -360,7 +360,7 @@ orbi_filter_flagged_data <- function(dataset) {
 
 
 #' @title Define the denominator for ratio calculation
-#' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator)
+#' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator) and calculates the instantaneous isotope ratios against it.
 #' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`.
 #' @param basepeak_def The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios
 #'
@@ -370,7 +370,7 @@ orbi_filter_flagged_data <- function(dataset) {
 #'   orbi_simplify_isox() |>
 #'   orbi_define_basepeak(basepeak_def = "M0")
 #'
-#' @returns Input data frame without the rows of the basepeak isotopocule and instead two new columns called `basepeak` and `basepeak_ions` holding the basepeak information
+#' @returns Input data frame without the rows of the basepeak isotopocule and instead three new columns called `basepeak`, `basepeak_ions`, and `ratio` holding the basepeak information and the isotope ratios vs. the base peak
 #' @export
 orbi_define_basepeak <- function(dataset, basepeak_def) {
 
@@ -471,12 +471,24 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
       "something went wrong removing the base peak isotopocule"
     )
 
-  # info
+  # calculate ratios
+  df.out <-
+    try_catch_all(
+      df.out |>
+        dplyr::mutate(
+          ratio = .data$ions.incremental / .data$basepeak_ions,
+          .after = "ions.incremental"
+        ),
+      "something went wrong calculating ratios: "
+    )
+  
+  # info message
   sprintf(
-    "base peak set for %d isotopocules ('%s')",
+    "set base peak and calculated %d ratios for %d isotopocules/base peak (%s)",
+    nrow(df.out),
     length(levels(df.out$isotopocule)),
-    paste(levels(df.out$isotopocule), collapse = "', '")) |>
-    message_finish(start_time = start_time)
+    paste(levels(df.out$isotopocule), collapse = ", ")
+  ) |> message_finish(start_time = start_time)
 
   # return
   return(df.out)

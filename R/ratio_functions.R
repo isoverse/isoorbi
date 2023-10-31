@@ -16,6 +16,13 @@ orbi_calculate_ratios <- function(dataset) {
       all(c("basepeak", "basepeak_ions") %in% names(dataset))
   )
 
+  # deprecated
+  lifecycle::deprecate_warn(
+    "1.3.0", "orbi_calculate_ratios()", 
+    details = "this function is obsolete as `orbi_define_basepeak()` already calculates the ratios automatically",
+    always = TRUE
+  )
+  
   # info message
   start_time <-
     sprintf(

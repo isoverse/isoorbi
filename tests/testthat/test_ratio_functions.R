@@ -245,7 +245,6 @@ test_that("test orbi_calculate_ratios()", {
     orbi_define_basepeak("15N")
 
   # failure
-
   expect_error(orbi_calculate_ratios(),
                "need a `dataset` data frame",
                fixed = TRUE)
@@ -256,9 +255,8 @@ test_that("test orbi_calculate_ratios()", {
                "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
                fixed = TRUE)
 
-  # success
-
-  expect_message(orbi_calculate_ratios(df_results), "orbi_calculate_ratios().*")
+  # deprecation warning
+  expect_warning(orbi_calculate_ratios(df_results), "obsolete")
 
 })
 

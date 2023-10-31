@@ -129,9 +129,7 @@ ggplot2::last_plot() %+%
 df_w_ratios <-
   df_w_blocks |>
   # define base peak
-  orbi_define_basepeak(basepeak_def = "M0") |> 
-  # calculate isotopocule/base peak ratios
-  orbi_calculate_ratios()
+  orbi_define_basepeak(basepeak_def = "M0")
 
 # calculate summary
 df_summary <- 

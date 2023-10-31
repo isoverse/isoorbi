@@ -78,7 +78,6 @@ reference:
 
 - title: Internal
   contents:
-  - orbi_calculate_ratios
   - orbi_get_settings
   - orbi_set_settings
 
@@ -87,4 +86,5 @@ reference:
   - orbi_filter_satellite_peaks
   - orbi_filter_scan_intensity
   - orbi_filter_weak_isotopocules
+  - orbi_calculate_ratios
 
