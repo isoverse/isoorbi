@@ -13,8 +13,8 @@ There are no breaking changes in this release (all changes and new features are 
 * `orbi_plot_shot_noise()` implemented
 * `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()` and `orbi_flag_outliers()` together with `orbi_filter_flagged_data()` supersede `orbi_filter_satellite_peaks()`, `orbi_filter_weak_isotopocules()` and `orbi_filter_scan_intensity()`
 * `orbi_export_data_to_excel()` implemented
-* `orbi_define_block()` implemented
-* `orbi_add_plots_to_plot()` implemented
+* `orbi_define_block_for_flow_injection()` implemented
+* `orbi_add_blocks_to_plot()` implemented
 
 ## Enhancements
 

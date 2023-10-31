@@ -1,33 +1,33 @@
 
 context("blocks functions")
 
-test_that("test orbi_define_block()", {
+test_that("test orbi_define_block_for_flow_injection()", {
 
   # type checks
-  expect_error(orbi_define_block(), "`dataset` must be a data frame or tibble")
-  expect_error(orbi_define_block(42), "`dataset` must be a data frame or tibble")
+  expect_error(orbi_define_block_for_flow_injection(), "`dataset` must be a data frame or tibble")
+  expect_error(orbi_define_block_for_flow_injection(42), "`dataset` must be a data frame or tibble")
 
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
-  expect_error(orbi_define_block(df2),
+  expect_error(orbi_define_block_for_flow_injection(df2),
                "`dataset` requires columns",
                fixed = TRUE)
 
-  expect_error(orbi_define_block(df, start_time.min = "a"), "if set, `start_time.min` must be a single number")
-  expect_error(orbi_define_block(df, end_time.min = "a"), "if set, `end_time.min` must be a single number")
-  expect_error(orbi_define_block(df, start_scan.no = "a"), "if set, `start_scan.no` must be a single integer")
-  expect_error(orbi_define_block(df, end_scan.no = "a"), "if set, `end_scan.no` must be a single integer")
+  expect_error(orbi_define_block_for_flow_injection(df, start_time.min = "a"), "if set, `start_time.min` must be a single number")
+  expect_error(orbi_define_block_for_flow_injection(df, end_time.min = "a"), "if set, `end_time.min` must be a single number")
+  expect_error(orbi_define_block_for_flow_injection(df, start_scan.no = "a"), "if set, `start_scan.no` must be a single integer")
+  expect_error(orbi_define_block_for_flow_injection(df, end_scan.no = "a"), "if set, `end_scan.no` must be a single integer")
 
-  expect_error(orbi_define_block(df, start_time.min = 0, start_scan.no = 5), "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`")
-  expect_error(orbi_define_block(df, start_time.min = 0, start_scan.no = 5, end_time.min = 2, end_scan.no = 10), "block definition can either be by time or by scan but not both")
+  expect_error(orbi_define_block_for_flow_injection(df, start_time.min = 0, start_scan.no = 5), "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`")
+  expect_error(orbi_define_block_for_flow_injection(df, start_time.min = 0, start_scan.no = 5, end_time.min = 2, end_scan.no = 10), "block definition can either be by time or by scan but not both")
 
   # results checks
   test_data <- tibble(
     filename = rep(c("test1", "test2"), c(6, 4)),
     scan.no = 1:10, time.min = scan.no/10
   )
-  expect_message(orbi_define_block(test_data, start_time.min = 0.1, end_time.min = 0.9), "column `filename` was turned into a factor.*")
+  expect_message(orbi_define_block_for_flow_injection(test_data, start_time.min = 0.1, end_time.min = 0.9), "column `filename` was turned into a factor.*")
 
 })
 
