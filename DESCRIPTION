@@ -32,6 +32,7 @@ Imports:
     tidyr (>= 1.2.0),
     dplyr (>= 1.1.1),
     ggplot2 (>= 3.4.0),
+    scales (>= 1.2.1),
     readr (>= 2.1.0),
     tidyselect (>= 1.2.0),
     openxlsx,

@@ -127,7 +127,6 @@ orbi_plot_shot_noise <- function(
   }
 
   # standard plot
-  rcolor_brewer_dark2 <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666")
   plot <-
     plot_df |>
     ggplot2::ggplot() +
@@ -138,8 +137,7 @@ orbi_plot_shot_noise <- function(
     ggplot2::geom_point(size = 3) +
     ggplot2::scale_y_log10(breaks = 10^(-4:4), labels = function(x) paste(x, "\U2030")) +
     ggplot2::annotation_logticks(sides = "lb") +
-    # use a color-blind friendly palette
-    ggplot2::scale_color_brewer(palette = "Dark2") +
+    ggplot2::scale_color_manual(values = colors) +
     ggplot2::scale_shape_manual(values = c(21:25, 15:18)) +
     ggplot2::scale_linetype_manual(values = rep(1, 8)) +
     #expand_limits(y = c(0.1, 10)) +

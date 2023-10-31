@@ -144,10 +144,21 @@ orbi_flag_satellite_peaks <- function(dataset) {
 
   # info
   sat_peaks <- sum(dataset$is_satellite_peak)
-  sprintf(
-    "flagged %d/%d as satellite peaks (%.1f%%)",
-    sat_peaks, nrow(dataset), 100 * sat_peaks/nrow(dataset)) |>
-    message_finish(start_time = start_time)
+  isotopocules <- dataset |> 
+    dplyr::summarise(has_sat_peaks = any(.data$is_satellite_peak), .by = "isotopocule") |>
+    dplyr::filter(.data$has_sat_peaks) |>
+    dplyr::pull(.data$isotopocule)
+  
+  if(sat_peaks > 0){
+    sprintf(
+      "flagged %d/%d peaks in %d isotopocules (\"%s\") as satellite peaks (%.1f%%)",
+      sat_peaks, nrow(dataset), length(isotopocules), 
+      paste(isotopocules, collapse = "\", \""),
+      100 * sat_peaks/nrow(dataset)) |>
+      message_finish(start_time = start_time)
+  } else {
+    message_finish("confirmed there are no satellite peaks", start_time = start_time)
+  }
 
   return(dataset)
 }
@@ -220,10 +231,14 @@ orbi_flag_weak_isotopocules <-
 
     # info
     removed_isotopocules <- dataset_out |> dplyr::filter(.data$is_weak_isotopocule) |> count_grouped_distinct("isotopocule")
-    sprintf(
-      "flagged %d/%d isotopocules across all data groups",
-      removed_isotopocules, starting_isotopocules) |>
-      message_finish(start_time = start_time)
+    if (removed_isotopocules > 0) {
+      sprintf(
+        "flagged %d/%d isotopocules across all data groups",
+        removed_isotopocules, starting_isotopocules) |>
+        message_finish(start_time = start_time)
+    } else {
+      message_finish("confirmed there are no weak isotopocules", start_time = start_time)
+    }
 
     # return with restored groupings from original dataset
     return(dataset_out |> group_by_same_groups(dataset))
