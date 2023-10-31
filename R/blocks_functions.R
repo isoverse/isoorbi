@@ -1,9 +1,5 @@
 # exported functions -------
-#' @importFrom utils data
-#' @importFrom ggplot2 scale_fill_manual
-NULL
-
-#' @title Manually define a block
+#' @title Define data block for flow injection
 #' @description Define a data block by either start and end time or start and end scan number.
 #' If you want to make segments in the blocks (optional), note that this function - manually defining blocks - removes all block segmentation. Make sure to call [orbi_segment_blocks()] **only after** finishing block definitions.
 #'
@@ -15,7 +11,7 @@ NULL
 #' @param sample_name if provided, will be used as the `sample_name` for the block
 #' @return A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
-orbi_define_block <- function(
+orbi_define_block_for_flow_injection <- function(
     dataset,
     start_time.min = NULL, end_time.min = NULL,
     start_scan.no = NULL, end_scan.no = NULL,
@@ -51,7 +47,7 @@ orbi_define_block <- function(
     factorize_dataset("filename") |>
     dplyr::mutate(..row_id = dplyr::row_number())
   start_time <-
-    sprintf("orbi_define_block() is adding new block (%s) to %d files... ",
+    sprintf("orbi_define_block_for_flow_injection() is adding new block (%s) to %d files... ",
             if(set_by_time) sprintf("%s to %s min", start_time.min, end_time.min)
             else sprintf("scan %s to %s", start_scan.no, end_scan.no),
             length(levels(dataset$filename))) |>
@@ -99,7 +95,7 @@ orbi_define_block <- function(
   scans <-
     try_catch_all(
       scans |>
-        # introduce updated segment, block, data type and samaple_name
+        # introduce updated segment, block, data type and sample_name
         dplyr::mutate(
           new_block = ifelse(.data$scan.no >= .data$start_scan.no & .data$scan.no <= .data$end_scan.no, .data$next_block, .data$block),
           sample_name = ifelse(!is.null(!!sample_name) & .data$new_block == .data$next_block, !!sample_name, .data$sample_name),
