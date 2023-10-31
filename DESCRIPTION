@@ -1,23 +1,23 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Isotopocule Data
-Version: 1.2.2
+Version: 1.2.1
 Date: 2023-10-09
-Authors@R: 
+Authors@R:
     c(person(
-        given = "Caj", family = "Neubauer", 
-        email = "caj.neubauer@colorado.edu", 
-        role = c("aut", "cre", "cph"), 
+        given = "Caj", family = "Neubauer",
+        email = "caj.neubauer@colorado.edu",
+        role = c("aut", "cre", "cph"),
         comment = c(ORCID = "0000-0002-5348-5609")),
     person(
-        given = "Sebastian", family = "Kopf", 
-        email = "sebastian.kopf@colorado.edu", 
-        role = c("aut"), 
+        given = "Sebastian", family = "Kopf",
+        email = "sebastian.kopf@colorado.edu",
+        role = c("aut"),
         comment = c(ORCID = "0000-0002-2044-0201")),
     person(
-        given = "Kristýna", family = "Kantnerová", 
-        email = "kristyna.kantnerova@colorado.edu", 
-        role = c("aut"), 
+        given = "Kristýna", family = "Kantnerová",
+        email = "kristyna.kantnerova@colorado.edu",
+        role = c("aut"),
         comment = c(ORCID = "0000-0001-6259-3225"))
     )
 URL: https://github.com/isoverse/isoorbi
