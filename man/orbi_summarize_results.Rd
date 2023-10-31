@@ -7,7 +7,9 @@
 orbi_summarize_results(
   dataset,
   ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum"),
-  .by = c("block", "sample_name", "segment", "data_group", "data_type", "injection")
+  .by = c("block", "sample_name", "segment", "data_group", "data_type", "injection"),
+  include_flagged_data = FALSE,
+  include_unused_data = FALSE
 )
 }
 \arguments{
@@ -24,6 +26,10 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 }}
 
 \item{.by}{additional grouping columns for the results summary (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.}
+
+\item{include_flagged_data}{whether to include flagged data in the calculations (FALSE by default)}
+
+\item{include_unused_data}{whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as setting("data_type_data")}
 }
 \value{
 Returns a results summary table retaining the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns: \code{start_scan.no}, \code{end_scan.no}, \code{start_time.min}, \code{mean_time.min}, \code{end_time.min}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}

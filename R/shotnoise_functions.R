@@ -6,9 +6,10 @@
 #' @title Shot noise calculation
 #' @description This function computes the shot noise calculation.
 #' @param dataset a data frame output after running `orbi_define_basepeak()`
+#' @param include_flagged_data whether to include flagged data in the shot noise calculation (FALSE by default)
 #' @return The processed data frame with new columns: `n_effective_ions`, `ratio`, `ratio_rel_se.permil`, `shot_noise.permil`
 #' @export
-orbi_analyze_shot_noise <- function(dataset){
+orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE){
 
   # safety checks
   stopifnot(
@@ -17,11 +18,18 @@ orbi_analyze_shot_noise <- function(dataset){
     "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first" = "basepeak_ions" %in% names(dataset)
   )
 
+  # filter flagged data
+  n_all <- nrow(dataset)
+  dataset_wo_flagged <- dataset |> filter_flagged_data()
+  n_after <- nrow(dataset_wo_flagged)
+  if (!include_flagged_data)
+    dataset <- dataset_wo_flagged
+  
   # info message
   start_time <-
     sprintf(
-      "orbi_analyze_shot_noise() is analyzing the shot noise for %d peaks... ",
-      nrow(dataset)
+      "orbi_analyze_shot_noise() is analyzing the shot noise for %d peaks (%s %d flagged peaks)... ",
+      if(include_flagged_data) n_all else n_after, if(include_flagged_data) "including" else "excluded", n_all - n_after
     ) |> message_start()
 
   # calculation
@@ -41,7 +49,6 @@ orbi_analyze_shot_noise <- function(dataset){
           n_effective_ions = .data$n_basepeak_ions * .data$n_isotopocule_ions / (.data$n_basepeak_ions + .data$n_isotopocule_ions),
           # relative standard error
           n_measurements = 1:n(),
-          ratio = .data$ions.incremental / .data$basepeak_ions,
           ratio_mean = cumsum(.data$ratio) / .data$n_measurements,
           ratio_gmean = exp(cumsum(log(.data$ratio)) / .data$n_measurements),
           #ratio_sd = sqrt( cumsum( (ratio - ratio_mean)^2 ) / (n_measurements - 1L) ),

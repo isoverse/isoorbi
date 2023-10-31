@@ -13,5 +13,5 @@ orbi_filter_flagged_data(dataset)
 a dataset with the flagged data filtered out
 }
 \description{
-This function filters out data that have been previously flagged using functions \code{orbi_flag_satellite_peaks()}, \code{orbi_flag_weak_isotopocules()}, and/or \code{orbi_flag_outliers()}.
+This function filters out data that have been previously flagged using functions \code{orbi_flag_satellite_peaks()}, \code{orbi_flag_weak_isotopocules()}, and/or \code{orbi_flag_outliers()}. Note that this function is no longer necessary to call explicitly as \code{orbi_analyze_shot_noise()} and \code{orbi_summarize_results()} automatically exclude flagged data.
 }

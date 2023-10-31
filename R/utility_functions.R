@@ -323,9 +323,22 @@ orbi_flag_outliers <- function(dataset, agc_window) {
   return(dataset_out |> group_by_same_groups(dataset))
 }
 
+# filter flagged data (fast internal function)
+filter_flagged_data <- function(dataset, filter_satellite_peaks = TRUE, filter_weak_isotopocules = TRUE, filter_outliers = TRUE) {
+  if (filter_satellite_peaks && "is_satellite_peak" %in% names(dataset)) {
+    dataset <- dataset |> filter(!.data$is_satellite_peak)
+  }
+  if (filter_weak_isotopocules && "is_weak_isotopocule" %in% names(dataset)) {
+    dataset <- dataset |> filter(!.data$is_weak_isotopocule)
+  }
+  if (filter_outliers && "is_outlier" %in% names(dataset)) {
+    dataset <- dataset |> filter(!.data$is_outlier)
+  }
+  return(dataset |> droplevels())
+}
 
 #' @title Filter out flagged data
-#' @description This function filters out data that have been previously flagged using functions `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()`, and/or `orbi_flag_outliers()`.
+#' @description This function filters out data that have been previously flagged using functions `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()`, and/or `orbi_flag_outliers()`. Note that this function is no longer necessary to call explicitly as `orbi_analyze_shot_noise()` and `orbi_summarize_results()` automatically exclude flagged data.
 #' @param dataset a tibble with previously flagged data from `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()`, and/or `orbi_flag_outliers()`
 #' @return a dataset with the flagged data filtered out
 #' @export
@@ -336,6 +349,13 @@ orbi_filter_flagged_data <- function(dataset) {
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset)
   )
 
+  # deprecation
+  lifecycle::deprecate_warn(
+    "1.3.0", "orbi_filter_flagged_data()", 
+    details = "filtering flagged data is no longer necessary as orbi_summarize_results() takes flagged data into consideration", 
+    always = TRUE
+  )
+  
   # original n
   nall <- nrow(dataset)
   nsat_peaks <- 0L

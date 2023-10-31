@@ -299,7 +299,8 @@ orbi_calculate_summarized_ratio <- function(
 #' @param dataset A tibble from `IsoX` output ([orbi_read_isox()]) and with a basepeak already defined (using `orbi_define_basepeak()`). Optionally, with block definitions ([orbi_define_blocks_for_dual_inlet()]) or even additional block segments ([orbi_segment_blocks()]).
 #' @inheritParams orbi_calculate_summarized_ratio
 #' @param .by additional grouping columns for the results summary (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
-#'
+#' @param include_flagged_data whether to include flagged data in the calculations (FALSE by default)
+#' @param include_unused_data whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as setting("data_type_data") 
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
@@ -325,7 +326,8 @@ orbi_calculate_summarized_ratio <- function(
 orbi_summarize_results <- function(
     dataset,
     ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum"),
-    .by = c("block", "sample_name", "segment", "data_group", "data_type", "injection")) {
+    .by = c("block", "sample_name", "segment", "data_group", "data_type", "injection"),
+    include_flagged_data = FALSE, include_unused_data = FALSE) {
 
   # basic checks
   if (missing(dataset))
@@ -349,6 +351,23 @@ orbi_summarize_results <- function(
       stop(call. = FALSE)
   }
 
+  # filter flagged data
+  n_all <- nrow(dataset)
+  dataset_wo_flagged <- dataset |> filter_flagged_data()
+  n_flagged <- n_all - nrow(dataset_wo_flagged)
+  if (!include_flagged_data)
+    dataset <- dataset_wo_flagged
+  
+  # filter unused data
+  n_unused <- 0L
+  if ("data_type" %in% names(dataset)) {
+    dataset_wo_unused <- dataset |> 
+      dplyr::filter(.data$data_type == setting("data_type_data"))
+    n_unused <- n_all - n_flagged - nrow(dataset_wo_unused)
+    if (!include_unused_data)
+      dataset <- dataset_wo_unused
+  }
+  
   # set basic groupings (use .add so prior group_by groupings are also preserved)
   df.group <- dataset |> dplyr::group_by(!!!lapply(base_group_cols, rlang::sym), .add = TRUE)
 
@@ -370,12 +389,18 @@ orbi_summarize_results <- function(
   # info message
   start_time <-
     sprintf(
-      "orbi_summarize_results() is grouping the data by %s and summarizing ratios using the '%s' method...",
+      "orbi_summarize_results() is grouping the data by %s and summarizing ratios from %d peaks (%s %d flagged peaks; %s %d unused peaks) using the '%s' method...",
       sprintf("'%s'", dplyr::group_vars(df.group)) |> paste(collapse = ", "),
+      if(include_flagged_data && include_unused_data) n_all 
+      else if (include_flagged_data) n_all - n_unused
+      else if (include_unused_data) n_all - n_flagged
+      else n_all - n_unused - n_flagged, 
+      if(include_flagged_data) "including" else "excluded", n_flagged,
+      if(include_unused_data) "including" else "excluded", n_unused,
       ratio_method
     ) |>
     message_start()
-
+  
   # calculations
   df.stat <-
     try_catch_all({
