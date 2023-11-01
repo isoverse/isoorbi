@@ -484,8 +484,8 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
         info <-
           too_few_bps |>
           dplyr::mutate(
-            label = sprintf("basepeak '%s' is missing in %.1f%% of scans of compound '%s' in file '%s'",
-                            basepeak_def, .data$n_too_few/.data$n_scans * 100, .data$compound, .data$filename)
+            label = sprintf("basepeak '%s' is missing in %d scans (%.1f%%) of compound '%s' in file '%s'",
+                            basepeak_def, .data$n_too_few, .data$n_too_few/.data$n_scans * 100, .data$compound, .data$filename)
           ) |>
           dplyr::pull(.data$label)
 
