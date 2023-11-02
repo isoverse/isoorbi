@@ -733,12 +733,13 @@ orbi_add_blocks_to_plot <- function(
   )
   x_column <- arg_match(x)
   
-  # check if it's a log-10 y axis
-  y_axis_type <- plot$scales$scales[[which(plot$scales$find("y"))[1]]]$trans$name
-  if (!is.null(y_axis_type) && y_axis_type == "log-10") {
-    sprintf("cannot add blocks to a log plot, consider using `y_scale = 'pseudo-log'`") |>
-      warn()
-    return(plot)
+  # check if it's a log y axis
+  y_axis <- plot$scales$scales[[which(plot$scales$find("y"))[1]]]
+  y_log <- FALSE
+  if (!is.null(y_axis)) {
+    y_zero <- suppressWarnings(y_axis$transform(0))
+    if (y_zero < 0 && is.infinite(y_zero))
+      y_log <- TRUE
   }
   
   # find out if it's a scan.no or time.min based plot if x is "guess"
@@ -772,7 +773,7 @@ orbi_add_blocks_to_plot <- function(
       data = get_blocks,
       map = ggplot2::aes(
         x = NULL, xmin = .data$xmin, xmax = .data$xmax,
-        y = NULL, color = NULL,  ymin = -Inf, ymax = Inf,
+        y = NULL, color = NULL,  ymin = if(y_log) 0 else -Inf, ymax = Inf,
         fill = {{ fill }}
       ),
       alpha = alpha, linetype = 0, color = NA_character_,
