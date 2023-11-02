@@ -709,8 +709,6 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 #' @title Plot blocks background
 #' @description This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused). Note that this function only works with continuous and pseudo-log y axis, not with log y axes.
 #'
-#' FIXME: this should also work with scan number
-#'
 #' @param plot object with a dataset that has defined blocks
 #' @param x which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.
 #' @param data_only if set to TRUE, only the blocks flagged as "data" (`setting("data_type_data")`) are highlighted
@@ -737,7 +735,7 @@ orbi_add_blocks_to_plot <- function(
   
   # find out if it's a scan.no or time.min based plot if x is "guess"
   if (x_column == "guess") {
-    x_column <- p$mapping$x |> as_label()
+    x_column <- plot$mapping$x |> as_label()
     if (!x_column %in% c("scan.no", "time.min")) {
       sprintf("cannot guess x-axis for blocks from plot as its aes(x = ) variable is neither 'scan.no' nor 'time.min'") |>
         warn()
@@ -750,7 +748,7 @@ orbi_add_blocks_to_plot <- function(
     ggplot2::geom_rect(
       data = function(df) {
         blocks <- df |> orbi_get_blocks_info()
-        if (!all(c("block", "sample_name", "data_type") %in% names(blocks))) {
+        if (!has_blocks(blocks)) {
           abort("columns `block`, `sample_name`, and `data_type` required for showing block")
         }
         if (data_only) {
@@ -782,6 +780,11 @@ orbi_add_blocks_to_plot <- function(
 }
 
 # internal functions ------------
+
+# check if dataset has blocks
+has_blocks <- function(dataset) {
+  return(all(c("block", "sample_name", "data_type") %in% names(dataset)))
+}
 
 # helper function to find blocks (internal)
 #' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]

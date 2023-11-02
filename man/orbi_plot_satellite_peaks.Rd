@@ -6,8 +6,10 @@
 \usage{
 orbi_plot_satellite_peaks(
   dataset,
-  isotopocules,
+  isotopocules = c(),
   x = c("scan.no", "time.min"),
+  y_scale = c("log", "pseudo-log", "continuous", "none"),
+  y_scale_sci_labels = TRUE,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
     "#666666")
 )
@@ -15,9 +17,13 @@ orbi_plot_satellite_peaks(
 \arguments{
 \item{dataset}{isox dataset with satellite peaks identified (\code{orbi_flag_satellite_peaks()})}
 
-\item{isotopocules}{which isotopocules to visualize}
+\item{isotopocules}{which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)}
 
-\item{x}{x-axis for the plot, either "time.min" (the default) or "scan.no"}
+\item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
+
+\item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "continuous" scale or "none" if you want to add a y scale to the plot manually instead}
+
+\item{y_scale_sci_labels}{whether to render numbers with scientific exponential notation}
 
 \item{colors}{which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)}
 }

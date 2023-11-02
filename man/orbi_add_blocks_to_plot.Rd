@@ -35,6 +35,4 @@ orbi_add_blocks_to_plot(
 }
 \description{
 This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused). Note that this function only works with continuous and pseudo-log y axis, not with log y axes.
-
-FIXME: this should also work with scan number
 }
