@@ -6,6 +6,7 @@
 \usage{
 orbi_add_blocks_to_plot(
   plot,
+  x = c("guess", "scan.no", "time.min"),
   data_only = FALSE,
   fill = .data$data_type,
   fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02",
@@ -17,6 +18,8 @@ orbi_add_blocks_to_plot(
 }
 \arguments{
 \item{plot}{object with a dataset that has defined blocks}
+
+\item{x}{which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.}
 
 \item{data_only}{if set to TRUE, only the blocks flagged as "data" (\code{setting("data_type_data")}) are highlighted}
 
@@ -31,7 +34,7 @@ orbi_add_blocks_to_plot(
 \item{show.legend}{whether to include the background information in the legend}
 }
 \description{
-This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused).
+This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused). Note that this function only works with continuous and pseudo-log y axis, not with log y axes.
 
 FIXME: this should also work with scan number
 }

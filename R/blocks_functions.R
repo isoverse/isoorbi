@@ -707,11 +707,12 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 }
 
 #' @title Plot blocks background
-#' @description This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused).
+#' @description This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused). Note that this function only works with continuous and pseudo-log y axis, not with log y axes.
 #'
 #' FIXME: this should also work with scan number
 #'
 #' @param plot object with a dataset that has defined blocks
+#' @param x which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.
 #' @param data_only if set to TRUE, only the blocks flagged as "data" (`setting("data_type_data")`) are highlighted
 #' @param fill what to use for the fill aesthetic, default is the block `data_type`
 #' @param fill_colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
@@ -721,12 +722,29 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 #' @export
 orbi_add_blocks_to_plot <- function(
     plot,
+    x = c("guess", "scan.no", "time.min"), 
     data_only = FALSE,
     fill = .data$data_type,
     fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
     fill_scale = scale_fill_manual(values = fill_colors),
     alpha = 0.5, show.legend = !data_only) {
 
+  # safety checks
+  stopifnot(
+    "`plot` has to be a ggplot" = !missing(plot) && is(plot, "ggplot")
+  )
+  x_column <- arg_match(x)
+  
+  # find out if it's a scan.no or time.min based plot if x is "guess"
+  if (x_column == "guess") {
+    x_column <- p$mapping$x |> as_label()
+    if (!x_column %in% c("scan.no", "time.min")) {
+      sprintf("cannot guess x-axis for blocks from plot as its aes(x = ) variable is neither 'scan.no' nor 'time.min'") |>
+        warn()
+      return(plot)
+    }
+  }
+  
   # add the rectangle plot as underlying layer
   plot$layers <- c(
     ggplot2::geom_rect(
@@ -738,10 +756,15 @@ orbi_add_blocks_to_plot <- function(
         if (data_only) {
           blocks <- blocks |> dplyr::filter(.data$data_type == setting("data_type_data"))
         }
-        blocks |> dplyr::filter(!is.na(.data$block))
+        blocks |> 
+          dplyr::filter(!is.na(.data$block)) |>
+          dplyr::mutate(
+            xmin = if(!!x_column == "time.min") .data$start_time.min else .data$start_scan.no,
+            xmax = if(!!x_column == "time.min") .data$end_time.min else .data$end_scan.no
+          )
       },
       map = ggplot2::aes(
-        x = NULL, xmin = .data$start_time.min, xmax = .data$end_time.min,
+        x = NULL, xmin = .data$xmin, xmax = .data$xmax,
         y = NULL, color = NULL,  ymin = -Inf, ymax = Inf,
         fill = {{ fill }}
       ),
