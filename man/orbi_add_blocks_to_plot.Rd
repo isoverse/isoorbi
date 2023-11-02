@@ -11,7 +11,7 @@ orbi_add_blocks_to_plot(
   fill = .data$data_type,
   fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02",
     "#A6761D", "#666666"),
-  fill_scale = scale_fill_manual(values = fill_colors),
+  fill_scale = scale_fill_manual("blocks", values = fill_colors),
   alpha = 0.5,
   show.legend = !data_only
 )

@@ -724,7 +724,7 @@ orbi_add_blocks_to_plot <- function(
     data_only = FALSE,
     fill = .data$data_type,
     fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
-    fill_scale = scale_fill_manual(values = fill_colors),
+    fill_scale = scale_fill_manual("blocks", values = fill_colors),
     alpha = 0.5, show.legend = !data_only) {
 
   # safety checks
@@ -732,6 +732,14 @@ orbi_add_blocks_to_plot <- function(
     "`plot` has to be a ggplot" = !missing(plot) && is(plot, "ggplot")
   )
   x_column <- arg_match(x)
+  
+  # check if it's a log-10 y axis
+  y_axis_type <- plot$scales$scales[[which(plot$scales$find("y"))[1]]]$trans$name
+  if (!is.null(y_axis_type) && y_axis_type == "log-10") {
+    sprintf("cannot add blocks to a log plot, consider using `y_scale = 'pseudo-log'`") |>
+      warn()
+    return(plot)
+  }
   
   # find out if it's a scan.no or time.min based plot if x is "guess"
   if (x_column == "guess") {
@@ -743,24 +751,25 @@ orbi_add_blocks_to_plot <- function(
     }
   }
   
+  # get blocks
+  get_blocks <- function(df) {
+    if (!has_blocks(df))
+      abort("this data set does not seem to have any block defintions yet, use a function from the `orbi_define_block...` family to define one or multiple data blocks")
+    if (data_only) 
+      df <- df |> dplyr::filter(.data$data_type == setting("data_type_data"))
+    blocks <- df |> orbi_get_blocks_info()
+    blocks |> 
+      dplyr::filter(!is.na(.data$block)) |>
+      dplyr::mutate(
+        xmin = if(!!x_column == "time.min") .data$start_time.min else .data$start_scan.no,
+        xmax = if(!!x_column == "time.min") .data$end_time.min else .data$end_scan.no
+      )
+  }
+  
   # add the rectangle plot as underlying layer
   plot$layers <- c(
     ggplot2::geom_rect(
-      data = function(df) {
-        blocks <- df |> orbi_get_blocks_info()
-        if (!has_blocks(blocks)) {
-          abort("columns `block`, `sample_name`, and `data_type` required for showing block")
-        }
-        if (data_only) {
-          blocks <- blocks |> dplyr::filter(.data$data_type == setting("data_type_data"))
-        }
-        blocks |> 
-          dplyr::filter(!is.na(.data$block)) |>
-          dplyr::mutate(
-            xmin = if(!!x_column == "time.min") .data$start_time.min else .data$start_scan.no,
-            xmax = if(!!x_column == "time.min") .data$end_time.min else .data$end_scan.no
-          )
-      },
+      data = get_blocks,
       map = ggplot2::aes(
         x = NULL, xmin = .data$xmin, xmax = .data$xmax,
         y = NULL, color = NULL,  ymin = -Inf, ymax = Inf,

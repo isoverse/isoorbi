@@ -173,7 +173,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 }
 
 #' @title Flag weak isotopocules
-#' @description The function `orbi_filter_weak_isotopocules()` flags isotopocules that are not consistently detected in most scans.
+#' @description The function `orbi_filter_weak_isotopocules()` flags isotopocules that are not detected in a minimum of `min_percent` of scans. This function evaluates weak isotopocules within each "filename", "block", "segment" and "injection" (if these columns exist), in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data frame.
 #'
 #' @param dataset A simplified IsoX data frame to be processed
 #' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)
@@ -204,10 +204,8 @@ orbi_flag_weak_isotopocules <-
     # ensure factors
     dataset <- dataset |> factorize_dataset("isotopocule")
 
-    # optional groupings - FIXME: implement like in summarize_results?
-    dataset_out <- dataset |>
-      dplyr::ungroup() |>
-      group_if_exists(c("filename", "block", "segment", "injection"))
+    # groupings if they exist
+    dataset_out <- dataset |> group_if_exists(c("filename", "block", "segment", "injection"), add = TRUE)
 
     # info
     start_time <-
@@ -258,8 +256,10 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 
 
 #' @title Flag outlier scans
-#' @description The function `orbi_flag_outliers()` flags outliers. Grouping is by columns `filename` and `compound`.
-#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent.
+#' @description The function `orbi_flag_outliers()` flags outliers using one of the different methods provided by the parameters (to use multiple, please call this function several times sequentially). Note that this function evaluates outliers within each "filename", "block", "segment" and "injection" (if these columns exist), in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data frame.
+#' 
+#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' @param agc_fold_cutoff flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, `agc_fold_cutoff = 2` flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. 
 #' @param dataset Simplified IsoX dataset to have outliers flagged
 #' @details Function is intended to flag scans that are outliers.
 #'
@@ -272,9 +272,9 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 #'   orbi_simplify_isox() |>
 #'   orbi_flag_outliers(agc_window = c(1,99))
 #'
-#' @return Filtered tibble
+#' @return A data frame with new columns `is_outlier` and `outlier_type` (if they don't already exist) that flags outliers identified by the method and provides the type of outlier (e.g. "2 fold agc cutoff"), respectively.
 #' @export
-orbi_flag_outliers <- function(dataset, agc_window) {
+orbi_flag_outliers <- function(dataset, agc_fold_cutoff = NA_real_, agc_window = c()) {
 
   # safety checks
   cols <- c("filename", "compound", "scan.no", "tic", "it.ms")
@@ -282,36 +282,92 @@ orbi_flag_outliers <- function(dataset, agc_window) {
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`" =
       all(cols %in% names(dataset)),
-    "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100" = !missing(agc_window) && is.numeric(agc_window) && length(agc_window) == 2L && agc_window[1] < agc_window[2]
+    "if provided, `agc_fold_cutoff` needs to be a single number" = (length(agc_fold_cutoff) == 1L && is.na(agc_fold_cutoff)) || is_scalar_double(agc_fold_cutoff),
+    "if provided, `agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100" = length(agc_window) == 0L || (is.numeric(agc_window) && length(agc_window) == 2L && agc_window[1] < agc_window[2])
   )
 
+  # check filter to apply
+  method <- c(
+    agc_window = length(agc_window) == 2L,
+    agc_fold_cutoff = !is.na(agc_fold_cutoff)
+  )
+  if (sum(method) > 1L) {
+    sprintf("can only use one method at a time, please call this function sequentially for each of these parameters: '%s'",
+            paste(names(method)[method], collapse = "', '")) |>
+    abort()
+  } else if (sum(method) == 0L) {
+    sprintf("need to define at least one of these parameters for identifying outliers: '%s'",
+            paste(names(method), collapse = "', '")) |>
+      abort()
+  }
+  method <- names(method)[method]
+  
+  # method message
+  method_msg <- ""
+  method_type <- ""
+  if (method == "agc_window") {
+    method_msg <- sprintf(
+      "%s %% of scans with the lowest and above %s %% of scans with the highest number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
+      agc_window[1], agc_window[2]
+    )
+    method_type <- sprintf("agc window (%s to %s %%)", agc_window[1], agc_window[2])
+  } else if (method == "agc_fold_cutoff") {
+    method_msg <- sprintf(
+      "scans below 1/%s and above %s times the average number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
+      agc_fold_cutoff, agc_fold_cutoff
+    )
+    method_type <- sprintf("%s fold agc cutoff", agc_fold_cutoff)
+  }
+  
   # optional groupings
-  dataset_out <- dataset |>
-    dplyr::ungroup() |>
-    group_if_exists(c("filename", "block", "segment", "injection"))
-
+  dataset_out <- dataset |> group_if_exists(c("filename", "block", "segment", "injection"), add = TRUE)
+  
   # info
   start_time <-
     sprintf(
-      "orbi_flag_outliers() is flagging the %s %% of scans with the lowest and above %s %% of scans with the highest number of ions (`tic` * `it.ms`) in the Orbitrap analyzer in %d data group(s) (based on '%s')... ",
-      agc_window[1], agc_window[2],
+      "orbi_flag_outliers() is flagging the %s in %d data group(s) (based on '%s')... ",
+      method_msg,
       dplyr::n_groups(dataset_out), paste(dplyr::group_vars(dataset_out), collapse = "', '")) |>
     message_start()
   n_scans <- dataset_out |> count_grouped_distinct("scan.no")
 
   # calculation
   dataset_out <- try_catch_all(
-    dataset_out |>
-      dplyr::mutate(TICxIT = .data$tic * .data$it.ms) |>
-      dplyr::mutate(
-        is_outlier =
-        .data$TICxIT < stats::quantile(.data$TICxIT, agc_window[1] / 100) |
-          .data$TICxIT > stats::quantile(.data$TICxIT, agc_window[2] / 100)
-      ) |>
-      dplyr::select(-"TICxIT"),
+    if (method == "agc_window") {
+      dataset_out |>
+        dplyr::mutate(
+          TICxIT = .data$tic * .data$it.ms,
+          is_new_outlier =
+            .data$TICxIT < stats::quantile(.data$TICxIT, agc_window[1] / 100) |
+            .data$TICxIT > stats::quantile(.data$TICxIT, agc_window[2] / 100)
+        ) |>
+        dplyr::select(-"TICxIT")
+    } else if (method == "agc_fold_cutoff") {
+      dataset_out |>
+        dplyr::mutate(
+          TICxIT = .data$tic * .data$it.ms,
+          TICxIT_mean = mean(.data$TICxIT),
+          is_new_outlier =
+            .data$TICxIT < 1/agc_fold_cutoff * TICxIT_mean |
+            .data$TICxIT > agc_fold_cutoff * TICxIT_mean
+        ) |>
+        dplyr::select(-"TICxIT", -"TICxIT_mean")
+    },
     "something went wrong flagging outliers: "
   )
 
+  # dataset outlier and type update
+  if (!"is_outlier" %in% names(dataset_out)) {
+    dataset_out$is_outlier <- FALSE
+    dataset_out$outlier_type <- NA_character_
+  }
+  dataset_out <- dataset_out |>
+    dplyr::mutate(
+      is_outlier = ifelse(.data$is_new_outlier, TRUE, .data$is_outlier),
+      outlier_type = ifelse(.data$is_new_outlier, method_type, .data$outlier_type)
+    ) |>
+    dplyr::select(-"is_new_outlier")
+  
   # info
   n_scans_removed <- dataset_out |> dplyr::filter(.data$is_outlier) |> count_grouped_distinct("scan.no")
   sprintf(

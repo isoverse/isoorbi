@@ -8,8 +8,7 @@ orbi_plot_isotopocule_coverage(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
-  add_blocks = TRUE,
-  weak_isotopocules_color = "red"
+  add_data_blocks = TRUE
 )
 }
 \arguments{
@@ -19,9 +18,7 @@ orbi_plot_isotopocule_coverage(
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
 
-\item{add_blocks}{add blocks if there are any block definitions in the dataset (using \code{orbi_add_blocks_to_plot()}). To add blocks manually, set \code{add_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
-
-\item{weak_isotopocules_color}{the color to use for weak isotopocules. Only relevant if weak isotopcules are already defined using \code{orbi_flag_weak_isotopocules()}.}
+\item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{orbi_add_blocks_to_plot()}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 }
 \description{
 Weak isotopocules (if previously defined by \code{orbi_flag_weak_isotopocules()}) are highlighted in the \code{weak_isotopocules_color}.
