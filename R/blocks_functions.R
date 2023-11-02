@@ -674,10 +674,10 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
       sample_name = NA_character_,
       data_type = factor(NA_character_),
       segment = NA_integer_,
-      start_scan.no = NA_integer_,
-      end_scan.no = NA_integer_,
-      start_time.min = NA_real_,
-      end_time.min = NA_real_
+      start_scan.no = min(.data$scan.no),
+      end_scan.no = max(.data$scan.no),
+      start_time.min = min(.data$time.min),
+      end_time.min = max(.data$time.min)
     )
 
   # no information

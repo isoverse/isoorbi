@@ -67,7 +67,7 @@ dynamic_y_scale <- function(plot,  y_scale = c("none", "continuous", "pseudo-log
 # decides whether to wrap by filename, compound or both filename and compound
 # depending on if either has more than 1 value
 dynamic_wrap <- function(plot, scales = "free_x") {
-  dataset <- p$data |> factorize_dataset(c("filename", "compound"))
+  dataset <- plot$data |> factorize_dataset(c("filename", "compound"))
   n_files <- length(levels(dataset$filename))
   n_compounds <- length(levels(dataset$compound))
   if (n_files > 1L && n_compounds > 1L) {
@@ -113,37 +113,43 @@ orbi_calculate_isotopocule_coverage <- function(dataset) {
       all(cols %in% names(dataset))
   )
   
-  # nesting requires global defs
-  scan_no <- time.min <- NULL
-  
-  # calculate coverage
+  # prep dataset
   dataset <- dataset |> factorize_dataset(c("filename", "compound", "isotopocule"))
   isotopocule_levels <- levels(dataset$isotopocule)
+  
+  # make sure a weak isotopocule column is included
+  if (!"is_weak_isotopocule" %in% names(dataset))
+    dataset <- dataset |> dplyr::mutate(is_weak_isotopocule = NA)
+  
+  # make sure a data group column is included
+  if (!"data_group" %in% names(dataset))
+    dataset <- dataset |> dplyr::mutate(data_group = NA_integer_)
+  
+  # nesting requires global defs
+  scan_no <- time.min <- data_group <- NULL
+  
+  # calculate coverage
   dataset |>
     # complete dataset (need isotopocule as char otherwise will always complete for all levels)
-    dplyr::select("filename", "compound", "isotopocule", "scan.no", "time.min", "ions.incremental") |>
+    dplyr::select("filename", "compound", "isotopocule", "scan.no", "time.min", "ions.incremental", "data_group", "is_weak_isotopocule") |>
     dplyr::mutate(isotopocule = as.character(.data$isotopocule)) |>
-    dplyr::group_by(.data$filename, .data$compound) |>
-    tidyr::complete(.data$isotopocule, tidyr::nesting(scan.no, time.min)) |>
-    dplyr::ungroup() |>
-    # find data/no-data stretches
+    # find data stretches
     dplyr::arrange(.data$filename, .data$compound, .data$isotopocule, .data$scan.no) |>
     dplyr::mutate(
       isotopocule = factor(.data$isotopocule, levels = isotopocule_levels),
-      group = c(0, cumsum(abs(diff(is.na(.data$ions.incremental))))),
+      data_stretch = c(0, cumsum(diff(.data$scan.no) > 1L)),
       .by = c("filename", "compound", "isotopocule")
     ) |>
     # summarize
     tidyr::nest(data = c(.data$scan.no, .data$time.min, .data$ions.incremental)) |>
     dplyr::mutate(
-      has_data = !map_lgl(.data$data, ~is.na(.x$ions.incremental[1])),
       n_points = map_int(.data$data, nrow),
       start_scan.no = map_dbl(.data$data, ~.x$scan.no[1]),
       end_scan.no = map_dbl(.data$data, ~tail(.x$scan.no, 1)),
       start_time.min = map_dbl(.data$data, ~.x$time.min[1]),
       end_time.min = map_dbl(.data$data, ~tail(.x$time.min, 1))
     ) |>
-    dplyr::arrange(.data$filename, .data$compound, .data$isotopocule)
+    dplyr::arrange(.data$filename, .data$compound, .data$isotopocule, .data$data_group)
 }
 
 # plot functions ==========
@@ -212,13 +218,16 @@ orbi_plot_satellite_peaks <- function(
 
 #' Plot isotopocule coverage
 #' 
+#' Weak isotopocules (if previously defined by `orbi_flag_weak_isotopocules()`) are highlighted in the `weak_isotopocules_color`.
+#' 
 #' @param dataset isox data
 #' @inheritParams orbi_plot_satellite_peaks
-#' @param add_blocks add blocks if there are any block definitions in the dataset
+#' @param add_blocks add blocks if there are any block definitions in the dataset (using `orbi_add_blocks_to_plot()`). To add blocks manually, set `add_blocks = FALSE` and manually call the `orbi_add_blocks_to_plot()` function afterwards.
+#' @param weak_isotopocules_color the color to use for weak isotopocules. Only relevant if weak isotopcules are already defined using `orbi_flag_weak_isotopocules()`.
 #' @export
 orbi_plot_isotopocule_coverage <- function(
     dataset, isotopocules = c(), x = c("scan.no", "time.min"),
-    add_blocks = TRUE
+    add_blocks = TRUE, weak_isotopocules_color = "red"
     ) {
   
   # safety checks
@@ -242,7 +251,7 @@ orbi_plot_isotopocule_coverage <- function(
       filter_outliers = FALSE
     )
   
-  # changes
+  # delta x
   files_delta_x <- 
     dataset |> 
     dplyr::group_by(.data$filename) |> 
@@ -252,6 +261,10 @@ orbi_plot_isotopocule_coverage <- function(
           (max(.data$time.min) - min(.data$time.min)) / (max(.data$scan.no) - min(.data$scan.no))
         else 1
     )
+  
+  # weak isotopocules and data groups
+  has_weak_col <- "is_weak_isotopocule" %in% names(dataset)
+  has_data_groups <- "data_group" %in% names(dataset)
   
   # calculate coverage
   isotopocule_coverage <- 
@@ -266,13 +279,41 @@ orbi_plot_isotopocule_coverage <- function(
   
   # outlines (to show which isotopocules are recorded at all)
   scan_outlines <-
-    isotopocule_coverage |>
-    dplyr::summarize(
-      xmin = min(.data$xmin), 
-      xmax = max(.data$xmax),
-      .by = c("filename", "compound", "y")
+    dataset |>
+    dplyr::mutate(
+      xmin = if(x_column == "time.min") min(.data$time.min) else min(.data$scan.no),
+      xmax = if(x_column == "time.min") max(.data$time.min) else max(.data$scan.no),
+      .by = c("filename")
     ) |>
+    dplyr::select("filename", "compound", "isotopocule", "xmin", "xmax") |>
+    dplyr::distinct() |>
+    dplyr::mutate(y = as.integer(.data$isotopocule)) |>
     dplyr::left_join(files_delta_x, by = "filename")
+  
+  # group outlines (for weak isotopocule backgrounds)
+  if (has_weak_col) {
+    group_outlines <-
+      isotopocule_coverage |>
+      dplyr::summarize(
+        is_weak_isotopocule = any(!is.na(.data$is_weak_isotopocule) & .data$is_weak_isotopocule),
+        xmin = min(.data$xmin), 
+        xmax = max(.data$xmax),
+        .by = c("filename", "compound", "y", "data_group")
+      ) |>
+      dplyr::group_by(.data$filename, .data$compound) |>
+      tidyr::complete(.data$y, .data$data_group) |>
+      dplyr::ungroup() |>
+      dplyr::left_join(
+        suppressWarnings(dataset |> orbi_get_blocks_info()),
+        by = c("filename", "data_group")
+      ) |>
+      dplyr::mutate(
+        is_weak_isotopocule = ifelse(!is.na(.data$xmin), .data$is_weak_isotopocule, TRUE),
+        xmin = if(x_column == "time.min") .data$start_time.min else .data$start_scan.no,
+        xmax = if(x_column == "time.min") .data$end_time.min else .data$end_scan.no
+      ) |>
+      dplyr::left_join(files_delta_x, by = "filename")
+  }
   
   # make plot
   plot <- 
@@ -283,28 +324,33 @@ orbi_plot_isotopocule_coverage <- function(
       xmin = .data$xmin - .data$delta_x, xmax = .data$xmax + .data$delta_x, 
       ymin = .data$y - 0.4, ymax = .data$y + 0.4
     ) +
-    # background outline
-    ggplot2::geom_rect(data = scan_outlines, fill = NA, color = "black") +
-    # missing data
-    ggplot2::geom_rect(
-      data = isotopocule_coverage |> dplyr::filter(!.data$has_data),
-      fill = "white"
-    ) +
-    # has data
-    ggplot2::geom_rect(
-      data = isotopocule_coverage |> dplyr::filter(.data$has_data),
-      fill = "black"
-    ) +
+    # scan outlines
+    ggplot2::geom_rect(data = scan_outlines, fill = "white", color = "black")
+  
+  # weak isotopcules outlines
+  if (has_weak_col) {
+    plot <- plot + 
+      ggplot2::geom_rect(
+        data = group_outlines |> filter(.data$is_weak_isotopocule),
+        fill = weak_isotopocules_color, color = NA_character_
+      )
+  }
+  
+  # continue plot
+  plot <- plot + 
+    # data
+    ggplot2::geom_rect(data = isotopocule_coverage, fill = "black") +
     scale_y_reverse(
       breaks = seq_along(levels(isotopocule_coverage$isotopocule)), 
       labels = levels(isotopocule_coverage$isotopocule)
     ) +
     orbi_default_theme() +
+    coord_cartesian(expand = FALSE) +
     labs(x = x_column, y = NULL)
   
   # blocks
   if (add_blocks && has_blocks(dataset))
-    plot <- plot |> orbi_add_blocks_to_plot(x = x_column)
+    plot <- plot |> orbi_add_blocks_to_plot(x = x_column, data_only = TRUE)
   
   # return
   plot |> dynamic_wrap()

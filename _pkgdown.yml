@@ -34,24 +34,36 @@ reference:
   - orbi_read_isox
   - orbi_define_basepeak
   - orbi_summarize_results
-  - orbi_adjust_block
 
-- title: Removing data
+- title: Define data blocks
   desc: >
-    These functions handle data selection and outlier removal.
+    These functions are useful for annotating and processing `dual inlet` and `flow injection` data.
+  contents:
+  - orbi_define_block_for_flow_injection
+  - orbi_define_blocks_for_dual_inlet
+  - orbi_adjust_block
+  - orbi_segment_blocks
+  - orbi_get_blocks_info
+
+- title: Curate data
+  desc: >
+    These functions handle data selection and flagging outliers.
   contents:
   - orbi_filter_isox
   - orbi_flag_outliers
   - orbi_flag_satellite_peaks
   - orbi_flag_weak_isotopocules
-  - orbi_filter_flagged_data
+  - orbi_calculate_isotopocule_coverage
 
-- title: Optional functions
+- title: Visualize data
   desc: >
-    These functions are available to simplify or customize the data analysis.
+    These functions help visualize what happens to the data during processing
   contents:
-  - orbi_simplify_isox
-  - orbi_calculate_summarized_ratio
+  - orbi_plot_satellite_peaks
+  - orbi_plot_isotopocule_coverage
+  - orbi_plot_raw_data
+  - orbi_add_blocks_to_plot
+  - orbi_default_theme
 
 - title: Shot noise analysis
   desc: >
@@ -60,23 +72,22 @@ reference:
   - orbi_analyze_shot_noise
   - orbi_plot_shot_noise
 
-- title: Dual inlet
-  desc: >
-    These functions are useful for annotating and processing `dual inlet` data.
-  contents:
-  - orbi_define_blocks_for_dual_inlet
-  - orbi_get_blocks_info
-  - orbi_segment_blocks
-  - orbi_add_blocks_to_plot
-  - orbi_define_block
-
 - title: Export functions
   desc: >
     This function serves to export data to an Excel file.
   contents:
   - orbi_export_data_to_excel
+  
+- title: Other functions
+  desc: >
+    These functions are available to simplify or customize the data analysis.
+  contents:
+  - orbi_simplify_isox
+  - orbi_calculate_summarized_ratio
 
 - title: Internal
+  desc: >
+    These functions are available to simplify or customize the data analysis.
   contents:
   - orbi_get_settings
   - orbi_set_settings
@@ -86,5 +97,6 @@ reference:
   - orbi_filter_satellite_peaks
   - orbi_filter_scan_intensity
   - orbi_filter_weak_isotopocules
+  - orbi_filter_flagged_data
   - orbi_calculate_ratios
 

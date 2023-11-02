@@ -233,7 +233,7 @@ orbi_flag_weak_isotopocules <-
     removed_isotopocules <- dataset_out |> dplyr::filter(.data$is_weak_isotopocule) |> count_grouped_distinct("isotopocule")
     if (removed_isotopocules > 0) {
       sprintf(
-        "flagged %d/%d isotopocules across all data groups",
+        "flagged %d/%d isotopocules across all data groups (use `orbi_plot_isotopocule_coverage()` to visualize them)",
         removed_isotopocules, starting_isotopocules) |>
         message_finish(start_time = start_time)
     } else {
@@ -352,7 +352,7 @@ orbi_filter_flagged_data <- function(dataset) {
   # deprecation
   lifecycle::deprecate_warn(
     "1.3.0", "orbi_filter_flagged_data()", 
-    details = "filtering flagged data is no longer necessary as orbi_summarize_results() takes flagged data into consideration", 
+    details = "filtering flagged data is no longer necessary as orbi_summarize_results() and other functions take flagged data into consideration and treat it appropriately", 
     always = TRUE
   )
   
