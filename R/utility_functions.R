@@ -371,7 +371,7 @@ orbi_flag_outliers <- function(dataset, agc_fold_cutoff = NA_real_, agc_window =
   # info
   n_scans_removed <- dataset_out |> dplyr::filter(.data$is_outlier) |> count_grouped_distinct("scan.no")
   sprintf(
-    "flagged %d/%d scans (%.1f%%) across all data groups",
+    "flagged %d/%d scans (%.1f%%) as outliers (use `orbi_plot_raw_data(y = tic * it.ms)` to visualize them) across all data groups",
     n_scans_removed, n_scans, n_scans_removed/n_scans * 100) |>
     message_finish(start_time = start_time)
 

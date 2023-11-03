@@ -11,7 +11,8 @@ orbi_plot_satellite_peaks(
   y_scale = c("log", "pseudo-log", "continuous", "none"),
   y_scale_sci_labels = TRUE,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
-    "#666666")
+    "#666666"),
+  color_scale = scale_color_manual(values = colors)
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ orbi_plot_satellite_peaks(
 \item{y_scale_sci_labels}{whether to render numbers with scientific exponential notation}
 
 \item{colors}{which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)}
+
+\item{color_scale}{use this parameter to replace the entire color scale rather than just the \code{colors}}
 }
 \description{
 Call this function any time after flagging the satellite peaks to see where they are. Use the \code{isotopocules} argument to focus on the specific isotopocules of interest.

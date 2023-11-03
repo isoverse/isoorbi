@@ -164,11 +164,13 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 #' @param y_scale what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "continuous" scale or "none" if you want to add a y scale to the plot manually instead
 #' @param y_scale_sci_labels whether to render numbers with scientific exponential notation
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
+#' @param color_scale use this parameter to replace the entire color scale rather than just the `colors`
 #' @export
 orbi_plot_satellite_peaks <- function(
     dataset, isotopocules = c(), x = c("scan.no", "time.min"),
     y_scale = c("log", "pseudo-log", "continuous", "none"), y_scale_sci_labels = TRUE,
-    colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666")) {
+    colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"), 
+    color_scale = scale_color_manual(values = colors)) {
 
   # safety checks
   cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental")
@@ -203,7 +205,7 @@ orbi_plot_satellite_peaks <- function(
       map = aes(shape = .data$flagged)
     ) +
     ggplot2::scale_shape_manual(values = 17) +
-    ggplot2::scale_color_manual(values = colors) +
+    {{ color_scale }} +
     ggplot2::guides(
       color = ggplot2::guide_legend(override.aes = list(shape = NA), order = 1)
     ) +
@@ -220,17 +222,20 @@ orbi_plot_satellite_peaks <- function(
 #' Call this function to visualize orbitrap data vs. time or scan number. The most common uses are `orbi_plot_raw_data(y = intensity)`, `orbi_plot_raw_data(y = ratio)`, and `orbi_plot_raw_data(y = tic * it.ms)`. By default includes all isotopcules that have not been previously identified by `orbi_flag_weak_isotopcules()` (if already called on dataset). To narrow down the isotopocules to show, use the `isotopocule` parameter.
 #'
 #' @param dataset isox dataset
-#' @param y expression for what to plot on the y-axis, e.g. `intensity`, `tic * it.ms`, `ratio`, etc. the default is `intensity`
+#' @param y expression for what to plot on the y-axis, e.g. `intensity` (all or specific isotopocules), `tic * it.ms` (pick one `isotopocules` as this is identical across the same scan), `ratio` (all or specific isotopocules, typically switch `y_scale` to "none), etc. The default is `intensity`.
 #' @param color expression for what to use for the color aesthetic, default is isotopocule
 #' @param add_data_blocks add highlight for data blocks if there are any block definitions in the dataset (uses `orbi_add_blocks_to_plot()`). To add blocks manually, set `add_data_blocks = FALSE` and manually call the `orbi_add_blocks_to_plot()` function afterwards.
 #' @param add_all_blocks add highlight for all blocks, not just data blocks (equivalent to the `data_only = FALSE` argument in `orbi_add_blocks_to_plot()`)
+#' @param show_outliers whether to highlight data previously flagged as outliers by `orbi_flag_outliers()`
 #' @inheritParams orbi_plot_satellite_peaks
 #' @export
 orbi_plot_raw_data <- function(
     dataset, isotopocules = c(), x = c("time.min", "scan.no"), y = intensity,
     y_scale = c("continuous", "log", "pseudo-log", "none"), y_scale_sci_labels = TRUE,
-    color = isotopocule, colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
-    add_data_blocks = TRUE, add_all_blocks = FALSE, highlight_outliers = TRUE) {
+    color = isotopocule, 
+    colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
+    color_scale = scale_color_manual(values = colors),
+    add_data_blocks = TRUE, add_all_blocks = FALSE, show_outliers = TRUE) {
 
   # safety checks
   cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule")
@@ -253,6 +258,15 @@ orbi_plot_raw_data <- function(
       filter_weak_isotopocules = length(isotopocules) == 0L,
       filter_outliers = FALSE)
 
+  # check for outlier column
+  if (!"is_outlier" %in% names(plot_df)) {
+    plot_df$is_outlier <- FALSE
+    plot_df$outlier_type <- NA_character_
+  } else if ("is_outlier" %in% names(plot_df) && show_outliers && !"outlier_type" %in% names(plot_df)) {
+    abort("trying to highlight outliers based on`is_outlier` column but `outlier_type` column is missing")
+  }
+  show_outliers <- show_outliers && any(plot_df$is_outlier)
+  
   # generate y value and color to check if they work
   yquo <- enquo(y)
   colorquo <- enquo(color)
@@ -272,33 +286,41 @@ orbi_plot_raw_data <- function(
   # make plot
   plot <- plot_df |>
     ggplot2::ggplot() +
-    ggplot2::aes(
-      x = !!sym(x_column), y = {{ y }}, color = {{ color }}) +
-    ggplot2::geom_line() +
-    ggplot2::scale_color_manual(values = colors) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      text = ggplot2::element_text(size = 16),
-      strip.text = ggplot2::element_text(size = 20),
-      panel.grid = ggplot2::element_blank(),
-      panel.background = ggplot2::element_blank(),
-      plot.background = ggplot2::element_blank(),
-      strip.background = ggplot2::element_blank(),
-      legend.background = ggplot2::element_blank()
+    ggplot2::aes(x = !!sym(x_column), y = {{ y }}, color = {{ color }}) +
+    # data
+    ggplot2::geom_line(
+      data = function(df) dplyr::filter(df, !.data$is_outlier),
+      alpha = if (show_outliers) 0.5 else 1.0
     ) +
-    labs(y = as_label(yquo))
-
+    {{ color_scale }} +
+    orbi_default_theme()
+  
   # scale and dynamic wrap
   plot <- plot |>
     dynamic_y_scale(y_scale, sci_labels = y_scale_sci_labels) |>
     dynamic_wrap()
-
+  
   # blocks
   if ( add_all_blocks && has_blocks(dataset))
     plot <- plot |> orbi_add_blocks_to_plot(x = x_column)
   else if ( add_data_blocks && has_blocks(dataset))
     plot <- plot |> orbi_add_blocks_to_plot(x = x_column, data_only = TRUE, fill_colors = "gray80", show.legend = TRUE)
-
+  
+  # outliers
+  if (show_outliers) {
+    plot <- plot + 
+      ggplot2::geom_point(
+        data = function(df) dplyr::filter(df, !!show_outliers & .data$is_outlier),
+        map = aes(shape = .data$outlier_type)
+      ) +
+      # typicall only the first or sometimes first two will be used
+      ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +
+      ggplot2::guides(
+        color = ggplot2::guide_legend(override.aes = list(shape = NA, fill = NA), order = 1)
+      ) +
+      labs(shape = "flagged outliers")
+  }
+ 
   return(plot)
 }
 

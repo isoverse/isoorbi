@@ -14,9 +14,10 @@ orbi_plot_raw_data(
   color = isotopocule,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
     "#666666"),
+  color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
-  highlight_outliers = TRUE
+  show_outliers = TRUE
 )
 }
 \arguments{
@@ -26,7 +27,7 @@ orbi_plot_raw_data(
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
 
-\item{y}{expression for what to plot on the y-axis, e.g. \code{intensity}, \code{tic * it.ms}, \code{ratio}, etc. the default is \code{intensity}}
+\item{y}{expression for what to plot on the y-axis, e.g. \code{intensity} (all or specific isotopocules), \code{tic * it.ms} (pick one \code{isotopocules} as this is identical across the same scan), \code{ratio} (all or specific isotopocules, typically switch \code{y_scale} to "none), etc. The default is \code{intensity}.}
 
 \item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "continuous" scale or "none" if you want to add a y scale to the plot manually instead}
 
@@ -36,9 +37,13 @@ orbi_plot_raw_data(
 
 \item{colors}{which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)}
 
+\item{color_scale}{use this parameter to replace the entire color scale rather than just the \code{colors}}
+
 \item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{orbi_add_blocks_to_plot()}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 
 \item{add_all_blocks}{add highlight for all blocks, not just data blocks (equivalent to the \code{data_only = FALSE} argument in \code{orbi_add_blocks_to_plot()})}
+
+\item{show_outliers}{whether to highlight data previously flagged as outliers by \code{orbi_flag_outliers()}}
 }
 \description{
 Call this function to visualize orbitrap data vs. time or scan number. The most common uses are \code{orbi_plot_raw_data(y = intensity)}, \code{orbi_plot_raw_data(y = ratio)}, and \code{orbi_plot_raw_data(y = tic * it.ms)}. By default includes all isotopcules that have not been previously identified by \code{orbi_flag_weak_isotopcules()} (if already called on dataset). To narrow down the isotopocules to show, use the \code{isotopocule} parameter.

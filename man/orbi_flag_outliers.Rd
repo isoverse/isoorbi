@@ -4,18 +4,20 @@
 \alias{orbi_flag_outliers}
 \title{Flag outlier scans}
 \usage{
-orbi_flag_outliers(dataset, agc_window)
+orbi_flag_outliers(dataset, agc_fold_cutoff = NA_real_, agc_window = c())
 }
 \arguments{
 \item{dataset}{Simplified IsoX dataset to have outliers flagged}
 
-\item{agc_window}{flags scans with a critically low or high number of ions in the Orbitrap analyzer. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap. Provide a vector with 2 numbers \code{c(x,y)} flagging the lowest x percent and highest y percent.}
+\item{agc_fold_cutoff}{flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, \code{agc_fold_cutoff = 2} flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.}
+
+\item{agc_window}{flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers \code{c(x,y)} flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.}
 }
 \value{
-Filtered tibble
+A data frame with new columns \code{is_outlier} and \code{outlier_type} (if they don't already exist) that flags outliers identified by the method and provides the type of outlier (e.g. "2 fold agc cutoff"), respectively.
 }
 \description{
-The function \code{orbi_flag_outliers()} flags outliers. Grouping is by columns \code{filename} and \code{compound}.
+The function \code{orbi_flag_outliers()} flags outliers using one of the different methods provided by the parameters (to use multiple, please call this function several times sequentially). Note that this function evaluates outliers within each "filename", "block", "segment" and "injection" (if these columns exist), in addition to any groupings already defined before calling this function using dplyr's \code{group_by()}. It restores the original groupings in the returned data frame.
 }
 \details{
 Function is intended to flag scans that are outliers.
