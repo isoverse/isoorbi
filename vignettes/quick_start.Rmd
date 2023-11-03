@@ -14,43 +14,72 @@ editor_options:
 ```{r}
 # load isoorbi library
 library(isoorbi)
+
+# default chunk options
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 A basic data processing example
 
-```{r, message=FALSE, results='hide'}
-# Path to a test file included in the isoorbi pacakge
+# Load
+
+```{r}
+# path to a test file included in the isoorbi package
+# this file contains data from multiple analyses for the same compound
 file_path <- system.file(package = "isoorbi", "extdata", "testfile_flow.isox")
 
-# Read .isox test data
-df <- file_path |>  orbi_read_isox() 
+# load data
+df <- 
+  file_path |>  
+  # read .isox test data
+  orbi_read_isox() |>
+  # optionally: keep only most important columns; equivalent to simplify check box in IsoX
+  orbi_simplify_isox()
 
-# If there are multiple .isox files in your folder, you have to use the orbi_find_isox() function first
-# df <- "path_to_your_folder" |> 
-    # orbi_find_isox() |>
-    # orbi_read_isox()
+# If you wish to read a whole folder of files, you can use the orbi_find_isox() function
+# df <- "path_to_your_folder" |> orbi_find_isox() |> orbi_read_isox()
+```
 
-# Keep only most important columns; equivalent to simplify check box in IsoX
-df.simple <- df |> orbi_simplify_isox()
+# Check
 
-# Filter the data
-df.filtered <- df.simple |> 
-  orbi_filter_isox(
-    time_min = 0, 
-    time_max = 1, 
-    compounds = "HSO4-",
-    isotopocules = c("M0", "34S", "18O")
-  )
+Now that the data is loaded, check for satellite peaks, weak isotopocules and outliers.
 
-# Clean the data by removing noise and outliers
-df.clean <- df.filtered |> 
+```{r}
+# check for noise and outliers
+df_flagged <- df |> 
   orbi_flag_satellite_peaks() |> 
   orbi_flag_weak_isotopocules(min_percent = 2) |> 
-  orbi_flag_outliers(agc_window = c(1,99)) |>
-  orbi_filter_flagged_data()
+  orbi_flag_outliers(agc_fold_cutoff = 2)
+```
 
-# Define base peak and calculate the results table
-df.results <- df.clean |> 
+The info messages from these functions suggest that no data was flagged.
+
+# Calculate
+
+```{r}
+# define base peak and calculate the results table
+df_results <- 
+  df_flagged |> 
   orbi_define_basepeak(basepeak_def = "M0")|> 
   orbi_summarize_results(ratio_method = "sum")
 ```
+
+# Visualize
+
+```{r, fig.width=6, fig.height=4}
+# use a ggplot to plot the data
+library(ggplot2)
+df_results |>
+  ggplot() +
+  aes(
+    x = sprintf("%s/%s", isotopocule, basepeak),
+    y = ratio, ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
+    color = filename
+  ) +
+  geom_pointrange() +
+  scale_color_brewer(palette = "Set1") +
+  orbi_default_theme() +
+  labs(x = NULL, y = "ratio") +
+  facet_wrap(~compound)
+```
+
