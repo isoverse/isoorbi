@@ -82,7 +82,8 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE){
 #' @param x x-axis for the shot noise plot, either "time.min" or "n_effective_ions"
 #' @param color which column to use for the color aesthetic (must be a factor)
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
-#' @param permil_target highlight the t
+#' @param permil_target highlight the target permil in the shotnoise plot
+#' @return a ggplot object
 #' @export
 orbi_plot_shot_noise <- function(
     shotnoise,

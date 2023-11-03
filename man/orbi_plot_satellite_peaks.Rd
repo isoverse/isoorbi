@@ -33,6 +33,9 @@ orbi_plot_satellite_peaks(
 
 \item{color_scale}{use this parameter to replace the entire color scale rather than just the \code{colors}}
 }
+\value{
+a ggplot object
+}
 \description{
 Call this function any time after flagging the satellite peaks to see where they are. Use the \code{isotopocules} argument to focus on the specific isotopocules of interest.
 }

@@ -168,6 +168,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 #' @param y_scale_sci_labels whether to render numbers with scientific exponential notation
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
 #' @param color_scale use this parameter to replace the entire color scale rather than just the `colors`
+#' @return a ggplot object
 #' @export
 orbi_plot_satellite_peaks <- function(
     dataset, isotopocules = c(), x = c("scan.no", "time.min"), x_breaks = scales::breaks_pretty(5),
@@ -232,6 +233,7 @@ orbi_plot_satellite_peaks <- function(
 #' @param add_all_blocks add highlight for all blocks, not just data blocks (equivalent to the `data_only = FALSE` argument in `orbi_add_blocks_to_plot()`)
 #' @param show_outliers whether to highlight data previously flagged as outliers by `orbi_flag_outliers()`
 #' @inheritParams orbi_plot_satellite_peaks
+#' @return a ggplot object
 #' @export
 orbi_plot_raw_data <- function(
     dataset, isotopocules = c(), x = c("time.min", "scan.no"),  x_breaks = scales::breaks_pretty(5),
@@ -342,6 +344,7 @@ orbi_plot_raw_data <- function(
 #' @param dataset isox data
 #' @inheritParams orbi_plot_satellite_peaks
 #' @inheritParams orbi_plot_raw_data
+#' @return a ggplot object
 #' @export
 orbi_plot_isotopocule_coverage <- function(
     dataset, isotopocules = c(), x = c("scan.no", "time.min"), x_breaks = scales::breaks_pretty(5),

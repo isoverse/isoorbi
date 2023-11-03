@@ -23,6 +23,9 @@ orbi_plot_isotopocule_coverage(
 
 \item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{orbi_add_blocks_to_plot()}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 }
+\value{
+a ggplot object
+}
 \description{
 Weak isotopocules (if previously defined by \code{orbi_flag_weak_isotopocules()}) are highlighted in the \code{weak_isotopocules_color}.
 }

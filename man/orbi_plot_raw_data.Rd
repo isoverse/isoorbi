@@ -48,6 +48,9 @@ orbi_plot_raw_data(
 
 \item{show_outliers}{whether to highlight data previously flagged as outliers by \code{orbi_flag_outliers()}}
 }
+\value{
+a ggplot object
+}
 \description{
 Call this function to visualize orbitrap data vs. time or scan number. The most common uses are \code{orbi_plot_raw_data(y = intensity)}, \code{orbi_plot_raw_data(y = ratio)}, and \code{orbi_plot_raw_data(y = tic * it.ms)}. By default includes all isotopcules that have not been previously identified by \code{orbi_flag_weak_isotopcules()} (if already called on dataset). To narrow down the isotopocules to show, use the \code{isotopocule} parameter.
 }
