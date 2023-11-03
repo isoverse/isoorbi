@@ -21,6 +21,7 @@ Information functions:
 ## Enhancements
 
 * `orbi_simplify_isox()` now includes `intensity` by default and allows addition of user-specified columns
+* `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()` and `orbi_flag_outliers()` now provide additional information when no data is flagged and how to visualize what was flagged (if anything)
 
 ## Bug Fixes
 
@@ -39,7 +40,7 @@ There are no breaking changes in this release (all changes and new features are 
 * `orbi_find_isox()` added
 * `orbi_analyze_noise()` implemented
 * `orbi_plot_shot_noise()` implemented
-* `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()` and `orbi_flag_outliers()` together with `orbi_filter_flagged_data()` supersede `orbi_filter_satellite_peaks()`, `orbi_filter_weak_isotopocules()` and `orbi_filter_scan_intensity()`
+* `orbi_flag_satellite_peaks()`, `orbi_flag_weak_isotopocules()` and `orbi_flag_outliers()` supersede `orbi_filter_satellite_peaks()`, `orbi_filter_weak_isotopocules()` and `orbi_filter_scan_intensity()`
 * `orbi_export_data_to_excel()` implemented
 * `orbi_define_block_for_flow_injection()` implemented
 * `orbi_add_blocks_to_plot()` implemented
