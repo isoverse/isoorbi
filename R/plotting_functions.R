@@ -44,7 +44,7 @@ label_scientific_log <- function() {
 }
 
 # y axis as log, pseudo-log, or continuous
-dynamic_y_scale <- function(plot,  y_scale = c("none", "continuous", "pseudo-log", "log"), sci_labels = FALSE, breaks = scales::pretty_breaks(5)) {
+dynamic_y_scale <- function(plot,  y_scale = c("raw", "linear", "pseudo-log", "log"), sci_labels = FALSE, breaks = scales::pretty_breaks(5)) {
   y_scale <- arg_match(y_scale)
   labeler <- if(sci_labels) label_scientific_log() else identity
   if (y_scale == "log") {
@@ -56,7 +56,7 @@ dynamic_y_scale <- function(plot,  y_scale = c("none", "continuous", "pseudo-log
         breaks = breaks,
         labels = labeler
       )
-  } else if (y_scale == "continuous"){
+  } else if (y_scale == "linear"){
     plot <- plot +
       scale_y_continuous(labels = labeler)
   }
@@ -161,14 +161,15 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 #' @param dataset isox dataset with satellite peaks identified (`orbi_flag_satellite_peaks()`)
 #' @param isotopocules which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)
 #' @param x x-axis column for the plot, either "time.min" or "scan.no"
-#' @param y_scale what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "continuous" scale or "none" if you want to add a y scale to the plot manually instead
+#' @param x_breaks what breaks to use for the x axis, change to make more specifid tickmarks
+#' @param y_scale what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "linear" scale, or "raw" (if you want to add a y scale to the plot manually instead)
 #' @param y_scale_sci_labels whether to render numbers with scientific exponential notation
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
 #' @param color_scale use this parameter to replace the entire color scale rather than just the `colors`
 #' @export
 orbi_plot_satellite_peaks <- function(
-    dataset, isotopocules = c(), x = c("scan.no", "time.min"),
-    y_scale = c("log", "pseudo-log", "continuous", "none"), y_scale_sci_labels = TRUE,
+    dataset, isotopocules = c(), x = c("scan.no", "time.min"), x_breaks = scales::breaks_pretty(5),
+    y_scale = c("log", "pseudo-log", "linear", "raw"), y_scale_sci_labels = TRUE,
     colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"), 
     color_scale = scale_color_manual(values = colors)) {
 
@@ -204,6 +205,7 @@ orbi_plot_satellite_peaks <- function(
         dplyr::mutate(flagged = "satellite peaks"),
       map = aes(shape = .data$flagged)
     ) +
+    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
     ggplot2::scale_shape_manual(values = 17) +
     {{ color_scale }} +
     ggplot2::guides(
@@ -222,7 +224,7 @@ orbi_plot_satellite_peaks <- function(
 #' Call this function to visualize orbitrap data vs. time or scan number. The most common uses are `orbi_plot_raw_data(y = intensity)`, `orbi_plot_raw_data(y = ratio)`, and `orbi_plot_raw_data(y = tic * it.ms)`. By default includes all isotopcules that have not been previously identified by `orbi_flag_weak_isotopcules()` (if already called on dataset). To narrow down the isotopocules to show, use the `isotopocule` parameter.
 #'
 #' @param dataset isox dataset
-#' @param y expression for what to plot on the y-axis, e.g. `intensity` (all or specific isotopocules), `tic * it.ms` (pick one `isotopocules` as this is identical across the same scan), `ratio` (all or specific isotopocules, typically switch `y_scale` to "none), etc. The default is `intensity`.
+#' @param y expression for what to plot on the y-axis, e.g. `intensity`, `tic * it.ms` (pick one `isotopocules` as this is identical for different istopocules), `ratio`. Depending on the variable, you may want to adjust the `y_scale` and potentially `y_scale_sci_labels` argument.
 #' @param color expression for what to use for the color aesthetic, default is isotopocule
 #' @param add_data_blocks add highlight for data blocks if there are any block definitions in the dataset (uses `orbi_add_blocks_to_plot()`). To add blocks manually, set `add_data_blocks = FALSE` and manually call the `orbi_add_blocks_to_plot()` function afterwards.
 #' @param add_all_blocks add highlight for all blocks, not just data blocks (equivalent to the `data_only = FALSE` argument in `orbi_add_blocks_to_plot()`)
@@ -230,8 +232,8 @@ orbi_plot_satellite_peaks <- function(
 #' @inheritParams orbi_plot_satellite_peaks
 #' @export
 orbi_plot_raw_data <- function(
-    dataset, isotopocules = c(), x = c("time.min", "scan.no"), y = intensity,
-    y_scale = c("continuous", "log", "pseudo-log", "none"), y_scale_sci_labels = TRUE,
+    dataset, isotopocules = c(), x = c("time.min", "scan.no"),  x_breaks = scales::breaks_pretty(5),
+    y, y_scale = c("raw", "linear", "pseudo-log", "log"), y_scale_sci_labels = TRUE,
     color = isotopocule, 
     colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
     color_scale = scale_color_manual(values = colors),
@@ -243,6 +245,7 @@ orbi_plot_raw_data <- function(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`" =
       all(cols %in% names(dataset)),
+    "`y` has to be provided, can be any expression valid in the data frame, common examples include intensity, ratio, tic * it.ms" = !missing(y),
     "`isotopocules` has to be a character vector if provided" = length(isotopocules) == 0L || is_character(isotopocules)
   )
   x_column <- arg_match(x)
@@ -258,6 +261,10 @@ orbi_plot_raw_data <- function(
       filter_weak_isotopocules = length(isotopocules) == 0L,
       filter_outliers = FALSE)
 
+  # make sure a data group column is included
+  if (!"data_group" %in% names(plot_df))
+    plot_df <- plot_df |> dplyr::mutate(data_group = NA_integer_)
+  
   # check for outlier column
   if (!"is_outlier" %in% names(plot_df)) {
     plot_df$is_outlier <- FALSE
@@ -290,9 +297,11 @@ orbi_plot_raw_data <- function(
     # data
     ggplot2::geom_line(
       data = function(df) dplyr::filter(df, !.data$is_outlier),
-      alpha = if (show_outliers) 0.5 else 1.0
+      alpha = if (show_outliers) 0.5 else 1.0,
+      map = aes(group = paste(.data$data_group, .data$isotopocule))
     ) +
     {{ color_scale }} +
+    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
     orbi_default_theme()
   
   # scale and dynamic wrap
@@ -311,14 +320,14 @@ orbi_plot_raw_data <- function(
     plot <- plot + 
       ggplot2::geom_point(
         data = function(df) dplyr::filter(df, !!show_outliers & .data$is_outlier),
-        map = aes(shape = .data$outlier_type)
+        map = aes(shape = .data$outlier_type, group = paste(.data$data_group, .data$isotopocule))
       ) +
       # typicall only the first or sometimes first two will be used
       ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +
       ggplot2::guides(
         color = ggplot2::guide_legend(override.aes = list(shape = NA, fill = NA), order = 1)
       ) +
-      labs(shape = "flagged outliers")
+      ggplot2::labs(shape = "flagged outliers")
   }
  
   return(plot)
@@ -333,7 +342,7 @@ orbi_plot_raw_data <- function(
 #' @inheritParams orbi_plot_raw_data
 #' @export
 orbi_plot_isotopocule_coverage <- function(
-    dataset, isotopocules = c(), x = c("scan.no", "time.min"),
+    dataset, isotopocules = c(), x = c("scan.no", "time.min"), x_breaks = scales::breaks_pretty(5),
     add_data_blocks = TRUE) {
 
   # safety checks
@@ -453,13 +462,14 @@ orbi_plot_isotopocule_coverage <- function(
       data = isotopocule_coverage,
       map = aes(fill = "isotopocule detected")
     ) +
-    scale_y_reverse(
+    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
+    ggplot2::scale_y_reverse(
       breaks = seq_along(levels(isotopocule_coverage$isotopocule)),
-      labels = levels(isotopocule_coverage$isotopocule)
+      labels = levels(isotopocule_coverage$isotopocule),
+      expand = c(0, 0.2)
     ) +
     orbi_default_theme() +
-    coord_cartesian(expand = FALSE) +
-    labs(x = x_column, y = NULL)
+    ggplot2::labs(x = x_column, y = NULL)
 
   # blocks
   if ( add_data_blocks && has_blocks(dataset)) {

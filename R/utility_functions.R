@@ -310,13 +310,13 @@ orbi_flag_outliers <- function(dataset, agc_fold_cutoff = NA_real_, agc_window =
       "%s %% of scans with the lowest and above %s %% of scans with the highest number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
       agc_window[1], agc_window[2]
     )
-    method_type <- sprintf("agc window (%s to %s %%)", agc_window[1], agc_window[2])
+    method_type <- sprintf("AGC window (%s to %s %%)", agc_window[1], agc_window[2])
   } else if (method == "agc_fold_cutoff") {
     method_msg <- sprintf(
       "scans below 1/%s and above %s times the average number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
       agc_fold_cutoff, agc_fold_cutoff
     )
-    method_type <- sprintf("%s fold agc cutoff", agc_fold_cutoff)
+    method_type <- sprintf("%s fold AGC cutoff", agc_fold_cutoff)
   }
   
   # optional groupings
