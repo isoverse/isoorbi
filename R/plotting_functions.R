@@ -48,7 +48,9 @@ dynamic_y_scale <- function(plot,  y_scale = c("raw", "linear", "pseudo-log", "l
   y_scale <- arg_match(y_scale)
   labeler <- if(sci_labels) label_scientific_log() else identity
   if (y_scale == "log") {
-    plot <- plot + ggplot2::scale_y_log10(label = labeler)
+    plot <- plot + 
+      ggplot2::scale_y_log10(label = labeler) +
+      ggplot2::annotation_logticks(sides = "l")
   } else if (y_scale == "pseudo-log") {
     plot <- plot +
       scale_y_continuous(

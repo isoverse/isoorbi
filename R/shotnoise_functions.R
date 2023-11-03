@@ -147,23 +147,12 @@ orbi_plot_shot_noise <- function(
     ggplot2::scale_color_manual(values = colors) +
     ggplot2::scale_shape_manual(values = c(21:25, 15:18)) +
     ggplot2::scale_linetype_manual(values = rep(1, 8)) +
-    #expand_limits(y = c(0.1, 10)) +
-    # FIXME: include filename only if there is more than one file
-    ggplot2::theme_bw() +
+    orbi_default_theme() +
     ggplot2::theme(
-      text = ggplot2::element_text(size = 16),
-      strip.text = ggplot2::element_text(size = 20),
-      panel.grid = ggplot2::element_blank(),
-      #panel.border = ggplot2::element_blank(), # MAYBE
-      panel.background = ggplot2::element_blank(),
-      plot.background = ggplot2::element_blank(),
-      #axis.line.y.left = ggplot2::element_line(), # MAYBE
-      #axis.line.x.bottom = ggplot2::element_line(), # MAYBE
       strip.background = ggplot2::element_blank(),
       legend.position = "bottom",
       legend.direction = "vertical",
-      legend.title.align = 0.5,
-      legend.background = ggplot2::element_blank()
+      legend.title.align = 0.5
     ) +
     ggplot2::labs(
       y = "relative error",
@@ -176,15 +165,7 @@ orbi_plot_shot_noise <- function(
     )
 
   # wrap
-  n_files <- length(levels(plot_df$filename))
-  n_compounds <- length(levels(plot_df$compound))
-  if (n_files > 1L && n_compounds > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~filename + compound)
-  } else if (n_compounds > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~compound)
-  } else if (n_files > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~filename)
-  }
+  plot <- plot |> dynamic_wrap()
 
   # plots vs. time
   if (x_column == "time.min") {
