@@ -8,7 +8,8 @@ orbi_plot_satellite_peaks(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
-  y_scale = c("log", "pseudo-log", "continuous", "none"),
+  x_breaks = scales::breaks_pretty(5),
+  y_scale = c("log", "pseudo-log", "linear", "raw"),
   y_scale_sci_labels = TRUE,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
     "#666666"),
@@ -22,7 +23,9 @@ orbi_plot_satellite_peaks(
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
 
-\item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "continuous" scale or "none" if you want to add a y scale to the plot manually instead}
+\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
+
+\item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "linear" scale, or "raw" (if you want to add a y scale to the plot manually instead)}
 
 \item{y_scale_sci_labels}{whether to render numbers with scientific exponential notation}
 

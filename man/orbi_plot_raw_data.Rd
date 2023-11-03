@@ -8,8 +8,9 @@ orbi_plot_raw_data(
   dataset,
   isotopocules = c(),
   x = c("time.min", "scan.no"),
-  y = intensity,
-  y_scale = c("continuous", "log", "pseudo-log", "none"),
+  x_breaks = scales::breaks_pretty(5),
+  y,
+  y_scale = c("raw", "linear", "pseudo-log", "log"),
   y_scale_sci_labels = TRUE,
   color = isotopocule,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
@@ -27,9 +28,11 @@ orbi_plot_raw_data(
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
 
-\item{y}{expression for what to plot on the y-axis, e.g. \code{intensity} (all or specific isotopocules), \code{tic * it.ms} (pick one \code{isotopocules} as this is identical across the same scan), \code{ratio} (all or specific isotopocules, typically switch \code{y_scale} to "none), etc. The default is \code{intensity}.}
+\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
 
-\item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "continuous" scale or "none" if you want to add a y scale to the plot manually instead}
+\item{y}{expression for what to plot on the y-axis, e.g. \code{intensity}, \code{tic * it.ms} (pick one \code{isotopocules} as this is identical for different istopocules), \code{ratio}. Depending on the variable, you may want to adjust the \code{y_scale} and potentially \code{y_scale_sci_labels} argument.}
+
+\item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "linear" scale, or "raw" (if you want to add a y scale to the plot manually instead)}
 
 \item{y_scale_sci_labels}{whether to render numbers with scientific exponential notation}
 

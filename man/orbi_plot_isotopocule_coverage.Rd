@@ -8,6 +8,7 @@ orbi_plot_isotopocule_coverage(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
+  x_breaks = scales::breaks_pretty(5),
   add_data_blocks = TRUE
 )
 }
@@ -17,6 +18,8 @@ orbi_plot_isotopocule_coverage(
 \item{isotopocules}{which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)}
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
+
+\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
 
 \item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{orbi_add_blocks_to_plot()}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 }
