@@ -298,7 +298,7 @@ orbi_plot_raw_data <- function(
     ggplot2::geom_line(
       data = function(df) dplyr::filter(df, !.data$is_outlier),
       alpha = if (show_outliers) 0.5 else 1.0,
-      map = aes(group = paste(.data$data_group, .data$isotopocule))
+      map = aes(group = paste(.data$filename, .data$compound, .data$isotopocule, .data$data_group, .data$isotopocule))
     ) +
     {{ color_scale }} +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
@@ -320,7 +320,7 @@ orbi_plot_raw_data <- function(
     plot <- plot + 
       ggplot2::geom_point(
         data = function(df) dplyr::filter(df, !!show_outliers & .data$is_outlier),
-        map = aes(shape = .data$outlier_type, group = paste(.data$data_group, .data$isotopocule))
+        map = aes(shape = .data$outlier_type)
       ) +
       # typicall only the first or sometimes first two will be used
       ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +
