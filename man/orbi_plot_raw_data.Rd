@@ -7,7 +7,7 @@
 orbi_plot_raw_data(
   dataset,
   isotopocules = c(),
-  x = c("scan.no", "time.min"),
+  x = c("time.min", "scan.no"),
   y = intensity,
   y_scale = c("continuous", "log", "pseudo-log", "none"),
   y_scale_sci_labels = TRUE,

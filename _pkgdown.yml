@@ -53,7 +53,7 @@ reference:
   - orbi_flag_outliers
   - orbi_flag_satellite_peaks
   - orbi_flag_weak_isotopocules
-  - orbi_calculate_isotopocule_coverage
+  - orbi_get_isotopocule_coverage
 
 - title: Visualize data
   desc: >
