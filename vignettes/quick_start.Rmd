@@ -31,9 +31,9 @@ file_path <- system.file(package = "isoorbi", "extdata", "testfile_flow.isox")
 # load data
 df <- 
   file_path |>  
-  # read .isox test data
+  # reads .isox test data
   orbi_read_isox() |>
-  # optionally: keep only most important columns; equivalent to simplify check box in IsoX
+  # optionally: keeps only most important columns; equivalent to simplify check box in IsoX
   orbi_simplify_isox()
 
 # If you wish to read a whole folder of files, you can use the orbi_find_isox() function
@@ -47,9 +47,9 @@ Now that the data is loaded, check for satellite peaks, weak isotopocules and ou
 ```{r}
 # check for noise and outliers
 df_flagged <- df |> 
-  orbi_flag_satellite_peaks() |> 
-  orbi_flag_weak_isotopocules(min_percent = 2) |> 
-  orbi_flag_outliers(agc_fold_cutoff = 2)
+  orbi_flag_satellite_peaks() |> # removes minor signals that were reported by IsoX in the same tolerance window where the peak of interest is
+  orbi_flag_weak_isotopocules(min_percent = 2) |> # removes signals of isotopocules that were not detected at least in min_percent scans
+  orbi_flag_outliers(agc_fold_cutoff = 2) # removes outlying scans that have more than 2 times or less than 1/2 times the average number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)
 ```
 
 The info messages from these functions suggest that no data was flagged.
@@ -60,8 +60,8 @@ The info messages from these functions suggest that no data was flagged.
 # define base peak and calculate the results table
 df_results <- 
   df_flagged |> 
-  orbi_define_basepeak(basepeak_def = "M0")|> 
-  orbi_summarize_results(ratio_method = "sum")
+  orbi_define_basepeak(basepeak_def = "M0")|> # sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation
+  orbi_summarize_results(ratio_method = "sum") # calculates ratios and generates a results table
 ```
 
 # Visualize
