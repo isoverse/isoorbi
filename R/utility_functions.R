@@ -205,7 +205,7 @@ orbi_flag_weak_isotopocules <-
     dataset <- dataset |> factorize_dataset("isotopocule")
 
     # groupings if they exist
-    dataset_out <- dataset |> group_if_exists(c("filename", "block", "segment", "injection"), add = TRUE)
+    dataset_out <- dataset |> group_if_exists(c("filename", "compound", "block", "segment", "injection"), add = TRUE)
 
     # info
     start_time <-
