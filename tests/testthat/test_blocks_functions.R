@@ -339,8 +339,17 @@ test_that("test orbi_get_blocks_info()", {
 test_that("test orbi_add_blocks_to_plot()", {
 
   # type checks
-  expect_error(orbi_add_blocks_to_plot(), "argument \"plot\" is missing, with no default", fixed = TRUE)
-  expect_error(orbi_add_blocks_to_plot(42), "$ operator is invalid for atomic vectors", fixed = TRUE)
+  expect_error(orbi_add_blocks_to_plot(), "`plot` has to be a ggplot", fixed = TRUE)
+  expect_error(orbi_add_blocks_to_plot(42), "`plot` has to be a ggplot", fixed = TRUE)
+  
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
+    orbi_simplify_isox() |> orbi_define_blocks_for_dual_inlet(ref_block_time.min = 0.5, change_over_time.min = 0.1)
+  
+  library(ggplot2)
+  
+  fig <- orbi_plot_raw_data(df, y = "ratio")
+  
+  suppressMessages(expect_type(orbi_add_blocks_to_plot(fig), "list"))
 
 })
 

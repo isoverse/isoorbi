@@ -143,7 +143,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       .by = c("filename", "compound", "isotopocule")
     ) |>
     # summarize
-    tidyr::nest(data = c(.data$scan.no, .data$time.min, .data$ions.incremental)) |>
+    tidyr::nest(data = c(scan.no, time.min, ions.incremental)) |>
     dplyr::mutate(
       n_points = map_int(.data$data, nrow),
       start_scan.no = map_dbl(.data$data, ~.x$scan.no[1]),
@@ -274,7 +274,7 @@ orbi_plot_raw_data <- function(
     plot_df$is_outlier <- FALSE
     plot_df$outlier_type <- NA_character_
   } else if ("is_outlier" %in% names(plot_df) && show_outliers && !"outlier_type" %in% names(plot_df)) {
-    abort("trying to highlight outliers based on`is_outlier` column but `outlier_type` column is missing")
+    abort("trying to highlight outliers based on `is_outlier` column but `outlier_type` column is missing")
   }
   show_outliers <- show_outliers && any(plot_df$is_outlier)
   

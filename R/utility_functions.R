@@ -117,10 +117,10 @@ orbi_filter_satellite_peaks <- function(...) {
 orbi_flag_satellite_peaks <- function(dataset) {
 
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  cols <- c("filepath", "filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
+    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
       all(cols %in% names(dataset))
   )
 
@@ -192,10 +192,10 @@ orbi_flag_weak_isotopocules <-
   function(dataset, min_percent) {
 
     # safety checks
-    cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+    cols <- c("filepath", "filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
     stopifnot(
       "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-      "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
+      "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
         all(cols %in% names(dataset)),
       "`min_percent` needs to be a single number" = !missing(min_percent) && is.numeric(min_percent) && length(min_percent) == 1L,
       "`min_percent` needs to be between 0 and 90" = min_percent >= 0 && min_percent <= 90
