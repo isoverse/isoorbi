@@ -206,7 +206,7 @@ orbi_plot_satellite_peaks <- function(
     ggplot2::geom_point(
       data = function(df) dplyr::filter(df, .data$is_satellite_peak) |>
         dplyr::mutate(flagged = "satellite peaks"),
-      map = aes(shape = .data$flagged)
+      map = ggplot2::aes(shape = .data$flagged)
     ) +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
     ggplot2::scale_shape_manual(values = 17) +
@@ -241,7 +241,8 @@ orbi_plot_raw_data <- function(
     color = isotopocule, 
     colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
     color_scale = scale_color_manual(values = colors),
-    add_data_blocks = TRUE, add_all_blocks = FALSE, show_outliers = TRUE) {
+    add_data_blocks = TRUE, add_all_blocks = FALSE, 
+    show_outliers = TRUE) {
 
   # safety checks
   cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule")
@@ -259,7 +260,7 @@ orbi_plot_raw_data <- function(
   plot_df <- dataset |>
     factorize_dataset(c("filename", "compound", "isotopocule")) |>
     filter_isotopocules(isotopocules) |>
-    # filter out satellite peaks and weak isotopocules (if istopocules = c())
+    # filter out satellite peaks and weak isotopocules (if isotopocules = c())
     filter_flagged_data(
       filter_satellite_peaks = TRUE,
       filter_weak_isotopocules = length(isotopocules) == 0L,
@@ -302,7 +303,7 @@ orbi_plot_raw_data <- function(
     ggplot2::geom_line(
       data = function(df) dplyr::filter(df, !.data$is_outlier),
       alpha = if (show_outliers) 0.5 else 1.0,
-      map = aes(group = paste(.data$filename, .data$compound, .data$isotopocule, .data$data_group, .data$isotopocule))
+      map = ggplot2::aes(group = paste(.data$filename, .data$compound, .data$isotopocule, .data$data_group, .data$isotopocule))
     ) +
     {{ color_scale }} +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
@@ -447,7 +448,7 @@ orbi_plot_isotopocule_coverage <- function(
     # scan outlines
     ggplot2::geom_rect(
       data = scan_outlines,
-      map = aes(fill = "not detected"),
+      map = ggplot2::aes(fill = "not detected"),
       color = "black"
     )
 
@@ -456,7 +457,7 @@ orbi_plot_isotopocule_coverage <- function(
     plot <- plot +
       ggplot2::geom_rect(
         data = group_outlines |> filter(.data$is_weak_isotopocule),
-        map = aes(fill = "was flagged as weak"), color = NA_character_
+        map = ggplot2::aes(fill = "was flagged as weak"), color = NA_character_
       )
   }
 
@@ -465,7 +466,7 @@ orbi_plot_isotopocule_coverage <- function(
     # data
     ggplot2::geom_rect(
       data = isotopocule_coverage,
-      map = aes(fill = "isotopocule detected")
+      map = ggplot2::aes(fill = "isotopocule detected")
     ) +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
     ggplot2::scale_y_reverse(
