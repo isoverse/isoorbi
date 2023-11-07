@@ -19,6 +19,8 @@ navbar:
     href: articles/shot_noise.html
   - text: Dual Inlet
     href: articles/dual_inlet.html
+  - text: Flow Injection
+    href: articles/flow_injection.html
   - text: IsoXL demo GUI
     href: articles/isoxl_demo.html
   - text: Reference

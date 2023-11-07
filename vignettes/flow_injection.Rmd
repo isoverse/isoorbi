@@ -1,0 +1,115 @@
+---
+title: "Flow Injection"
+description: >
+  An example for flow-injection analysis.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Flow Injection}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| message: false
+# load libraries
+library(isoorbi) # for Orbitrap functions
+library(dplyr) # for data wrangling
+library(stringr) # for extracting text information
+library(ggplot2) # for data visualization
+
+# default chunk options
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+# Data
+
+## Load data
+
+```{r}
+# load and process data
+data <- 
+  # load file included in isoorbi package
+  system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
+  orbi_read_isox() |>
+  orbi_simplify_isox() |>
+  # define data block where signal is stable (plateau)
+  orbi_define_block_for_flow_injection(start_time.min = 0.1, end_time.min = 0.9) |>
+  # flag extreme TICxIT values
+  orbi_flag_outliers(agc_fold_cutoff = 2)
+```
+
+# Calculations
+
+## Ratios
+
+```{r}
+# basepeak & ratios
+data_w_basepeak <- 
+  data |>
+  orbi_define_basepeak("M0")
+
+# ratio summaries
+data_summary <- 
+  data_w_basepeak |>
+  orbi_summarize_results(ratio_method = "sum")
+
+```
+
+# Figures
+
+## Visualize data
+
+```{r}
+#| label: fig-raw-data
+#| fig-cap: Ions of isotopocules in time
+#| fig-width: 6
+#| fig-height: 4
+#| warning: false
+orbi_plot_raw_data(data, y = ions.incremental, y_scale = "log")
+```
+
+## Raw ratios
+
+```{r}
+#| label: fig-ratios
+#| fig-cap: Isotopocule ratios vs M0
+#| fig-width: 6
+#| fig-height: 4
+#| warning: false
+data_w_basepeak |> orbi_plot_raw_data(y = ratio) 
+```
+
+## Ratios for 18O
+
+```{r}
+#| label: fig-ratios-18O
+#| fig-cap: Isotopocule ratios 18O vs M0
+#| fig-width: 6
+#| fig-height: 4
+
+fig <- 
+  data_summary |>
+  filter(isotopocule == "18O") |>
+  # plot
+  ggplot() +
+  aes(
+    x = filename,
+    y = ratio, ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
+    color = filename, shape = filename
+  ) +
+  geom_pointrange() +
+  scale_color_brewer(palette = "Dark2") +
+  # theme definitions
+  theme_bw() +
+  theme(
+    text = element_text(size = 16),
+    panel.grid = element_blank()
+  ) +
+  # labels
+  labs(
+    y = expression("ratio ("^18*O/M0*")")
+  )
+fig
+```
