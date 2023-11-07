@@ -23,7 +23,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 # Model Peptide (MRFA)
 
-This is an example for shot noise analysis from [Kantnerová et al. (2023)](https://github.com/isoverse/2023_kantnerova_et_al).
+This is an example for shot-noise analysis from [Kantnerová et al. (2023)](https://github.com/isoverse/2023_kantnerova_et_al).
 
 # Data
 
