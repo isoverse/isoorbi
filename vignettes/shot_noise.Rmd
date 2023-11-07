@@ -14,7 +14,7 @@ editor_options:
 ```{r}
 #| message: false
 # load libraries
-library(isoorbi) # for orbitrap functions
+library(isoorbi) # for Orbitrap functions
 library(dplyr) # for data wrangling
 
 # default chunk options
@@ -32,12 +32,12 @@ This is an example for shot noise analysis from [Kantnerová et al. (2023)](http
 ```{r}
 # load and process data
 data <- 
-  # load file included in isorobi package
+  # load file included in isoorbi package
   system.file(package = "isoorbi", "extdata", "testfile_shotnoise.isox") |>
   orbi_read_isox() |>
   # check data for satellite peaks
   orbi_flag_satellite_peaks() |>
-  # make sure isotopcules are present in (almost) all scans, otherwise
+  # make sure isotopocules are present in (almost) all scans, otherwise
   # shot noise analyses can be inaccurate
   orbi_flag_weak_isotopocules(min_percent = 90) |> 
   # see if there are any AGC outliers
@@ -48,7 +48,7 @@ This indicates that there were a few satellite peaks and weak isotopocules but n
 
 ## Visualize isotopocule coverage
 
-Show the isotopocule coverage for the different amino acids, thus higlhighting which isotopocules were detected in which scans. Note that 2H was highlighted as weak for Alanine, Arginine, and Phenylalanine. This is because of the high cutuff (90%) in `orbi_flag_weak_isotopocules()` which is appropriate for shot noise analyses but simply for inspecting ratios it would be reasonable to examine the 2H signal at least for Alanine.
+Show the isotopocule coverage for the different amino acids, thus highlighting which isotopocules were detected in which scans. Note that 2H was highlighted as weak for Alanine, Arginine, and Phenylalanine. This is because of the high cutoff (90%) in `orbi_flag_weak_isotopocules()` which is appropriate for shot-noise analyses but simply for inspecting ratios it would be reasonable to examine the 2H signal at least for Alanine.
 
 ```{r}
 #| label: fig-mrfa-isotopocule-coverage
@@ -72,7 +72,7 @@ Show peaks that were flagged as satellite peaks.
 data |> orbi_plot_satellite_peaks()
 ```
 
-## Visualize intensity vs. time
+## Visualize intensity vs time
 
 ```{r}
 #| label: fig-mrfa-intensity
@@ -98,12 +98,12 @@ data_w_bp <-
   data |>
   orbi_define_basepeak("M0")
 
-# calculate shotnoise
+# calculate shot noise
 shot_noise <-
   data_w_bp |>
   orbi_analyze_shot_noise()
 
-# export shot noise to excel file
+# export shot noise to an Excel file
 shot_noise |>
   orbi_export_data_to_excel("shot_noise.xlsx") 
 ```
@@ -116,7 +116,7 @@ unlink("shot_noise.xlsx")
 ## Table
 
 ```{r}
-# example of first few rows of the shotnoise calculations
+# example of the first few rows of the shot-noise calculations
 shot_noise |>
   arrange(compound, isotopocule, scan.no) |>
   select(compound, scan.no, time.min, isotopocule,
@@ -126,11 +126,11 @@ shot_noise |>
 ```
 
 
-## Visualize ratios vs. time
+## Visualize ratios vs time
 
 ```{r}
 #| label: fig-mrfa-ratios
-#| fig-cap: Isotopocule ratios vs. M0
+#| fig-cap: Isotopocule ratios vs M0
 #| fig-width: 8
 #| fig-height: 7
 #| warning: false
