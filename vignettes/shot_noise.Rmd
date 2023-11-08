@@ -11,14 +11,16 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+```{r, include=FALSE}
+# default chunk options
+knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>")
+```
+
 ```{r}
-#| message: false
 # load libraries
 library(isoorbi) # for Orbitrap functions
 library(dplyr) # for data wrangling
-
-# default chunk options
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 # Model Peptide (MRFA)

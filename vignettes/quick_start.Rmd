@@ -11,12 +11,15 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r, include=FALSE}
+# default chunk options
+knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>")
+```
+
+
 ```{r}
 # load isoorbi library
 library(isoorbi)
-
-# default chunk options
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 A basic data processing example

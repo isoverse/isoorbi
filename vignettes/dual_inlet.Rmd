@@ -11,15 +11,18 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+```{r, include=FALSE}
+# default chunk options
+knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>")
+```
+
 ```{r, message=FALSE}
 # libraries
 library(isoorbi) #load isoorbi R package
 library(forcats) #better ordering of factor variables in plots
 library(dplyr) # for mutating data frames
 library(ggplot2) # for data visualization
-
-# default chunk options
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 # A basic data processing example
