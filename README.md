@@ -46,27 +46,11 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
   orbi_define_basepeak(basepeak_def = "M0")|> 
   orbi_summarize_results(ratio_method = "sum") |>
   orbi_export_data_to_excel(file = "data_summary.xlsx")
-#> orbi_read_isox() is loading .isox data from 1 file(s)...
-#> - loaded 6449 peaks for 1 compounds (HSO4-) with 5 isotopocules (M0, 33S,
-#>    17O, 34S, 18O) from testfile_flow.isox in 0.22 seconds.
-#> orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)...
-#>    ...confirmed there are no satellite peaks in 0.20 seconds.
-#> orbi_define_basepeak() is setting the 'M0' isotopocule as the ratio
-#>    denominator...
-#>    ...set base peak and calculated 5159 ratios for 4 isotopocules/base peak
-#>    (33S, 17O, 34S, 18O) in 0.11 seconds.
-#> orbi_summarize_results() is grouping the data by 'filename', 'compound',
-#>    'basepeak', 'isotopocule' and summarizing ratios from 5159 peaks (excluded
-#>    0 flagged peaks; excluded 0 unused peaks) using the 'sum' method...
-#>    ...completed in 0.02 seconds.
-#> orbi_export_data_to_excel() is exporting data set with 12 rows and 15 columns
-#>    to data_summary.xlsx...
-#>    ...completed in 0.25 seconds.
 ```
 
 ## Package layout
 
-![](man/figures/figure_flowchart.png)
+<img src="man/figures/figure_flowchart.png" style="width:50.0%" />
 
 ## Getting help
 

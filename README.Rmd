@@ -10,7 +10,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  dpi = 300
+  dpi = 300,
+  message = FALSE
 )
 ```
 
@@ -35,7 +36,7 @@ You can install the current CRAN version of `isoorbi` with:
 install.packages("isoorbi")
 ```
 
-To get a bug fix or to use the latest features, you can install the latest development version of `isoorbi` from [GitHub](https://github.com/) with:
+To use the latest updates, you can install the development version of `isoorbi` from [GitHub](https://github.com/) with:
 
 ```{r, eval = FALSE}
 if(!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
@@ -62,7 +63,7 @@ unlink("data_summary.xlsx")
 
 ## Package layout
 
-![](figure_flowchart.png)
+![](man/figures/figure_flowchart.png){width=50%}
 
 ## Getting help
 
