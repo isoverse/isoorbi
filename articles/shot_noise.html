@@ -99,10 +99,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/isoverse/isoorbi" class="external-link">isoorbi</a></span><span class="op">)</span> <span class="co"># for Orbitrap functions</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span> <span class="co"># for data wrangling</span></span>
-<span></span>
-<span><span class="co"># default chunk options</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span> <span class="co"># for data wrangling</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="model-peptide-mrfa">Model Peptide (MRFA)<a class="anchor" aria-label="anchor" href="#model-peptide-mrfa"></a>
 </h2>
@@ -127,23 +124,7 @@ al. (2023)</a>.</p>
 <span>  <span class="co"># shot noise analyses can be inaccurate</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">90</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># see if there are any AGC outliers</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; orbi_read_isox() is loading .isox data from 1 file(s)...</span></span>
-<span><span class="co">#&gt; - loaded 1931 peaks for 4 compounds (Alanine, Arginine, Methionine,</span></span>
-<span><span class="co">#&gt;    Phenylalanine) with 6 isotopocules (M0, 15N, 13C, 2H, 33S, 34S) from</span></span>
-<span><span class="co">#&gt;    testfile_shotnoise.isox in 0.23 seconds.</span></span>
-<span><span class="co">#&gt; orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)...</span></span>
-<span><span class="co">#&gt;    ...flagged 33/1931 peaks in 3 isotopocules ("M0", "15N", "13C") as</span></span>
-<span><span class="co">#&gt;    satellite peaks (1.7%) in 0.10 seconds.</span></span>
-<span><span class="co">#&gt; orbi_flag_weak_isotopocules() is flagging isotopocules from data that are</span></span>
-<span><span class="co">#&gt;    detected in less than 90% of scans in 4 data group(s) (based on</span></span>
-<span><span class="co">#&gt;    'filename', 'compound')...</span></span>
-<span><span class="co">#&gt;    ...flagged 3/18 isotopocules across all data groups (use</span></span>
-<span><span class="co">#&gt;    `orbi_plot_isotopocule_coverage()` to visualize them) in 0.06 seconds.</span></span>
-<span><span class="co">#&gt; orbi_flag_outliers() is flagging the scans below 1/2 and above 2 times the</span></span>
-<span><span class="co">#&gt;    average number of ions (`tic` * `it.ms`) in the Orbitrap analyzer in 1</span></span>
-<span><span class="co">#&gt;    data group(s) (based on 'filename')...</span></span>
-<span><span class="co">#&gt;    ...confirmed there are no outliers based on this method in 0.05 seconds.</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p>This indicates that there were a few satellite peaks and weak
 isotopocules but no outliers.</p>
 </div>
@@ -204,25 +185,15 @@ Isotopocule intensity for M0 ion
 <span><span class="va">data_w_bp</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; orbi_define_basepeak() is setting the 'M0' isotopocule as the ratio</span></span>
-<span><span class="co">#&gt;    denominator...</span></span>
-<span><span class="co">#&gt;    ...set base peak and calculated 1458 ratios for 5 isotopocules/base peak</span></span>
-<span><span class="co">#&gt;    (15N, 13C, 2H, 33S, 34S) in 0.05 seconds.</span></span>
 <span></span>
 <span><span class="co"># calculate shot noise</span></span>
 <span><span class="va">shot_noise</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">data_w_bp</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_analyze_shot_noise.html">orbi_analyze_shot_noise</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; orbi_analyze_shot_noise() is analyzing the shot noise for 1254 peaks</span></span>
-<span><span class="co">#&gt;    (excluded 204 flagged peaks)...</span></span>
-<span><span class="co">#&gt;    ...calculations finished in 0.03 seconds.</span></span>
 <span></span>
 <span><span class="co"># export shot noise to an Excel file</span></span>
 <span><span class="va">shot_noise</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel</a></span><span class="op">(</span><span class="st">"shot_noise.xlsx"</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; orbi_export_data_to_excel() is exporting data set with 1254 rows and 33</span></span>
-<span><span class="co">#&gt;    columns to shot_noise.xlsx...</span></span>
-<span><span class="co">#&gt;    ...completed in 0.51 seconds.</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel</a></span><span class="op">(</span><span class="st">"shot_noise.xlsx"</span><span class="op">)</span> </span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="table">Table<a class="anchor" aria-label="anchor" href="#table"></a>
