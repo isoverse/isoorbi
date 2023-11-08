@@ -3,9 +3,11 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   dual_inlet: dual_inlet.html
+  flow_injection: flow_injection.html
   isoxl_demo: isoxl_demo.html
   quick_start: quick_start.html
-last_built: 2023-10-28T00:24Z
+  shot_noise: shot_noise.html
+last_built: 2023-11-08T02:02Z
 urls:
   reference: https://isoorbi.isoverse.org/reference
   article: https://isoorbi.isoverse.org/articles

@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,13 @@
   <a class="nav-link" href="../articles/quick_start.html">Quick Start</a>
 </li>
 <li class="nav-item">
+  <a class="nav-link" href="../articles/shot_noise.html">Shot Noise</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="../articles/dual_inlet.html">Dual Inlet</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../articles/flow_injection.html">Flow Injection</a>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../articles/isoxl_demo.html">IsoXL demo GUI</a>
@@ -92,44 +98,101 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load isoorbi library</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/isoverse/isoorbi" class="external-link">isoorbi</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/isoverse/isoorbi" class="external-link">isoorbi</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># default chunk options</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span><span class="op">)</span></span></code></pre></div>
 <p>A basic data processing example</p>
+<div class="section level2">
+<h2 id="load">Load<a class="anchor" aria-label="anchor" href="#load"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Path to a test file included in the isoorbi pacakge</span></span>
+<code class="sourceCode R"><span><span class="co"># path to a test file included in the isoorbi package</span></span>
+<span><span class="co"># this file contains data from multiple analyses for the same compound</span></span>
 <span><span class="va">file_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"isoorbi"</span>, <span class="st">"extdata"</span>, <span class="st">"testfile_flow.isox"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read .isox test data</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">file_path</span> <span class="op">|&gt;</span>  <span class="fu"><a href="../reference/orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span><span class="co"># load data</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">file_path</span> <span class="op">|&gt;</span>  </span>
+<span>  <span class="co"># reads .isox test data</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># optionally: keeps only most important columns; equivalent to simplify check box in IsoX</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; orbi_read_isox() is loading .isox data from 1 file(s)...</span></span>
+<span><span class="co">#&gt; - loaded 6449 peaks for 1 compounds (HSO4-) with 5 isotopocules (M0, 33S,</span></span>
+<span><span class="co">#&gt;    17O, 34S, 18O) from testfile_flow.isox in 0.24 seconds.</span></span>
+<span><span class="co">#&gt; orbi_simplify_isox() will keep only columns 'filepath', 'filename',</span></span>
+<span><span class="co">#&gt;    'scan.no', 'time.min', 'compound', 'isotopocule', 'ions.incremental',</span></span>
+<span><span class="co">#&gt;    'tic', 'it.ms'...</span></span>
+<span><span class="co">#&gt;    ...complete in 0.01 seconds.</span></span>
 <span></span>
-<span><span class="co"># If there are multiple .isox files in your folder, you have to use the orbi_find_isox() function first</span></span>
-<span><span class="co"># df &lt;- "path_to_your_folder" |&gt; </span></span>
-<span>    <span class="co"># orbi_find_isox() |&gt;</span></span>
-<span>    <span class="co"># orbi_read_isox()</span></span>
-<span></span>
-<span><span class="co"># Keep only most important columns; equivalent to simplify check box in IsoX</span></span>
-<span><span class="va">df.simple</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Filter the data</span></span>
-<span><span class="va">df.filtered</span> <span class="op">&lt;-</span> <span class="va">df.simple</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_filter_isox.html">orbi_filter_isox</a></span><span class="op">(</span></span>
-<span>    time_min <span class="op">=</span> <span class="fl">0</span>, </span>
-<span>    time_max <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>    compounds <span class="op">=</span> <span class="st">"HSO4-"</span>,</span>
-<span>    isotopocules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M0"</span>, <span class="st">"34S"</span>, <span class="st">"18O"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Clean the data by removing noise and outliers</span></span>
-<span><span class="va">df.clean</span> <span class="op">&lt;-</span> <span class="va">df.filtered</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">99</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_filter_flagged_data.html">orbi_filter_flagged_data</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Define base peak and calculate the results table</span></span>
-<span><span class="va">df.results</span> <span class="op">&lt;-</span> <span class="va">df.clean</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span><span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></code></pre></div>
-  </main>
+<span><span class="co"># If you wish to read a whole folder of files, you can use the orbi_find_isox() function</span></span>
+<span><span class="co"># df &lt;- "path_to_your_folder" |&gt; orbi_find_isox() |&gt; orbi_read_isox()</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="check">Check<a class="anchor" aria-label="anchor" href="#check"></a>
+</h2>
+<p>Now that the data is loaded, check for satellite peaks, weak
+isotopocules and outliers.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># check for noise and outliers</span></span>
+<span><span class="va">df_flagged</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># removes minor signals that were reported by IsoX in the same tolerance window where the peak of interest is</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># removes signals of isotopocules that were not detected at least in min_percent scans</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># removes outlying scans that have more than 2 times or less than 1/2 times the average number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)</span></span>
+<span><span class="co">#&gt; orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)...</span></span>
+<span><span class="co">#&gt;    ...confirmed there are no satellite peaks in 0.27 seconds.</span></span>
+<span><span class="co">#&gt; orbi_flag_weak_isotopocules() is flagging isotopocules from data that are</span></span>
+<span><span class="co">#&gt;    detected in less than 2% of scans in 3 data group(s) (based on 'filename',</span></span>
+<span><span class="co">#&gt;    'compound')...</span></span>
+<span><span class="co">#&gt;    ...confirmed there are no weak isotopocules in 0.09 seconds.</span></span>
+<span><span class="co">#&gt; orbi_flag_outliers() is flagging the scans below 1/2 and above 2 times the</span></span>
+<span><span class="co">#&gt;    average number of ions (`tic` * `it.ms`) in the Orbitrap analyzer in 3</span></span>
+<span><span class="co">#&gt;    data group(s) (based on 'filename')...</span></span>
+<span><span class="co">#&gt;    ...confirmed there are no outliers based on this method in 0.06 seconds.</span></span></code></pre></div>
+<p>The info messages from these functions suggest that no data was
+flagged.</p>
+</div>
+<div class="section level2">
+<h2 id="calculate">Calculate<a class="anchor" aria-label="anchor" href="#calculate"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># define base peak and calculate the results table</span></span>
+<span><span class="va">df_results</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">df_flagged</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span><span class="op">|&gt;</span> <span class="co"># sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span> <span class="co"># calculates ratios and generates a results table</span></span>
+<span><span class="co">#&gt; orbi_define_basepeak() is setting the 'M0' isotopocule as the ratio</span></span>
+<span><span class="co">#&gt;    denominator...</span></span>
+<span><span class="co">#&gt;    ...set base peak and calculated 5159 ratios for 4 isotopocules/base peak</span></span>
+<span><span class="co">#&gt;    (33S, 17O, 34S, 18O) in 0.11 seconds.</span></span>
+<span><span class="co">#&gt; orbi_summarize_results() is grouping the data by 'filename', 'compound',</span></span>
+<span><span class="co">#&gt;    'basepeak', 'isotopocule' and summarizing ratios from 5159 peaks (excluded</span></span>
+<span><span class="co">#&gt;    0 flagged peaks; excluded 0 unused peaks) using the 'sum' method...</span></span>
+<span><span class="co">#&gt;    ...completed in 0.03 seconds.</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="visualize">Visualize<a class="anchor" aria-label="anchor" href="#visualize"></a>
+</h2>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># use a ggplot to plot the data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">df_results</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s/%s"</span>, <span class="va">isotopocule</span>, <span class="va">basepeak</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">ratio</span>, ymin <span class="op">=</span> <span class="va">ratio</span> <span class="op">-</span> <span class="va">ratio_sem</span>, ymax <span class="op">=</span> <span class="va">ratio</span> <span class="op">+</span> <span class="va">ratio_sem</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">filename</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_default_theme.html">orbi_default_theme</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">compound</span><span class="op">)</span></span></code></pre></div>
+<p><img src="quick_start_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
