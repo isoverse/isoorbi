@@ -66,7 +66,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 
 ## Package layout
 
-![](figure_flowchart.png)
+![](man/figures/figure_flowchart.png)
 
 ## Getting help
 

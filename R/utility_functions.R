@@ -348,8 +348,8 @@ orbi_flag_outliers <- function(dataset, agc_fold_cutoff = NA_real_, agc_window =
           TICxIT = .data$tic * .data$it.ms,
           TICxIT_mean = mean(.data$TICxIT),
           is_new_outlier =
-            .data$TICxIT < 1/agc_fold_cutoff * TICxIT_mean |
-            .data$TICxIT > agc_fold_cutoff * TICxIT_mean
+            .data$TICxIT < 1/agc_fold_cutoff * .data$TICxIT_mean |
+            .data$TICxIT > agc_fold_cutoff * .data$TICxIT_mean
         ) |>
         dplyr::select(-"TICxIT", -"TICxIT_mean")
     },

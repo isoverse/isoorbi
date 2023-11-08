@@ -12,7 +12,7 @@ orbi_plot_raw_data(
   y,
   y_scale = c("raw", "linear", "pseudo-log", "log"),
   y_scale_sci_labels = TRUE,
-  color = isotopocule,
+  color = .data$isotopocule,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
     "#666666"),
   color_scale = scale_color_manual(values = colors),

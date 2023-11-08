@@ -1,4 +1,3 @@
-
 # utility functions ========
 
 # internal function to filter for specific isotopocules
@@ -24,6 +23,7 @@ filter_isotopocules <- function(dataset, isotopocules, allow_all = TRUE) {
 }
 
 # internal function to nicely format log scales
+#' @importFrom stats na.omit
 label_scientific_log <- function() {
   parser1 <- scales::label_scientific()
   parser2 <- scales::label_parse()
@@ -31,9 +31,10 @@ label_scientific_log <- function() {
   function(x) {
     needs_decimal <- any((log10(na.omit(x)) %% 1) > 0)
     if (needs_decimal) {
-      out <- x |>
-        parser1() |>
-        stringr::str_replace("e\\+?", " %.% 10^") |>
+      parsed_x <- x |>
+        parser1()
+      out <- sub("e\\+?", " %.% 10^", parsed_x)
+      out <- out |>
         parser2()
     } else {
       out <- parser3(x)
@@ -53,14 +54,14 @@ dynamic_y_scale <- function(plot,  y_scale = c("raw", "linear", "pseudo-log", "l
       ggplot2::annotation_logticks(sides = "l")
   } else if (y_scale == "pseudo-log") {
     plot <- plot +
-      scale_y_continuous(
+      ggplot2::scale_y_continuous(
         trans = scales::pseudo_log_trans(),
         breaks = breaks,
         labels = labeler
       )
   } else if (y_scale == "linear"){
     plot <- plot +
-      scale_y_continuous(labels = labeler)
+      ggplot2::scale_y_continuous(labels = labeler)
   }
   return(plot)
 }
@@ -84,6 +85,8 @@ dynamic_wrap <- function(plot, scales = "free_x") {
 
 #' Default isoorbi plotting theme
 #' @return ggplot theme object
+#' @param text_size a font size for text
+#' @param facet_text_size a font size for facet text
 #' @export
 orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
   ggplot2::theme_bw() +
@@ -143,7 +146,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       .by = c("filename", "compound", "isotopocule")
     ) |>
     # summarize
-    tidyr::nest(data = c(scan.no, time.min, ions.incremental)) |>
+    tidyr::nest(data = c(.data$scan.no, time.min, .data$ions.incremental)) |>
     dplyr::mutate(
       n_points = map_int(.data$data, nrow),
       start_scan.no = map_dbl(.data$data, ~.x$scan.no[1]),
@@ -238,7 +241,7 @@ orbi_plot_satellite_peaks <- function(
 orbi_plot_raw_data <- function(
     dataset, isotopocules = c(), x = c("time.min", "scan.no"),  x_breaks = scales::breaks_pretty(5),
     y, y_scale = c("raw", "linear", "pseudo-log", "log"), y_scale_sci_labels = TRUE,
-    color = isotopocule, 
+    color = .data$isotopocule, 
     colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
     color_scale = scale_color_manual(values = colors),
     add_data_blocks = TRUE, add_all_blocks = FALSE, 
@@ -325,7 +328,7 @@ orbi_plot_raw_data <- function(
     plot <- plot + 
       ggplot2::geom_point(
         data = function(df) dplyr::filter(df, !!show_outliers & .data$is_outlier),
-        map = aes(shape = .data$outlier_type)
+        map = ggplot2::aes(shape = .data$outlier_type)
       ) +
       # typicall only the first or sometimes first two will be used
       ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +

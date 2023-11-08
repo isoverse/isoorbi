@@ -718,6 +718,7 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 #' @param alpha opacity settings for the background
 #' @param show.legend whether to include the background information in the legend
 #' @export
+#' @importFrom methods is
 orbi_add_blocks_to_plot <- function(
     plot,
     x = c("guess", "scan.no", "time.min"), 

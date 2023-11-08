@@ -16,7 +16,6 @@ editor_options:
 # load libraries
 library(isoorbi) # for Orbitrap functions
 library(dplyr) # for data wrangling
-library(stringr) # for extracting text information
 library(ggplot2) # for data visualization
 
 # default chunk options

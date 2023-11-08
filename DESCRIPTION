@@ -36,13 +36,13 @@ Imports:
     readr (>= 2.1.0),
     tidyselect (>= 1.2.0),
     openxlsx,
-    purrr
+    purrr,
+    methods
 Suggests:
     devtools,
     knitr,
     rmarkdown,
     testthat,
-    scales,
     forcats
 Description: Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Citation: Kantnerova et al. (in review).
 License: MIT + file LICENSE

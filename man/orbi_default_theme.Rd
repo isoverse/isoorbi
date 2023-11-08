@@ -6,6 +6,11 @@
 \usage{
 orbi_default_theme(text_size = 16, facet_text_size = 20)
 }
+\arguments{
+\item{text_size}{a font size for text}
+
+\item{facet_text_size}{a font size for facet text}
+}
 \value{
 ggplot theme object
 }
