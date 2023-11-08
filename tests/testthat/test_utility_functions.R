@@ -74,7 +74,7 @@ test_that("orbi_filter_satellite_peaks() tests", {
 test_that("orbi_flag_satellite_peaks() tests", {
 
   # success
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet_new.isox", package = "isoorbi"))
 
   expect_true(is.tbl(orbi_flag_satellite_peaks(orbi_simplify_isox(df))))
 
@@ -86,13 +86,13 @@ test_that("orbi_flag_satellite_peaks() tests", {
                "need a `dataset` data frame")
 
   expect_error(orbi_flag_satellite_peaks(dataset = df[, 1:5]),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
+    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
     fixed = TRUE)
 
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(orbi_flag_satellite_peaks(dataset = df2),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
+    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
     fixed = TRUE)
 
 })
@@ -126,7 +126,7 @@ test_that("orbi_flag_weak_isotopocules() tests", {
     fixed = TRUE)
 
   expect_error(orbi_flag_weak_isotopocules(dataset = df[, 1:5]),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
+    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
     fixed = TRUE)
 
   expect_error(orbi_flag_weak_isotopocules(dataset = df[0, ]),
@@ -185,7 +185,7 @@ test_that("orbi_flag_outliers() tests", {
 
 
   expect_error(orbi_flag_outliers(dataset = df),
-               "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
+               "need to define at least one of these parameters for identifying outliers: 'agc_window', 'agc_fold_cutoff'",
                fixed = TRUE)
 
   expect_error(orbi_flag_outliers(dataset = df, agc_window = T),
@@ -195,13 +195,21 @@ test_that("orbi_flag_outliers() tests", {
   expect_error(orbi_flag_outliers(dataset = df, agc_window = 1000),
     "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
     fixed = TRUE)
+  
+  expect_error(orbi_flag_outliers(dataset = df, agc_fold_cutoff = T),
+               "if provided, `agc_fold_cutoff` needs to be a single number",
+               fixed = TRUE)
+  
+  expect_error(orbi_flag_outliers(dataset = df, agc_window = c(2,98), agc_fold_cutoff = 2),
+               "can only use one method at a time, please call this function sequentially for each of these parameters: 'agc_window', 'agc_fold_cutoff'",
+               fixed = TRUE)
 
   expect_error(orbi_flag_outliers(dataset = df[, 1:5]),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`",
     fixed = TRUE)
 
   expect_error(orbi_flag_outliers(dataset = df[0,]),
-               "`agc_window` needs to be a vector of two numbers (low and high filter) between 0 and 100",
+               "need to define at least one of these parameters for identifying outliers: 'agc_window', 'agc_fold_cutoff'",
                fixed = TRUE)
 
   df2 <- df |> mutate(dummy=1) |> select(-scan.no)
@@ -223,19 +231,19 @@ test_that("orbi_flag_outliers() tests", {
 
 })
 
-# orbi_filter_flagged_data
-test_that("orbi_filter_flagged_data() tests", {
-
-  # failure
-  expect_error(orbi_filter_flagged_data(),
-               "need a `dataset` data frame", fixed = TRUE)
-
-  # success
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
-
-  expect_true(is.tbl(orbi_filter_flagged_data(dataset = df)))
-
-})
+# orbi_filter_flagged_data has been deprecated in v1.3
+# test_that("orbi_filter_flagged_data() tests", {
+# 
+#   # failure
+#   expect_error(orbi_filter_flagged_data(),
+#                "need a `dataset` data frame", fixed = TRUE)
+# 
+#   # success
+#   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+# 
+#   expect_true(is.tbl(orbi_filter_flagged_data(dataset = df)))
+# 
+# })
 
 # orbi_define_basepeak()
 
@@ -270,8 +278,21 @@ test_that("orbi_define_basepeak() tests", {
   df2 <- df |> select(-scan.no)
   expect_error(orbi_define_basepeak(dataset = df2,
                                     basepeak_def = "M0"),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`", fixed = TRUE)
+    "`dataset` requires columns `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`",
+    fixed = TRUE)
 
+  df3 <- df
+  df3[df3 == "17O"] <- "M0"
+  
+  expect_error(orbi_define_basepeak(df3, basepeak_def = "M0"),
+               "the M0 isotopocule exists multiple times in some scans, make sure to run orbi_flag_satellite_peaks() first",
+               fixed = TRUE)
+  
+  df3[df3 == "M0"] <- "17O"
+  
+  suppressMessages(expect_error(orbi_define_basepeak(df3, basepeak_def = "M0"),
+               "the 'M0' isotopocule does not exist in some scans, consider using `orbi_filter_isox()` to focus on specific file(s) and/or compound(s): \n - basepeak 'M0' is missing in 2 scans (100.0%) of compound 'HSO4-' in file 's3744'",
+               fixed = TRUE))
 
   # success
   expect_true(is.tbl(orbi_define_basepeak(

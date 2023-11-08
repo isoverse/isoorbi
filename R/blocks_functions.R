@@ -1,9 +1,5 @@
 # exported functions -------
-#' @importFrom utils data
-#' @importFrom ggplot2 scale_fill_manual
-NULL
-
-#' @title Manually define a block
+#' @title Define data block for flow injection
 #' @description Define a data block by either start and end time or start and end scan number.
 #' If you want to make segments in the blocks (optional), note that this function - manually defining blocks - removes all block segmentation. Make sure to call [orbi_segment_blocks()] **only after** finishing block definitions.
 #'
@@ -15,7 +11,7 @@ NULL
 #' @param sample_name if provided, will be used as the `sample_name` for the block
 #' @return A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
-orbi_define_block <- function(
+orbi_define_block_for_flow_injection <- function(
     dataset,
     start_time.min = NULL, end_time.min = NULL,
     start_scan.no = NULL, end_scan.no = NULL,
@@ -51,7 +47,7 @@ orbi_define_block <- function(
     factorize_dataset("filename") |>
     dplyr::mutate(..row_id = dplyr::row_number())
   start_time <-
-    sprintf("orbi_define_block() is adding new block (%s) to %d files... ",
+    sprintf("orbi_define_block_for_flow_injection() is adding new block (%s) to %d files... ",
             if(set_by_time) sprintf("%s to %s min", start_time.min, end_time.min)
             else sprintf("scan %s to %s", start_scan.no, end_scan.no),
             length(levels(dataset$filename))) |>
@@ -99,7 +95,7 @@ orbi_define_block <- function(
   scans <-
     try_catch_all(
       scans |>
-        # introduce updated segment, block, data type and samaple_name
+        # introduce updated segment, block, data type and sample_name
         dplyr::mutate(
           new_block = ifelse(.data$scan.no >= .data$start_scan.no & .data$scan.no <= .data$end_scan.no, .data$next_block, .data$block),
           sample_name = ifelse(!is.null(!!sample_name) & .data$new_block == .data$next_block, !!sample_name, .data$sample_name),
@@ -678,10 +674,10 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
       sample_name = NA_character_,
       data_type = factor(NA_character_),
       segment = NA_integer_,
-      start_scan.no = NA_integer_,
-      end_scan.no = NA_integer_,
-      start_time.min = NA_real_,
-      end_time.min = NA_real_
+      start_scan.no = min(.data$scan.no),
+      end_scan.no = max(.data$scan.no),
+      start_time.min = min(.data$time.min),
+      end_time.min = max(.data$time.min)
     )
 
   # no information
@@ -711,11 +707,10 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 }
 
 #' @title Plot blocks background
-#' @description This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused).
-#'
-#' FIXME: this should also work with scan number
+#' @description This function can be used to add colored background to a plot of dual-inlet data where different colors signify different data types (data, startup time, changeover time, unused). Note that this function only works with continuous and pseudo-log y axis, not with log y axes.
 #'
 #' @param plot object with a dataset that has defined blocks
+#' @param x which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.
 #' @param data_only if set to TRUE, only the blocks flagged as "data" (`setting("data_type_data")`) are highlighted
 #' @param fill what to use for the fill aesthetic, default is the block `data_type`
 #' @param fill_colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
@@ -723,30 +718,63 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 #' @param alpha opacity settings for the background
 #' @param show.legend whether to include the background information in the legend
 #' @export
+#' @importFrom methods is
 orbi_add_blocks_to_plot <- function(
     plot,
+    x = c("guess", "scan.no", "time.min"), 
     data_only = FALSE,
     fill = .data$data_type,
     fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
-    fill_scale = scale_fill_manual(values = fill_colors),
+    fill_scale = scale_fill_manual("blocks", values = fill_colors),
     alpha = 0.5, show.legend = !data_only) {
 
+  # safety checks
+  stopifnot(
+    "`plot` has to be a ggplot" = !missing(plot) && is(plot, "ggplot")
+  )
+  x_column <- arg_match(x)
+  
+  # check if it's a log y axis
+  y_axis <- plot$scales$scales[[which(plot$scales$find("y"))[1]]]
+  y_log <- FALSE
+  if (!is.null(y_axis)) {
+    y_zero <- suppressWarnings(y_axis$transform(0))
+    if (y_zero < 0 && is.infinite(y_zero))
+      y_log <- TRUE
+  }
+  
+  # find out if it's a scan.no or time.min based plot if x is "guess"
+  if (x_column == "guess") {
+    x_column <- plot$mapping$x |> as_label()
+    if (!x_column %in% c("scan.no", "time.min")) {
+      sprintf("cannot guess x-axis for blocks from plot as its aes(x = ) variable is neither 'scan.no' nor 'time.min'") |>
+        warn()
+      return(plot)
+    }
+  }
+  
+  # get blocks
+  get_blocks <- function(df) {
+    if (!has_blocks(df))
+      abort("this data set does not seem to have any block defintions yet, use a function from the `orbi_define_block...` family to define one or multiple data blocks")
+    if (data_only) 
+      df <- df |> dplyr::filter(.data$data_type == setting("data_type_data"))
+    blocks <- df |> orbi_get_blocks_info()
+    blocks |> 
+      dplyr::filter(!is.na(.data$block)) |>
+      dplyr::mutate(
+        xmin = if(!!x_column == "time.min") .data$start_time.min else .data$start_scan.no,
+        xmax = if(!!x_column == "time.min") .data$end_time.min else .data$end_scan.no
+      )
+  }
+  
   # add the rectangle plot as underlying layer
   plot$layers <- c(
     ggplot2::geom_rect(
-      data = function(df) {
-        blocks <- df |> orbi_get_blocks_info()
-        if (!all(c("block", "sample_name", "data_type") %in% names(blocks))) {
-          abort("columns `block`, `sample_name`, and `data_type` required for showing block")
-        }
-        if (data_only) {
-          blocks <- blocks |> dplyr::filter(.data$data_type == setting("data_type_data"))
-        }
-        blocks |> dplyr::filter(!is.na(.data$block))
-      },
+      data = get_blocks,
       map = ggplot2::aes(
-        x = NULL, xmin = .data$start_time.min, xmax = .data$end_time.min,
-        y = NULL, color = NULL,  ymin = -Inf, ymax = Inf,
+        x = NULL, xmin = .data$xmin, xmax = .data$xmax,
+        y = NULL, color = NULL,  ymin = if(y_log) 0 else -Inf, ymax = Inf,
         fill = {{ fill }}
       ),
       alpha = alpha, linetype = 0, color = NA_character_,
@@ -763,6 +791,11 @@ orbi_add_blocks_to_plot <- function(
 }
 
 # internal functions ------------
+
+# check if dataset has blocks
+has_blocks <- function(dataset) {
+  return(all(c("block", "sample_name", "data_type") %in% names(dataset)))
+}
 
 # helper function to find blocks (internal)
 #' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]

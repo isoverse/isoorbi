@@ -6,9 +6,10 @@
 #' @title Shot noise calculation
 #' @description This function computes the shot noise calculation.
 #' @param dataset a data frame output after running `orbi_define_basepeak()`
+#' @param include_flagged_data whether to include flagged data in the shot noise calculation (FALSE by default)
 #' @return The processed data frame with new columns: `n_effective_ions`, `ratio`, `ratio_rel_se.permil`, `shot_noise.permil`
 #' @export
-orbi_analyze_shot_noise <- function(dataset){
+orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE){
 
   # safety checks
   stopifnot(
@@ -17,11 +18,18 @@ orbi_analyze_shot_noise <- function(dataset){
     "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first" = "basepeak_ions" %in% names(dataset)
   )
 
+  # filter flagged data
+  n_all <- nrow(dataset)
+  dataset_wo_flagged <- dataset |> filter_flagged_data()
+  n_after <- nrow(dataset_wo_flagged)
+  if (!include_flagged_data)
+    dataset <- dataset_wo_flagged
+  
   # info message
   start_time <-
     sprintf(
-      "orbi_analyze_shot_noise() is analyzing the shot noise for %d peaks... ",
-      nrow(dataset)
+      "orbi_analyze_shot_noise() is analyzing the shot noise for %d peaks (%s %d flagged peaks)... ",
+      if(include_flagged_data) n_all else n_after, if(include_flagged_data) "including" else "excluded", n_all - n_after
     ) |> message_start()
 
   # calculation
@@ -41,7 +49,6 @@ orbi_analyze_shot_noise <- function(dataset){
           n_effective_ions = .data$n_basepeak_ions * .data$n_isotopocule_ions / (.data$n_basepeak_ions + .data$n_isotopocule_ions),
           # relative standard error
           n_measurements = 1:n(),
-          ratio = .data$ions.incremental / .data$basepeak_ions,
           ratio_mean = cumsum(.data$ratio) / .data$n_measurements,
           ratio_gmean = exp(cumsum(log(.data$ratio)) / .data$n_measurements),
           #ratio_sd = sqrt( cumsum( (ratio - ratio_mean)^2 ) / (n_measurements - 1L) ),
@@ -75,7 +82,8 @@ orbi_analyze_shot_noise <- function(dataset){
 #' @param x x-axis for the shot noise plot, either "time.min" or "n_effective_ions"
 #' @param color which column to use for the color aesthetic (must be a factor)
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
-#' @param permil_target highlight the t
+#' @param permil_target highlight the target permil in the shotnoise plot
+#' @return a ggplot object
 #' @export
 orbi_plot_shot_noise <- function(
     shotnoise,
@@ -127,7 +135,6 @@ orbi_plot_shot_noise <- function(
   }
 
   # standard plot
-  rcolor_brewer_dark2 <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666")
   plot <-
     plot_df |>
     ggplot2::ggplot() +
@@ -138,27 +145,15 @@ orbi_plot_shot_noise <- function(
     ggplot2::geom_point(size = 3) +
     ggplot2::scale_y_log10(breaks = 10^(-4:4), labels = function(x) paste(x, "\U2030")) +
     ggplot2::annotation_logticks(sides = "lb") +
-    # use a color-blind friendly palette
-    ggplot2::scale_color_brewer(palette = "Dark2") +
+    ggplot2::scale_color_manual(values = colors) +
     ggplot2::scale_shape_manual(values = c(21:25, 15:18)) +
     ggplot2::scale_linetype_manual(values = rep(1, 8)) +
-    #expand_limits(y = c(0.1, 10)) +
-    # FIXME: include filename only if there is more than one file
-    ggplot2::theme_bw() +
+    orbi_default_theme() +
     ggplot2::theme(
-      text = ggplot2::element_text(size = 16),
-      strip.text = ggplot2::element_text(size = 20),
-      panel.grid = ggplot2::element_blank(),
-      #panel.border = ggplot2::element_blank(), # MAYBE
-      panel.background = ggplot2::element_blank(),
-      plot.background = ggplot2::element_blank(),
-      #axis.line.y.left = ggplot2::element_line(), # MAYBE
-      #axis.line.x.bottom = ggplot2::element_line(), # MAYBE
       strip.background = ggplot2::element_blank(),
       legend.position = "bottom",
       legend.direction = "vertical",
-      legend.title.align = 0.5,
-      legend.background = ggplot2::element_blank()
+      legend.title.align = 0.5
     ) +
     ggplot2::labs(
       y = "relative error",
@@ -171,15 +166,7 @@ orbi_plot_shot_noise <- function(
     )
 
   # wrap
-  n_files <- length(levels(plot_df$filename))
-  n_compounds <- length(levels(plot_df$compound))
-  if (n_files > 1L && n_compounds > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~filename + compound)
-  } else if (n_compounds > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~compound)
-  } else if (n_files > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~filename)
-  }
+  plot <- plot |> dynamic_wrap()
 
   # plots vs. time
   if (x_column == "time.min") {

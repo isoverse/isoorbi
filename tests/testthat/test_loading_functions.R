@@ -87,7 +87,7 @@ test_that("orbi_simplify_isox() tests", {
   expect_error(orbi_simplify_isox(dataset = "string"), "need a `dataset` data frame")
   expect_type(df, "list")
   dataset = subset(df, select = -c(filename))
-  expect_error(orbi_simplify_isox(dataset), "dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
+  expect_error(orbi_simplify_isox(dataset), "dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
   dataset = df[0,]
   expect_error(orbi_simplify_isox(dataset), "dataset contains no rows")
   # failure
@@ -98,14 +98,14 @@ test_that("orbi_simplify_isox() tests", {
   expect_error(orbi_simplify_isox(dataset = as.matrix(df)), "need a `dataset` data frame", fixed = TRUE)
 
   expect_error(orbi_simplify_isox(dataset = df[,1:5]),
-               "dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
+               "dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`")
   dataset = df[0,]
   expect_error(orbi_simplify_isox(dataset),
                "dataset contains no rows")
 
   df2 <- df |> mutate(dummy = "1") |> select(-scan.no)
   expect_error(orbi_simplify_isox(dataset = df2),
-               "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`", fixed = TRUE)
+               "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`", fixed = TRUE)
 
 })
 
@@ -134,7 +134,7 @@ test_that("orbi_filter_isox() tests",{
                fixed = TRUE)
 
   expect_error(orbi_filter_isox(dataset = df[,1:2]),
-               "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`")
+               "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `tic` and `it.ms`")
 
   expect_error(orbi_filter_isox(dataset = df,
                                 time_min = "A"),

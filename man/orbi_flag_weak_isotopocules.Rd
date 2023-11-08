@@ -15,7 +15,7 @@ orbi_flag_weak_isotopocules(dataset, min_percent)
 A data frame with new column \code{is_weak_isotopocule} that flags weak isotopocules.
 }
 \description{
-The function \code{orbi_filter_weak_isotopocules()} flags isotopocules that are not consistently detected in most scans.
+The function \code{orbi_filter_weak_isotopocules()} flags isotopocules that are not detected in a minimum of \code{min_percent} of scans. This function evaluates weak isotopocules within each "filename", "block", "segment" and "injection" (if these columns exist), in addition to any groupings already defined before calling this function using dplyr's \code{group_by()}. It restores the original groupings in the returned data frame.
 }
 \details{
 The input \code{dataset} is expected to have at least these 8 columns: \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}.

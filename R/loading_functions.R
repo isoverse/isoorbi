@@ -142,12 +142,12 @@ orbi_read_isox <- function(file) {
 }
 
 #' @title Simplify IsoX data
-#' @description Keep only columns that are directly relevant for isotopocule ratio analysis.
+#' @description Keep only columns that are directly relevant for isotopocule ratio analysis. This function is optional and does not affect any downstream function calls. 
 #'
 #' @param dataset IsoX data that is to be simplified
 #' @param add additional columns to keep
 #'
-#' @return A tibble containing only the 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`, plus any additional columns defined in the `add` argument
+#' @return A tibble containing only the 9 columns: `filepath`, `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`, plus any additional columns defined in the `add` argument
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package="isoorbi")
@@ -158,10 +158,10 @@ orbi_read_isox <- function(file) {
 orbi_simplify_isox <- function(dataset, add = c()) {
 
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
+  cols <- c("filepath", "filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental", "tic", "it.ms")
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
+    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" =
       all(cols %in% names(dataset))
   )
 
@@ -226,7 +226,7 @@ orbi_filter_isox <-
   cols <- c("filename", "compound", "isotopocule", "time.min")
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`" =
+    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `tic` and `it.ms`" =
       all(cols %in% names(dataset)),
     "`filenames` must be a vector of filenames (or NULL)" = is.null(filenames) || is_character(filenames),
     "`compounds` must be a vector of compounds (or NULL)" = is.null(compounds) || is_character(compounds),

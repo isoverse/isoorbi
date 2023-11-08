@@ -4,10 +4,12 @@
 \alias{orbi_analyze_shot_noise}
 \title{Shot noise calculation}
 \usage{
-orbi_analyze_shot_noise(dataset)
+orbi_analyze_shot_noise(dataset, include_flagged_data = FALSE)
 }
 \arguments{
 \item{dataset}{a data frame output after running \code{orbi_define_basepeak()}}
+
+\item{include_flagged_data}{whether to include flagged data in the shot noise calculation (FALSE by default)}
 }
 \value{
 The processed data frame with new columns: \code{n_effective_ions}, \code{ratio}, \code{ratio_rel_se.permil}, \code{shot_noise.permil}

@@ -65,8 +65,8 @@ test_that("orbi_plot_shot_noise() tests", {
                "`x` must be a character vector, not the number 42.",
                fixed = TRUE)
 
-  expect_error(orbi_plot_shot_noise(df, "filename"),
-               "`x` must be one of \"time.min\" or \"n_effective_ions\", not \"filename\".",
+  expect_error(orbi_plot_shot_noise(df, "xyz"),
+               "`x` must be one of \"time.min\" or \"n_effective_ions\", not \"xyz\".",
                fixed = TRUE)
 
   expect_error(orbi_plot_shot_noise(df, "time.min", permil_target = 0.5, color = 42),
