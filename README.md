@@ -26,9 +26,8 @@ You can install the current CRAN version of `isoorbi` with:
 install.packages("isoorbi")
 ```
 
-To get a bug fix or to use the latest features, you can install the
-latest development version of `isoorbi` from
-[GitHub](https://github.com/) with:
+To use the latest updates, you can install the development version of
+`isoorbi` from [GitHub](https://github.com/) with:
 
 ``` r
 if(!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
@@ -50,7 +49,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 
 ## Package layout
 
-<img src="man/figures/figure_flowchart.png" style="width:50.0%" />
+<img src="man/figures/figure_flowchart.png" style="width:60.0%" />
 
 ## Getting help
 
