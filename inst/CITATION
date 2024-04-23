@@ -1,6 +1,6 @@
 bibentry(
   bibtype = "Article",
-  textVersion = "Kantnerova et al., in review",
+  textVersion = "Kantnerova et al.",
   header = "To cite isoorbi in publications, please use",
   author   = c(person(given = "Kristyna",
                         family = "Kantnerova"),
@@ -14,12 +14,12 @@ bibentry(
                         family = "Kopf"),
               person(given = "Cajetan",
                         family = "Neubauer")),
-  title = "ESI-Orbitrap IRMS: A Guide to Precision Isotopocule Analysis for Life and Environmental Scientists",
+  title = "A guide to precise measurements of isotope abundance by ESI-Orbitrap MS",
   publisher = "Nature Publishing Group",
   journal  = "Nature Protocols",
-  year     = "2023",
+  year     = "202¨4",
   volume   = "",
   number   = "",
   pages    = "",
-  doi     = ""
+  doi     = "10.1038/s41596-024-00981-5"
 )
