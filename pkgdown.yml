@@ -1,5 +1,5 @@
-pandoc: 2.19.2
-pkgdown: 2.0.7
+pandoc: 3.1.11
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   dual_inlet: dual_inlet.html
@@ -7,7 +7,7 @@ articles:
   isoxl_demo: isoxl_demo.html
   quick_start: quick_start.html
   shot_noise: shot_noise.html
-last_built: 2023-11-08T21:50Z
+last_built: 2024-04-23T18:16Z
 urls:
   reference: https://isoorbi.isoverse.org/reference
   article: https://isoorbi.isoverse.org/articles
