@@ -20,7 +20,7 @@ Authors@R:
         role = c("aut"),
         comment = c(ORCID = "0000-0001-6259-3225"))
     )
-URL: https://github.com/isoverse/isoorbi
+URL: https://isoorbi.isoverse.org/, https://github.com/isoverse/isoorbi
 BugReports: https://github.com/isoverse/isoorbi/issues
 Depends:
     R (>= 4.1.0)
