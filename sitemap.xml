@@ -1,138 +1,48 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://isoorbi.isoverse.org/404.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/articles/dual_inlet.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/articles/flow_injection.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/articles/isoxl_demo.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/articles/quick_start.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/articles/shot_noise.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/index.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_adjust_block.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_analyze_shot_noise.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_ratios.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_calculate_summarized_ratio.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_default_theme.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_export_data_to_excel.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_flagged_data.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_satellite_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_scan_intensity.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak_isotopocules.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_find_isox.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_flag_outliers.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_flag_satellite_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_flag_weak_isotopocules.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_get_isotopocule_coverage.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_get_settings.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_plot_isotopocule_coverage.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_plot_satellite_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_plot_shot_noise.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_read_isox.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_segment_blocks.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_set_settings.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html</loc>
-  </url>
-  <url>
-    <loc>https://isoorbi.isoverse.org/reference/orbi_summarize_results.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://isoorbi.isoverse.org/404.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/LICENSE-text.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/LICENSE.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/dual_inlet.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/flow_injection.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/index.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/isoxl_demo.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/quick_start.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/shot_noise.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/authors.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/index.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/news/index.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/index.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_adjust_block.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_analyze_shot_noise.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_calculate_ratios.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_calculate_summarized_ratio.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_default_theme.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_export_data_to_excel.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_filter_flagged_data.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_filter_isox.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_filter_satellite_peaks.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_filter_scan_intensity.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_filter_weak_isotopocules.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_find_isox.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_flag_outliers.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_flag_satellite_peaks.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_flag_weak_isotopocules.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_get_isotopocule_coverage.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_get_settings.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_isotopocule_coverage.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_satellite_peaks.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_shot_noise.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_read_isox.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_segment_blocks.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_set_settings.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_summarize_results.html</loc></url>
 </urlset>
+
