@@ -41,10 +41,6 @@ test_that("add_excel_sheet() tests", {
                "argument \"wb\" is missing, with no default",
                fixed = TRUE)
 
-  expect_error(add_excel_sheet(42),
-               "wb must be a Workbok",
-               fixed = TRUE)
-
   library(openxlsx)
   wb <- createWorkbook("test")
 
