@@ -1,8 +1,8 @@
 Package: isoorbi
 Type: Package
 Title: Process Orbitrap Isotopocule Data
-Version: 1.3.0
-Date: 2023-11-07
+Version: 1.3.1
+Date: 2024-07-24
 Authors@R:
     c(person(
         given = "Caj", family = "Neubauer",
