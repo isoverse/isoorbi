@@ -15,11 +15,11 @@ bibentry(
               person(given = "Cajetan",
                         family = "Neubauer")),
   title = "A guide to precise measurements of isotope abundance by ESI-Orbitrap MS",
-  publisher = "Nature Publishing Group",
+  publisher = "Nature Publishing Group UK London",
   journal  = "Nature Protocols",
   year     = "2024",
   volume   = "",
   number   = "",
-  pages    = "",
+  pages    = "1-32",
   doi     = "10.1038/s41596-024-00981-5"
 )
