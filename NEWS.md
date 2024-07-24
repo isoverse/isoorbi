@@ -1,6 +1,6 @@
 # isoorbi 1.3.1
 
-This is a minor release adding compatibility updates.
+This is a patch containing compatibility updates.
 
 
 # isoorbi 1.3.0
