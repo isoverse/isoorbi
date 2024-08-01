@@ -153,7 +153,7 @@ orbi_plot_shot_noise <- function(
       strip.background = ggplot2::element_blank(),
       legend.position = "bottom",
       legend.direction = "vertical",
-      legend.title = element_text(hjust = 0.5)
+      legend.title = ggplot2::element_text(hjust = 0.5)
     ) +
     ggplot2::labs(
       y = "relative error",
