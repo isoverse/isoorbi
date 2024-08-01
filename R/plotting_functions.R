@@ -146,7 +146,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       .by = c("filename", "compound", "isotopocule")
     ) |>
     # summarize
-    tidyr::nest(data = c(.data$scan.no, time.min, .data$ions.incremental)) |>
+    tidyr::nest(data = c("scan.no", time.min, "ions.incremental")) |>
     dplyr::mutate(
       n_points = map_int(.data$data, nrow),
       start_scan.no = map_dbl(.data$data, ~.x$scan.no[1]),
