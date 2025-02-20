@@ -66,29 +66,29 @@ get_pkg_options <- function() {
     #' - `raw_aggregator`: configuration for pulling data out of raw files
     raw_aggregator = define_pkg_option(
       default = 
-        start_aggregator("file_info", uid_source = "RAW file", cast = "as.factor") |> 
-        add_aggregator("file_info", "\\1", source = "(.*)", regexp = TRUE) |>
-        add_aggregator("scans", "scan", cast = "as.integer") |>
-        add_aggregator("scans", "time.min", source = "StartTime", cast = "as.numeric") |>
-        add_aggregator("scans", "tic", source = "TIC", cast = "as.numeric") |>
-        add_aggregator("scans", "it.ms", source = "Ion Injection Time (ms):", cast = "as.numeric") |>
-        add_aggregator("scans", "resolution", source = "FT Resolution:", cast = "as.numeric") |>
-        add_aggregator("scans", "basePeakIntensity", source = "basePeak", cast = "as.numeric",   
+        orbi_start_aggregator("file_info", uid_source = "RAW file", cast = "as.factor") |> 
+        orbi_add_aggregator("file_info", "\\1", source = "(.*)", regexp = TRUE) |>
+        orbi_add_aggregator("scans", "scan", cast = "as.integer") |>
+        orbi_add_aggregator("scans", "time.min", source = "StartTime", cast = "as.numeric") |>
+        orbi_add_aggregator("scans", "tic", source = "TIC", cast = "as.numeric") |>
+        orbi_add_aggregator("scans", "it.ms", source = "Ion Injection Time (ms):", cast = "as.numeric") |>
+        orbi_add_aggregator("scans", "resolution", source = "FT Resolution:", cast = "as.numeric") |>
+        orbi_add_aggregator("scans", "basePeakIntensity", source = "basePeak", cast = "as.numeric",   
                        func = "sapply", args = list(`[`, 2)) |> # list column that needs 2nd value
-        add_aggregator("scans", "rawOvFtT", source = "RawOvFtT:", cast = "as.numeric") |>
-        add_aggregator("scans", "intensCompFactor", source = "OT Intens Comp Factor:", cast = "as.numeric") |>
-        add_aggregator("scans", "agc", source = "AGC:") |>
-        add_aggregator("scans", "agcTarget", source = "AGC Target:", cast = "as.integer") |>
-        add_aggregator("scans", "microscans", source = "Micro Scan Count:", cast = "as.integer") |>
-        add_aggregator("scans", "numberLockmassesFound", source = "Number of LM Found:", cast = "as.integer") |>
-        add_aggregator("scans", "analyzerTemperature", source = "Analyzer Temperature:", cast = "as.numeric") |>
-        add_aggregator("peaks", "scan", cast = "as.integer") |>
-        add_aggregator("peaks", "mzMeasured", source = "centroid.PreferredMasses", cast = "as.numeric") |>
-        add_aggregator("peaks", "intensity", source = "centroid.intensity", cast = "as.numeric") |>
-        add_aggregator("peaks", "peakNoise", source = "centroid.PreferredNoises", cast = "as.numeric") |>
-        add_aggregator("raw_data", "scan", cast = "as.integer") |>
-        add_aggregator("raw_data", "mz", source = "mZ", cast = "as.numeric") |>
-        add_aggregator("raw_data", "intensity", cast = "as.numeric"),
+        orbi_add_aggregator("scans", "rawOvFtT", source = "RawOvFtT:", cast = "as.numeric") |>
+        orbi_add_aggregator("scans", "intensCompFactor", source = "OT Intens Comp Factor:", cast = "as.numeric") |>
+        orbi_add_aggregator("scans", "agc", source = "AGC:") |>
+        orbi_add_aggregator("scans", "agcTarget", source = "AGC Target:", cast = "as.integer") |>
+        orbi_add_aggregator("scans", "microscans", source = "Micro Scan Count:", cast = "as.integer") |>
+        orbi_add_aggregator("scans", "numberLockmassesFound", source = "Number of LM Found:", cast = "as.integer") |>
+        orbi_add_aggregator("scans", "analyzerTemperature", source = "Analyzer Temperature:", cast = "as.numeric") |>
+        orbi_add_aggregator("peaks", "scan", cast = "as.integer") |>
+        orbi_add_aggregator("peaks", "mzMeasured", source = "centroid.PreferredMasses", cast = "as.numeric") |>
+        orbi_add_aggregator("peaks", "intensity", source = "centroid.intensity", cast = "as.numeric") |>
+        orbi_add_aggregator("peaks", "peakNoise", source = "centroid.PreferredNoises", cast = "as.numeric") |>
+        orbi_add_aggregator("raw_data", "scan", cast = "as.integer") |>
+        orbi_add_aggregator("raw_data", "mz", source = "mZ", cast = "as.numeric") |>
+        orbi_add_aggregator("raw_data", "intensity", cast = "as.numeric"),
       check_fn = function(x) {
         if(missing(x) || !is.data.frame(x)) cli_abort("{.var raw_aggregator} is not a data frame")
         aggregator_req_cols <- c("dataset", "column", "source", "default", "cast", "regexp", "func", "args")
@@ -96,7 +96,9 @@ get_pkg_options <- function() {
           cli_abort("{.var raw_aggregator} is missing required column{?s} {.var {missing}}")
         return(TRUE)
       }
-    )
+    ),
+    #' - `debug`: turn on debug mode
+    debug = define_pkg_option(default = FALSE, check_fn = is_scalar_logical)
   )
 }
 

@@ -47,7 +47,8 @@ orbi_read_raw <- function(file_paths, show_progress = rlang::is_interactive(), s
           file_path, 
           show_problems = FALSE, # summarized below 
           show_progress = show_progress, pb = pb), 
-        error_value = tibble(file_path = file_path, problems = list(tibble()))
+        error_value = tibble(file_path = file_path, problems = list(tibble())),
+        catch_errors = !orbi_get_option("debug")
       )
     
     # merge new into the returned problems
@@ -104,23 +105,33 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
   
   # headers
   if (show_progress) cli_progress_update(id = pb, status = "read headers")
-  headers <- try_catch_cnds(rawrr::readFileHeader(file_path), error_value = tibble())
+  headers <- try_catch_cnds(
+    rawrr::readFileHeader(file_path), error_value = tibble(),
+    catch_errors = !orbi_get_option("debug"))
   parse_headers <- function() convert_list_to_tibble(headers$result)
-  headers_parsed <- try_catch_cnds(parse_headers(), error_value = tibble())
+  headers_parsed <- try_catch_cnds(
+    parse_headers(), error_value = tibble(),
+    catch_errors = !orbi_get_option("debug"))
   
   # indices
   if (show_progress)  cli_progress_update(id = pb, status = "indices")
-  indices <- try_catch_cnds(rawrr::readIndex(file_path), error_value = tibble(scan = integer(0)))
+  indices <- try_catch_cnds(
+    rawrr::readIndex(file_path), error_value = tibble(scan = integer(0)),
+    catch_errors = !orbi_get_option("debug"))
   parse_indices <- function() {
     if (!"scan" %in% names(indices$result)) rlang::abort("no {.var scan} column found in scan index")
     indices$result$scan <- as.integer(indices$result$scan)
     return(tibble::as_tibble(indices$result))
   }
-  indices_parsed <- try_catch_cnds(parse_indices(), error_value = tibble(scan = integer(0)))
+  indices_parsed <- try_catch_cnds(
+    parse_indices(), error_value = tibble(scan = integer(0)),
+    catch_errors = !orbi_get_option("debug"))
   
   # spectra
   if (show_progress) cli_progress_update(id = pb, status = "spectra")
-  spectra <- try_catch_cnds(rawrr::readSpectrum(file_path, scan = indices$result$scan), error_value = list())
+  spectra <- try_catch_cnds(
+    rawrr::readSpectrum(file_path, scan = indices$result$scan), error_value = list(),
+    catch_errors = !orbi_get_option("debug"))
   
   # parse spectral data
   if (show_progress) cli_progress_update(id = pb, status = "parse spectra")
@@ -133,7 +144,9 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
       })
     dplyr::bind_rows(spectra)
   }
-  spectra_parsed <- try_catch_cnds(parse_spectra(), error_value = tibble(scan = integer(0)))
+  spectra_parsed <- try_catch_cnds(
+    parse_spectra(), error_value = tibble(scan = integer(0)),
+    catch_errors = !orbi_get_option("debug"))
   
   # scan info
   if (show_progress) cli_progress_update(id = pb, status = "parse scan info")
@@ -144,7 +157,9 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
     indices_parsed$result[c("scan", scan_cols)] |> 
       dplyr::left_join(scan_info, by = "scan")
   }
-  scan_info <- try_catch_cnds(parse_scan_info(), error_value = tibble(scan = integer(0)))
+  scan_info <- try_catch_cnds(
+    parse_scan_info(), error_value = tibble(scan = integer(0)),
+    catch_errors = !orbi_get_option("debug"))
   
   # peaks
   if (show_progress) cli_progress_update(id = pb, status = "parse peaks")
@@ -157,7 +172,9 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
       tibble::as_tibble()
     peaks |> tidyr::unnest(-"scan")
   }
-  peaks <- try_catch_cnds(parse_peaks(), error_value = tibble(scan = integer(0)))
+  peaks <- try_catch_cnds(
+    parse_peaks(), error_value = tibble(scan = integer(0)),
+    catch_errors = !orbi_get_option("debug"))
   
   # raw data
   if (show_progress) cli_progress_update(id = pb, status = "parse raw data")
@@ -170,7 +187,9 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
       tibble::as_tibble()
     raw_data |> tidyr::unnest(-"scan")
   }
-  raw_data <- try_catch_cnds(parse_raw_data(), error_value = tibble(scan = integer(0)))
+  raw_data <- try_catch_cnds(
+    parse_raw_data(), error_value = tibble(scan = integer(0)),
+    catch_errors = !orbi_get_option("debug"))
   
   # wrapping up
   if (show_progress) cli_progress_update(id = pb, status = "finalizing")

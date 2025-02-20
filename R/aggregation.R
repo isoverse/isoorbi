@@ -12,8 +12,8 @@ orbi_aggregate_raw <- function(files_data, aggregator = orbi_get_option("raw_agg
 #' start the aggregator for a dataset
 #' defines the unique ID field
 #' @export
-start_aggregator <- function(dataset, uid_source, cast, regexp = FALSE, func = NULL, args = NULL) {
-  add_aggregator(tibble(), dataset, column = "uid", source = uid_source, cast = cast, regexp = regexp, func = func, args = args)
+orbi_start_aggregator <- function(dataset, uid_source, cast, regexp = FALSE, func = NULL, args = NULL) {
+  orbi_add_aggregator(tibble(), dataset, column = "uid", source = uid_source, cast = cast, regexp = regexp, func = func, args = args)
 }
 
 #' add aggregator
@@ -22,7 +22,7 @@ start_aggregator <- function(dataset, uid_source, cast, regexp = FALSE, func = N
 #' @param source single character column name or vector of column names if alternatives could be the source
 #' @param args additional arguments to pass to func
 #' @export
-add_aggregator <- function(aggregator, dataset, column, source = column, default = NA, cast = "as.character", regexp = FALSE, func = NULL, args = NULL) {
+orbi_add_aggregator <- function(aggregator, dataset, column, source = column, default = NA, cast = "as.character", regexp = FALSE, func = NULL, args = NULL) {
   
   # checks
   if(!is_tibble(aggregator)) cli_abort("{.var aggregator} is not a data frame")
@@ -132,6 +132,7 @@ aggregate_files <- function(files_data, aggregator, show_progress = rlang::is_in
           show_problems = FALSE # show them later
         ),
         error_value = list(file_info = list(uid = NA), problems = tibble()),
+        catch_errors = !orbi_get_option("debug")
       )
     
     # filepath update
@@ -210,7 +211,9 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
   }
   
   # safety checks (run the check datasets with try_catch_cnds)
-  aggregator <- aggregator |> check_datasets() |> try_catch_cnds(error_value = tibble())
+  aggregator <- aggregator |> check_datasets() |> 
+    try_catch_cnds(error_value = tibble(),
+                   catch_errors = !orbi_get_option("debug"))
   if (nrow(aggregator$result) == 0) cli_abort("there is nothing to aggregate")
   if (!"uid" %in% aggregator$result$column) 
     cli_abort("there is no {.var uid} (unique identifier) column in the aggregator")
@@ -295,7 +298,8 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     out <-
       try_catch_cnds(
         aggregate_value(dataset, column, source, cast, func, args), 
-        error_value = default_value
+        error_value = default_value,
+        catch_errors = !orbi_get_option("debug")
       )
     if (show_problems) show_cnds(out$conditions)
     return(out)

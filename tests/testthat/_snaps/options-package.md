@@ -37,4 +37,7 @@
       10 scans     "intensCompFactor"  <list [1]> NA      FALSE  as.nume~ <NA>  <NULL>
       # i 12 more rows
       
+      $debug
+      [1] FALSE
+      
 

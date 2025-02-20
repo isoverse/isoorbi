@@ -2,10 +2,11 @@
 #' @description This functions exports the final `dataset` into an Excel file.
 #' @param dataset data frame
 #' @param file file path to export the file
-#' @inheritParams add_excel_sheet
+#' @param dbl_digits how many digits to show for dbls (all are exported)
+#' @param int_format the excel formatting style for integers
+#' @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
 #' @export
 #' @return returns dataset invisibly for use in pipes
-#'
 orbi_export_data_to_excel <- function(dataset, file, dbl_digits = 7, int_format = "0", dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)) {
 
   # check for availability
@@ -56,13 +57,13 @@ orbi_export_data_to_excel <- function(dataset, file, dbl_digits = 7, int_format 
 
 # @title Add a new sheet
 # @description Internal function to add an excel sheet to a workbook.
-#' @param wb the workbook object
-#' @param sheet_name the name of the excel sheet
-#' @param dataset the data frame(s)
-#' @param dbl_digits how many digits to show for dbls (all are exported)
-#' @param int_format the excel formatting style for integers
-#' @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
-#lib @param col_max_width maximum column width
+# @param wb the workbook object
+# @param sheet_name the name of the excel sheet
+# @param dataset the data frame(s)
+# @param dbl_digits how many digits to show for dbls (all are exported)
+# @param int_format the excel formatting style for integers
+# @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
+# @param col_max_width maximum column width
 add_excel_sheet <- function(wb, sheet_name, dataset, dbl_digits = 2, col_max_width = 75, int_format = "0", dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)) {
 
   # sheet

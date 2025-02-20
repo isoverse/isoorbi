@@ -798,10 +798,10 @@ has_blocks <- function(dataset) {
 }
 
 # helper function to find blocks (internal)
-#' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
-#' @param ref_block_time.min time where the signal is stable when reference is analyzed
-#' @param sample_block_time.min time where the signal is stable when sample is analyzed
-#' @param startup_time.min initial time to stabilize spray
+# @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
+# @param ref_block_time.min time where the signal is stable when reference is analyzed
+# @param sample_block_time.min time where the signal is stable when sample is analyzed
+# @param startup_time.min initial time to stabilize spray
 find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref_block_time.min, startup_time.min = 0) {
 
   # type checks
@@ -870,8 +870,8 @@ find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref
 }
 
 # general helper function to divide up time into intervals (internal)
-#' @param total_time which time should be divided up into intervals
-#' @param intervals how many intervals
+# @param total_time which time should be divided up into intervals
+# @param intervals how many intervals
 find_intervals <- function(total_time, intervals) {
 
   # safety checks
@@ -913,9 +913,9 @@ find_intervals <- function(total_time, intervals) {
 }
 
 # helper to find scan number from time
-#' @param scans must be scans from a single file
-#' @param time time stamp where the scan number is required
-#' @param which searching towards the start or end of the file
+# @param scans must be scans from a single file
+# @param time time stamp where the scan number is required
+# @param which searching towards the start or end of the file
 find_scan_from_time <- function(scans, time, which = c("start", "end")) {
   time_scans <- scans |>
     dplyr::filter(
@@ -940,8 +940,8 @@ find_scan_from_time <- function(scans, time, which = c("start", "end")) {
 }
 
 # pull out scan rows (and safety check along the way)
-#' @param scans must be scans from a single file
-#' @param scan scan number
+# @param scans must be scans from a single file
+# @param scan scan number
 get_scan_row <- function(scans, scan) {
   if (!rlang::is_empty(scan)) {
     scan_row <- scans |>
@@ -962,7 +962,7 @@ get_scan_row <- function(scans, scan) {
 }
 
 # internal function to determine data groups
-#' @param dataset assumes is in the correct order
+# @param dataset assumes is in the correct order
 determine_data_groups <- function(dataset) {
   dataset |>
     # assign data groups
@@ -976,8 +976,8 @@ determine_data_groups <- function(dataset) {
 }
 
 # internal function to segment into a specific number of segments
-#' @param scan.no where the segmentation starts
-#' @param into_segments how many segments
+# @param scan.no where the segmentation starts
+# @param into_segments how many segments
 segment_by_segs <- function(scan.no, into_segments) {
   idx <- seq_along(scan.no)
   if(into_segments >= length(scan.no)) {
@@ -992,16 +992,16 @@ segment_by_segs <- function(scan.no, into_segments) {
 }
 
 # internal function to segment by scans
-#' @param scan.no where the segmentation starts
-#' @param by_scans number of scans in each segment
+# @param scan.no where the segmentation starts
+# @param by_scans number of scans in each segment
 segment_by_scans <- function(scan.no, by_scans) {
   # approximates number of scans
   return(segment_by_segs(scan.no, into_segments = round(length(scan.no) / by_scans)))
 }
 
 # internal function to segment by time interval
-#' @param time.min where the segmentation starts
-#' @param time_interval length of each segment in minutes
+# @param time.min where the segmentation starts
+# @param time_interval length of each segment in minutes
 segment_by_time_interval <- function(time.min, time_interval) {
   return( as.integer((time.min - min(time.min)) %/% time_interval + 1L))
 }
