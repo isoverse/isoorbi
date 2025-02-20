@@ -1,7 +1,19 @@
+# isoorbi 1.4.0
+
+## Breaking changes
+
+There are no breaking changes in this release (all changes and new features are backwards compatible).
+
+## New features
+
+## Enhancements
+
+* renamed package "settings" to package "options" to be consistent with the naming conventions in base R (`orbi_options()` replaces `orbi_set_settings()` and `orbi_get_options()` / `orbi_get_option()` replaces `orbi_get_settings()`)
+* improved functionality for options loading and defaults
+
 # isoorbi 1.3.1
 
 This is a patch containing compatibility updates.
-
 
 # isoorbi 1.3.0
 

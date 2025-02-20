@@ -21,5 +21,5 @@ orbi_segment_blocks(
 \item{by_time_interval}{segment each data block into segments spanning this time interval. The result will have the requested time interval for all segments except usually the last one which is almost always shorter than the requested interval.}
 }
 \description{
-This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with \code{data_type} set to "data" (\code{orbi_get_settings("data_type")}) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
+This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with \code{data_type} set to "data" (\code{orbi_get_option("data_type_data")}) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
 }
