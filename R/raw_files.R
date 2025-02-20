@@ -26,7 +26,7 @@ orbi_read_raw <- function(file_paths, show_progress = rlang::is_interactive(), s
           "({prettyunits::pretty_bytes(file.size(pb_extra$file_path))})",
           "| step {pb_current %% pb_extra$multiplier + 1}: {.field {pb_status}}"
         )
-    ); on.exit(cli_process_done(), add = TRUE)
+    ); on.exit(cli_process_done(id = pb), add = TRUE)
   }
   
   # read files safely and with progress info
@@ -72,11 +72,9 @@ orbi_read_raw <- function(file_paths, show_progress = rlang::is_interactive(), s
     return(out$result)
   }
   
-  # finish progress
-  if (show_progress) cli_progress_done(id = pb)
-  
   # read files (separate calls to simplify backtraces)
   results <- file_paths |> map2(seq_along(file_paths), read_safely_with_progress)
+  if (show_progress) cli_progress_done(id = pb)
   results <- results |> bind_rows()
 
   # info
@@ -110,10 +108,6 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
   parse_headers <- function() convert_list_to_tibble(headers$result)
   headers_parsed <- try_catch_cnds(parse_headers(), error_value = tibble())
   
-  # FIXME
-  warning("bla")
-  bla <- try_catch_cnds(test())
-  
   # indices
   if (show_progress)  cli_progress_update(id = pb, status = "indices")
   indices <- try_catch_cnds(rawrr::readIndex(file_path), error_value = tibble(scan = integer(0)))
@@ -144,7 +138,7 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
   # scan info
   if (show_progress) cli_progress_update(id = pb, status = "parse scan info")
   parse_scan_info <- function() {
-    scan_info_cols <- !str_detect(names(spectra_parsed$result), "^(centroid\\.|mZ|intensity)")
+    scan_info_cols <- !grepl("^(centroid\\.|mZ|intensity)", names(spectra_parsed$result))
     scan_info <- spectra_parsed$result[, scan_info_cols]
     scan_cols <- setdiff(names(indices_parsed$result), names(scan_info))
     indices_parsed$result[c("scan", scan_cols)] |> 
@@ -155,7 +149,7 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
   # peaks
   if (show_progress) cli_progress_update(id = pb, status = "parse peaks")
   parse_peaks <- function() {
-    peak_cols <- str_detect(names(spectra_parsed$result), "^centroid\\.")
+    peak_cols <- grepl("^centroid\\.", names(spectra_parsed$result))
     if (!any(peak_cols))
       rlang::abort("no centroid data found in spectra, returning empty peaks")
     peaks <-
@@ -168,7 +162,7 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
   # raw data
   if (show_progress) cli_progress_update(id = pb, status = "parse raw data")
   parse_raw_data <- function() {
-    data_cols <- str_detect(names(spectra_parsed$result), "^(mZ|intensity)")
+    data_cols <- grepl("^(mZ|intensity)", names(spectra_parsed$result))
     if (!any(data_cols))
       rlang::abort("no raw data ({.var mZ} & {.var intensity}) found in spectra, returning empty raw data table")
     raw_data <-
@@ -183,7 +177,6 @@ read_raw_file <- function(file_path, show_progress = rlang::is_interactive(), sh
   
   # problems
   problems <- bind_rows(
-    bla$conditions,
     headers$conditions, headers_parsed$conditions, 
     indices$conditions, indices_parsed$conditions,
     spectra$conditions, spectra_parsed$conditions,

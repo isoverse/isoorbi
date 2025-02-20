@@ -3,13 +3,14 @@
 #' aggregate data from raw files
 #' @param files_data the files read in by orbi_read_raw
 #' @export
-orbi_aggregate_raw <- function(files_data, aggregator, show_progress = rlang::is_interactive(), show_problems = TRUE) {
+orbi_aggregate_raw <- function(files_data, aggregator = orbi_get_option("raw_aggregator"), show_progress = rlang::is_interactive(), show_problems = TRUE) {
   aggregate_files(files_data, aggregator, show_progress = show_progress, show_problems = show_progress)
 }
 
 # design aggregators (general) =====
 
-#' start the aggregator dataset
+#' start the aggregator for a dataset
+#' defines the unique ID field
 #' @export
 start_aggregator <- function(dataset, uid_source, cast, regexp = FALSE, func = NULL, args = NULL) {
   add_aggregator(tibble(), dataset, column = "uid", source = uid_source, cast = cast, regexp = regexp, func = func, args = args)
@@ -30,10 +31,11 @@ add_aggregator <- function(aggregator, dataset, column, source = column, default
   if(!is_character(source) && !is_list(source)) cli_abort("{.var source} is not a character vector or list")
   if (!is.list(source)) source <- list(source)
   if(!is_scalar_logical(regexp)) cli_abort("{.var regexp} is not a TRUEor FALSE")
-  if(!is_scalar_character(cast) || !exists(cast, mode = "function")) 
-    cli_abort("{.var cast} is not the name of a function")
-  if(!is.null(func) && (!is_scalar_character(func) || !exists(func, mode = "function"))) 
-    cli_abort("{.var func} is not the name of a function")
+  if(!is_scalar_character(cast)) cli_abort("{.var cast} must be a scalar character")
+  if(!exists(cast, mode = "function")) cli_abort("function {.fn {cast}} could not be found")
+  # pkg::func not supported yet, need to load the namespace, solution needed?
+  if(!is.null(func) && !is_scalar_character(func)) cli_abort("{.var func} must be a scalar character")
+  if(!is.null(func) && !exists(func, mode = "function")) cli_abort("function {.fn {func}} could not be found")
   if(!is.null(args) && !is_list(args)) cli_abort("{.var agrs} must be a list if provided")
   
   # check if default evaluates without error to avoid unexpected/uncaught errors later on
@@ -55,6 +57,22 @@ add_aggregator <- function(aggregator, dataset, column, source = column, default
         args = if (!is.null(args)) list(args) else list(NULL)
       )
     )
+}
+
+# if we make aggregator a class this could just be the show method
+summarize_aggregator <- function(aggregator) {
+  aggregator |>
+  dplyr::mutate(
+    source = purrr::map_chr(source, ~{
+      sprintf("arg %d: '%s'", seq_along(.x), 
+              purrr::map_chr(.x, paste, collapse = "' or '")) |>
+        paste(collapse = "; ")
+    }),
+    args = purrr::map_chr(args, ~{
+      if (length(.x) > 0) format_inline("args: {.x}")
+      else NA_character_
+    })
+  )
 }
 
 # aggregate raw file data (general) ========
@@ -95,7 +113,7 @@ aggregate_files <- function(files_data, aggregator, show_progress = rlang::is_in
           "| {pb_elapsed} | ETA{pb_eta} | {.emph {pb_status}}"
         )
     ); on.exit(cli_process_done(), add = TRUE)
-    cli_progress_update(inc = 0, status = "initializing")
+    cli_progress_update(id = pb, inc = 0, status = "initializing")
   }
   
   # aggregate files safely and with progress info
