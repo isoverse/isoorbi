@@ -3,12 +3,11 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-context("export functions")
-
 # orbi_export_data_to_excel
 test_that("orbi_export_data_to_excel() tests", {
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
+    suppressMessages()
 
   # failure
   expect_error(orbi_export_data_to_excel(),
@@ -21,15 +20,16 @@ test_that("orbi_export_data_to_excel() tests", {
 
   expect_error(orbi_export_data_to_excel(df, "c", "c"),
                "invalid format '%d'; use format %s for character objects",
-               fixed = TRUE)
+               fixed = TRUE) |> suppressMessages()
 
   expect_error(orbi_export_data_to_excel(df, "c", 2, int_format = TRUE),
                "a character vector argument expected",
-               fixed = TRUE)
+               fixed = TRUE) |> suppressMessages()
 
   # success
   tmp_file <- tempfile()
-  expect_type(orbi_export_data_to_excel(df, tmp_file, 2, int_format = "0"), "list")
+  expect_type(orbi_export_data_to_excel(df, tmp_file, 2, int_format = "0"), "list") |>
+    suppressMessages()
   unlink(tmp_file)
 })
 

@@ -3,8 +3,6 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-context("ratio functions")
-
 # calculate_ratios_sem
 test_that("test calculate_ratios_sem()", {
 
@@ -238,11 +236,13 @@ test_that("test orbi_calculate_summarized_ratio()", {
 # orbi_calculate_ratios
 test_that("test orbi_calculate_ratios()", {
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
+    suppressMessages()
   df_results <-
     df |>
     # define base peak
-    orbi_define_basepeak("15N")
+    orbi_define_basepeak("15N") |>
+    suppressMessages()
 
   # failure
   expect_error(orbi_calculate_ratios(),
@@ -256,7 +256,8 @@ test_that("test orbi_calculate_ratios()", {
                fixed = TRUE)
 
   # deprecation warning
-  expect_warning(orbi_calculate_ratios(df_results), "obsolete")
+  expect_warning(orbi_calculate_ratios(df_results), "obsolete") |>
+    suppressMessages()
 
 })
 
@@ -265,9 +266,11 @@ test_that("test orbi_summarize_results()", {
 
   # success
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N")
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N") |>
+    suppressMessages()
 
-  expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum")))
+  expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum"))) |>
+    suppressMessages()
 
   df2 <- df |> mutate(
     block = as.factor("block1"),
@@ -276,7 +279,8 @@ test_that("test orbi_summarize_results()", {
     sample_name = as.factor("sample_name4")
   )
 
-  expect_true(is.tbl(orbi_summarize_results(df2, ratio_method = "sum")))
+  expect_true(is.tbl(orbi_summarize_results(df2, ratio_method = "sum"))) |>
+    suppressMessages()
 
   # failure
   expect_error(orbi_summarize_results(),
@@ -299,7 +303,7 @@ test_that("test orbi_summarize_results()", {
   expect_error(orbi_summarize_results(dataset = df, ratio_method = "sum", .by = foo),
                "foo.*doesn't exist")
 
-  df3 <- df |> mutate(dummy = 1) |> select(-ions.incremental)
+  df3 <- df |> mutate(dummy = 1) |> select(-"ions.incremental")
 
   expect_error(
     orbi_summarize_results(dataset = df3, ratio_method = "sum"),
