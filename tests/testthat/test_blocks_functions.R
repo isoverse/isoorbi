@@ -1,13 +1,12 @@
 
-context("blocks functions")
-
 test_that("test orbi_define_block_for_flow_injection()", {
 
   # type checks
   expect_error(orbi_define_block_for_flow_injection(), "`dataset` must be a data frame or tibble")
   expect_error(orbi_define_block_for_flow_injection(42), "`dataset` must be a data frame or tibble")
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> 
+    suppressMessages()
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(orbi_define_block_for_flow_injection(df2),
@@ -27,7 +26,8 @@ test_that("test orbi_define_block_for_flow_injection()", {
     filename = rep(c("test1", "test2"), c(6, 4)),
     scan.no = 1:10, time.min = scan.no/10
   )
-  expect_message(orbi_define_block_for_flow_injection(test_data, start_time.min = 0.1, end_time.min = 0.9), "column `filename` was turned into a factor.*")
+  expect_message(orbi_define_block_for_flow_injection(test_data, start_time.min = 0.1, end_time.min = 0.9), "column `filename` was turned into a factor.*") |> 
+    suppressMessages()
 
 })
 
@@ -103,7 +103,7 @@ test_that("test find_blocks()", {
     filename = rep(c("test1", "test2"), c(6, 4)),
     scan.no = 1:10, time.min = scan.no/10
   )
-  expect_is(res1 <- test_data |> find_blocks(0.2), "data.frame")
+  expect_true(is.data.frame(res1 <- test_data |> find_blocks(0.2)))
   expect_equal(
     res1,
     tibble(
@@ -118,7 +118,7 @@ test_that("test find_blocks()", {
       last = c(FALSE, FALSE, TRUE, FALSE, TRUE)
     )
   )
-  expect_is(res2 <- test_data |> find_blocks(0.2, 0.3, 0.2), "data.frame")
+  expect_true(is.data.frame(res2 <- test_data |> find_blocks(0.2, 0.3, 0.2)))
   expect_equal(
     res2,
     tibble(
@@ -166,7 +166,8 @@ test_that("test orbi_define_blocks_for_dual_inlet()", {
     filename = rep(c("test1", "test2"), c(6, 4)),
     scan.no = 1:10, time.min = scan.no/10
   )
-  expect_message(res1 <- orbi_define_blocks_for_dual_inlet(test_data, 0.3, 0.1), "identified 4 blocks.*in.*2 file")
+  expect_message(res1 <- orbi_define_blocks_for_dual_inlet(test_data, 0.3, 0.1), "identified 4 blocks.*in.*2 file") |> 
+    suppressMessages()
   expect_equal(
     res1,
     test_data |> dplyr::mutate(
@@ -181,7 +182,8 @@ test_that("test orbi_define_blocks_for_dual_inlet()", {
   expect_message(
     res2 <- orbi_define_blocks_for_dual_inlet(test_data, 0.2, change_over_time.min = 0.05,
                                               sample_block_time.min = 0.5, startup_time.min = 0.2),
-    "identified 4 blocks.*in.*2 file")
+    "identified 4 blocks.*in.*2 file") |> 
+    suppressMessages()
   expect_equal(
     res2,
     test_data |> dplyr::mutate(
@@ -237,27 +239,32 @@ test_that("test orbi_adjust_block()", {
   expect_message(result0 <- orbi_adjust_block(test_data, 1, "test1"), "not making any changes")
   expect_equal(test_data, result0)
 
-  expect_message(result1 <- orbi_adjust_block(test_data, 2, "test1", set_start_time.min = 0), "is making the following block adjustments")
+  expect_message(result1 <- orbi_adjust_block(test_data, 2, "test1", set_start_time.min = 0), "is making the following block adjustments") |> 
+    suppressMessages()
   expect_equal(result1$block, rep(2, 6))
   expect_equal(result1$data_group, rep(c(1, 3), c(5, 1)))
   expect_equal(result1$data_type, test_data$data_type)
   expect_equal(result1$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
-  expect_message(result2 <- orbi_adjust_block(test_data, 1, "test1", shift_start_scan.no = 1), "moving block 1 start from scan 1.*to 2")
+  expect_message(result2 <- orbi_adjust_block(test_data, 1, "test1", shift_start_scan.no = 1), "moving block 1 start from scan 1.*to 2") |> 
+    suppressMessages()
   expect_equal(result2$block, rep(c(1, 2), c(3, 3)))
   expect_equal(result2$data_group, rep(c(1, 2, 3), c(1, 2, 3)))
   expect_equal(result2$data_type, rep(c("unused", "data"), c(1, 5)))
   expect_equal(result2$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
-  expect_message(result3 <- orbi_adjust_block(test_data, 2, "test1", shift_start_time.min = -1), "moving block 1 end to the new start of block 2")
+  expect_message(result3 <- orbi_adjust_block(test_data, 2, "test1", shift_start_time.min = -1), "moving block 1 end to the new start of block 2") |> 
+    suppressMessages()
   expect_equal(result3$block, rep(2, 6))
   expect_equal(result3$data_group, rep(c(1, 3), c(5, 1)))
   expect_equal(result3$data_type, test_data$data_type)
   expect_equal(result3$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
-  expect_message(result4 <- orbi_adjust_block(test_data, 1, "test1", shift_end_scan.no = 1), "moving block 1 end from scan 3.*to 4")
+  expect_message(result4 <- orbi_adjust_block(test_data, 1, "test1", shift_end_scan.no = 1), "moving block 1 end from scan 3.*to 4") |> 
+    suppressMessages()
 
-  expect_message(result5 <- orbi_adjust_block(test_data, 1, "test1", shift_end_time.min = 1), "moving block 2 start to the new end of block 1")
+  expect_message(result5 <- orbi_adjust_block(test_data, 1, "test1", shift_end_time.min = 1), "moving block 2 start to the new end of block 1") |> 
+    suppressMessages()
 })
 
 test_that("test orbi_segment_block()", {
@@ -290,7 +297,8 @@ test_that("test orbi_segment_block()", {
     data_type = rep(c("unused", "data"), c(2, 8))
   )
 
-  expect_message(res1 <- test_data |> orbi_segment_blocks(into_segments = 2), "segmenting 3 data blocks")
+  expect_message(res1 <- test_data |> orbi_segment_blocks(into_segments = 2), "segmenting 3 data blocks") |> 
+    suppressMessages()
   expect_equal(
     res1,
     test_data |> dplyr::mutate(
@@ -299,7 +307,9 @@ test_that("test orbi_segment_block()", {
     ) |> dplyr::relocate(data_group, .before = "block")
   )
 
-  expect_message(res2 <- test_data |> orbi_segment_blocks(by_scans = 2), "2 scans")
+  
+  expect_message(res2 <- test_data |> orbi_segment_blocks(by_scans = 2), "2 scans")|> 
+    suppressMessages()
   expect_equal(
     res2,
     test_data |> dplyr::mutate(
@@ -308,7 +318,8 @@ test_that("test orbi_segment_block()", {
     ) |> dplyr::relocate(data_group, .before = "block")
   )
 
-  expect_message(res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0), "2.3 segments")
+  expect_message(res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0), "2.3 segments") |> 
+    suppressMessages()
   expect_equal(
     res3,
     test_data |> dplyr::mutate(
@@ -325,7 +336,8 @@ test_that("test orbi_get_blocks_info()", {
   expect_error(orbi_get_blocks_info(), "`dataset` must be a data frame or tibble")
   expect_error(orbi_get_blocks_info(42), "`dataset` must be a data frame or tibble")
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
+    suppressMessages()
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(orbi_get_blocks_info(df2),
@@ -343,7 +355,8 @@ test_that("test orbi_add_blocks_to_plot()", {
   expect_error(orbi_add_blocks_to_plot(42), "`plot` has to be a ggplot", fixed = TRUE)
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox() |> orbi_define_blocks_for_dual_inlet(ref_block_time.min = 0.5, change_over_time.min = 0.1)
+    orbi_simplify_isox() |> orbi_define_blocks_for_dual_inlet(ref_block_time.min = 0.5, change_over_time.min = 0.1) |> 
+    suppressMessages()
   
   library(ggplot2)
   

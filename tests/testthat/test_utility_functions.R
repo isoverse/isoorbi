@@ -3,8 +3,6 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-context("utility functions")
-
 # Internal utility functions =============
 
 # factorize_dataset
@@ -14,7 +12,9 @@ test_that("factorize_dataset() tests", {
   expect_error(factorize_dataset(),
                "argument \"dataset\" is missing, with no default")
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- suppressMessages(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  )
 
   expect_silent(factorize_dataset(df))
 
@@ -64,9 +64,12 @@ test_that("count_grouped_distinct() tests", {
 
 test_that("orbi_filter_satellite_peaks() tests", {
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
-
-  expect_warning(orbi_filter_satellite_peaks(df), "deprecated")
+  df <- suppressMessages(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  )
+  
+  expect_warning(suppressMessages(orbi_filter_satellite_peaks(df)), "deprecated") |>
+    suppressMessages() |> suppressWarnings() # cascade suppressed
 
 })
 
@@ -74,9 +77,13 @@ test_that("orbi_filter_satellite_peaks() tests", {
 test_that("orbi_flag_satellite_peaks() tests", {
 
   # success
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet_new.isox", package = "isoorbi"))
+  df <- suppressMessages(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet_new.isox", package = "isoorbi"))
+  )
 
-  expect_true(is.tbl(orbi_flag_satellite_peaks(orbi_simplify_isox(df))))
+  expect_true(
+    suppressMessages(is.tbl(orbi_flag_satellite_peaks(orbi_simplify_isox(df))))
+  )
 
   # failure
   expect_error(orbi_flag_satellite_peaks(),
@@ -89,7 +96,7 @@ test_that("orbi_flag_satellite_peaks() tests", {
     "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
     fixed = TRUE)
 
-  df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
+  df2 <- df |> mutate(dummy = 1) |> select(-"scan.no")
 
   expect_error(orbi_flag_satellite_peaks(dataset = df2),
     "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
@@ -100,9 +107,12 @@ test_that("orbi_flag_satellite_peaks() tests", {
 # orbi_filter_weak_isotopocules
 test_that("orbi_filter_weak_isotopocules() tests", {
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- suppressMessages(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  )
 
-  expect_warning(orbi_filter_weak_isotopocules(df, min_percent = 5), "deprecated")
+  expect_warning(suppressMessages(orbi_filter_weak_isotopocules(df, min_percent = 5), "deprecated")) |>
+    suppressMessages() |> suppressWarnings() # cascade suppressed
 
 })
 
@@ -119,7 +129,9 @@ test_that("orbi_flag_weak_isotopocules() tests", {
                "need a `dataset` data frame",
                fixed = TRUE)
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- suppressMessages(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  )
 
   expect_error(orbi_flag_weak_isotopocules(dataset = df),
     "`min_percent` needs to be a single number",
@@ -141,10 +153,13 @@ test_that("orbi_flag_weak_isotopocules() tests", {
     "`min_percent` needs to be between 0 and 90",
     fixed = TRUE)
 
-  expect_true(is.tbl(orbi_flag_weak_isotopocules(dataset = orbi_simplify_isox(df),
+  expect_true(
+    suppressMessages(is.tbl(orbi_flag_weak_isotopocules(dataset = orbi_simplify_isox(df),
                                                    min_percent = 1)))
+  )
 
-  df2 <-read.csv(file.path(base_dir, "test_files", "first10rows.csv")) |> select(-scan.no)
+  df2 <-read.csv(file.path(base_dir, "test_files", "first10rows.csv")) |> 
+    select(-"scan.no")
 
   expect_error(orbi_flag_weak_isotopocules(dataset = df2, min_percent = 1))
 
@@ -155,7 +170,9 @@ test_that("orbi_flag_weak_isotopocules() tests", {
   )
 
   # success
-  expect_true(is.tbl(orbi_flag_weak_isotopocules(dataset = df3, min_percent = 1)))
+  expect_true(
+    suppressMessages(is.tbl(orbi_flag_weak_isotopocules(dataset = df3, min_percent = 1)))
+  )
 
 })
 
@@ -163,10 +180,13 @@ test_that("orbi_flag_weak_isotopocules() tests", {
 
 test_that("orbi_filter_scan_intensity() tests", {
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
-
-  expect_warning(orbi_filter_scan_intensity(df, outlier_percent = 5), "deprecated")
-
+  df <- suppressMessages(
+    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  )
+  
+  expect_warning(suppressMessages(orbi_filter_scan_intensity(df, outlier_percent = 5)), "deprecated") |>
+    suppressMessages() |> suppressWarnings() # cascade suppressed
+  
 })
 
 # orbi_flag_outliers
@@ -182,7 +202,6 @@ test_that("orbi_flag_outliers() tests", {
                fixed = TRUE)
 
   df <- read.csv(file.path(base_dir, "test_files", "first10rows.csv"), stringsAsFactors = T)
-
 
   expect_error(orbi_flag_outliers(dataset = df),
                "need to define at least one of these parameters for identifying outliers: 'agc_window', 'agc_fold_cutoff'",
@@ -218,32 +237,24 @@ test_that("orbi_flag_outliers() tests", {
                fixed = TRUE)
 
   # success
-  expect_true(is.tbl(orbi_flag_outliers(dataset = df, agc_window = c(10,90))))
+  expect_true(
+    suppressMessages(is.tbl(orbi_flag_outliers(dataset = df, agc_window = c(10,90))))
+  )
 
   df3 <-
-    orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> mutate(
-      block = as.factor("block1"),
-      segment = as.factor("segment2"),
-      injection = as.factor("injection3")
+    suppressMessages(
+      orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> mutate(
+        block = as.factor("block1"),
+        segment = as.factor("segment2"),
+        injection = as.factor("injection3")
+      )
     )
 
-  expect_true(is.tbl(orbi_flag_outliers(dataset = df3, agc_window = c(10,90))))
+  expect_true(
+    suppressMessages(is.tbl(orbi_flag_outliers(dataset = df3, agc_window = c(10,90))))
+  )
 
 })
-
-# orbi_filter_flagged_data has been deprecated in v1.3
-# test_that("orbi_filter_flagged_data() tests", {
-# 
-#   # failure
-#   expect_error(orbi_filter_flagged_data(),
-#                "need a `dataset` data frame", fixed = TRUE)
-# 
-#   # success
-#   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
-# 
-#   expect_true(is.tbl(orbi_filter_flagged_data(dataset = df)))
-# 
-# })
 
 # orbi_define_basepeak()
 
@@ -286,7 +297,7 @@ test_that("orbi_define_basepeak() tests", {
   
   expect_error(orbi_define_basepeak(df3, basepeak_def = "M0"),
                "the M0 isotopocule exists multiple times in some scans, make sure to run orbi_flag_satellite_peaks() first",
-               fixed = TRUE)
+               fixed = TRUE) |> suppressMessages()
   
   df3[df3 == "M0"] <- "17O"
   
@@ -295,8 +306,11 @@ test_that("orbi_define_basepeak() tests", {
                fixed = TRUE))
 
   # success
-  expect_true(is.tbl(orbi_define_basepeak(
-    dataset = df, basepeak_def = "M0"
-    )))
+  expect_message(
+    expect_true(is.tbl(orbi_define_basepeak(
+      dataset = df, basepeak_def = "M0"
+      ))),
+    "setting.*denominator"
+  ) |> suppressMessages()
 
 })
