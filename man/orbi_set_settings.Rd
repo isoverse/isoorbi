@@ -6,6 +6,9 @@
 \usage{
 orbi_set_settings(...)
 }
+\arguments{
+\item{...}{named arguments to set specific options, passed on to \code{\link[=orbi_options]{orbi_options()}}}
+}
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 

@@ -14,7 +14,7 @@ Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectr
 Resources:
 \itemize{
 \item Website for the isoorbi package: \url{https://isoorbi.isoverse.org}
-\item Package options: \link{isoorbi_options}
+\item Package options: \link{orbi_options}
 }
 }
 \seealso{

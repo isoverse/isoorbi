@@ -21,14 +21,14 @@
 #' orbi_get_option("data_type_unused")
 #' 
 #' @param ... set package options, syntax identical to [options()]
-#' @describeIn isoorbi_options set/get option values
+#' @describeIn orbi_options set/get option values
 #' @export
 orbi_options <- function(...) {
   pkg_options(pkg = "isoorbi", pkg_options = get_pkg_options(), ...)
 }
 
 #' @param pattern to retrieve multiple options (as a list) with a shared pattern
-#' @describeIn isoorbi_options get a subset of option values that fit a pattern
+#' @describeIn orbi_options get a subset of option values that fit a pattern
 #' @export
 orbi_get_options <- function(pattern = NULL) {
   pkg_options <- orbi_options()
@@ -38,14 +38,14 @@ orbi_get_options <- function(pattern = NULL) {
   return(pkg_options)
 }
 
-#' @describeIn isoorbi_options retrieve the current value of one option (option must be defined for the package)
+#' @describeIn orbi_options retrieve the current value of one option (option must be defined for the package)
 #' @param x name of the specific option to retrieve
 #' @export
 orbi_get_option <- function(x) {
   get_pkg_option(option = x, pkg = "isoorbi", pkg_options = get_pkg_options())
 }
 
-#' @rdname isoorbi_options
+#' @rdname orbi_options
 #' @format NULL
 #' @usage NULL
 #' @section Options for the isoorbi package:
@@ -110,7 +110,7 @@ get_pkg_options <- function() {
 #' `r lifecycle::badge("deprecated")`
 #' 
 #' `orbi_set_settings()` was renamed `orbi_options()` as part of `isoorbi` switching from 'settings' to 'options' to be consistent with base R naming conventions
-#'
+#' @param ... named arguments to set specific options, passed on to [orbi_options()]
 #' @export
 orbi_set_settings <- function(...) {
   lifecycle::deprecate_warn("1.4.0", "orbi_set_settings()", "orbi_options()", details = "`isoorbi` switched from 'settings' to 'options' to be consistent with base R naming conventions")
@@ -123,7 +123,7 @@ orbi_set_settings <- function(...) {
 #' `r lifecycle::badge("deprecated")`
 #' 
 #' `orbi_get_settings()` was renamed `orbi_get_options()` as part of `isoorbi` switching from 'settings' to 'options' to be consistent with base R naming conventions
-#' 
+#' @param pattern passed on to [orbi_get_options()]
 #' @export
 orbi_get_settings <- function(pattern = NULL) {
   lifecycle::deprecate_warn("1.4.0", "orbi_get_settings()", "orbi_get_options()", details = "`isoorbi` switched from 'settings' to 'options' to be consistent with base R naming conventions")

@@ -1,17 +1,67 @@
-# read the raw files =======
+# auxiliary raw file functions ========
 
-#' read raw files with progress bar and summary stats
+#' Find raw files
+#' @description Finds all .raw files in a folder.
+#' @param folder path to a folder with raw files
+#' @param recursive whether to find files recursively
+#'
+#' @examples
+#'
+#' # all .raw files provided with the isoorbi package
+#' orbi_find_raw(system.file("extdata", package = "isoorbi"))
+#'
+#' @export
+orbi_find_raw <- function(folder, recursive = TRUE) {
+  # safety check
+  stopifnot(
+    "`folder` must be an existing directory" = dir.exists(folder),
+    "`recursive` must be TRUE or FALSE" = is_scalar_logical(recursive)
+  )
+  
+  # return
+  list.files(folder, pattern = "\\.raw", full.names = TRUE, recursive = recursive)
+}
+
+# read raw files =======
+
+#' Read RAW files
+#' 
+#' Read raw data files (`.raw`) from Orbitrap IRMS runs directly. This function extracts all available information and thus can be relatively slow (~1s / Mb on a typical personal computer). The results can be used directly or, more typically, are aggregated with [orbi_aggregate_raw()] to safely extract the relevant information for downstream processing.  This function is designed to be fail save by safely catching errors and reporting back on them (see [orbi_get_problems()]).
+#'
+#' @param file_paths paths to the `.raw` file(s), single value or vector of paths. Use [orbi_find_raw()] to get all raw files in a folder.
+#' @param show_progress whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with `show_progress = FALSE`
+#' @param show_problems whether to show problems encountered along the way (rather than just keeping track of them with [orbi_get_problems()]). Set to `show_problems = FALSE` to turn off the live printout. Either way, all encountered problems can be retrieved with running [orbi_get_problems()] for the returned list
+#' @return a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically `file_info`, `scans`, `peaks`, and `raw_data`). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use [orbi_aggregate_raw()] to extract safely across files.
 #' @export
 orbi_read_raw <- function(file_paths, show_progress = rlang::is_interactive(), show_problems = TRUE) {
   
   # get started
   call <- force(rlang::current_call())
-  n_files <- length(file_paths)
-  if (n_files == 0) cli_abort("no {.var file_paths} provided")
   start <- Sys.time()
+  
+  # check for availability of rawrr
+  if (!requireNamespace("rawrr", quietly = TRUE)) {
+    cli_abort(
+      c(
+        "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
+        "i" = "typically, runnign the following commands will work to install {.pkg rawrr} and its assemblies:",
+        " " =  "{.emph install.packages(\"BiocManager\")}",
+        " " =  "{.emph BiocManager::install(\"rawrr\")}",
+        " " =  "{.emph rawrr::installRawFileReaderDLLs()}",
+        " " =  "{.emph rawrr::buildRawrrExe() || rawrr::installRawrrExe()}"
+      )
+    )
+  }
+  
+  # safety checks
+  stopifnot(
+    "no file path supplied" = !missing(file_paths),
+    "`file_paths` has to be at least one file path" = is_character(file_paths) && length(file_paths) >= 1L
+  )
   
   # progress bar
   pb <- NULL
+  n_files <- length(file_paths)
   if (show_progress) { 
     old <- options(cli.progress_show_after = 0); on.exit(options(old))
     pb_multiplier <- 10 # for subprocesses

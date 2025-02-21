@@ -90,8 +90,8 @@ try_catch_cnds <- function(expr, error_value = NULL, catch_errors = TRUE, catch_
         purrr::map_chr(~as.character(conditionCall(.x))[1]), 
       message = .data$condition |> 
         # strip ansi since this is just the problems summary
-        purrr::map_chr(~stringr::str_replace_all(
-          cli::ansi_strip(conditionMessage(.x)), "\\n", " ")),
+        purrr::map_chr(
+          ~gsub("\\n", " ", cli::ansi_strip(conditionMessage(.x)))),
       .before = "condition"
     )
 
@@ -119,11 +119,11 @@ format_cnds <- function(conditions, include_symbol = TRUE, include_call = TRUE, 
   indent <- rep("\u00a0", indent * 2) |> paste(collapse = "")
   out <- conditions |>
     mutate(
-      symbol = ifelse(type == "error", "{col_red(symbol$cross)} ", "{col_yellow('!')} "),
+      symbol = ifelse(.data$type == "error", "{col_red(symbol$cross)} ", "{col_yellow('!')} "),
       call_label = ifelse(!is.na(.data$call), sprintf("%s{.fn %s}: ", call_prefix, .data$call), ""),
       message_w_type = paste0(indent, prefix, if (include_symbol) .data$symbol, if (include_call) .data$call_label, .data$message)
     ) |>
-    pull(message_w_type)
+    pull(.data$message_w_type)
   return(out)
 }
 

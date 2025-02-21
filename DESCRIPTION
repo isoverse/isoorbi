@@ -27,25 +27,27 @@ Depends:
 Imports:
     utils (>= 4.1.0),
     stats (>= 4.1.0),
+    methods,
     rlang (>= 1.0.0),
     cli (>= 3.6.0),
     lifecycle (>= 1.0.0),
     tidyr (>= 1.2.0),
     tibble,
+    tidyselect (>= 1.2.0),
     dplyr (>= 1.1.1),
     ggplot2 (>= 3.4.0),
     scales (>= 1.2.1),
     readr (>= 2.1.0),
-    tidyselect (>= 1.2.0),
     openxlsx,
     purrr,
-    methods
+    prettyunits
 Suggests:
     devtools,
     knitr,
     rmarkdown,
     testthat,
-    forcats
+    forcats,
+    rawrr
 Description: Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Citation: Kantnerova et al. (Nature Protocols, 2024).
 License: MIT + file LICENSE
 Encoding: UTF-8
