@@ -22,6 +22,11 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install Mono
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y mono-mcs mono-xbuild
+        shell: bash {0}
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::covr, any::xml2
