@@ -30,14 +30,30 @@ navbar:
     href: https://github.com/isoverse/isoorbi
 
 reference:
-- title: Core functions
+- title: Read RAW files
   desc: >
-    These core functions are essential to read and process isox data.
+    These functions allow reading of raw files directly
+  contents:
+  - orbi_read_raw
+  - orbi_aggregate_raw
+  - orbi_start_aggregator
+  - orbi_add_aggregator
+
+- title: Read ISOX files
+  desc: >
+    These functions allow reading of isox files
   contents:
   - orbi_find_isox
   - orbi_read_isox
+  - orbi_simplify_isox
+  
+- title: Core proessing functions
+  desc: >
+    These core functions are essential to process the data read from RAW or ISOX files
+  contents:
   - orbi_define_basepeak
   - orbi_summarize_results
+  - orbi_calculate_summarized_ratio
 
 - title: Define data blocks
   desc: >
@@ -82,17 +98,11 @@ reference:
   contents:
   - orbi_export_data_to_excel
   
-- title: Other functions
+- title: Package options
   desc: >
     These functions are available to simplify or customize the data analysis.
   contents:
-  - orbi_simplify_isox
-  - orbi_calculate_summarized_ratio
-
-- title: Internal
-  desc: >
-    These functions are available to simplify or customize the data analysis.
-  contents:
+  - isoorbi-package
   - orbi_options
   - orbi_get_options
   - orbi_get_option
