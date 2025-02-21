@@ -34,10 +34,12 @@ reference:
   desc: >
     These functions allow reading of raw files directly
   contents:
+  - orbi_find_raw
   - orbi_read_raw
   - orbi_aggregate_raw
   - orbi_start_aggregator
   - orbi_add_aggregator
+  - orbi_get_problems
 
 - title: Read ISOX files
   desc: >
