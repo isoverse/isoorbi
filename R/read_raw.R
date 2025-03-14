@@ -72,7 +72,7 @@ orbi_read_raw <- function(file_paths, show_progress = rlang::is_interactive(), s
         paste(
           "Reading {floor(pb_current/pb_extra$multiplier) + 1}/{pb_extra$n_files}",
           "raw files {pb_bar} {pb_percent}",
-          "| {pb_elapsed} | ETA{pb_eta} | {.emph {basename(pb_extra$file_path)}}",
+          "| {pb_elapsed} | ETA {pb_eta} | {.emph {basename(pb_extra$file_path)}}",
           "({prettyunits::pretty_bytes(file.size(pb_extra$file_path))})",
           "| step {pb_current %% pb_extra$multiplier + 1}: {.field {pb_status}}"
         )
@@ -112,7 +112,7 @@ orbi_read_raw <- function(file_paths, show_progress = rlang::is_interactive(), s
       "Read {.emph {basename(file_path)}} ",
       if (file.exists(file_path)) "({prettyunits::pretty_bytes(file.size(file_path))}) ",
       summarize_cnds(problems, "but encountered {issues}"),
-      if (show_problems) ":"
+      if (show_problems && nrow(problems) > 0) ":"
     )
     cli_text(info)
     
