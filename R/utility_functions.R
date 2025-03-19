@@ -51,6 +51,8 @@ try_catch_all <- function(expr, error, warn = error, newline = TRUE) {
   )
 }
 
+# FIXME: this should all work now with cli, i.e. no need to do this kind of wrapping as long as wrap = TRUE on cli_alert_... calls
+
 # print out info start message
 message_start <- function(...) {
   message_wrap(..., exdent = 3, appendLF = !interactive())
@@ -85,6 +87,12 @@ message_wrap <- function (..., appendLF = TRUE, width = if (!interactive()) opti
   invisible()
 }
 
+# return a pretty int
+pretty_n <- function(n) {
+  n |> 
+    prettyunits::pretty_num("nopad") |> 
+    gsub(pattern = " *$", replacement = "")
+}
 
 # Common utility functions to clean and annotate data ------------------------------------
 
