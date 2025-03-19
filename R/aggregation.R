@@ -13,6 +13,29 @@ orbi_aggregate_raw <- function(files_data, aggregator = orbi_get_option("raw_agg
   aggregate_files(files_data, aggregator, show_progress = show_progress, show_problems = show_progress)
 }
 
+#' Get data frame from aggregated data
+#' 
+#' Retrieve a specific subset of the aggregated data into a single data frame by specifying which columns to take from each dataset (file_info, scans, peaks, etc.) using [dplyr::select()] syntax. If data from more than one dataset is selected (e.g. some columns from `scans` AND some from `peaks`), the datasets are combined with an [dplyr::inner_join()] using the columns listed in `by` (only the ones actually in the datasets). Joins that would lead to duplicated data entries (i.e. many-to-many joins) are not allowed and will throw an error to avoid unexpected replications of individual datapoints. If you really want to do such a join, you'll have to do it manually.
+#' @param aggregated_data datasets aggregated from [orbi_aggregate_raw()]
+#' @param file_info columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
+#' @param scans columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
+#' @param peaks columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
+#' @param raw_data columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
+#' @param by which columns to look for when joining datasets together. Make sure to include the relevant `by` columns in the selections of the individual datasets so they are joined correctly.
+#' @return a tibble
+#' @export
+orbi_get_data <- function(aggregated_data, file_info = NULL, scans = NULL, peaks = NULL, raw_data = NULL, problems = NULL, by = c("uid", "scan")) {
+  get_data(
+    .ds = aggregated_data,
+    file_info = {{ file_info }},
+    scans = {{ scans }},
+    peaks = {{ peaks }},
+    raw_data = {{ raw_data }},
+    problems = {{ problems }},
+    by = by
+  )
+}
+
 # design aggregators (general) =====
 
 #' Dynamic data agreggator
@@ -44,18 +67,22 @@ orbi_start_aggregator <- function(dataset, uid_source, cast = "as.factor", regex
 orbi_add_aggregator <- function(aggregator, dataset, column, source = column, default = NA, cast = "as.character", regexp = FALSE, func = NULL, args = NULL) {
   
   # checks
-  if(!is_tibble(aggregator)) cli_abort("{.var aggregator} is not a data frame")
-  if(!is_scalar_character(dataset)) cli_abort("{.var dataset} is not a scalar character")
-  if(!is_scalar_character(column)) cli_abort("{.var column} is not a scalar character")
-  if(!is_character(source) && !is_list(source)) cli_abort("{.var source} is not a character vector or list")
+  stopifnot(
+    "`aggregator` must be a data frame" = !missing(aggregator) && is_tibble(aggregator),
+    "`dataset` must be a scalar character" = !missing(dataset) && is_scalar_character(dataset),
+    "`column` must be a scalar character" = !missing(column) && is_scalar_character(column),
+    "`source` must a character vector of list" = is_character(source) || is_list(source),
+    "`regexp` must be TRUE or FALSE" = is_scalar_logical(regexp),
+    "`cast` must be a scalar character" = is_scalar_character(cast),
+    "if provided, `func` must be a scalar character" = is.null(func) || is_scalar_character(func),
+    "if provided, `args` must be a list" = is.null(args) || is_list(args)
+    
+  )
   if (!is.list(source)) source <- list(source)
-  if(!is_scalar_logical(regexp)) cli_abort("{.var regexp} is not a TRUEor FALSE")
-  if(!is_scalar_character(cast)) cli_abort("{.var cast} must be a scalar character")
+  
+  # function checks - pkg::func not supported yet (e.g. forcats::as_factor)! need to load the namespace, solution needed?
   if(!exists(cast, mode = "function")) cli_abort("function {.fn {cast}} could not be found")
-  # pkg::func not supported yet, need to load the namespace, solution needed?
-  if(!is.null(func) && !is_scalar_character(func)) cli_abort("{.var func} must be a scalar character")
   if(!is.null(func) && !exists(func, mode = "function")) cli_abort("function {.fn {func}} could not be found")
-  if(!is.null(args) && !is_list(args)) cli_abort("{.var agrs} must be a list if provided")
   
   # check if default evaluates without error to avoid unexpected/uncaught errors later on
   do.call(cast, args = list(default))
@@ -185,9 +212,7 @@ aggregate_files <- function(files_data, aggregator, show_progress = rlang::is_in
   
   # info
   if (show_progress) cli_progress_done(id = pb)
-  n_rows <- map_int(results, nrow) |> 
-    prettyunits::pretty_num("nopad") |> 
-    gsub(pattern = " *$", replacement = "")
+  n_rows <- map_int(results, nrow) |> pretty_n()
   details <- sprintf("{col_blue('%s')} (%s)", names(results), n_rows)
   info <- format_inline(
     "{col_green(symbol$tick)} ",
@@ -367,3 +392,108 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
   return(c(datasets, list(problems = problems))) 
 }
 
+# get data from aggregated ===========
+
+# get data from an aggregated list of datasets via inner joins
+# @param .ds the list of datasets (uses .ds to avoid accidental partial mapping by ...)
+# @param ... named arguments for each dataset that should be included with a tidyselect expression for the columns to include
+# @param by which columns to use for join by operations (if there are any)
+# @param relationship passed to inner_join
+get_data <- function(.ds, ..., by = c(), call = rlang::caller_env(), relationship = NULL) {
+  # basic safety checks
+  stopifnot(
+    "`.ds` must be a list" = !missing(.ds) && is_list(.ds),
+    "`.ds` must contain at least one data frame" = 
+      length(.ds) > 0 && sum(sapply(.ds, is.data.frame) > 0),
+    "`by` must be a character vector" = is_empty(by) || is_character(by)
+  )
+  
+  # any selectors?
+  selectors <- rlang::enquos(...)
+  selectors <- selectors[!purrr::map_lgl(selectors, quo_is_null)]
+  if (length(selectors) == 0) {
+    cli_abort(c(
+      "no dataset column selections provided",
+      "i" = "available dataset{?s}: {.emph {names(.ds)}}"
+    ))
+  }
+  
+  # valid selectors?
+  if (any(missing <- !names(selectors) %in% names(.ds))) {
+    cli_abort(
+      c("dataset{?s} not in the data: {.emph {names(selectors)[missing]}}",
+      "i" = "available dataset{?s}: {.emph {names(.ds)}}"
+      ), call = call)
+  }
+  
+  # quick loop (better errors than map for the small number of .ds)
+  join_bys <- list()
+  out <- tibble::tibble()
+  for (i in seq_along(selectors)) {
+    # fetch
+    new_data <- tryCatch(
+      .ds[[names(selectors)[i]]] |> dplyr::select(!!selectors[[i]]),
+      error = function(cnd) {
+        cli_abort(
+          c(
+            "encountered an error selecting columns for {.emph {names(selectors)[i]}}", 
+            "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(.ds[[names(selectors)[i]]])}}"
+          ),
+          parent = cnd, call = call)
+      }
+    )
+    # join
+    if (i > 1) {
+      join_by <- intersect(by, names(out)) |> intersect(names(new_data))
+      if (length(join_by) == 0) {
+        cli_abort(
+          c(
+            paste(
+              "unclear how to join {.emph {names(selectors)[i]}}",
+              "with {.emph {names(selectors)[1:(i-1)]}}"
+            ),
+            "i" = if(length(by) == 0) "there are no join columns defined in {.var by}"
+                  else "allowed join columns: {.var {by}}",
+            "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(new_data)}}",
+            "i" = "columns in {.emph {names(selectors)[1:(i-1)]}}: {.var {names(out)}}"
+          ), 
+         call = call)
+      }
+      out <- 
+        tryCatch(
+          dplyr::inner_join(out, new_data, by = join_by, relationship = relationship),
+          warning = function(cnd) {
+            cli_abort(
+              c(
+                paste(
+                  "encountered warning when joining {.emph {names(selectors)[i]}}",
+                  "with {.emph {names(selectors)[1:(i-1)]}} by {.var {join_by}}"
+                ),
+                "i" = "are you sure the by column{?s} ({.var {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
+              ), parent = cnd, call = call)
+          }
+        )
+      join_bys <- c(join_bys, join_by)
+    } else {
+      # just one dataset
+      out <- new_data
+    }
+  }
+  
+  # info
+  n_rows <- 
+    purrr::map_int(.ds[names(selectors)], nrow) |> 
+    pretty_n()
+  
+  details <- 
+    if (length(selectors) == 1) sprintf("{col_blue('%s')}", names(selectors))
+    else sprintf("{col_blue('%s')} (%s)", names(selectors), n_rows)
+  
+  format_inline(
+    "Retrieved {pretty_n(nrow(out))} records from {qty(length(selectors))}",
+    "{?/the combination of }{details}{?/ via }{?/{.var {unique(unlist(join_bys))}}}"
+  ) |> cli_alert_success(wrap = TRUE)
+  
+  # return
+  return(out)
+}
