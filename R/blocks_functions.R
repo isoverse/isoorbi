@@ -9,7 +9,7 @@
 #' @param start_scan.no set the start scan of the block
 #' @param end_scan.no set the end scan of the block
 #' @param sample_name if provided, will be used as the `sample_name` for the block
-#' @return A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
+#' @return A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of `orbi_get_option("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
 orbi_define_block_for_flow_injection <- function(
     dataset,
@@ -64,7 +64,7 @@ orbi_define_block_for_flow_injection <- function(
   if (!"sample_name" %in% names(scans))
     scans$sample_name <- NA_character_
   if (!"data_type" %in% names(scans))
-    scans$data_type <- setting("data_type_unused")
+    scans$data_type <- orbi_get_option("data_type_unused")
 
   # nest
   scans <- scans |> tidyr::nest(data = -"filename")
@@ -99,7 +99,7 @@ orbi_define_block_for_flow_injection <- function(
         dplyr::mutate(
           new_block = ifelse(.data$scan.no >= .data$start_scan.no & .data$scan.no <= .data$end_scan.no, .data$next_block, .data$block),
           sample_name = ifelse(!is.null(!!sample_name) & .data$new_block == .data$next_block, !!sample_name, .data$sample_name),
-          data_type = ifelse(.data$new_block == .data$next_block, setting("data_type_data"), .data$data_type),
+          data_type = ifelse(.data$new_block == .data$next_block, orbi_get_option("data_type_data"), .data$data_type),
           segment = NA_integer_
         ) |>
         # determine data groups
@@ -152,7 +152,7 @@ orbi_define_block_for_flow_injection <- function(
 #' * `block` is an integer counting the data blocks in each file (0 is the startup block)
 #' * `sample_name` is the name of the material being measured as defined by the `ref_block_name` and `sample_block_name` parameters
 #' * `segment` is an integer defines segments within individual blocks - this will be `NA` until the optional [orbi_segment_blocks()] is called
-#' * `data_type` is a text value describing the type of data in each `data_group` - for a list of the main categories, call `orbi_get_settings("data_type")`
+#' * `data_type` is a text value describing the type of data in each `data_group` - for a list of the main categories, call `orbi_get_options("data_type")`
 #' @export
 orbi_define_blocks_for_dual_inlet <- function(
     dataset,
@@ -160,8 +160,8 @@ orbi_define_blocks_for_dual_inlet <- function(
     change_over_time.min,
     sample_block_time.min = ref_block_time.min,
     startup_time.min = 0,
-    ref_block_name = setting("di_ref_name"),
-    sample_block_name = setting("di_sample_name")
+    ref_block_name = orbi_get_option("di_ref_name"),
+    sample_block_name = orbi_get_option("di_sample_name")
     ) {
 
   # type checks
@@ -239,9 +239,9 @@ orbi_define_blocks_for_dual_inlet <- function(
       data_type =
         dplyr::case_when(
           # note that there is no unused data ("data_type_unused") yet at this point
-          .data$startup ~ setting("data_type_startup"),
-          .data$changeover ~ setting("data_type_changeover"),
-          TRUE ~ setting("data_type_data")
+          .data$startup ~ orbi_get_option("data_type_startup"),
+          .data$changeover ~ orbi_get_option("data_type_changeover"),
+          TRUE ~ orbi_get_option("data_type_data")
         ) |>
         # turn into a factor to make it faster to filter on
         as.factor()
@@ -288,7 +288,7 @@ orbi_define_blocks_for_dual_inlet <- function(
 #' @param set_end_time.min if provided, sets the end time of the block as close as possible to this time
 #' @param set_start_scan.no if provided, sets the start of the block to this scan number (scan must exist in the `dataset`)
 #' @param set_end_scan.no if provided, sets the end of the block to this scan number (scan must exist in the `dataset`)
-#' @return A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of `orbi_get_settings("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
+#' @return A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of `orbi_get_option("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
 orbi_adjust_block <- function(
     dataset, block, filename = NULL,
@@ -374,7 +374,7 @@ orbi_adjust_block <- function(
   block_scans <- file_scans |>
     dplyr::filter(
       .data$block == !!block,
-      .data$data_type == setting("data_type_data")
+      .data$data_type == orbi_get_option("data_type_data")
     )
 
   old_start_scan <- block_scans$scan.no |> utils::head(1)
@@ -488,10 +488,10 @@ orbi_adjust_block <- function(
       # update data type
       data_type = dplyr::case_when(
         # new data range
-        .data$scan.no >= new_start_scan & .data$scan.no <= new_end_scan ~ setting("data_type_data"),
+        .data$scan.no >= new_start_scan & .data$scan.no <= new_end_scan ~ orbi_get_option("data_type_data"),
         # previous data that's now unused
-        .data$data_type == setting("data_type_data") &
-          .data$scan.no >= old_start_scan & .data$scan.no <= old_end_scan ~ setting("data_type_unused"),
+        .data$data_type == orbi_get_option("data_type_data") &
+          .data$scan.no >= old_start_scan & .data$scan.no <= old_end_scan ~ orbi_get_option("data_type_unused"),
         # unchanged
         TRUE ~ .data$data_type
       ),
@@ -534,7 +534,7 @@ orbi_adjust_block <- function(
 }
 
 #' @title Segment data blocks
-#' @description This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with `data_type` set to "data" (`orbi_get_settings("data_type")`) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
+#' @description This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with `data_type` set to "data" (`orbi_get_option("data_type_data")`) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
 #' @inheritParams orbi_adjust_block
 #' @param into_segments segment each data block into this many segments. The result will have exactly this number of segments for each data block except for if there are more segments requested than observations in a group (in which case each observation will be one segment)
 #' @param by_scans segment each data block into segments spanning this number of scans. The result will be approximately the requested number of scans per segment, depending on what is the most sensible distribution of the data. For example, in a hypothetical data block with 31 scans, if by_scans = 10, this function will create 3 segments with 11, 10 and 10 scans each (most evenly distributed), instead of 4 segments with 10, 10, 10, 1 (less evenly distributed).
@@ -595,7 +595,7 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
     dplyr::group_by(.data$filename, .data$block, .data$data_type) |>
     dplyr::mutate(
       segment =
-        if(.data$data_type[1] == setting("data_type_data")) {
+        if(.data$data_type[1] == orbi_get_option("data_type_data")) {
           # data type is 'data'
           if (!rlang::is_empty(!!into_segments)) {
             segment_by_segs(.data$scan.no, !!into_segments)
@@ -614,7 +614,7 @@ orbi_segment_blocks <- function(dataset, into_segments = NULL, by_scans = NULL, 
 
   # info message
   info_sum <- segmented_scans |>
-    dplyr::filter(.data$block > 0, .data$data_type == setting("data_type_data")) |>
+    dplyr::filter(.data$block > 0, .data$data_type == orbi_get_option("data_type_data")) |>
     dplyr::select("filename", "block", "segment", "scan.no") |>
     dplyr::distinct() |>
     dplyr::count(.data$filename, .data$block, .data$segment) |>
@@ -711,7 +711,7 @@ orbi_get_blocks_info <- function(dataset, .by = c("filename", "injection", "data
 #'
 #' @param plot object with a dataset that has defined blocks
 #' @param x which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.
-#' @param data_only if set to TRUE, only the blocks flagged as "data" (`setting("data_type_data")`) are highlighted
+#' @param data_only if set to TRUE, only the blocks flagged as "data" (`orbi_get_option("data_type_data")`) are highlighted
 #' @param fill what to use for the fill aesthetic, default is the block `data_type`
 #' @param fill_colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
 #' @param fill_scale use this parameter to replace the entire fill scale rather than just the `fill_colors`
@@ -758,7 +758,7 @@ orbi_add_blocks_to_plot <- function(
     if (!has_blocks(df))
       abort("this data set does not seem to have any block defintions yet, use a function from the `orbi_define_block...` family to define one or multiple data blocks")
     if (data_only) 
-      df <- df |> dplyr::filter(.data$data_type == setting("data_type_data"))
+      df <- df |> dplyr::filter(.data$data_type == orbi_get_option("data_type_data"))
     blocks <- df |> orbi_get_blocks_info()
     blocks |> 
       dplyr::filter(!is.na(.data$block)) |>
@@ -798,10 +798,10 @@ has_blocks <- function(dataset) {
 }
 
 # helper function to find blocks (internal)
-#' @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
-#' @param ref_block_time.min time where the signal is stable when reference is analyzed
-#' @param sample_block_time.min time where the signal is stable when sample is analyzed
-#' @param startup_time.min initial time to stabilize spray
+# @param dataset tibble produced by [orbi_define_blocks_for_dual_inlet()]
+# @param ref_block_time.min time where the signal is stable when reference is analyzed
+# @param sample_block_time.min time where the signal is stable when sample is analyzed
+# @param startup_time.min initial time to stabilize spray
 find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref_block_time.min, startup_time.min = 0) {
 
   # type checks
@@ -870,8 +870,8 @@ find_blocks <- function(dataset, ref_block_time.min, sample_block_time.min = ref
 }
 
 # general helper function to divide up time into intervals (internal)
-#' @param total_time which time should be divided up into intervals
-#' @param intervals how many intervals
+# @param total_time which time should be divided up into intervals
+# @param intervals how many intervals
 find_intervals <- function(total_time, intervals) {
 
   # safety checks
@@ -913,9 +913,9 @@ find_intervals <- function(total_time, intervals) {
 }
 
 # helper to find scan number from time
-#' @param scans must be scans from a single file
-#' @param time time stamp where the scan number is required
-#' @param which searching towards the start or end of the file
+# @param scans must be scans from a single file
+# @param time time stamp where the scan number is required
+# @param which searching towards the start or end of the file
 find_scan_from_time <- function(scans, time, which = c("start", "end")) {
   time_scans <- scans |>
     dplyr::filter(
@@ -940,8 +940,8 @@ find_scan_from_time <- function(scans, time, which = c("start", "end")) {
 }
 
 # pull out scan rows (and safety check along the way)
-#' @param scans must be scans from a single file
-#' @param scan scan number
+# @param scans must be scans from a single file
+# @param scan scan number
 get_scan_row <- function(scans, scan) {
   if (!rlang::is_empty(scan)) {
     scan_row <- scans |>
@@ -962,7 +962,7 @@ get_scan_row <- function(scans, scan) {
 }
 
 # internal function to determine data groups
-#' @param dataset assumes is in the correct order
+# @param dataset assumes is in the correct order
 determine_data_groups <- function(dataset) {
   dataset |>
     # assign data groups
@@ -976,8 +976,8 @@ determine_data_groups <- function(dataset) {
 }
 
 # internal function to segment into a specific number of segments
-#' @param scan.no where the segmentation starts
-#' @param into_segments how many segments
+# @param scan.no where the segmentation starts
+# @param into_segments how many segments
 segment_by_segs <- function(scan.no, into_segments) {
   idx <- seq_along(scan.no)
   if(into_segments >= length(scan.no)) {
@@ -992,16 +992,16 @@ segment_by_segs <- function(scan.no, into_segments) {
 }
 
 # internal function to segment by scans
-#' @param scan.no where the segmentation starts
-#' @param by_scans number of scans in each segment
+# @param scan.no where the segmentation starts
+# @param by_scans number of scans in each segment
 segment_by_scans <- function(scan.no, by_scans) {
   # approximates number of scans
   return(segment_by_segs(scan.no, into_segments = round(length(scan.no) / by_scans)))
 }
 
 # internal function to segment by time interval
-#' @param time.min where the segmentation starts
-#' @param time_interval length of each segment in minutes
+# @param time.min where the segmentation starts
+# @param time_interval length of each segment in minutes
 segment_by_time_interval <- function(time.min, time_interval) {
   return( as.integer((time.min - min(time.min)) %/% time_interval + 1L))
 }

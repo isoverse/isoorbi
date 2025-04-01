@@ -29,7 +29,7 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 
 \item{include_flagged_data}{whether to include flagged data in the calculations (FALSE by default)}
 
-\item{include_unused_data}{whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as setting("data_type_data")}
+\item{include_unused_data}{whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as orbi_get_option("data_type_data")}
 }
 \value{
 Returns a results summary table retaining the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns: \code{start_scan.no}, \code{end_scan.no}, \code{start_time.min}, \code{mean_time.min}, \code{end_time.min}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}

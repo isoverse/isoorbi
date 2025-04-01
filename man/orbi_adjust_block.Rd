@@ -42,7 +42,7 @@ orbi_adjust_block(
 \item{set_end_scan.no}{if provided, sets the end of the block to this scan number (scan must exist in the \code{dataset})}
 }
 \value{
-A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of \code{orbi_get_settings("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
+A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
 }
 \description{
 This function can be used to manually adjust where certain \code{block} starts or ends using either time or scan number.

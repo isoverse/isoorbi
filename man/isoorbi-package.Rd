@@ -10,6 +10,13 @@
 
 Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Citation: Kantnerova et al. (Nature Protocols, 2024).
 }
+\details{
+Resources:
+\itemize{
+\item Website for the isoorbi package: \url{https://isoorbi.isoverse.org}
+\item Package options: \link{orbi_options}
+}
+}
 \seealso{
 Useful links:
 \itemize{
@@ -29,4 +36,3 @@ Authors:
 }
 
 }
-\keyword{internal}

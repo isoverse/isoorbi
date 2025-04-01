@@ -5,11 +5,12 @@
 
 <!-- badges: start -->
 
-[![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://isoorbi.isoverse.org/)
-[![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
-[![codecov](https://codecov.io/gh/isoverse/isoorbi/branch/main/graph/badge.svg?token=SN0YDIJ6Y6)](https://app.codecov.io/gh/isoverse/isoorbi)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/isoorbi)](https://CRAN.R-project.org/package=isoorbi)
+[![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://isoorbi.isoverse.org/)
+[![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/isoverse/isoorbi/graph/badge.svg)](https://app.codecov.io/gh/isoverse/isoorbi)
 <!-- badges: end -->
 
 ## Overview

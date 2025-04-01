@@ -300,7 +300,7 @@ orbi_calculate_summarized_ratio <- function(
 #' @inheritParams orbi_calculate_summarized_ratio
 #' @param .by additional grouping columns for the results summary (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
 #' @param include_flagged_data whether to include flagged data in the calculations (FALSE by default)
-#' @param include_unused_data whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as setting("data_type_data") 
+#' @param include_unused_data whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as orbi_get_option("data_type_data") 
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
@@ -362,7 +362,7 @@ orbi_summarize_results <- function(
   n_unused <- 0L
   if ("data_type" %in% names(dataset)) {
     dataset_wo_unused <- dataset |> 
-      dplyr::filter(.data$data_type == setting("data_type_data"))
+      dplyr::filter(.data$data_type == orbi_get_option("data_type_data"))
     n_unused <- n_all - n_flagged - nrow(dataset_wo_unused)
     if (!include_unused_data)
       dataset <- dataset_wo_unused

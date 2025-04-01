@@ -3,8 +3,6 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-context("loading functions")
-
 test_that("orbi_find_isox", {
 
   # safety checks
@@ -31,17 +29,17 @@ test_that("orbi_read_isox() tests", {
   unlink(temp_file) # destroy the temp file
 
   # corrupt files - missing columns
-  expect_error(orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")), "file format error")
+  expect_error(orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")), "file format error") |> suppressMessages()
   # corrupt files
   expect_error(orbi_read_isox(file.path(
     base_dir, "test_files", "missing_column.isox"
   )), "file format error",
-  fixed = TRUE)
+  fixed = TRUE) |> suppressMessages()
 
   # test reading a file
   expect_true(
     is.tbl(df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")))
-  )
+  ) |> suppressMessages()
 
   expect_equal(
     names(df),
@@ -69,7 +67,7 @@ test_that("orbi_read_isox() tests", {
           system.file("extdata", "testfile_flow.isox", package = "isoorbi")
         ))
     )
-  )
+  ) |> suppressMessages()
   expect_equal(nrow(df2), 11633)
 
 })
@@ -78,9 +76,10 @@ test_that("orbi_read_isox() tests", {
 test_that("orbi_simplify_isox() tests", {
 
   # success
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> 
+    suppressMessages()
 
-  expect_true(is.tbl(orbi_simplify_isox(df)))
+  expect_true(is.tbl(orbi_simplify_isox(df))) |> suppressMessages()
 
   # test safety checks
   expect_error(orbi_simplify_isox(), "need a `dataset` data frame")
@@ -114,16 +113,18 @@ test_that("orbi_simplify_isox() tests", {
 test_that("orbi_filter_isox() tests",{
 
   # success
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> 
+    suppressMessages()
 
-  expect_true(is.tbl(orbi_filter_isox(df)))
+  expect_true(is.tbl(orbi_filter_isox(df))) |> suppressMessages()
 
   expect_true(is.tbl(orbi_filter_isox(df,
                                       filenames = "20220125_01",
                                       compounds = "NO3-",
                                       isotopocules = c("15N", "18O"),
                                       time_min = 0.5,
-                                      time_max = 2)))
+                                      time_max = 2))) |> 
+    suppressMessages()
 
   # failure
   expect_error(orbi_filter_isox(), "need a `dataset` data frame",
@@ -165,3 +166,4 @@ test_that("orbi_filter_isox() tests",{
                "`compounds` must be a vector of compounds (or NULL)", fixed = TRUE)
 
 })
+

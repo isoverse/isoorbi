@@ -1,4 +1,3 @@
-context("plotting functions")
 
 # filter_isotopocules
 
@@ -10,7 +9,7 @@ test_that("filter_isotopocules() tests", {
                fixed = TRUE)
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox()
+    orbi_simplify_isox() |> suppressMessages()
   
   expect_error(filter_isotopocules(df),
                "argument \"isotopocules\" is missing, with no default",
@@ -36,7 +35,8 @@ test_that("dynamic_y_scale() tests", {
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
     orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N") |>
-    orbi_analyze_shot_noise()
+    orbi_analyze_shot_noise() |> 
+    suppressMessages()
   
 })
 
@@ -52,7 +52,7 @@ test_that("orbi_get_isotopocule_coverage() tests", {
   # success
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox()
+    orbi_simplify_isox() |> suppressMessages()
   
   dataset <- df |> factorize_dataset(c("filename", "compound", "isotopocule"))
   
@@ -70,7 +70,8 @@ test_that("orbi_plot_satellite_peaks() tests", {
                fixed = TRUE)
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox()
+    orbi_simplify_isox() |>
+    suppressMessages()
   
   expect_error(orbi_plot_satellite_peaks(df),
                "`dataset` requires column `is_satellite_peak` - make sure to run `orbi_flag_satellite_peaks()` first",
@@ -78,9 +79,10 @@ test_that("orbi_plot_satellite_peaks() tests", {
   
   # success
   df2 <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox() |> orbi_flag_satellite_peaks()
+    orbi_simplify_isox() |> orbi_flag_satellite_peaks() |>
+    suppressMessages()
   
-  library(ggplot2)
+  suppressPackageStartupMessages(library(ggplot2))
   expect_type(orbi_plot_satellite_peaks(df2), "list")
   
 })
@@ -95,7 +97,8 @@ test_that("orbi_plot_raw_data() tests", {
                fixed = TRUE)
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox() |> orbi_flag_outliers(agc_fold_cutoff = 2)
+    orbi_simplify_isox() |> orbi_flag_outliers(agc_fold_cutoff = 2) |>
+    suppressMessages()
   
   expect_error(orbi_plot_raw_data(df),
                "`y` has to be provided, can be any expression valid in the data frame, common examples include intensity, ratio, tic * it.ms",
@@ -103,11 +106,12 @@ test_that("orbi_plot_raw_data() tests", {
   
   # success
   
-  library(ggplot2)
+  suppressPackageStartupMessages(library(ggplot2))
   expect_type(orbi_plot_raw_data(df, y = "ratio"), "list")
   
   df2 <- orbi_read_isox(system.file("extdata", "testfile_flow.isox", package = "isoorbi")) |>
-    orbi_simplify_isox() |> orbi_flag_outliers(agc_fold_cutoff = 2)
+    orbi_simplify_isox() |> orbi_flag_outliers(agc_fold_cutoff = 2) |>
+    suppressMessages()
   
   fig2 <- orbi_plot_raw_data(df2, y = "ratio", show_outliers = TRUE)
   
@@ -125,7 +129,8 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
                fixed = TRUE)
   
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
-    orbi_simplify_isox()
+    orbi_simplify_isox() |>
+    suppressMessages()
   
   expect_error(orbi_plot_isotopocule_coverage(df, isotopocules = 42),
                "`isotopocules` has to be a character vector if provided",
@@ -133,7 +138,7 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
   
   # success
   
-  library(ggplot2)
+  suppressPackageStartupMessages(library(ggplot2))
   fig <- orbi_plot_isotopocule_coverage(df)
   
   expect_type(fig, "list")

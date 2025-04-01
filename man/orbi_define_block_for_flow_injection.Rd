@@ -27,7 +27,7 @@ orbi_define_block_for_flow_injection(
 \item{sample_name}{if provided, will be used as the \code{sample_name} for the block}
 }
 \value{
-A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of \code{orbi_get_settings("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
+A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
 }
 \description{
 Define a data block by either start and end time or start and end scan number.

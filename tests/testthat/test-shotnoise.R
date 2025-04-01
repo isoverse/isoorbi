@@ -3,8 +3,6 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-context("shotnoise functions")
-
 # orbi_analyze_shot_noise
 test_that("orbi_analyze_shot_noise() tests", {
 
@@ -17,7 +15,9 @@ test_that("orbi_analyze_shot_noise() tests", {
                "need a `dataset` data frame",
                fixed = TRUE)
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi"))
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
+    suppressMessages()
+  
   df_2 <- subset(df, select = -filename)
 
   expect_error(orbi_analyze_shot_noise(df_2),
@@ -27,7 +27,8 @@ test_that("orbi_analyze_shot_noise() tests", {
   df_results <-
     df |>
     # define base peak
-    orbi_define_basepeak("15N")
+    orbi_define_basepeak("15N") |>
+    suppressMessages()
   df_results2 <- subset(df_results, select = -basepeak_ions)
 
   expect_error(orbi_calculate_ratios(df_results2),
@@ -36,11 +37,14 @@ test_that("orbi_analyze_shot_noise() tests", {
 
   # success
 
-  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N")
+  df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |> orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N") |>
+    suppressMessages()
 
-  expect_true(is.tbl(orbi_analyze_shot_noise(df)))
+  expect_true(is.tbl(orbi_analyze_shot_noise(df))) |>
+    suppressMessages()
 
-  expect_type(orbi_analyze_shot_noise(df), "list")
+  expect_type(orbi_analyze_shot_noise(df), "list") |>
+    suppressMessages()
 
 })
 
@@ -59,7 +63,8 @@ test_that("orbi_plot_shot_noise() tests", {
 
   df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")) |>
     orbi_simplify_isox() |> orbi_define_basepeak(basepeak_def = "15N") |>
-    orbi_analyze_shot_noise()
+    orbi_analyze_shot_noise() |>
+    suppressMessages()
 
   expect_error(orbi_plot_shot_noise(df, 42),
                "`x` must be a character vector, not the number 42.",
@@ -90,7 +95,7 @@ test_that("orbi_plot_shot_noise() tests", {
                fixed = TRUE)
 
   # success
-  library(ggplot2)
+  suppressPackageStartupMessages(library(ggplot2))
   expect_type(orbi_plot_shot_noise(df, "time.min"), "list")
 
   fig <- orbi_plot_shot_noise(df, x = "n_effective_ions")
