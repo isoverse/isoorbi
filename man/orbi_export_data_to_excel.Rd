@@ -15,7 +15,7 @@ orbi_export_data_to_excel(
 \arguments{
 \item{dataset}{data frame}
 
-\item{file}{file path to export the file}
+\item{file}{file path to export the file - recursively creates the directory if non-existent}
 
 \item{dbl_digits}{how many digits to show for dbls (all are exported)}
 

@@ -1,7 +1,7 @@
 #' @title Export data frame to excel
 #' @description This functions exports the final `dataset` into an Excel file.
 #' @param dataset data frame
-#' @param file file path to export the file
+#' @param file file path to export the file - recursively creates the directory if non-existent
 #' @param dbl_digits how many digits to show for dbls (all are exported)
 #' @param int_format the excel formatting style for integers
 #' @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
@@ -23,11 +23,20 @@ orbi_export_data_to_excel <- function(dataset, file, dbl_digits = 7, int_format 
     "`file` needs to be a filepath" = !missing(file) && is_scalar_character(file)
   )
 
+  #Check if output path exists
+  output_dir <- dirname(file.path(file))
+  creating_directory <- ""
+  if (!dir.exists(output_dir)) {
+    #Prepare a message for the user
+    creating_directory <- "After creating directory, "
+    dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+  }
+
   # info
   start_time <-
     sprintf(
-      "orbi_export_data_to_excel() is exporting data set with %d rows and %d columns to %s... ",
-      nrow(dataset), ncol(dataset), file
+      "%sorbi_export_data_to_excel() is exporting data set with %d rows and %d columns to %s... ",
+      creating_directory, nrow(dataset), ncol(dataset), file
     ) |>
     message_start()
 
