@@ -40,14 +40,15 @@ Imports:
     readr (>= 2.1.0),
     openxlsx,
     purrr,
-    prettyunits
+    prettyunits (>= 1.2.0),
+    rawrr (>= 1.15.3)
 Suggests:
     devtools,
     knitr,
     rmarkdown,
-    testthat,
-    forcats,
-    rawrr
+    testthat (>= 3.0.0),
+    vdiffr,
+    forcats
 Description: Read and process isotopocule data from an Orbitrap Isotope Solutions mass spectrometer. Citation: Kantnerova et al. (Nature Protocols, 2024).
 License: MIT + file LICENSE
 Encoding: UTF-8
