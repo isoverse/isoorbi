@@ -64,3 +64,5 @@ paper.md
 # exclude revdep checks
 revdep/
 docs
+
+/.quarto/
