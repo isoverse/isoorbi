@@ -3,11 +3,17 @@
 # internal function to ensure dataset columns are factors (if they exist)
 # will warn the user about the transformation
 factorize_dataset <- function(dataset, cols = c()) {
-  for (col in cols) {
-    if (col %in% names(dataset) && !is.factor(dataset[[col]])) {
-      sprintf("column `%s` was turned into a factor", col) |> message()
+  factor_cols <- names(dataset)[purrr::map_lgl(dataset, is.factor)]
+  factorize_cols <- setdiff(cols, factor_cols)
+  if (length(factorize_cols) > 0) {
+    for (col in factorize_cols) {
       dataset[[col]] <- factor_in_order(dataset[[col]])
     }
+    cli_inform(
+      c(
+        "i" = "column{?s} {.field {factorize_cols}} {?was/were} turned into {?a/} factor{?s}"
+      )
+    )
   }
   return(dataset)
 }
@@ -39,13 +45,7 @@ count_grouped_distinct <- function(dataset, column) {
 
 # internal function to wrap around expressions that should throw errors whenever anything unexpected happens
 # error/warn can be text or function
-try_catch_all <- function(
-  expr,
-  error,
-  warn = error,
-  newline = TRUE,
-  call = caller_env()
-) {
+try_catch_all <- function(expr, error, warn = error, newline = TRUE) {
   tryCatch(
     {{ expr }},
     error = function(p) {
@@ -55,7 +55,7 @@ try_catch_all <- function(
       if (is_function(error)) {
         error(p)
       } else {
-        abort(error, parent = p, call = call)
+        abort(error, parent = p)
       }
     },
     warning = function(p) {
@@ -65,13 +65,11 @@ try_catch_all <- function(
       if (is_function(warn)) {
         warn(p)
       } else {
-        abort(warn, parent = p, call = call)
+        abort(warn, parent = p)
       }
     }
   )
 }
-
-# FIXME: this should all work now with cli, i.e. no need to do this kind of wrapping as long as wrap = TRUE on cli_alert_... calls
 
 # print out info start message
 message_start <- function(...) {
@@ -121,12 +119,6 @@ message_wrap <- function(
   invisible()
 }
 
-# return a pretty int
-pretty_n <- function(n) {
-  n |>
-    prettyunits::pretty_num("nopad") |>
-    gsub(pattern = " *$", replacement = "")
-}
 
 # Common utility functions to clean and annotate data ------------------------------------
 
@@ -640,32 +632,36 @@ orbi_filter_flagged_data <- function(dataset) {
 #' @export
 orbi_define_basepeak <- function(dataset, basepeak_def) {
   # safety checks
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`" = all(
-      c(
-        "filename",
-        "compound",
-        "scan.no",
-        "isotopocule",
-        "ions.incremental"
-      ) %in%
-        names(dataset)
-    ),
-    "`basepeak_def` needs to be a single text value identifying the isotopocule to use as the basepeak" = !missing(
+  ## dataset
+  check_tibble(
+    dataset,
+    c(
+      "filename",
+      "compound",
+      "scan.no",
+      "isotopocule",
+      "ions.incremental"
+    )
+  )
+  ## basepeak_def
+  check_arg(
+    basepeak_def,
+    !missing(
       basepeak_def
     ) &&
-      rlang::is_scalar_character(basepeak_def)
+      rlang::is_scalar_character(basepeak_def),
+    "must be a single text value identifying the isotopocule to use as the basepeak"
   )
-
-  if (!basepeak_def %in% levels(dataset$isotopocule)) {
-    cli_abort(
-      c(
-        "provided basepeak {.val {basepeak_def}} ({.field basepeak_def}) is not an isotopocule in the dataset",
-        "i" = "available isotopocule{?s}: {.val {levels(dataset$isotopocule)}}"
-      )
-    )
-  }
+  ## bsepeak_def in isotopocules
+  check_arg(
+    basepeak_def,
+    basepeak_def %in%
+      levels(dataset$isotopocule),
+    format_inline(
+      "({.val {basepeak_def}}) is not an isotopocule in the dataset, available: {.val {levels(dataset$isotopocule)}}"
+    ),
+    include_type = FALSE
+  )
 
   # ensure factors
   dataset <- dataset |> factorize_dataset("isotopocule")

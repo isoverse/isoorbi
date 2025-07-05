@@ -1,28 +1,41 @@
 # utility functions ========
 
-# internal function to filter for specific isotopocules
-filter_isotopocules <- function(dataset, isotopocules, allow_all = TRUE) {
-  dataset <- dataset |> factorize_dataset("isotopocules")
+# internal function to filter for specific isotopocules during plotting
+filter_isotopocules <- function(
+  dataset,
+  isotopocules,
+  allow_all = TRUE,
+  call = caller_env()
+) {
+  dataset <- dataset |> factorize_dataset("isotopocule")
   if (allow_all && length(isotopocules) == 0L) {
     isotopocules <- levels(dataset$isotopocule)
   }
   missing_isotopocules <- !isotopocules %in% levels(dataset$isotopocule)
+
+  if (sum(!missing_isotopocules) == 0) {
+    cli_abort(
+      c(
+        "none of the provided {.field isotopocules} are in the dataset",
+        "i" = "provided: {.val {isotopocules}}",
+        "i" = "available: {.val {levels(dataset$isotopocule)}}"
+      ),
+      call = call
+    )
+  }
+
   if (sum(missing_isotopocules) > 0L) {
-    sprintf(
-      "not all `isotopocules` are in the dataset, missing '%s'. Available: '%s'",
-      paste(isotopocules[missing_isotopocules], collapse = "', '"),
-      paste(levels(dataset$isotopocule), collapse = "', '")
-    ) |>
-      warn()
+    cli_alert_warning("not all {.field isotopocules} are in the dataset")
+    cli_alert_info(
+      "missing (will be ignored): {.val {isotopocules[missing_isotopocules]}}"
+    )
+    cli_alert_info("available: {.val {levels(dataset$isotopocule)}}")
   }
   isotopocules <- isotopocules[!missing_isotopocules]
-  if (length(isotopocules) == 0L) {
-    abort("none of the provided `isotopocules` are in the dataset")
-  }
 
   # plot dataset
   dataset |>
-    dplyr::filter(.data$isotopocule %in% isotopocules) |>
+    dplyr::filter(.data$isotopocule %in% !!isotopocules) |>
     droplevels()
 }
 
@@ -232,27 +245,34 @@ orbi_plot_satellite_peaks <- function(
   color_scale = scale_color_manual(values = colors)
 ) {
   # safety checks
-  cols <- c(
-    "filename",
-    "compound",
-    "scan.no",
-    "time.min",
-    "isotopocule",
-    "ions.incremental"
+  ## dataset
+  check_tibble(
+    dataset,
+    req_cols = c(
+      "filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental"
+    )
   )
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`isotopocules` has to be a character vector if provided" = length(
-      isotopocules
-    ) ==
-      0L ||
-      is_character(isotopocules),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" = all(
-      cols %in% names(dataset)
-    ),
-    "`dataset` requires column `is_satellite_peak` - make sure to run `orbi_flag_satellite_peaks()` first" = "is_satellite_peak" %in%
-      names(dataset)
+
+  ## isotopocules
+  check_arg(
+    isotopocules,
+    missing(isotopocules) || is_character(isotopocules),
+    "must be a character vector"
   )
+
+  ## satelite peak
+  if (!"is_satellite_peak" %in% names(dataset)) {
+    cli_abort(
+      "{.field dataset} requires column {.field is_satellite_peak} - make sure to run {.fn orbi_flag_satellite_peaks} first"
+    )
+  }
+
+  ## x_column / y_scale
   x_column <- arg_match(x)
   y_scale <- arg_match(y_scale)
 
@@ -336,31 +356,28 @@ orbi_plot_raw_data <- function(
   show_outliers = TRUE
 ) {
   # safety checks
-  if (missing(dataset) || !is.data.frame(dataset)) {
-    cli_abort("parameter {.field dataset} must be a data frame or tibble")
-  }
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule")
-  if (length(missing <- setdiff(cols, names(data.frame))) > 0) {
-    cli_abort(c(
-      "column{?s} {.field {missing}} are missing from the dataset",
-      "i" = "available columns: {.field {names(dataset)}}"
-    ))
-  }
-  if (missing(y)) {
-    cli_abort(c(
-      "parameter {.field y} must be provided",
-      "i" = "{.field y} can be any expression valid in the data frame, common examples include {.field y = intensity}, {.field ratio}, or {.field tic * it.ms}"
-    ))
-  }
-  if (
-    !missing(isotopocules) &&
-      (length(isotopocules) == 0 || !is_character(isotopocules))
-  ) {
-    cli_abort(
-      "if provided, parameter {.field isotopocules} must be a character vector, not {.obj_type_friendly isotopocules}"
-    )
-  }
+  ## dataset
+  check_tibble(
+    dataset,
+    req_cols = c("filename", "compound", "scan.no", "time.min", "isotopocule")
+  )
+  ## y
+  check_arg(
+    y,
+    !missing(y),
+    format_inline(
+      "can be any expression valid in the data frame, common examples include {.field y = intensity}, {.field y = ratio}, or {.field y = tic * it.ms}"
+    ),
+    include_type = FALSE
+  )
+  ## isotopocules
+  check_arg(
+    isotopocules,
+    missing(isotopocules) || is_character(isotopocules),
+    "must be a character vector"
+  )
 
+  ## x_column / y_scale
   x_column <- arg_match(x)
   y_scale <- arg_match(y_scale)
 
@@ -500,25 +517,25 @@ orbi_plot_isotopocule_coverage <- function(
   add_data_blocks = TRUE
 ) {
   # safety checks
-  cols <- c(
-    "filename",
-    "compound",
-    "scan.no",
-    "time.min",
-    "isotopocule",
-    "ions.incremental"
-  )
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`isotopocules` has to be a character vector if provided" = length(
-      isotopocules
-    ) ==
-      0L ||
-      is_character(isotopocules),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" = all(
-      cols %in% names(dataset)
+  ## dataset
+  check_tibble(
+    dataset,
+    req_cols = c(
+      "filename",
+      "compound",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental"
     )
   )
+  ## isotopocules
+  check_arg(
+    isotopocules,
+    missing(isotopocules) || is_character(isotopocules),
+    "must be a character vector"
+  )
+  ## x_column
   x_column <- arg_match(x)
 
   # prepare dataset

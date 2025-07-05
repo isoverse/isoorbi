@@ -1009,8 +1009,10 @@ orbi_add_blocks_to_plot <- function(
   show.legend = !data_only
 ) {
   # safety checks
-  stopifnot(
-    "`plot` has to be a ggplot" = !missing(plot) && is(plot, "ggplot")
+  check_arg(
+    plot,
+    !missing(plot) && ggplot2::is_ggplot(plot),
+    "has to be a ggplot"
   )
   x_column <- arg_match(x)
 
@@ -1121,33 +1123,34 @@ find_blocks <- function(
   startup_time.min = 0
 ) {
   # type checks
-  stopifnot(
-    "`dataset` must be a data frame or tibble" = !missing(dataset) &&
-      is.data.frame(dataset),
-    "`ref_block_time.min` must be a single positive number" = !missing(
-      ref_block_time.min
-    ) &&
+  ## dataset
+  check_tibble(dataset, c("filename", "time.min"))
+  ## ref_block_time.min
+  check_arg(
+    ref_block_time.min,
+    !missing(ref_block_time.min) &&
       rlang::is_scalar_double(ref_block_time.min) &&
       ref_block_time.min > 0,
-    "`sample_block_time.min` must be a single positive number" = rlang::is_scalar_double(
+    "must be a single positive number"
+  )
+  ## sample_block_time.min
+  check_arg(
+    sample_block_time.min,
+    rlang::is_scalar_double(
       sample_block_time.min
     ) &&
       sample_block_time.min > 0,
-    "`startup_time.min` must be a single number (>= 0)" = rlang::is_scalar_double(
+    "must be a single positive number"
+  )
+  ## startup_time.min
+  check_arg(
+    startup_time.min,
+    rlang::is_scalar_double(
       startup_time.min
     ) &&
-      startup_time.min >= 0
+      startup_time.min >= 0,
+    "must be a single number (>=0)"
   )
-
-  # dataset columns check
-  req_cols <- c("filename", "time.min")
-  if (length(missing <- setdiff(req_cols, names(dataset)))) {
-    sprintf(
-      "`dataset` is missing the column(s) '%s'",
-      paste(missing, collapse = "', '")
-    ) |>
-      rlang::abort()
-  }
 
   # find blocks
   find_file_blocks <- function(tmin, tmax) {

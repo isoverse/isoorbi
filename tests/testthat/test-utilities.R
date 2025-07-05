@@ -354,14 +354,12 @@ test_that("orbi_define_basepeak() tests", {
 
   expect_error(
     orbi_define_basepeak(),
-    "need a `dataset` data frame",
-    fixed = TRUE
+    "must be a data frame"
   )
 
   expect_error(
     orbi_define_basepeak(dataset = T),
-    "need a `dataset` data frame",
-    fixed = TRUE
+    "must be a data frame"
   )
 
   df <- read.csv(
@@ -371,33 +369,28 @@ test_that("orbi_define_basepeak() tests", {
 
   expect_error(
     orbi_define_basepeak(dataset = df),
-    "`basepeak_def` needs to be a single text value identifying the isotopocule to use as the basepeak",
-    fixed = TRUE
+    "basepeak_def.*must be.*identifying the isotopocule"
   )
 
   expect_error(
     orbi_define_basepeak(dataset = df, basepeak_def = F),
-    "`basepeak_def` needs to be a single text value identifying the isotopocule to use as the basepeak",
-    fixed = TRUE
+    "basepeak_def.*must be.*identifying the isotopocule"
   )
 
   expect_error(
     orbi_define_basepeak(dataset = df, basepeak_def = c("M0", "123")),
-    "`basepeak_def` needs to be a single text value identifying the isotopocule to use as the basepeak",
-    fixed = TRUE
+    "basepeak_def.*must be.*identifying the isotopocule"
   )
 
   expect_error(
     orbi_define_basepeak(dataset = df, basepeak_def = c("ABC123")),
-    "`basepeak_def` is not an isotopocule in the dataset",
-    fixed = TRUE
+    "basepeak_def.*is not an isotopocule in the dataset"
   )
 
   df2 <- df |> select(-scan.no)
   expect_error(
     orbi_define_basepeak(dataset = df2, basepeak_def = "M0"),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`",
-    fixed = TRUE
+    "column.*scan.no.*is missing"
   )
 
   df3 <- df

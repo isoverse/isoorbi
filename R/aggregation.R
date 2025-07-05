@@ -309,7 +309,7 @@ aggregate_files <- function(
   if (show_progress) {
     cli_progress_done(id = pb)
   }
-  n_rows <- map_int(results, nrow) |> pretty_n()
+  n_rows <- map_int(results, nrow) |> prettyunits::pretty_num()
   details <- sprintf("{col_blue('%s')} (%s)", names(results), n_rows)
   info <- format_inline(
     "{col_green(symbol$tick)} ",
@@ -652,7 +652,9 @@ get_data <- function(
   # info
   n_rows <-
     purrr::map_int(.ds[names(selectors)], nrow) |>
-    pretty_n()
+    prettyunits::pretty_num() |>
+    # take care of leading/trailing whitespaces
+    gsub(pattern = "(^ +| +$)", replacement = "")
 
   details <-
     if (length(selectors) == 1) {
@@ -662,7 +664,7 @@ get_data <- function(
     }
 
   format_inline(
-    "Retrieved {pretty_n(nrow(out))} records from {qty(length(selectors))}",
+    "Retrieved {prettyunits::pretty_num(nrow(out))} records from {qty(length(selectors))}",
     "{?/the combination of }{details}{?/ via }{?/{.var {unique(unlist(join_bys))}}}"
   ) |>
     cli_alert_success(wrap = TRUE)

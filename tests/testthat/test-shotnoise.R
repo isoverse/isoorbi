@@ -68,17 +68,9 @@ test_that("orbi_analyze_shot_noise() tests", {
 
 test_that("orbi_plot_shot_noise() tests", {
   # failure
-  expect_error(
-    orbi_plot_shot_noise(),
-    "need a `shotnoise` data frame",
-    fixed = TRUE
-  )
+  expect_error(orbi_plot_shot_noise(), "shotnoise.* must be a data frame")
 
-  expect_error(
-    orbi_plot_shot_noise(42),
-    "need a `shotnoise` data frame",
-    fixed = TRUE
-  )
+  expect_error(orbi_plot_shot_noise(42), "shotnoise.* must be a data frame")
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -112,16 +104,14 @@ test_that("orbi_plot_shot_noise() tests", {
 
   expect_error(
     orbi_plot_shot_noise(df_2),
-    "`shotnoise` requires columns `filename`, `compound`, `isotopocule` and `basepeak`",
-    fixed = TRUE
+    "column.*filename.*is missing from.*shotnoise"
   )
 
   df_2 <- subset(df, select = -ratio_rel_se.permil)
 
   expect_error(
     orbi_plot_shot_noise(df_2),
-    "`shotnoise` requires columns `ratio_rel_se.permil` and `shot_noise.permil`, make sure to run `orbi_analyze_shot_noise()` first",
-    fixed = TRUE
+    "requires columns.*make sure to run.*orbi_analyze_shot_noise()"
   )
 
   expect_error(
@@ -131,12 +121,16 @@ test_that("orbi_plot_shot_noise() tests", {
   )
 
   # success
-  suppressPackageStartupMessages(library(ggplot2))
-  expect_type(orbi_plot_shot_noise(df, "time.min"), "list")
-
-  fig <- orbi_plot_shot_noise(df, x = "n_effective_ions")
-  expect_equal(fig$facet$vars(), character(0))
-
-  fig2 <- orbi_plot_shot_noise(df, x = "n_effective_ions", permil_target = 1)
-  expect_equal(length(fig2$layers), 5)
+  vdiffr::expect_doppelganger(
+    "shot noise plot 1",
+    orbi_plot_shot_noise(df, "time.min")
+  )
+  vdiffr::expect_doppelganger(
+    "shot noise plot 2",
+    orbi_plot_shot_noise(df, x = "n_effective_ions")
+  )
+  vdiffr::expect_doppelganger(
+    "shot noise plot 3",
+    orbi_plot_shot_noise(df, x = "n_effective_ions", permil_target = 1)
+  )
 })

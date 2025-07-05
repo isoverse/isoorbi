@@ -24,8 +24,7 @@ test_that("filter_isotopocules() tests", {
 
   suppressWarnings(expect_error(
     filter_isotopocules(df, isotopocules = "M0"),
-    "none of the provided `isotopocules` are in the dataset",
-    fixed = TRUE
+    "none of the provided.*isotopocules.*are in the dataset"
   ))
 
   # success
@@ -82,11 +81,7 @@ test_that("orbi_get_isotopocule_coverage() tests", {
 
 test_that("orbi_plot_satellite_peaks() tests", {
   # failure
-  expect_error(
-    orbi_plot_satellite_peaks(),
-    "need a `dataset` data frame",
-    fixed = TRUE
-  )
+  expect_error(orbi_plot_satellite_peaks(), "must be a data frame")
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -98,8 +93,7 @@ test_that("orbi_plot_satellite_peaks() tests", {
 
   expect_error(
     orbi_plot_satellite_peaks(df),
-    "`dataset` requires column `is_satellite_peak` - make sure to run `orbi_flag_satellite_peaks()` first",
-    fixed = TRUE
+    "dataset.* requires column.*is_satellite_peak.*orbi_flag_satellite_peaks()"
   )
 
   # success
@@ -122,11 +116,9 @@ test_that("orbi_plot_satellite_peaks() tests", {
 
 test_that("orbi_plot_raw_data() tests", {
   # failure
-  expect_error(
-    orbi_plot_raw_data(),
-    "need a `dataset` data frame",
-    fixed = TRUE
-  )
+  expect_error(orbi_plot_raw_data(), "dataset.*must be a data frame")
+  expect_error(orbi_plot_raw_data(42), "dataset.*must be a data frame")
+  expect_error(orbi_plot_raw_data(mtcars), "columns.*missing")
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -135,20 +127,21 @@ test_that("orbi_plot_raw_data() tests", {
   )) |>
     orbi_simplify_isox() |>
     orbi_flag_outliers(agc_fold_cutoff = 2) |>
-    orbi_define_basepeak("M0") |>
     suppressMessages()
 
+  expect_error(orbi_plot_raw_data(df), "y.*can be any expression valid")
   expect_error(
-    orbi_plot_raw_data(df),
-    "`y` has to be provided, can be any expression valid in the data frame, common examples include intensity, ratio, tic * it.ms",
-    fixed = TRUE
+    orbi_plot_raw_data(df, y = ions.incremental, x = "dne"),
+    "must.*time.min.*scan.no"
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, y_scale = "dne"),
+    "must.*raw.*linear.*pseudo-log.*log"
   )
 
-  # success
-
   vdiffr::expect_doppelganger(
-    "raw data ratio plot",
-    orbi_plot_raw_data(df, y = ratio)
+    "raw data ions plot",
+    orbi_plot_raw_data(df, y = ions.incremental, y_scale = "log")
   )
 
   df2 <- orbi_read_isox(system.file(
@@ -158,22 +151,31 @@ test_that("orbi_plot_raw_data() tests", {
   )) |>
     orbi_simplify_isox() |>
     orbi_flag_outliers(agc_fold_cutoff = 2) |>
+    orbi_define_basepeak("M0") |>
     suppressMessages()
 
-  fig2 <- orbi_plot_raw_data(df2, y = "ratio", show_outliers = TRUE)
+  expect_error(
+    orbi_plot_raw_data(df2, y = ratio, isotopocules = "dne"),
+    "none.*are in the dataset"
+  )
+  expect_message(
+    orbi_plot_raw_data(df2, y = ratio, isotopocules = c("dne", "33S")),
+    "not all.*in the dataset"
+  ) |>
+    expect_message("missing.*dne") |>
+    expect_message("available")
 
-  expect_equal(length(fig2$layers), 1)
+  vdiffr::expect_doppelganger(
+    "raw data ratio plot",
+    orbi_plot_raw_data(df2, y = ratio, x = "scan.no", show_outliers = TRUE)
+  )
 })
 
 # orbi_plot_isotopocule_coverage
 
 test_that("orbi_plot_isotopocule_coverage() tests", {
   # failure
-  expect_error(
-    orbi_plot_isotopocule_coverage(),
-    "need a `dataset` data frame",
-    fixed = TRUE
-  )
+  expect_error(orbi_plot_isotopocule_coverage(), "must be a data frame")
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -185,16 +187,13 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
 
   expect_error(
     orbi_plot_isotopocule_coverage(df, isotopocules = 42),
-    "`isotopocules` has to be a character vector if provided",
-    fixed = TRUE
+    "must be a character vector, not a number"
   )
 
   # success
 
-  suppressPackageStartupMessages(library(ggplot2))
-  fig <- orbi_plot_isotopocule_coverage(df)
-
-  expect_type(fig, "list")
-
-  expect_equal(fig$facet$vars(), character(0))
+  vdiffr::expect_doppelganger(
+    "coverage plot",
+    orbi_plot_isotopocule_coverage(df)
+  )
 })

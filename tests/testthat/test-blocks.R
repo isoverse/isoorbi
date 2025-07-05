@@ -71,7 +71,7 @@ test_that("test orbi_define_block_for_flow_injection()", {
       start_time.min = 0.1,
       end_time.min = 0.9
     ),
-    "column `filename` was turned into a factor.*"
+    "column.*filename.*was turned into a factor"
   ) |>
     suppressMessages()
 })
@@ -144,51 +144,48 @@ test_that("test internal find_intervals()", {
 
 test_that("test find_blocks()", {
   # type checks
-  expect_error(find_blocks(), "`dataset` must be a data frame or tibble")
-  expect_error(find_blocks(42), "`dataset` must be a data frame or tibble")
+  expect_error(find_blocks(), "dataset.* must be a data frame or tibble")
+  expect_error(find_blocks(42), "dataset.* must be a data frame or tibble")
+  expect_error(find_blocks(mtcars), "columns.*are missing")
   expect_error(
-    find_blocks(tibble()),
-    "`ref_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0)),
+    "ref_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), "42"),
-    "`ref_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0), "42"),
+    "ref_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), 0),
-    "`ref_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0), 0),
+    "ref_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), c(42, 42)),
-    "`ref_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0), c(42, 42)),
+    "ref_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), 1, "42"),
-    "`sample_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0), 1, "42"),
+    "sample_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), 1, 0),
-    "`sample_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0), 1, 0),
+    "sample_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), 1, c(42, 42)),
-    "`sample_block_time.min` must be a single positive number"
+    find_blocks(tibble(filename = "1", time.min = 0), 1, c(42, 42)),
+    "sample_block_time.min.*must be a single positive number"
   )
   expect_error(
-    find_blocks(tibble(), 1, 1, "42"),
-    "`startup_time.min` must be a single number"
+    find_blocks(tibble(filename = "1", time.min = 0), 1, 1, "42"),
+    "startup_time.min.*must be a single number"
   )
   expect_error(
-    find_blocks(tibble(), 1, 1, -0.1),
-    "`startup_time.min` must be a single number"
+    find_blocks(tibble(filename = "1", time.min = 0), 1, 1, -0.1),
+    "startup_time.min.*must be a single number"
   )
   expect_error(
-    find_blocks(tibble(), 1, 1, c(42, 42)),
-    "`startup_time.min` must be a single number"
-  )
-  expect_error(
-    find_blocks(tibble(), 1, 1, 1),
-    "`dataset` is missing the column"
+    find_blocks(tibble(filename = "1", time.min = 0), 1, 1, c(42, 42)),
+    "startup_time.min.*must be a single number"
   )
 
   # results check
@@ -749,13 +746,11 @@ test_that("test orbi_add_blocks_to_plot()", {
   # type checks
   expect_error(
     orbi_add_blocks_to_plot(),
-    "`plot` has to be a ggplot",
-    fixed = TRUE
+    "plot.*has to be a ggplot"
   )
   expect_error(
     orbi_add_blocks_to_plot(42),
-    "`plot` has to be a ggplot",
-    fixed = TRUE
+    "plot.*has to be a ggplot"
   )
 
   df <- orbi_read_isox(system.file(
@@ -770,11 +765,10 @@ test_that("test orbi_add_blocks_to_plot()", {
     ) |>
     suppressMessages()
 
-  library(ggplot2)
-
-  fig <- orbi_plot_raw_data(df, y = "ratio")
-
-  suppressMessages(expect_type(orbi_add_blocks_to_plot(fig), "list"))
+  vdiffr::expect_doppelganger(
+    "intensity plot with blocks",
+    orbi_plot_raw_data(df, y = ions.incremental)
+  )
 })
 
 test_that("test find_scan_from_time()", {

@@ -125,17 +125,20 @@ orbi_plot_shot_noise <- function(
   )
 ) {
   # safety checks
-  stopifnot(
-    "need a `shotnoise` data frame" = !missing(shotnoise) &&
-      is.data.frame(shotnoise),
-    "`shotnoise` requires columns `filename`, `compound`, `isotopocule` and `basepeak`" = all(
-      c("filename", "compound", "compound", "isotopocule", "basepeak") %in%
-        names(shotnoise)
-    ),
-    "`shotnoise` requires columns `ratio_rel_se.permil` and `shot_noise.permil`, make sure to run `orbi_analyze_shot_noise()` first" = all(
-      c("ratio_rel_se.permil", "shot_noise.permil") %in% names(shotnoise)
-    )
+  ## shotnoise
+  check_tibble(
+    shotnoise,
+    c("filename", "compound", "compound", "isotopocule", "basepeak")
   )
+  check_arg(
+    shotnoise,
+    all(c("ratio_rel_se.permil", "shot_noise.permil") %in% names(shotnoise)),
+    format_inline(
+      "requires columns {.field ratio_rel_se.permil} and {.field shot_noise.permil}, make sure to run {.fun orbi_analyze_shot_noise} first"
+    ),
+    include_type = FALSE
+  )
+  # x_column
   x_column <- arg_match(x)
 
   # data
@@ -148,6 +151,7 @@ orbi_plot_shot_noise <- function(
     )
 
   # color checks
+
   stopifnot(
     "`shotnoise` requires a factor column set for `color` aesthetic" = is_scalar_character(
       color
@@ -225,12 +229,12 @@ orbi_plot_shot_noise <- function(
 
   # plots vs. time
   if (x_column == "time.min") {
-    plot <- plot %+%
+    plot <- plot +
       ggplot2::aes(x = .data$time.min) +
       ggplot2::scale_x_log10(breaks = 10^(-2:2), labels = paste) +
       ggplot2::labs(x = "analysis time [min]")
   } else if (x_column == "n_effective_ions") {
-    plot <- plot %+%
+    plot <- plot +
       ggplot2::aes(x = .data$n_effective_ions) +
       ggplot2::scale_x_log10(breaks = 10^(2:12), labels = scales::label_log()) +
       ggplot2::labs(x = "counts")
