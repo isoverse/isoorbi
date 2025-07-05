@@ -31,8 +31,8 @@ To use the latest updates, you can install the development version of
 `isoorbi` from [GitHub](https://github.com/) with:
 
 ``` r
-if(!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-devtools::install_github("isoverse/isoorbi")
+if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
+pak::pak("isoverse/isoorbi")
 ```
 
 ## Show me some code
