@@ -39,6 +39,7 @@ reference:
   - orbi_aggregate_raw
   - orbi_start_aggregator
   - orbi_add_aggregator
+  - orbi_get_data
   - orbi_get_problems
 
 - title: Read ISOX files
