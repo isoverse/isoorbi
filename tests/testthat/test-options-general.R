@@ -1,4 +1,3 @@
-
 test_that("safety checks work", {
   # define_pkg_option
   expect_error(define_pkg_option(check_fn = 42), "must be a function")

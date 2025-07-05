@@ -1,6 +1,5 @@
 # factor_in_order
 test_that("factor_in_order() tests", {
-
   # text factor
   x <- c("b", "b", "d", "b", "d", "a", "f", "a", "a", "b", "c")
   expect_s3_class(factor_in_order(x), "factor")
@@ -14,5 +13,4 @@ test_that("factor_in_order() tests", {
   expect_equal(factor_in_order(y) |> levels(), c("4", "3", "1", "5", "2"))
   expect_equal(factor_in_order(y) |> as.character(), as.character(y))
   expect_equal(factor_in_order(factor(y)), factor_in_order(y))
-
 })

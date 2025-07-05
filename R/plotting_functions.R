@@ -3,18 +3,22 @@
 # internal function to filter for specific isotopocules
 filter_isotopocules <- function(dataset, isotopocules, allow_all = TRUE) {
   dataset <- dataset |> factorize_dataset("isotopocules")
-  if (allow_all && length(isotopocules) == 0L)
+  if (allow_all && length(isotopocules) == 0L) {
     isotopocules <- levels(dataset$isotopocule)
+  }
   missing_isotopocules <- !isotopocules %in% levels(dataset$isotopocule)
   if (sum(missing_isotopocules) > 0L) {
-    sprintf("not all `isotopocules` are in the dataset, missing '%s'. Available: '%s'",
-            paste(isotopocules[missing_isotopocules], collapse = "', '"),
-            paste(levels(dataset$isotopocule), collapse = "', '")) |>
+    sprintf(
+      "not all `isotopocules` are in the dataset, missing '%s'. Available: '%s'",
+      paste(isotopocules[missing_isotopocules], collapse = "', '"),
+      paste(levels(dataset$isotopocule), collapse = "', '")
+    ) |>
       warn()
   }
   isotopocules <- isotopocules[!missing_isotopocules]
-  if (length(isotopocules) == 0L)
+  if (length(isotopocules) == 0L) {
     abort("none of the provided `isotopocules` are in the dataset")
+  }
 
   # plot dataset
   dataset |>
@@ -45,11 +49,16 @@ label_scientific_log <- function() {
 }
 
 # y axis as log, pseudo-log, or continuous
-dynamic_y_scale <- function(plot,  y_scale = c("raw", "linear", "pseudo-log", "log"), sci_labels = FALSE, breaks = scales::pretty_breaks(5)) {
+dynamic_y_scale <- function(
+  plot,
+  y_scale = c("raw", "linear", "pseudo-log", "log"),
+  sci_labels = FALSE,
+  breaks = scales::pretty_breaks(5)
+) {
   y_scale <- arg_match(y_scale)
-  labeler <- if(sci_labels) label_scientific_log() else identity
+  labeler <- if (sci_labels) label_scientific_log() else identity
   if (y_scale == "log") {
-    plot <- plot + 
+    plot <- plot +
       ggplot2::scale_y_log10(label = labeler) +
       ggplot2::annotation_logticks(sides = "l")
   } else if (y_scale == "pseudo-log") {
@@ -59,7 +68,7 @@ dynamic_y_scale <- function(plot,  y_scale = c("raw", "linear", "pseudo-log", "l
         breaks = breaks,
         labels = labeler
       )
-  } else if (y_scale == "linear"){
+  } else if (y_scale == "linear") {
     plot <- plot +
       ggplot2::scale_y_continuous(labels = labeler)
   }
@@ -74,11 +83,12 @@ dynamic_wrap <- function(plot, scales = "free_x") {
   n_files <- length(levels(dataset$filename))
   n_compounds <- length(levels(dataset$compound))
   if (n_files > 1L && n_compounds > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~.data$filename + .data$compound, scales = scales)
+    plot <- plot +
+      ggplot2::facet_wrap(~ .data$filename + .data$compound, scales = scales)
   } else if (n_compounds > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~.data$compound, scales = scales)
+    plot <- plot + ggplot2::facet_wrap(~ .data$compound, scales = scales)
   } else if (n_files > 1L) {
-    plot <- plot + ggplot2::facet_wrap(~.data$filename, scales = scales)
+    plot <- plot + ggplot2::facet_wrap(~ .data$filename, scales = scales)
   }
   return(plot)
 }
@@ -90,15 +100,15 @@ dynamic_wrap <- function(plot, scales = "free_x") {
 #' @export
 orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
   ggplot2::theme_bw() +
-  ggplot2::theme(
-    text = ggplot2::element_text(size = text_size),
-    strip.text = ggplot2::element_text(size = facet_text_size),
-    panel.grid = ggplot2::element_blank(),
-    panel.background = ggplot2::element_blank(),
-    plot.background = ggplot2::element_blank(),
-    strip.background = ggplot2::element_blank(),
-    legend.background = ggplot2::element_blank()
-  )
+    ggplot2::theme(
+      text = ggplot2::element_text(size = text_size),
+      strip.text = ggplot2::element_text(size = facet_text_size),
+      panel.grid = ggplot2::element_blank(),
+      panel.background = ggplot2::element_blank(),
+      plot.background = ggplot2::element_blank(),
+      strip.background = ggplot2::element_blank(),
+      legend.background = ggplot2::element_blank()
+    )
 }
 
 #' Calculate isotopocule coverage
@@ -109,26 +119,36 @@ orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
 #' @return summary data frame
 #' @export
 orbi_get_isotopocule_coverage <- function(dataset) {
-
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental")
+  cols <- c(
+    "filename",
+    "compound",
+    "scan.no",
+    "time.min",
+    "isotopocule",
+    "ions.incremental"
+  )
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" =
-      all(cols %in% names(dataset))
+    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" = all(
+      cols %in% names(dataset)
+    )
   )
 
   # prep dataset
-  dataset <- dataset |> factorize_dataset(c("filename", "compound", "isotopocule"))
+  dataset <- dataset |>
+    factorize_dataset(c("filename", "compound", "isotopocule"))
   isotopocule_levels <- levels(dataset$isotopocule)
 
   # make sure a weak isotopocule column is included
-  if (!"is_weak_isotopocule" %in% names(dataset))
+  if (!"is_weak_isotopocule" %in% names(dataset)) {
     dataset <- dataset |> dplyr::mutate(is_weak_isotopocule = NA)
+  }
 
   # make sure a data group column is included
-  if (!"data_group" %in% names(dataset))
+  if (!"data_group" %in% names(dataset)) {
     dataset <- dataset |> dplyr::mutate(data_group = NA_integer_)
+  }
 
   # nesting requires global defs
   scan_no <- time.min <- data_group <- NULL
@@ -136,10 +156,24 @@ orbi_get_isotopocule_coverage <- function(dataset) {
   # calculate coverage
   dataset |>
     # complete dataset (need isotopocule as char otherwise will always complete for all levels)
-    dplyr::select("filename", "compound", "isotopocule", "scan.no", "time.min", "ions.incremental", "data_group", "is_weak_isotopocule") |>
+    dplyr::select(
+      "filename",
+      "compound",
+      "isotopocule",
+      "scan.no",
+      "time.min",
+      "ions.incremental",
+      "data_group",
+      "is_weak_isotopocule"
+    ) |>
     dplyr::mutate(isotopocule = as.character(.data$isotopocule)) |>
     # find data stretches
-    dplyr::arrange(.data$filename, .data$compound, .data$isotopocule, .data$scan.no) |>
+    dplyr::arrange(
+      .data$filename,
+      .data$compound,
+      .data$isotopocule,
+      .data$scan.no
+    ) |>
     dplyr::mutate(
       isotopocule = factor(.data$isotopocule, levels = isotopocule_levels),
       data_stretch = c(0, cumsum(diff(.data$scan.no) > 1L)),
@@ -149,12 +183,17 @@ orbi_get_isotopocule_coverage <- function(dataset) {
     tidyr::nest(data = c("scan.no", time.min, "ions.incremental")) |>
     dplyr::mutate(
       n_points = map_int(.data$data, nrow),
-      start_scan.no = map_dbl(.data$data, ~.x$scan.no[1]),
-      end_scan.no = map_dbl(.data$data, ~tail(.x$scan.no, 1)),
-      start_time.min = map_dbl(.data$data, ~.x$time.min[1]),
-      end_time.min = map_dbl(.data$data, ~tail(.x$time.min, 1))
+      start_scan.no = map_dbl(.data$data, ~ .x$scan.no[1]),
+      end_scan.no = map_dbl(.data$data, ~ tail(.x$scan.no, 1)),
+      start_time.min = map_dbl(.data$data, ~ .x$time.min[1]),
+      end_time.min = map_dbl(.data$data, ~ tail(.x$time.min, 1))
     ) |>
-    dplyr::arrange(.data$filename, .data$compound, .data$isotopocule, .data$data_group)
+    dplyr::arrange(
+      .data$filename,
+      .data$compound,
+      .data$isotopocule,
+      .data$data_group
+    )
 }
 
 # plot functions ==========
@@ -174,19 +213,45 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 #' @return a ggplot object
 #' @export
 orbi_plot_satellite_peaks <- function(
-    dataset, isotopocules = c(), x = c("scan.no", "time.min"), x_breaks = scales::breaks_pretty(5),
-    y_scale = c("log", "pseudo-log", "linear", "raw"), y_scale_sci_labels = TRUE,
-    colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"), 
-    color_scale = scale_color_manual(values = colors)) {
-
+  dataset,
+  isotopocules = c(),
+  x = c("scan.no", "time.min"),
+  x_breaks = scales::breaks_pretty(5),
+  y_scale = c("log", "pseudo-log", "linear", "raw"),
+  y_scale_sci_labels = TRUE,
+  colors = c(
+    "#1B9E77",
+    "#D95F02",
+    "#7570B3",
+    "#E7298A",
+    "#66A61E",
+    "#E6AB02",
+    "#A6761D",
+    "#666666"
+  ),
+  color_scale = scale_color_manual(values = colors)
+) {
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental")
+  cols <- c(
+    "filename",
+    "compound",
+    "scan.no",
+    "time.min",
+    "isotopocule",
+    "ions.incremental"
+  )
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`isotopocules` has to be a character vector if provided" = length(isotopocules) == 0L || is_character(isotopocules),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" =
-      all(cols %in% names(dataset)),
-    "`dataset` requires column `is_satellite_peak` - make sure to run `orbi_flag_satellite_peaks()` first" = "is_satellite_peak" %in% names(dataset)
+    "`isotopocules` has to be a character vector if provided" = length(
+      isotopocules
+    ) ==
+      0L ||
+      is_character(isotopocules),
+    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" = all(
+      cols %in% names(dataset)
+    ),
+    "`dataset` requires column `is_satellite_peak` - make sure to run `orbi_flag_satellite_peaks()` first" = "is_satellite_peak" %in%
+      names(dataset)
   )
   x_column <- arg_match(x)
   y_scale <- arg_match(y_scale)
@@ -200,20 +265,28 @@ orbi_plot_satellite_peaks <- function(
   plot <- plot_df |>
     ggplot2::ggplot() +
     ggplot2::aes(
-      x = !!sym(x_column), y = .data$ions.incremental,
-      color = .data$isotopocule) +
+      x = !!sym(x_column),
+      y = .data$ions.incremental,
+      color = .data$isotopocule
+    ) +
     ggplot2::geom_line(
       data = function(df) dplyr::filter(df, !.data$is_satellite_peak),
       alpha = 0.5
     ) +
     ggplot2::geom_point(
-      data = function(df) dplyr::filter(df, .data$is_satellite_peak) |>
-        dplyr::mutate(flagged = "satellite peaks"),
+      data = function(df) {
+        dplyr::filter(df, .data$is_satellite_peak) |>
+          dplyr::mutate(flagged = "satellite peaks")
+      },
       map = ggplot2::aes(shape = .data$flagged)
     ) +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
     ggplot2::scale_shape_manual(values = 17) +
-    {{ color_scale }} +
+    {
+      {
+        color_scale
+      }
+    } +
     ggplot2::guides(
       color = ggplot2::guide_legend(override.aes = list(shape = NA), order = 1)
     ) +
@@ -239,23 +312,55 @@ orbi_plot_satellite_peaks <- function(
 #' @return a ggplot object
 #' @export
 orbi_plot_raw_data <- function(
-    dataset, isotopocules = c(), x = c("time.min", "scan.no"),  x_breaks = scales::breaks_pretty(5),
-    y, y_scale = c("raw", "linear", "pseudo-log", "log"), y_scale_sci_labels = TRUE,
-    color = .data$isotopocule, 
-    colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#666666"),
-    color_scale = scale_color_manual(values = colors),
-    add_data_blocks = TRUE, add_all_blocks = FALSE, 
-    show_outliers = TRUE) {
-
+  dataset,
+  isotopocules = c(),
+  x = c("time.min", "scan.no"),
+  x_breaks = scales::breaks_pretty(5),
+  y,
+  y_scale = c("raw", "linear", "pseudo-log", "log"),
+  y_scale_sci_labels = TRUE,
+  color = .data$isotopocule,
+  colors = c(
+    "#1B9E77",
+    "#D95F02",
+    "#7570B3",
+    "#E7298A",
+    "#66A61E",
+    "#E6AB02",
+    "#A6761D",
+    "#666666"
+  ),
+  color_scale = scale_color_manual(values = colors),
+  add_data_blocks = TRUE,
+  add_all_blocks = FALSE,
+  show_outliers = TRUE
+) {
   # safety checks
+  if (missing(dataset) || !is.data.frame(dataset)) {
+    cli_abort("parameter {.field dataset} must be a data frame or tibble")
+  }
   cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule")
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`" =
-      all(cols %in% names(dataset)),
-    "`y` has to be provided, can be any expression valid in the data frame, common examples include intensity, ratio, tic * it.ms" = !missing(y),
-    "`isotopocules` has to be a character vector if provided" = length(isotopocules) == 0L || is_character(isotopocules)
-  )
+  if (length(missing <- setdiff(cols, names(data.frame))) > 0) {
+    cli_abort(c(
+      "column{?s} {.field {missing}} are missing from the dataset",
+      "i" = "available columns: {.field {names(dataset)}}"
+    ))
+  }
+  if (missing(y)) {
+    cli_abort(c(
+      "parameter {.field y} must be provided",
+      "i" = "{.field y} can be any expression valid in the data frame, common examples include {.field y = intensity}, {.field ratio}, or {.field tic * it.ms}"
+    ))
+  }
+  if (
+    !missing(isotopocules) &&
+      (length(isotopocules) == 0 || !is_character(isotopocules))
+  ) {
+    cli_abort(
+      "if provided, parameter {.field isotopocules} must be a character vector, not {.obj_type_friendly isotopocules}"
+    )
+  }
+
   x_column <- arg_match(x)
   y_scale <- arg_match(y_scale)
 
@@ -267,35 +372,48 @@ orbi_plot_raw_data <- function(
     filter_flagged_data(
       filter_satellite_peaks = TRUE,
       filter_weak_isotopocules = length(isotopocules) == 0L,
-      filter_outliers = FALSE)
+      filter_outliers = FALSE
+    )
 
   # make sure a data group column is included
-  if (!"data_group" %in% names(plot_df))
+  if (!"data_group" %in% names(plot_df)) {
     plot_df <- plot_df |> dplyr::mutate(data_group = NA_integer_)
-  
+  }
+
   # check for outlier column
   if (!"is_outlier" %in% names(plot_df)) {
     plot_df$is_outlier <- FALSE
     plot_df$outlier_type <- NA_character_
-  } else if ("is_outlier" %in% names(plot_df) && show_outliers && !"outlier_type" %in% names(plot_df)) {
-    abort("trying to highlight outliers based on `is_outlier` column but `outlier_type` column is missing")
+  } else if (
+    "is_outlier" %in%
+      names(plot_df) &&
+      show_outliers &&
+      !"outlier_type" %in% names(plot_df)
+  ) {
+    abort(
+      "trying to highlight outliers based on `is_outlier` column but `outlier_type` column is missing"
+    )
   }
   show_outliers <- show_outliers && any(plot_df$is_outlier)
-  
+
   # generate y value and color to check if they work
   yquo <- enquo(y)
   colorquo <- enquo(color)
   try_catch_all(
     plot_df |>
       dplyr::mutate(y = !!yquo),
-    sprintf("something went wrong generating the `y` variable `%s`",
-            rlang::as_label(yquo))
+    sprintf(
+      "something went wrong generating the `y` variable with `%s`",
+      rlang::as_label(yquo)
+    )
   )
   try_catch_all(
     plot_df |>
       dplyr::mutate(color = !!colorquo),
-    sprintf("something went wrong generating the `color` variable `%s`",
-            rlang::as_label(colorquo))
+    sprintf(
+      "something went wrong generating the `color` variable with `%s`",
+      rlang::as_label(colorquo)
+    )
   )
 
   # make plot
@@ -306,38 +424,62 @@ orbi_plot_raw_data <- function(
     ggplot2::geom_line(
       data = function(df) dplyr::filter(df, !.data$is_outlier),
       alpha = if (show_outliers) 0.5 else 1.0,
-      map = ggplot2::aes(group = paste(.data$filename, .data$compound, .data$isotopocule, .data$data_group, .data$isotopocule))
+      map = ggplot2::aes(
+        group = paste(
+          .data$filename,
+          .data$compound,
+          .data$isotopocule,
+          .data$data_group,
+          .data$isotopocule
+        )
+      )
     ) +
-    {{ color_scale }} +
+    {
+      {
+        color_scale
+      }
+    } +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
     orbi_default_theme()
-  
+
   # scale and dynamic wrap
   plot <- plot |>
     dynamic_y_scale(y_scale, sci_labels = y_scale_sci_labels) |>
     dynamic_wrap()
-  
+
   # blocks
-  if ( add_all_blocks && has_blocks(dataset))
+  if (add_all_blocks && has_blocks(dataset)) {
     plot <- plot |> orbi_add_blocks_to_plot(x = x_column)
-  else if ( add_data_blocks && has_blocks(dataset))
-    plot <- plot |> orbi_add_blocks_to_plot(x = x_column, data_only = TRUE, fill_colors = "gray80", show.legend = TRUE)
-  
+  } else if (add_data_blocks && has_blocks(dataset)) {
+    plot <- plot |>
+      orbi_add_blocks_to_plot(
+        x = x_column,
+        data_only = TRUE,
+        fill_colors = "gray80",
+        show.legend = TRUE
+      )
+  }
+
   # outliers
   if (show_outliers) {
-    plot <- plot + 
+    plot <- plot +
       ggplot2::geom_point(
-        data = function(df) dplyr::filter(df, !!show_outliers & .data$is_outlier),
+        data = function(df) {
+          dplyr::filter(df, !!show_outliers & .data$is_outlier)
+        },
         map = ggplot2::aes(shape = .data$outlier_type)
       ) +
       # typicall only the first or sometimes first two will be used
       ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +
       ggplot2::guides(
-        color = ggplot2::guide_legend(override.aes = list(shape = NA, fill = NA), order = 1)
+        color = ggplot2::guide_legend(
+          override.aes = list(shape = NA, fill = NA),
+          order = 1
+        )
       ) +
       ggplot2::labs(shape = "flagged outliers")
   }
- 
+
   return(plot)
 }
 
@@ -351,16 +493,31 @@ orbi_plot_raw_data <- function(
 #' @return a ggplot object
 #' @export
 orbi_plot_isotopocule_coverage <- function(
-    dataset, isotopocules = c(), x = c("scan.no", "time.min"), x_breaks = scales::breaks_pretty(5),
-    add_data_blocks = TRUE) {
-
+  dataset,
+  isotopocules = c(),
+  x = c("scan.no", "time.min"),
+  x_breaks = scales::breaks_pretty(5),
+  add_data_blocks = TRUE
+) {
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "time.min", "isotopocule", "ions.incremental")
+  cols <- c(
+    "filename",
+    "compound",
+    "scan.no",
+    "time.min",
+    "isotopocule",
+    "ions.incremental"
+  )
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`isotopocules` has to be a character vector if provided" = length(isotopocules) == 0L || is_character(isotopocules),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" =
-      all(cols %in% names(dataset))
+    "`isotopocules` has to be a character vector if provided" = length(
+      isotopocules
+    ) ==
+      0L ||
+      is_character(isotopocules),
+    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" = all(
+      cols %in% names(dataset)
+    )
   )
   x_column <- arg_match(x)
 
@@ -380,10 +537,12 @@ orbi_plot_isotopocule_coverage <- function(
     dataset |>
     dplyr::group_by(.data$filename) |>
     dplyr::summarize(
-      delta_x =
-        if(x_column == "time.min")
-          (max(.data$time.min) - min(.data$time.min)) / (max(.data$scan.no) - min(.data$scan.no))
-        else 1
+      delta_x = if (x_column == "time.min") {
+        (max(.data$time.min) - min(.data$time.min)) /
+          (max(.data$scan.no) - min(.data$scan.no))
+      } else {
+        1
+      }
     )
 
   # weak isotopocules and data groups
@@ -396,8 +555,16 @@ orbi_plot_isotopocule_coverage <- function(
     orbi_get_isotopocule_coverage() |>
     dplyr::mutate(
       y = as.integer(.data$isotopocule),
-      xmin = if(x_column == "time.min") .data$start_time.min else .data$start_scan.no,
-      xmax = if(x_column == "time.min") .data$end_time.min else .data$end_scan.no,
+      xmin = if (x_column == "time.min") {
+        .data$start_time.min
+      } else {
+        .data$start_scan.no
+      },
+      xmax = if (x_column == "time.min") {
+        .data$end_time.min
+      } else {
+        .data$end_scan.no
+      },
     ) |>
     dplyr::left_join(files_delta_x, by = "filename")
 
@@ -405,8 +572,16 @@ orbi_plot_isotopocule_coverage <- function(
   scan_outlines <-
     dataset |>
     dplyr::mutate(
-      xmin = if(x_column == "time.min") min(.data$time.min) else min(.data$scan.no),
-      xmax = if(x_column == "time.min") max(.data$time.min) else max(.data$scan.no),
+      xmin = if (x_column == "time.min") {
+        min(.data$time.min)
+      } else {
+        min(.data$scan.no)
+      },
+      xmax = if (x_column == "time.min") {
+        max(.data$time.min)
+      } else {
+        max(.data$scan.no)
+      },
       .by = c("filename")
     ) |>
     dplyr::select("filename", "compound", "isotopocule", "xmin", "xmax") |>
@@ -419,7 +594,9 @@ orbi_plot_isotopocule_coverage <- function(
     group_outlines <-
       isotopocule_coverage |>
       dplyr::summarize(
-        is_weak_isotopocule = any(!is.na(.data$is_weak_isotopocule) & .data$is_weak_isotopocule),
+        is_weak_isotopocule = any(
+          !is.na(.data$is_weak_isotopocule) & .data$is_weak_isotopocule
+        ),
         xmin = min(.data$xmin),
         xmax = max(.data$xmax),
         .by = c("filename", "compound", "y", "data_group")
@@ -432,9 +609,21 @@ orbi_plot_isotopocule_coverage <- function(
         by = c("filename", "data_group")
       ) |>
       dplyr::mutate(
-        is_weak_isotopocule = ifelse(!is.na(.data$xmin), .data$is_weak_isotopocule, TRUE),
-        xmin = if(x_column == "time.min") .data$start_time.min else .data$start_scan.no,
-        xmax = if(x_column == "time.min") .data$end_time.min else .data$end_scan.no
+        is_weak_isotopocule = ifelse(
+          !is.na(.data$xmin),
+          .data$is_weak_isotopocule,
+          TRUE
+        ),
+        xmin = if (x_column == "time.min") {
+          .data$start_time.min
+        } else {
+          .data$start_scan.no
+        },
+        xmax = if (x_column == "time.min") {
+          .data$end_time.min
+        } else {
+          .data$end_scan.no
+        }
       ) |>
       dplyr::left_join(files_delta_x, by = "filename")
   }
@@ -445,8 +634,10 @@ orbi_plot_isotopocule_coverage <- function(
     ggplot2::ggplot() +
     ggplot2::aes(
       y = .data$y,
-      xmin = .data$xmin - .data$delta_x, xmax = .data$xmax + .data$delta_x,
-      ymin = .data$y - 0.4, ymax = .data$y + 0.4
+      xmin = .data$xmin - .data$delta_x,
+      xmax = .data$xmax + .data$delta_x,
+      ymin = .data$y - 0.4,
+      ymax = .data$y + 0.4
     ) +
     # scan outlines
     ggplot2::geom_rect(
@@ -460,7 +651,8 @@ orbi_plot_isotopocule_coverage <- function(
     plot <- plot +
       ggplot2::geom_rect(
         data = group_outlines |> filter(.data$is_weak_isotopocule),
-        map = ggplot2::aes(fill = "was flagged as weak"), color = NA_character_
+        map = ggplot2::aes(fill = "was flagged as weak"),
+        color = NA_character_
       )
   }
 
@@ -481,14 +673,18 @@ orbi_plot_isotopocule_coverage <- function(
     ggplot2::labs(x = x_column, y = NULL)
 
   # blocks
-  if ( add_data_blocks && has_blocks(dataset)) {
-    plot <- plot |> orbi_add_blocks_to_plot(
-      x = x_column,
-      data_only = TRUE,
-      fill = "data block",
-      fill_scale = scale_fill_manual("legend", values = c("#1B9E77", "black", "white", "red")),
-      show.legend = TRUE
-    )
+  if (add_data_blocks && has_blocks(dataset)) {
+    plot <- plot |>
+      orbi_add_blocks_to_plot(
+        x = x_column,
+        data_only = TRUE,
+        fill = "data block",
+        fill_scale = scale_fill_manual(
+          "legend",
+          values = c("#1B9E77", "black", "white", "red")
+        ),
+        show.legend = TRUE
+      )
   } else {
     plot <- plot +
       ggplot2::scale_fill_manual("legend", values = c("black", "white", "red"))
