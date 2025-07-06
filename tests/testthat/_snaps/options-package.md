@@ -21,6 +21,9 @@
       $data_type_unused
       [1] "unused"
       
+      $include_spectra
+      [1] FALSE
+      
       $raw_aggregator
       # A tibble: 22 x 8
          dataset   column              source     default regexp cast     func  args  

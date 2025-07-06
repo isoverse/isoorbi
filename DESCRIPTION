@@ -41,7 +41,8 @@ Imports:
     openxlsx,
     purrr,
     prettyunits (>= 1.2.0),
-    rawrr (>= 1.15.3)
+    rawrr (>= 1.15.3),
+    arrow (>= 20.0.0.0)
 Suggests:
     devtools,
     knitr,

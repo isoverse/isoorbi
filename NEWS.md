@@ -6,6 +6,8 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## New features
 
+* implemented direct reading and caching of orbitrap IRMS raw files (`orbi_read_read()`)
+
 ## Enhancements
 
 * renamed package "settings" to package "options" to be consistent with the naming conventions in base R (`orbi_options()` replaces `orbi_set_settings()` and `orbi_get_options()` / `orbi_get_option()` replaces `orbi_get_settings()`)

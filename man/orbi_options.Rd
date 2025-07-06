@@ -41,6 +41,7 @@ These options are best set via \code{\link[=orbi_options]{orbi_options()}} and q
 \item \code{data_type_startup}: the text used to flag raw data as being part of the startup
 \item \code{data_type_changeover}: the text used to flag raw data as being part of a changeover
 \item \code{data_type_unused}: the text used to flag raw data as being unused
+\item \code{include_spectra} : whether to include the spectral data in \link{orbi_read_raw}.
 \item \code{raw_aggregator}: configuration for pulling data out of raw files
 \item \code{debug}: turn on debug mode
 }

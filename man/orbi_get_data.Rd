@@ -9,7 +9,7 @@ orbi_get_data(
   file_info = NULL,
   scans = NULL,
   peaks = NULL,
-  raw_data = NULL,
+  spectra = NULL,
   problems = NULL,
   by = c("uid", "scan")
 )
@@ -23,7 +23,7 @@ orbi_get_data(
 
 \item{peaks}{columns to get from the aggregated \code{peaks}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
-\item{raw_data}{columns to get from the aggregated \code{raw_data}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
+\item{spectra}{columns to get from the aggregated \code{spectra}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
 \item{problems}{columns to get from the aggregated \code{problems}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 

@@ -30,7 +30,7 @@ orbi_aggregate_raw <- function(
 #' @param file_info columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
 #' @param scans columns to get from the aggregated `scans`, all [dplyr::select()] syntax is supported
 #' @param peaks columns to get from the aggregated `peaks`, all [dplyr::select()] syntax is supported
-#' @param raw_data columns to get from the aggregated `raw_data`, all [dplyr::select()] syntax is supported
+#' @param spectra columns to get from the aggregated `spectra`, all [dplyr::select()] syntax is supported
 #' @param problems columns to get from the aggregated `problems`, all [dplyr::select()] syntax is supported
 #' @param by which columns to look for when joining datasets together. Make sure to include the relevant `by` columns in the selections of the individual datasets so they are joined correctly.
 #' @return a tibble
@@ -40,7 +40,7 @@ orbi_get_data <- function(
   file_info = NULL,
   scans = NULL,
   peaks = NULL,
-  raw_data = NULL,
+  spectra = NULL,
   problems = NULL,
   by = c("uid", "scan")
 ) {
@@ -49,7 +49,7 @@ orbi_get_data <- function(
     file_info = {{ file_info }},
     scans = {{ scans }},
     peaks = {{ peaks }},
-    raw_data = {{ raw_data }},
+    spectra = {{ spectra }},
     problems = {{ problems }},
     by = by
   )
@@ -310,7 +310,10 @@ aggregate_files <- function(
   if (show_progress) {
     cli_progress_done(id = pb)
   }
-  n_rows <- map_int(results, nrow) |> prettyunits::pretty_num()
+  n_rows <- map_int(results, nrow) |>
+    prettyunits::pretty_num() |>
+    # take care of leading/trailing whitespaces
+    gsub(pattern = "(^ +| +$)", replacement = "")
   details <- sprintf("{col_blue('%s')} (%s)", names(results), n_rows)
   info <- format_inline(
     "{col_green(symbol$tick)} ",
