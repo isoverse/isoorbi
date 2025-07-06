@@ -5,11 +5,12 @@
 
 <!-- badges: start -->
 
-[![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://isoorbi.isoverse.org/)
-[![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
-[![codecov](https://codecov.io/gh/isoverse/isoorbi/branch/main/graph/badge.svg?token=SN0YDIJ6Y6)](https://app.codecov.io/gh/isoverse/isoorbi)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/isoorbi)](https://CRAN.R-project.org/package=isoorbi)
+[![Documentation](https://img.shields.io/badge/docs-online-green.svg)](https://isoorbi.isoverse.org/)
+[![R-CMD-check](https://github.com/isoverse/isoorbi/workflows/R-CMD-check/badge.svg)](https://github.com/isoverse/isoorbi/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/isoverse/isoorbi/graph/badge.svg)](https://app.codecov.io/gh/isoverse/isoorbi)
 <!-- badges: end -->
 
 ## Overview
@@ -30,9 +31,17 @@ To use the latest updates, you can install the development version of
 `isoorbi` from [GitHub](https://github.com/) with:
 
 ``` r
-if(!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-devtools::install_github("isoverse/isoorbi")
+if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
+pak::pak("isoverse/isoorbi")
 ```
+
+> Important: the first time you read a .raw file (this is possible in
+> the development version of `isoorbi` on GitHub), you will be asked to
+> agree to the [License
+> agreement](https://github.com/fgcz/rawrr/blob/devel/inst/rawrrassembly/RawFileReaderLicense.txt)
+> for Thermo’s
+> [RawFileReader](https://github.com/thermofisherlsms/RawFileReader) to
+> proceed.
 
 ## Show me some code
 

@@ -20,3 +20,6 @@
 ^doc$
 ^Meta$
 ^revdep$
+^paper
+^[\.]?air\.toml$
+^\.vscode$

@@ -21,7 +21,7 @@ orbi_add_blocks_to_plot(
 
 \item{x}{which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.}
 
-\item{data_only}{if set to TRUE, only the blocks flagged as "data" (\code{setting("data_type_data")}) are highlighted}
+\item{data_only}{if set to TRUE, only the blocks flagged as "data" (\code{orbi_get_option("data_type_data")}) are highlighted}
 
 \item{fill}{what to use for the fill aesthetic, default is the block \code{data_type}}
 
