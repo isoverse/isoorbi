@@ -35,6 +35,14 @@ if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
 pak::pak("isoverse/isoorbi")
 ```
 
+> Important: the first time you read a .raw file (this is possible in
+> the development version of `isoorbi` on GitHub), you will be asked to
+> agree to the [License
+> agreement](https://github.com/fgcz/rawrr/blob/devel/inst/rawrrassembly/RawFileReaderLicense.txt)
+> for Thermo’s
+> [RawFileReader](https://github.com/thermofisherlsms/RawFileReader) to
+> proceed.
+
 ## Show me some code
 
 ``` r
