@@ -19,11 +19,13 @@ orbi_get_data(
 
 \item{file_info}{columns to get from the aggregated \code{file_info}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
-\item{scans}{columns to get from the aggregated \code{file_info}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
+\item{scans}{columns to get from the aggregated \code{scans}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
-\item{peaks}{columns to get from the aggregated \code{file_info}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
+\item{peaks}{columns to get from the aggregated \code{peaks}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
-\item{raw_data}{columns to get from the aggregated \code{file_info}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
+\item{raw_data}{columns to get from the aggregated \code{raw_data}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
+
+\item{problems}{columns to get from the aggregated \code{problems}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
 \item{by}{which columns to look for when joining datasets together. Make sure to include the relevant \code{by} columns in the selections of the individual datasets so they are joined correctly.}
 }

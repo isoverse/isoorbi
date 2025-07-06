@@ -28,9 +28,10 @@ orbi_aggregate_raw <- function(
 #' Retrieve a specific subset of the aggregated data into a single data frame by specifying which columns to take from each dataset (file_info, scans, peaks, etc.) using [dplyr::select()] syntax. If data from more than one dataset is selected (e.g. some columns from `scans` AND some from `peaks`), the datasets are combined with an [dplyr::inner_join()] using the columns listed in `by` (only the ones actually in the datasets). Joins that would lead to duplicated data entries (i.e. many-to-many joins) are not allowed and will throw an error to avoid unexpected replications of individual datapoints. If you really want to do such a join, you'll have to do it manually.
 #' @param aggregated_data datasets aggregated from [orbi_aggregate_raw()]
 #' @param file_info columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
-#' @param scans columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
-#' @param peaks columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
-#' @param raw_data columns to get from the aggregated `file_info`, all [dplyr::select()] syntax is supported
+#' @param scans columns to get from the aggregated `scans`, all [dplyr::select()] syntax is supported
+#' @param peaks columns to get from the aggregated `peaks`, all [dplyr::select()] syntax is supported
+#' @param raw_data columns to get from the aggregated `raw_data`, all [dplyr::select()] syntax is supported
+#' @param problems columns to get from the aggregated `problems`, all [dplyr::select()] syntax is supported
 #' @param by which columns to look for when joining datasets together. Make sure to include the relevant `by` columns in the selections of the individual datasets so they are joined correctly.
 #' @return a tibble
 #' @export

@@ -120,8 +120,8 @@
 <text x='430.86' y='550.79' text-anchor='middle' style='font-size: 12.80px; fill: #4D4D4D; font-family: sans;' textLength='17.79px' lengthAdjust='spacingAndGlyphs'>2.0</text>
 <text x='521.25' y='550.79' text-anchor='middle' style='font-size: 12.80px; fill: #4D4D4D; font-family: sans;' textLength='17.79px' lengthAdjust='spacingAndGlyphs'>2.5</text>
 <text x='611.65' y='550.79' text-anchor='middle' style='font-size: 12.80px; fill: #4D4D4D; font-family: sans;' textLength='17.79px' lengthAdjust='spacingAndGlyphs'>3.0</text>
-<text x='340.92' y='567.20' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='8.01px' lengthAdjust='spacingAndGlyphs'>x</text>
-<text transform='translate(16.49,282.60) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='8.01px' lengthAdjust='spacingAndGlyphs'>y</text>
+<text x='340.92' y='567.20' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='60.46px' lengthAdjust='spacingAndGlyphs'>time.min</text>
+<text transform='translate(16.49,282.60) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='116.52px' lengthAdjust='spacingAndGlyphs'>ions.incremental</text>
 <text x='628.08' y='204.03' style='font-size: 16.00px; font-family: sans;' textLength='80.96px' lengthAdjust='spacingAndGlyphs'>isotopocule</text>
 <rect x='628.79' y='211.87' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter;' />
 <line x1='629.81' y1='219.81' x2='643.64' y2='219.81' style='stroke-width: 1.07; stroke: #1B9E77; stroke-linecap: butt;' />
