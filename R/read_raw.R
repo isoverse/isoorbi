@@ -27,9 +27,56 @@ orbi_find_raw <- function(folder, recursive = TRUE) {
   )
 }
 
-
 # make sure raw reader is available
-check_for_raw_reader <- function() {}
+# note: this should really call rawrr:::.isAssemblyWorking()
+# but it's not exported so we have to read a test file to
+# triger it --> could save some processing time here,
+# consider reimplementing rawrr::.isAssemblyWorking() for
+# this purpose
+check_for_raw_reader <- function(
+  install_if_missing = TRUE,
+  call = caller_env()
+) {
+  tryCatch(
+    # read a minimal file as a test
+    # note: index is fastest
+    rawrr::readIndex(system.file(
+      "extdata",
+      "nitrate_test_1scan.raw",
+      package = "isoorbi"
+    )),
+    error = function(cnd) {
+      # missing rawrrr exe
+      if (grepl("rawrr::installRawrrExe", conditionMessage(cnd))) {
+        if (install_if_missing) {
+          # try to install
+          cli_alert_warning(
+            "Could not find the executable for the RAW file reader:"
+          )
+          cli_inform(c(" " = "{.emph {cnd$message}}"))
+          cli_inform(c(
+            ">" = "Trying to install {.pkg rawrr.exe} (this requires an internet connection and may take a moment)..."
+          ))
+          rawrr::installRawrrExe()
+          return(check_for_raw_reader(install_if_missing = FALSE, call = call))
+        } else {
+          # failed to install
+          cli_abort(
+            "Failed to install the executable, please try manually",
+            parent = cnd,
+            call = call
+          )
+        }
+      } else {
+        cli_abort(
+          "Could not run the executable for the RAW file reader",
+          parent = cnd,
+          call = call
+        )
+      }
+    }
+  )
+}
 
 # read raw files =======
 
@@ -51,19 +98,22 @@ orbi_read_raw <- function(
   call <- force(rlang::current_call())
   start <- Sys.time()
 
+  # check for raw file reader
+  check_for_raw_reader()
+
   # check for availability of rawrr
   if (!requireNamespace("rawrr", quietly = TRUE)) {
     cli_abort(
       c(
         "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
-        "i" = "typically, runnign the following commands will work to install {.pkg rawrr} and its assemblies:",
+        "i" = "typically, running the following commands will work to install {.pkg rawrr}:",
         " " = "{.emph install.packages(\"BiocManager\")}",
-        " " = "{.emph BiocManager::install(\"rawrr\")}",
-        " " = "{.emph rawrr::installRawFileReaderDLLs()}",
-        " " = "{.emph rawrr::buildRawrrExe() || rawrr::installRawrrExe()}"
+        " " = "{.emph BiocManager::install(\"rawrr\")}"
       )
     )
   }
+
+  # check for availability of the exe
 
   # safety checks
   stopifnot(
