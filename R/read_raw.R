@@ -12,11 +12,20 @@
 #'
 #' @export
 orbi_find_raw <- function(folder, recursive = TRUE) {
-  # safety check
-  stopifnot(
-    "`folder` must be an existing directory" = dir.exists(folder),
-    "`recursive` must be TRUE or FALSE" = is_scalar_logical(recursive)
+  # safety checks
+  check_arg(
+    folder,
+    !missing(folder) &&
+      is_character(folder) &&
+      length(folder) > 0 &&
+      all(dir.exists(folder)),
+    format_inline(
+      "must point to {qty(if(!missing(folder)) length(folder) else 1)}{?an/} existing director{?y/ies}"
+    ),
+    include_type = FALSE,
+    include_value = TRUE
   )
+  check_arg(recursive, is_scalar_logical(recursive), "must be TRUE or FALSE")
 
   # return
   list.files(
@@ -24,7 +33,8 @@ orbi_find_raw <- function(folder, recursive = TRUE) {
     pattern = "\\.raw",
     full.names = TRUE,
     recursive = recursive
-  )
+  ) |>
+    unique()
 }
 
 # make sure raw reader is available
@@ -37,6 +47,18 @@ check_for_raw_reader <- function(
   install_if_missing = TRUE,
   call = caller_env()
 ) {
+  # check for availability of rawrr
+  if (!requireNamespace("rawrr", quietly = TRUE)) {
+    cli_abort(
+      c(
+        "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
+        "i" = "typically, running the following commands will work to install {.pkg rawrr}:",
+        " " = "{.emph install.packages(\"BiocManager\")}",
+        " " = "{.emph BiocManager::install(\"rawrr\")}"
+      ),
+      call = call
+    )
+  }
   tryCatch(
     # read a minimal file as a test
     # note: index is fastest
@@ -106,20 +128,6 @@ orbi_read_raw <- function(
 
   # check for raw file reader
   check_for_raw_reader()
-
-  # check for availability of rawrr
-  if (!requireNamespace("rawrr", quietly = TRUE)) {
-    cli_abort(
-      c(
-        "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
-        "i" = "typically, running the following commands will work to install {.pkg rawrr}:",
-        " " = "{.emph install.packages(\"BiocManager\")}",
-        " " = "{.emph BiocManager::install(\"rawrr\")}"
-      )
-    )
-  }
-
-  # check for availability of the exe
 
   # safety checks
   stopifnot(
@@ -261,12 +269,20 @@ read_raw_file <- function(
 ) {
   # safety checks
   if (!file.exists(file_path)) {
-    rlang::abort("file does not exist")
+    cli_abort("file {.val {basename(file_path)}} does not exist")
   }
+
+  # cache info
+  cache_info <- tibble(
+    file_size = as.integer(file.size(file_path)),
+    isoorbi_version = as.character(packageVersion("isoorbi")),
+    cache_timestamp = Sys.time()
+  )
 
   # caching
   cache_path <- paste0(file_path, ".cache")
   cache_paths <- list(
+    cache_info = file.path(cache_path, "cache_info.parquet"),
     file_info = file.path(cache_path, "file_info.parquet"),
     scans = file.path(cache_path, "scans.parquet"),
     peaks = file.path(cache_path, "peaks.parquet"),
@@ -279,12 +295,26 @@ read_raw_file <- function(
   read_anew <- TRUE
   read_spectra_anew <- include_spectra
   raw_spectral_data <- list(result = tibble(), conditions = tibble())
-  if (read_cache && all(purrr::map_lgl(cache_paths[-5], file.exists))) {
+  if (read_cache && all(purrr::map_lgl(cache_paths[-6], file.exists))) {
     ## all cached files exist (spectra.parquet is not required) --> try to read from cache
     if (show_progress) {
       cli_progress_update(id = pb, status = "read from cache")
     }
     read_anew <- FALSE
+
+    ## read cache info
+    cache_info_old <- try_catch_cnds(arrow::read_parquet(
+      cache_paths$cache_info
+    ))
+    if (nrow(cache_info_old$conditions) > 0) {
+      read_anew <- TRUE # --> there was an issue, re-read everything
+    }
+    if (cache_info_old$result$file_size != cache_info$file_size) {
+      read_anew <- TRUE # --> file changed size, cache cannot be accurate anymore
+      # add: if any isoorbi version changes the file reading process, can use
+      # the isoorbi_version tag to determine whether a new read is necessary
+    }
+
     ## read headers from cache
     headers_parsed <- try_catch_cnds(arrow::read_parquet(
       cache_paths$file_info
@@ -318,7 +348,7 @@ read_raw_file <- function(
       } else {
         # store the problems read result
         problems <- problems$result |>
-          mutate(condition = list(list()))
+          dplyr::mutate(condition = list(list()))
       }
     }
     ## is there also a cached spectrum? --> read it from cache
@@ -332,6 +362,11 @@ read_raw_file <- function(
         read_spectra_anew <- FALSE
       }
     }
+  }
+
+  # cache info
+  if (read_anew && cache) {
+    arrow::write_parquet(cache_info, sink = cache_paths$cache_info)
   }
 
   # read headers anew
@@ -548,7 +583,7 @@ read_raw_file <- function(
       peaks = list(peaks$result),
       spectra = list(raw_spectral_data$result),
       problems = list(problems),
-      read_info = if (!read_anew && !include_spectra || !read_spectra_anew) {
+      read_info = if (!(read_anew || (include_spectra && read_spectra_anew))) {
         "from cache"
       } else if (!read_anew && include_spectra && read_spectra_anew) {
         "partially from cache"

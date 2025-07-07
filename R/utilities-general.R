@@ -7,7 +7,8 @@ check_arg <- function(
   msg,
   arg = caller_arg(x),
   call = caller_env(),
-  include_type = TRUE
+  include_type = TRUE,
+  include_value = FALSE
 ) {
   if (!condition) {
     if (is_missing(maybe_missing(x))) {
@@ -19,7 +20,8 @@ check_arg <- function(
       } else {
         ""
       }
-      cli_abort("argument {.field {arg}} {msg}{type}", call = call)
+      value <- if (include_value) format_inline(" ({.val {x}})") else ""
+      cli_abort("argument {.field {arg}}{value} {msg}{type}", call = call)
     }
   }
 }

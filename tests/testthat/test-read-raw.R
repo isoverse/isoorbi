@@ -5,16 +5,11 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 test_that("orbi_find_raw() works", {
   # safety checks
+  expect_error(orbi_find_raw(), "folder.*must point to an existing directory")
+  expect_error(orbi_find_raw(42), "folder.*must point to an existing directory")
   expect_error(
-    orbi_find_raw(),
-    "argument \"folder\" is missing, with no default",
-    fixed = TRUE
-  )
-  expect_error(orbi_find_raw(42), "invalid filename argument")
-  expect_error(
-    orbi_find_raw("DNE"),
-    "folder` must be an existing directory",
-    fixed = TRUE
+    orbi_find_raw(c("DNE", "DNE2")),
+    "folder.*must point to existing directories"
   )
 })
 

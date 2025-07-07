@@ -274,8 +274,11 @@ aggregate_files <- function(
       )
 
     # filepath update
-    out$result$file_info <- out$result$file_info |>
-      dplyr::mutate(file_path = !!file_path, .after = 1L)
+    if ("file_info" %in% names(out$result)) {
+      out$result$file_info <- out$result$file_info |>
+        dplyr::as_tibble() |>
+        dplyr::mutate(file_path = !!file_path, .after = 1L)
+    }
 
     # merge old, returned, and caught problems
     problems <- bind_rows(out$result$problems, out$conditions) |>
