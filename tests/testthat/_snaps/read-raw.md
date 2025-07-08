@@ -32,18 +32,18 @@
       y
     Output
       $file_info
-      # A tibble: 2 x 38
-        uid                     `RAW file` `RAW file version` `Creation date` Operator
-        <fct>                   <chr>      <chr>              <chr>           <chr>   
-      1 nitrate_test_10scans.r~ nitrate_t~ 66                 1/30/2025 1:57~ SYSTEM  
-      2 nitrate_test_1scan.raw  nitrate_t~ 66                 1/30/2025 2:01~ SYSTEM  
-      # i 33 more variables: `Number of instruments` <chr>, Description <chr>,
-      #   `Instrument model` <chr>, `Instrument name` <chr>,
-      #   `Instrument method` <chr>, `Serial number` <chr>, `Software version` <chr>,
-      #   `Firmware version` <chr>, Units <chr>, `Mass resolution` <chr>,
-      #   `Number of scans` <chr>, `Number of ms2 scans` <chr>, `Scan range` <chr>,
-      #   `Time range` <chr>, `Mass range` <chr>, `Scan filter (first scan)` <chr>,
-      #   `Scan filter (last scan)` <chr>, `Total number of filters` <chr>, ...
+      # A tibble: 2 x 37
+        uid              `RAW file` `RAW file version` Operator Number of instrument~1
+        <fct>            <chr>      <chr>              <chr>    <chr>                 
+      1 nitrate_test_10~ nitrate_t~ 66                 SYSTEM   1                     
+      2 nitrate_test_1s~ nitrate_t~ 66                 SYSTEM   1                     
+      # i abbreviated name: 1: `Number of instruments`
+      # i 32 more variables: Description <chr>, `Instrument model` <chr>,
+      #   `Instrument name` <chr>, `Instrument method` <chr>, `Serial number` <chr>,
+      #   `Software version` <chr>, `Firmware version` <chr>, Units <chr>,
+      #   `Mass resolution` <chr>, `Number of scans` <chr>,
+      #   `Number of ms2 scans` <chr>, `Scan range` <chr>, `Time range` <chr>,
+      #   `Mass range` <chr>, `Scan filter (first scan)` <chr>, ...
       
       $scans
       # A tibble: 11 x 14

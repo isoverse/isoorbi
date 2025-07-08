@@ -93,5 +93,6 @@ test_that("orbi_read_raw() works", {
   expect_message(y <- orbi_aggregate_raw(x), "Aggregated") |>
     expect_snapshot()
   y$file_info$file_path <- NULL # OS dependent
+  y$file_info$`Creation date` <- NULL # OS dependent
   expect_snapshot(y)
 })
