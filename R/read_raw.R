@@ -3,6 +3,7 @@
 #' Find raw files
 #' @description Finds all .raw files in a folder.
 #' @param folder path to a folder with raw files
+#' @param include_cache whether to include .raw.cache folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files
 #' @param recursive whether to find files recursively
 #'
 #' @examples
@@ -11,20 +12,52 @@
 #' orbi_find_raw(system.file("extdata", package = "isoorbi"))
 #'
 #' @export
-orbi_find_raw <- function(folder, recursive = TRUE) {
-  # safety check
-  stopifnot(
-    "`folder` must be an existing directory" = dir.exists(folder),
-    "`recursive` must be TRUE or FALSE" = is_scalar_logical(recursive)
-  )
-
-  # return
-  list.files(
+orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
+  # safety checks
+  check_arg(
     folder,
-    pattern = "\\.raw",
+    !missing(folder) &&
+      is_character(folder) &&
+      length(folder) > 0 &&
+      all(dir.exists(folder)),
+    format_inline(
+      "must point to {qty(if(!missing(folder)) length(folder) else 1)}{?an/} existing director{?y/ies}"
+    ),
+    include_type = FALSE,
+    include_value = TRUE
+  )
+  check_arg(recursive, is_scalar_logical(recursive), "must be TRUE or FALSE")
+
+  # raw files
+  files <- list.files(
+    folder,
+    pattern = "\\.raw$",
     full.names = TRUE,
     recursive = recursive
-  )
+  ) |>
+    unique()
+
+  # cached folders
+  if (include_cache) {
+    folders <- list.files(
+      folder,
+      pattern = "\\.raw\\.cache$",
+      full.names = TRUE,
+      include.dirs = TRUE,
+      recursive = recursive
+    ) |>
+      unique()
+    folders <- folders[dir.exists(folders)]
+    if (length(folders) > 0) {
+      # include folders
+      linked_files <- gsub("\\.raw\\.cache$", ".raw", folders)
+      folders <- folders[!linked_files %in% files]
+      files <- c(files, folders) |> unique() |> sort()
+    }
+  }
+
+  # return
+  return(files)
 }
 
 # make sure raw reader is available
@@ -37,6 +70,18 @@ check_for_raw_reader <- function(
   install_if_missing = TRUE,
   call = caller_env()
 ) {
+  # check for availability of rawrr
+  if (!requireNamespace("rawrr", quietly = TRUE)) {
+    cli_abort(
+      c(
+        "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
+        "i" = "typically, running the following commands will work to install {.pkg rawrr}:",
+        " " = "{.emph install.packages(\"BiocManager\")}",
+        " " = "{.emph BiocManager::install(\"rawrr\")}"
+      ),
+      call = call
+    )
+  }
   tryCatch(
     # read a minimal file as a test
     # note: index is fastest
@@ -107,27 +152,13 @@ orbi_read_raw <- function(
   # check for raw file reader
   check_for_raw_reader()
 
-  # check for availability of rawrr
-  if (!requireNamespace("rawrr", quietly = TRUE)) {
-    cli_abort(
-      c(
-        "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
-        "i" = "typically, running the following commands will work to install {.pkg rawrr}:",
-        " " = "{.emph install.packages(\"BiocManager\")}",
-        " " = "{.emph BiocManager::install(\"rawrr\")}"
-      )
-    )
-  }
-
-  # check for availability of the exe
-
   # safety checks
-  stopifnot(
-    "no file path supplied" = !missing(file_paths),
-    "`file_paths` has to be at least one file path" = is_character(
-      file_paths
-    ) &&
-      length(file_paths) >= 1L
+  check_arg(
+    file_paths,
+    !missing(file_paths) &&
+      is_character(file_paths) &&
+      length(file_paths) > 0,
+    "must be at least one file path"
   )
 
   # progress bar
@@ -207,7 +238,7 @@ orbi_read_raw <- function(
       ) {
         out$result$read_info
       },
-      summarize_cnds(problems, "but encountered {issues}"),
+      summarize_cnds(problems, " but encountered {issues}"),
       if (show_problems && nrow(problems) > 0) ":"
     )
     cli_text(info)
@@ -261,30 +292,62 @@ read_raw_file <- function(
 ) {
   # safety checks
   if (!file.exists(file_path)) {
-    rlang::abort("file does not exist")
+    cli_abort("file {.val {basename(file_path)}} does not exist")
   }
 
+  # cache info
+  if (dir.exists(file_path)) {
+    # we're dealing with a cache folder
+    is_cache_folder <- TRUE
+    cache_path <- file_path
+  } else {
+    is_cache_folder <- FALSE
+    cache_path <- paste0(file_path, ".cache")
+  }
+  cache_info <- tibble(
+    file_size = as.integer(file.size(file_path)),
+    isoorbi_version = as.character(packageVersion("isoorbi")),
+    cache_timestamp = Sys.time()
+  )
+
   # caching
-  cache_path <- paste0(file_path, ".cache")
   cache_paths <- list(
+    cache_info = file.path(cache_path, "cache_info.parquet"),
     file_info = file.path(cache_path, "file_info.parquet"),
     scans = file.path(cache_path, "scans.parquet"),
     peaks = file.path(cache_path, "peaks.parquet"),
     problems = file.path(cache_path, "problems.parquet"),
     spectra = file.path(cache_path, "spectra.parquet")
   )
-  if (cache && !dir.exists(cache_path)) {
+  if (!is_cache_folder && cache && !dir.exists(cache_path)) {
     dir.create(cache_path)
   }
   read_anew <- TRUE
   read_spectra_anew <- include_spectra
   raw_spectral_data <- list(result = tibble(), conditions = tibble())
-  if (read_cache && all(purrr::map_lgl(cache_paths[-5], file.exists))) {
+  if (read_cache && all(purrr::map_lgl(cache_paths[-6], file.exists))) {
     ## all cached files exist (spectra.parquet is not required) --> try to read from cache
     if (show_progress) {
       cli_progress_update(id = pb, status = "read from cache")
     }
     read_anew <- FALSE
+
+    ## read cache info
+    cache_info_old <- try_catch_cnds(arrow::read_parquet(
+      cache_paths$cache_info
+    ))
+    if (nrow(cache_info_old$conditions) > 0) {
+      read_anew <- TRUE # --> there was an issue, re-read everything
+    }
+    if (
+      !is_cache_folder &&
+        cache_info_old$result$file_size != cache_info$file_size
+    ) {
+      read_anew <- TRUE # --> file changed size, cache cannot be accurate anymore
+      # add: if any isoorbi version changes the file reading process, can use
+      # the isoorbi_version tag to determine whether a new read is necessary
+    }
+
     ## read headers from cache
     headers_parsed <- try_catch_cnds(arrow::read_parquet(
       cache_paths$file_info
@@ -318,7 +381,7 @@ read_raw_file <- function(
       } else {
         # store the problems read result
         problems <- problems$result |>
-          mutate(condition = list(list()))
+          dplyr::mutate(condition = list(list()))
       }
     }
     ## is there also a cached spectrum? --> read it from cache
@@ -334,17 +397,62 @@ read_raw_file <- function(
     }
   }
 
+  # cache folder okay?
+  if (read_anew && is_cache_folder) {
+    cli_abort("could not read cache folder, read .raw file instead")
+  }
+
+  # cache info
+  if (read_anew && cache) {
+    arrow::write_parquet(cache_info, sink = cache_paths$cache_info)
+  }
+
   # read headers anew
   if (read_anew) {
     if (show_progress) {
       cli_progress_update(id = pb, status = "read headers")
     }
 
+    # wrapper for executing rawrr reading functions
+    # to catch issues with the underlying rawfile reader
+    # NOTE: this may become easier in rawrr version 1.17 with a parameter to
+    # readFileHeader for the stderr/out (set to true and then capture.output)
+    # see https://github.com/fgcz/rawrr/issues/92
+    read_headers <- function(call = caller_call()) {
+      tryCatch(
+        rawrr::readFileHeader(file_path),
+        error = function(cnd) {
+          if (
+            grepl("failed for an unknown reason", conditionMessage(cnd)) &&
+              grepl("Please check the debug files", conditionMessage(cnd))
+          ) {
+            cli_abort(
+              "the Thermo RawFileReader could not parse this file, it may not be a valid RAW file",
+              call = call
+            )
+          }
+          stop(cnd)
+        }
+      )
+    }
+
     headers <- try_catch_cnds(
-      rawrr::readFileHeader(file_path),
+      read_headers(),
       error_value = tibble(),
       catch_errors = !orbi_get_option("debug")
     )
+
+    if (nrow(headers$conditions) > 0) {
+      # this raw file cannot be read by the RawFileReader
+      # --> return what we have and leave it at that
+      return(
+        tibble(
+          file_path = file_path,
+          problems = headers$conditions
+        )
+      )
+    }
+
     parse_headers <- function() convert_list_to_tibble(headers$result)
     headers_parsed <- try_catch_cnds(
       parse_headers(),
@@ -542,13 +650,17 @@ read_raw_file <- function(
   # combine
   out <-
     tibble(
-      file_path = file_path,
+      file_path = if (is_cache_folder) {
+        gsub("\\.cache$", "", file_path)
+      } else {
+        file_path
+      },
       file_info = list(headers_parsed$result),
       scans = list(indices_w_scan_info$result),
       peaks = list(peaks$result),
       spectra = list(raw_spectral_data$result),
       problems = list(problems),
-      read_info = if (!read_anew && !include_spectra || !read_spectra_anew) {
+      read_info = if (!(read_anew || (include_spectra && read_spectra_anew))) {
         "from cache"
       } else if (!read_anew && include_spectra && read_spectra_anew) {
         "partially from cache"
