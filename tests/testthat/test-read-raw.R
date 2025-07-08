@@ -87,10 +87,11 @@ test_that("orbi_read_raw() works", {
     "Read 2 raw files"
   ) |>
     suppressMessages()
-  expect_snapshot(x)
+  expect_snapshot(x |> select(-"file_path"))
 
   # plus aggregate
   expect_message(y <- orbi_aggregate_raw(x), "Aggregated") |>
     expect_snapshot()
+  y$file_info$file_path <- NULL # OS dependent
   expect_snapshot(y)
 })

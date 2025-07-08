@@ -1,13 +1,13 @@
 # orbi_read_raw() works
 
     Code
-      x
+      select(x, -"file_path")
     Output
-      # A tibble: 2 x 6
-        file_path                        file_info scans    peaks    spectra  problems
-        <chr>                            <list>    <list>   <list>   <list>   <list>  
-      1 /Users/seko0922/Dropbox/Tools/s~ <tibble>  <tibble> <tibble> <tibble> <tibble>
-      2 /Users/seko0922/Dropbox/Tools/s~ <tibble>  <tibble> <tibble> <tibble> <tibble>
+      # A tibble: 2 x 5
+        file_info         scans              peaks              spectra  problems
+        <list>            <list>             <list>             <list>   <list>  
+      1 <tibble [1 x 37]> <tibble [10 x 89]> <tibble [126 x 5]> <tibble> <tibble>
+      2 <tibble [1 x 37]> <tibble [1 x 89]>  <tibble [12 x 5]>  <tibble> <tibble>
 
 ---
 
@@ -32,11 +32,11 @@
       y
     Output
       $file_info
-      # A tibble: 2 x 39
-        uid           file_path `RAW file` `RAW file version` `Creation date` Operator
-        <fct>         <chr>     <chr>      <chr>              <chr>           <chr>   
-      1 nitrate_test~ /Users/s~ nitrate_t~ 66                 1/30/2025 1:57~ SYSTEM  
-      2 nitrate_test~ /Users/s~ nitrate_t~ 66                 1/30/2025 2:01~ SYSTEM  
+      # A tibble: 2 x 38
+        uid                     `RAW file` `RAW file version` `Creation date` Operator
+        <fct>                   <chr>      <chr>              <chr>           <chr>   
+      1 nitrate_test_10scans.r~ nitrate_t~ 66                 1/30/2025 1:57~ SYSTEM  
+      2 nitrate_test_1scan.raw  nitrate_t~ 66                 1/30/2025 2:01~ SYSTEM  
       # i 33 more variables: `Number of instruments` <chr>, Description <chr>,
       #   `Instrument model` <chr>, `Instrument name` <chr>,
       #   `Instrument method` <chr>, `Serial number` <chr>, `Software version` <chr>,
