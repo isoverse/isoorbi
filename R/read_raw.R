@@ -3,6 +3,7 @@
 #' Find raw files
 #' @description Finds all .raw files in a folder.
 #' @param folder path to a folder with raw files
+#' @param include_cache whether to include .raw.cache folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files
 #' @param recursive whether to find files recursively
 #'
 #' @examples
@@ -11,7 +12,7 @@
 #' orbi_find_raw(system.file("extdata", package = "isoorbi"))
 #'
 #' @export
-orbi_find_raw <- function(folder, recursive = TRUE) {
+orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
   # safety checks
   check_arg(
     folder,
@@ -27,14 +28,36 @@ orbi_find_raw <- function(folder, recursive = TRUE) {
   )
   check_arg(recursive, is_scalar_logical(recursive), "must be TRUE or FALSE")
 
-  # return
-  list.files(
+  # raw files
+  files <- list.files(
     folder,
-    pattern = "\\.raw",
+    pattern = "\\.raw$",
     full.names = TRUE,
     recursive = recursive
   ) |>
     unique()
+
+  # cached folders
+  if (include_cache) {
+    folders <- list.files(
+      folder,
+      pattern = "\\.raw\\.cache$",
+      full.names = TRUE,
+      include.dirs = TRUE,
+      recursive = recursive
+    ) |>
+      unique()
+    folders <- folders[dir.exists(folders)]
+    if (length(folders) > 0) {
+      # include folders
+      linked_files <- gsub("\\.raw\\.cache$", ".raw", folders)
+      folders <- folders[!linked_files %in% files]
+      files <- c(files, folders) |> unique() |> sort()
+    }
+  }
+
+  # return
+  return(files)
 }
 
 # make sure raw reader is available
@@ -130,12 +153,12 @@ orbi_read_raw <- function(
   check_for_raw_reader()
 
   # safety checks
-  stopifnot(
-    "no file path supplied" = !missing(file_paths),
-    "`file_paths` has to be at least one file path" = is_character(
-      file_paths
-    ) &&
-      length(file_paths) >= 1L
+  check_arg(
+    file_paths,
+    !missing(file_paths) &&
+      is_character(file_paths) &&
+      length(file_paths) > 0,
+    "must be at least one file path"
   )
 
   # progress bar
@@ -215,7 +238,7 @@ orbi_read_raw <- function(
       ) {
         out$result$read_info
       },
-      summarize_cnds(problems, "but encountered {issues}"),
+      summarize_cnds(problems, " but encountered {issues}"),
       if (show_problems && nrow(problems) > 0) ":"
     )
     cli_text(info)
@@ -273,6 +296,14 @@ read_raw_file <- function(
   }
 
   # cache info
+  if (dir.exists(file_path)) {
+    # we're dealing with a cache folder
+    is_cache_folder <- TRUE
+    cache_path <- file_path
+  } else {
+    is_cache_folder <- FALSE
+    cache_path <- paste0(file_path, ".cache")
+  }
   cache_info <- tibble(
     file_size = as.integer(file.size(file_path)),
     isoorbi_version = as.character(packageVersion("isoorbi")),
@@ -280,7 +311,6 @@ read_raw_file <- function(
   )
 
   # caching
-  cache_path <- paste0(file_path, ".cache")
   cache_paths <- list(
     cache_info = file.path(cache_path, "cache_info.parquet"),
     file_info = file.path(cache_path, "file_info.parquet"),
@@ -289,7 +319,7 @@ read_raw_file <- function(
     problems = file.path(cache_path, "problems.parquet"),
     spectra = file.path(cache_path, "spectra.parquet")
   )
-  if (cache && !dir.exists(cache_path)) {
+  if (!is_cache_folder && cache && !dir.exists(cache_path)) {
     dir.create(cache_path)
   }
   read_anew <- TRUE
@@ -309,7 +339,10 @@ read_raw_file <- function(
     if (nrow(cache_info_old$conditions) > 0) {
       read_anew <- TRUE # --> there was an issue, re-read everything
     }
-    if (cache_info_old$result$file_size != cache_info$file_size) {
+    if (
+      !is_cache_folder &&
+        cache_info_old$result$file_size != cache_info$file_size
+    ) {
       read_anew <- TRUE # --> file changed size, cache cannot be accurate anymore
       # add: if any isoorbi version changes the file reading process, can use
       # the isoorbi_version tag to determine whether a new read is necessary
@@ -364,6 +397,11 @@ read_raw_file <- function(
     }
   }
 
+  # cache folder okay?
+  if (read_anew && is_cache_folder) {
+    cli_abort("could not read cache folder, read .raw file instead")
+  }
+
   # cache info
   if (read_anew && cache) {
     arrow::write_parquet(cache_info, sink = cache_paths$cache_info)
@@ -375,11 +413,46 @@ read_raw_file <- function(
       cli_progress_update(id = pb, status = "read headers")
     }
 
+    # wrapper for executing rawrr reading functions
+    # to catch issues with the underlying rawfile reader
+    # NOTE: this may become easier in rawrr version 1.17 with a parameter to
+    # readFileHeader for the stderr/out (set to true and then capture.output)
+    # see https://github.com/fgcz/rawrr/issues/92
+    read_headers <- function(call = caller_call()) {
+      tryCatch(
+        rawrr::readFileHeader(file_path),
+        error = function(cnd) {
+          if (
+            grepl("failed for an unknown reason", conditionMessage(cnd)) &&
+              grepl("Please check the debug files", conditionMessage(cnd))
+          ) {
+            cli_abort(
+              "the Thermo RawFileReader could not parse this file, it may not be a valid RAW file",
+              call = call
+            )
+          }
+          stop(cnd)
+        }
+      )
+    }
+
     headers <- try_catch_cnds(
-      rawrr::readFileHeader(file_path),
+      read_headers(),
       error_value = tibble(),
       catch_errors = !orbi_get_option("debug")
     )
+
+    if (nrow(headers$conditions) > 0) {
+      # this raw file cannot be read by the RawFileReader
+      # --> return what we have and leave it at that
+      return(
+        tibble(
+          file_path = file_path,
+          problems = headers$conditions
+        )
+      )
+    }
+
     parse_headers <- function() convert_list_to_tibble(headers$result)
     headers_parsed <- try_catch_cnds(
       parse_headers(),
@@ -577,7 +650,11 @@ read_raw_file <- function(
   # combine
   out <-
     tibble(
-      file_path = file_path,
+      file_path = if (is_cache_folder) {
+        gsub("\\.cache$", "", file_path)
+      } else {
+        file_path
+      },
       file_info = list(headers_parsed$result),
       scans = list(indices_w_scan_info$result),
       peaks = list(peaks$result),

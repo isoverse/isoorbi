@@ -27,9 +27,8 @@ try_catch_cnds <- function(
   catch_errors = TRUE,
   catch_warnings = TRUE,
   truncate_call_stack = TRUE,
-  env = rlang::caller_env()
+  parent_call = rlang::caller_call()
 ) {
-  force(call)
   conds <- tibble::tibble(type = character(0), condition = list())
 
   handle_warning <- function(cnd) {
@@ -80,7 +79,12 @@ try_catch_cnds <- function(
 
     # re-throw error or catch it?
     if (!catch_errors) {
-      rlang::abort(message = NULL, parent = cnd, class = class(cnd), call = env)
+      rlang::abort(
+        message = NULL,
+        parent = cnd,
+        class = class(cnd),
+        call = parent_call
+      )
     } else {
       conds <<- conds |>
         dplyr::bind_rows(tibble::tibble(type = "error", condition = list(cnd)))
