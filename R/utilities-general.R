@@ -50,3 +50,48 @@ check_tibble <- function(
     )
   }
 }
+
+# print out info start message
+# @param ... message pieces
+# @param keep whether to keep the start info
+start_info <- function(..., keep = FALSE, env = caller_env()) {
+  msg <- c("{col_green(symbol$info)} ", ..., "...")
+  retval <- list(pb = NULL, start_time = Sys.time())
+  if (...length() == 0) {
+    # no message, just return the start time
+  } else if (keep) {
+    # message is permanent
+    cli_text(msg, .envir = parent.frame())
+  } else {
+    # message is a progress message
+    retval$pb <- cli_progress_message(msg, .envir = parent.frame())
+  }
+  return(invisible(retval))
+}
+
+# print out info end message
+finish_info <- function(
+  ...,
+  start = list(pb = NULL, start_time = NULL),
+  pre = if (!interactive()) "..." else "", # OBSOLETE?
+  indent = if (interactive()) 0 else 3, # OBSOLETE?
+  env = caller_env()
+) {
+  # close progress bar if there is one
+  if (!is.null(start$pb)) {
+    cli_progress_done(id = start$pb, .envir = parent.frame())
+  }
+
+  # are there any final messages to print?
+  if (...length() > 0) {
+    # using `cli_text()` instead of `cli_alert_success()` because it wraps to output width
+    cli_text(
+      "{col_green(symbol$tick)} ",
+      format_inline(
+        "{.timestamp {prettyunits::pretty_sec(as.numeric(Sys.time() - start$start_time, 'secs'))}} "
+      ),
+      ...,
+      .envir = parent.frame()
+    )
+  }
+}

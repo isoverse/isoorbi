@@ -71,55 +71,6 @@ try_catch_all <- function(expr, error, warn = error, newline = TRUE) {
   )
 }
 
-# print out info start message
-message_start <- function(...) {
-  message_wrap(..., exdent = 3, appendLF = !interactive())
-  return(Sys.time())
-}
-
-# print out info end message
-message_finish <- function(
-  ...,
-  start_time = NULL,
-  pre = if (!interactive()) "..." else "",
-  indent = if (interactive()) 0 else 3
-) {
-  end_time <- Sys.time()
-  time_info <-
-    if (!is.null(start_time)) {
-      sprintf(" in %.2f seconds.", end_time - start_time)
-    } else {
-      ""
-    }
-  message_wrap(pre, ..., time_info, indent = indent, exdent = 3)
-}
-
-# print out standalone info message
-message_standalone <- function(..., start_time = NULL) {
-  message_finish(..., start_time = start_time, pre = "", indent = 0)
-}
-
-# print out a message that wraps in non-interactive mode (e.g. in notebooks)
-message_wrap <- function(
-  ...,
-  appendLF = TRUE,
-  width = if (!interactive()) options()$width - 2 else NA,
-  indent = 0,
-  exdent = 0
-) {
-  if (is.na(width)) {
-    message(..., appendLF = appendLF)
-  } else {
-    original <- paste0(..., collapse = "")
-    original |>
-      strwrap(width = width, indent = indent, exdent = exdent) |>
-      paste(collapse = "\n") |>
-      message(appendLF = appendLF)
-  }
-  invisible()
-}
-
-
 # Common utility functions to clean and annotate data ------------------------------------
 
 #' @title Function replaced by `orbi_flag_satellite_peaks()`
@@ -174,7 +125,7 @@ orbi_flag_satellite_peaks <- function(dataset) {
   )
 
   # info
-  start_time <- message_start(
+  start <- start_info(
     "orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)... "
   )
 
@@ -215,11 +166,11 @@ orbi_flag_satellite_peaks <- function(dataset) {
       paste(isotopocules, collapse = "\", \""),
       100 * sat_peaks / nrow(dataset)
     ) |>
-      message_finish(start_time = start_time)
+      finish_info(start = start)
   } else {
-    message_finish(
+    finish_info(
       "confirmed there are no satellite peaks",
-      start_time = start_time
+      start = start
     )
   }
 
@@ -294,14 +245,14 @@ orbi_flag_weak_isotopocules <-
       )
 
     # info
-    start_time <-
+    start <-
       sprintf(
         "orbi_flag_weak_isotopocules() is flagging isotopocules from data that are detected in less than %s%% of scans in %d data group(s) (based on '%s')... ",
         min_percent,
         dplyr::n_groups(dataset_out),
         paste(dplyr::group_vars(dataset_out), collapse = "', '")
       ) |>
-      message_start()
+      start_info()
     starting_isotopocules <- dataset_out |>
       count_grouped_distinct("isotopocule")
 
@@ -330,11 +281,11 @@ orbi_flag_weak_isotopocules <-
         removed_isotopocules,
         starting_isotopocules
       ) |>
-        message_finish(start_time = start_time)
+        finish_info(start = start)
     } else {
-      message_finish(
+      finish_info(
         "confirmed there are no weak isotopocules",
-        start_time = start_time
+        start = start
       )
     }
 
@@ -462,14 +413,14 @@ orbi_flag_outliers <- function(
     group_if_exists(c("filename", "block", "segment", "injection"), add = TRUE)
 
   # info
-  start_time <-
+  start <-
     sprintf(
       "orbi_flag_outliers() is flagging the %s in %d data group(s) (based on '%s')... ",
       method_msg,
       dplyr::n_groups(dataset_out),
       paste(dplyr::group_vars(dataset_out), collapse = "', '")
     ) |>
-    message_start()
+    start_info()
   n_scans <- dataset_out |> count_grouped_distinct("scan.no")
 
   # calculation
@@ -524,11 +475,11 @@ orbi_flag_outliers <- function(
       n_scans,
       n_scans_removed / n_scans * 100
     ) |>
-      message_finish(start_time = start_time)
+      finish_info(start = start)
   } else {
-    message_finish(
+    finish_info(
       "confirmed there are no outliers based on this method",
-      start_time = start_time
+      start = start
     )
   }
 
@@ -581,7 +532,7 @@ orbi_filter_flagged_data <- function(dataset) {
   noutliers <- 0L
 
   # remove flagged
-  start_time <- Sys.time()
+  start <- Sys.time()
   details <- c()
   if ("is_satellite_peak" %in% names(dataset)) {
     dataset <- dataset |> filter(!.data$is_satellite_peak)
@@ -610,7 +561,7 @@ orbi_filter_flagged_data <- function(dataset) {
       ""
     }
   ) |>
-    message_standalone(start_time = start_time)
+    message_standalone(start = start)
 
   # return
   return(dataset |> droplevels())
@@ -667,12 +618,12 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   dataset <- dataset |> factorize_dataset("isotopocule")
 
   # info message
-  start_time <-
+  start <-
     sprintf(
       "orbi_define_basepeak() is setting the '%s' isotopocule as the ratio denominator... ",
       basepeak_def
     ) |>
-    message_start()
+    start_info()
 
   # identify `basepeak` for each scan
   df.out <-
@@ -792,7 +743,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     length(levels(df.out$isotopocule)),
     paste(levels(df.out$isotopocule), collapse = ", ")
   ) |>
-    message_finish(start_time = start_time)
+    finish_info(start = start)
 
   # return
   return(df.out)
