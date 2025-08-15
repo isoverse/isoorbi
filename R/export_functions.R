@@ -12,7 +12,7 @@ orbi_export_data_to_excel <- function(
   file,
   dbl_digits = 7,
   int_format = "0",
-  dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)
+  dbl_format = sprintf(sprintf("%%.%sf", dbl_digits), 0)
 ) {
   # check for availability
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
@@ -23,21 +23,21 @@ orbi_export_data_to_excel <- function(
   }
 
   # safety checks
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`file` needs to be a filepath" = !missing(file) &&
-      is_scalar_character(file)
+  check_arg(
+    dataset,
+    !missing(dataset) && is.data.frame(dataset),
+    "must be a data frame or tibble"
+  )
+  check_arg(
+    file,
+    !missing(file) && is_scalar_character(file),
+    "must be a filepath"
   )
 
   # info
-  start_time <-
-    sprintf(
-      "orbi_export_data_to_excel() is exporting data set with %d rows and %d columns to %s... ",
-      nrow(dataset),
-      ncol(dataset),
-      file
-    ) |>
-    message_start()
+  start <- start_info(
+    "Exporting {.field dataset} ({nrow(dataset)} row{?s}, {ncol(dataset)} column{?s}) to {.file {file}}"
+  )
 
   # make excel workbook
   wb <- openxlsx::createWorkbook()
@@ -56,7 +56,10 @@ orbi_export_data_to_excel <- function(
   openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   # info
-  message_finish("completed", start_time = start_time)
+  finish_info(
+    "Exported {.field dataset} ({nrow(dataset)} row{?s}, {ncol(dataset)} column{?s}) to {.file {file}}",
+    start = start
+  )
 
   # return invisible
   return(invisible(dataset))
@@ -79,8 +82,33 @@ add_excel_sheet <- function(
   dbl_digits = 2,
   col_max_width = 75,
   int_format = "0",
-  dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)
+  dbl_format = sprintf(sprintf("%%.%sf", dbl_digits), 0)
 ) {
+  # safety checks
+  check_arg(
+    wb,
+    !missing(wb) && is(wb, "Workbook"),
+    "must be an openxlsx workbook"
+  )
+  check_arg(
+    sheet_name,
+    !missing(sheet_name) && is_scalar_character(sheet_name),
+    "must be a string"
+  )
+  check_arg(
+    dataset,
+    !missing(dataset) && is.data.frame(dataset),
+    "must be a data frame or tibble"
+  )
+  check_arg(dbl_digits, is_scalar_integerish(dbl_digits), "must be an integer")
+  check_arg(
+    col_max_width,
+    is_scalar_integerish(col_max_width),
+    "must be an integer"
+  )
+  check_arg(int_format, is_scalar_character(int_format), "must be a string")
+  check_arg(dbl_format, is_scalar_character(dbl_format), "must be a string")
+
   # sheet
   openxlsx::addWorksheet(wb, sheet_name)
   hs <- openxlsx::createStyle(textDecoration = "bold") # header style
