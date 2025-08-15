@@ -53,9 +53,21 @@ check_tibble <- function(
 
 # print out info start message
 # @param ... message pieces
+# @param func whether to include the function name
 # @param keep whether to keep the start info
-start_info <- function(..., keep = FALSE, env = caller_env()) {
-  msg <- c("{col_green(symbol$info)} ", ..., "...")
+start_info <- function(
+  ...,
+  func = TRUE,
+  keep = FALSE,
+  env = caller_env(),
+  call = caller_call()
+) {
+  # prefix
+  prefix <- "{col_green(symbol$info)} "
+  if (func) {
+    prefix <- sprintf("%s{.strong %s()} ", prefix, as_label(call[[1]]))
+  }
+  msg <- c(prefix, ..., "...")
   retval <- list(pb = NULL, start_time = Sys.time())
   if (...length() == 0) {
     # no message, just return the start time
@@ -73,9 +85,9 @@ start_info <- function(..., keep = FALSE, env = caller_env()) {
 finish_info <- function(
   ...,
   start = list(pb = NULL, start_time = NULL),
-  pre = if (!interactive()) "..." else "", # OBSOLETE?
-  indent = if (interactive()) 0 else 3, # OBSOLETE?
-  env = caller_env()
+  func = TRUE,
+  env = caller_env(),
+  call = caller_call()
 ) {
   # close progress bar if there is one
   if (!is.null(start$pb)) {
@@ -84,14 +96,15 @@ finish_info <- function(
 
   # are there any final messages to print?
   if (...length() > 0) {
-    # using `cli_text()` instead of `cli_alert_success()` because it wraps to output width
-    cli_text(
-      "{col_green(symbol$tick)} ",
-      format_inline(
-        "{.timestamp {prettyunits::pretty_sec(as.numeric(Sys.time() - start$start_time, 'secs'))}} "
-      ),
-      ...,
-      .envir = parent.frame()
+    # prefix
+    prefix <- format_inline(
+      "{col_green(symbol$tick)} {.timestamp {prettyunits::pretty_sec(as.numeric(Sys.time() - start$start_time, 'secs'))}} "
     )
+    if (func) {
+      prefix <- sprintf("%s{.strong %s()} ", prefix, as_label(call[[1]]))
+    }
+
+    # using `cli_text()` instead of `cli_alert_success()` because it wraps to output width
+    cli_text(prefix, ..., .envir = parent.frame())
   }
 }

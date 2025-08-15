@@ -34,19 +34,25 @@ test_that("test check_tibble()", {
 # start_info() / finish_info() ================
 
 test_that("test start_info() / finish_info()", {
-  test <- function(keep) {
-    start <- start_info("testing", keep = keep)
+  test <- function(keep = FALSE, func = TRUE) {
+    start <- start_info("testing", keep = keep, func = func)
     Sys.sleep(0.1)
     finish_info("done", start = start)
   }
 
+  # default: disappearing start info (how to test for the disappearence?)
+  test() |>
+    expect_message("test().*testing...") |>
+    expect_message("test().*done") |>
+    suppressMessages()
+
   # keep start message
   test(TRUE) |>
-    expect_message("testing...") |>
-    expect_message("done")
+    expect_message("test().*testing...") |>
+    expect_message("test().*done")
 
-  # disappearing start info (how to test for the disappearence?)
-  test(FALSE) |>
+  # do not include function
+  test(TRUE, FALSE) |>
     expect_message("testing...") |>
     expect_message("done") |>
     suppressMessages()
