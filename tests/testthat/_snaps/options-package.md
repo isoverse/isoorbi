@@ -43,4 +43,7 @@
       $debug
       [1] FALSE
       
+      $auto_use_ansi
+      [1] TRUE
+      
 

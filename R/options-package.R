@@ -219,7 +219,12 @@ get_pkg_options <- function() {
       }
     ),
     #' - `debug`: turn on debug mode
-    debug = define_pkg_option(default = FALSE, check_fn = is_scalar_logical)
+    debug = define_pkg_option(default = FALSE, check_fn = is_scalar_logical),
+    #' - `auto_use_ansi`: whether to automatically enable correct rendering of stylized (ansi) output in HTML reports from notebooks
+    auto_use_ansi = define_pkg_option(
+      default = TRUE,
+      check_fn = is_scalar_logical
+    )
   )
 }
 
