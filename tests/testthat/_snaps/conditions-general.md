@@ -1,31 +1,51 @@
 # try_catch_cnds()
 
     Code
-      try_catch_cnds(wrap_f())$conditions$condition[[4]]$trace
+      as.data.frame(try_catch_cnds(wrap_f())$conditions$condition[[4]]$trace)
     Output
-          x
-       1. \-isoorbi (local) wrap_f() at isoorbi/R/conditions-general.R:86:5
-       2.   \-isoorbi (local) my_f(show_message = show_message) at test-conditions-general.R:5:3
-       3.     \-isoorbi (local) internal_func() at test-conditions-general.R:18:3
-       4.       \-rlang::abort("oh no internal {value} error!") at test-conditions-general.R:16:5
+                                                                           call
+      1 as.data.frame(try_catch_cnds(wrap_f())$conditions$condition[[4]]$trace)
+      2                                                                wrap_f()
+      3                                       my_f(show_message = show_message)
+      4                                                         internal_func()
+      5                           rlang::abort("oh no internal {value} error!")
+        parent visible namespace scope error_frame
+      1      0    TRUE      base    ::       FALSE
+      2      0    TRUE   isoorbi local       FALSE
+      3      2    TRUE   isoorbi local       FALSE
+      4      3    TRUE   isoorbi local        TRUE
+      5      4   FALSE     rlang    ::       FALSE
 
 ---
 
     Code
-      try_catch_cnds(wrap_f(), truncate_call_stack = FALSE)$conditions$condition[[4]]$
-        trace
+      as.data.frame(try_catch_cnds(wrap_f(), truncate_call_stack = FALSE)$conditions$
+        condition[[4]]$trace)
     Output
-           x
-        1. +-isoorbi:::try_catch_cnds(wrap_f(), truncate_call_stack = FALSE)
-        2. | +-base::tryCatch(...) at isoorbi/R/conditions-general.R:86:5
-        3. | | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
-        4. | |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        5. | |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
-        6. | \-base::withCallingHandlers(warning = handle_warning, expr) at isoorbi/R/conditions-general.R:86:5
-        7. \-isoorbi (local) wrap_f() at isoorbi/R/conditions-general.R:86:5
-        8.   \-isoorbi (local) my_f(show_message = show_message) at test-conditions-general.R:5:3
-        9.     \-isoorbi (local) internal_func() at test-conditions-general.R:18:3
-       10.       \-rlang::abort("oh no internal {value} error!") at test-conditions-general.R:16:5
+                                                                                                         call
+      1  as.data.frame(try_catch_cnds(wrap_f(), truncate_call_stack = FALSE)$conditions$condition[[4]]$trace)
+      2                                                 try_catch_cnds(wrap_f(), truncate_call_stack = FALSE)
+      3             tryCatch(error = handle_error, withCallingHandlers(warning = handle_warning, ,     expr))
+      4                                                      tryCatchList(expr, classes, parentenv, handlers)
+      5                                                   tryCatchOne(expr, names, parentenv, handlers[[1L]])
+      6                                                    doTryCatch(return(expr), name, parentenv, handler)
+      7                                                   withCallingHandlers(warning = handle_warning, expr)
+      8                                                                                              wrap_f()
+      9                                                                     my_f(show_message = show_message)
+      10                                                                                      internal_func()
+      11                                                        rlang::abort("oh no internal {value} error!")
+         parent visible namespace scope error_frame
+      1       0    TRUE      base    ::       FALSE
+      2       0    TRUE   isoorbi   :::       FALSE
+      3       2    TRUE      base    ::       FALSE
+      4       3    TRUE      base local       FALSE
+      5       4    TRUE      base local       FALSE
+      6       5    TRUE      base local       FALSE
+      7       2    TRUE      base    ::       FALSE
+      8       0    TRUE   isoorbi local       FALSE
+      9       8    TRUE   isoorbi local       FALSE
+      10      9    TRUE   isoorbi local        TRUE
+      11     10   FALSE     rlang    ::       FALSE
 
 ---
 

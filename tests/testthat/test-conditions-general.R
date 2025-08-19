@@ -24,12 +24,14 @@ my_f <- function(show_message = FALSE) {
 test_that("try_catch_cnds()", {
   # with truncated callstack (default)
   try_catch_cnds(wrap_f())$conditions$condition[[4]]$trace |>
+    as.data.frame() |>
     expect_snapshot()
 
   # without truncated callstack
   try_catch_cnds(wrap_f(), truncate_call_stack = FALSE)$conditions$condition[[
     4
   ]]$trace |>
+    as.data.frame() |>
     expect_snapshot()
 
   # with message
@@ -62,6 +64,7 @@ test_that("try_catch_cnds()", {
 test_that("summarize_cnds()", {
   # conditions to test with
   out <- try_catch_cnds(wrap_f())
+  expect_s3_class(out$conditions, "data.frame")
 
   # cli tests
   test_that_cli(
@@ -124,6 +127,7 @@ test_that("summarize_cnds()", {
 test_that("format_cnds()", {
   # conditions to test with
   out <- try_catch_cnds(wrap_f())
+  expect_s3_class(out$conditions, "data.frame")
 
   # cli tests
   test_that_cli(
@@ -167,6 +171,7 @@ test_that("format_cnds()", {
 test_that("summarize_and_format_cnds()", {
   # conditions to test with
   out <- try_catch_cnds(wrap_f())
+  expect_s3_class(out$conditions, "data.frame")
 
   # errors
   expect_error(summarize_and_format_cnds(), "conditions.*must be provided")
@@ -208,9 +213,16 @@ test_that("summarize_and_format_cnds()", {
       test_summarize_and_format_cnds(conditions = out$conditions[1:3, ]) |>
         expect_snapshot()
 
+      # single issue
+      test_summarize_and_format_cnds(conditions = out$conditions[1, ]) |>
+        expect_snapshot()
+
       # without issues
       test_summarize_and_format_cnds(conditions = out$conditions[c(), ]) |>
         expect_snapshot()
+
+      # don't show cnds
+      test_summarize_and_format_cnds(include_cnds = FALSE) |> expect_snapshot()
 
       # with message
       test_summarize_and_format_cnds(message = "even more {fun}") |>
@@ -244,6 +256,7 @@ test_that("summarize_and_format_cnds()", {
 test_that("show_cnds()", {
   # conditions to test with
   out <- try_catch_cnds(wrap_f())
+  expect_s3_class(out$conditions, "data.frame")
 
   # cli tests
   test_that_cli(
@@ -278,6 +291,7 @@ test_that("show_cnds()", {
 test_that("abort_cnds()", {
   # conditions to test with
   out <- try_catch_cnds(wrap_f())
+  expect_s3_class(out$conditions, "data.frame")
 
   # cli tests
   test_that_cli(

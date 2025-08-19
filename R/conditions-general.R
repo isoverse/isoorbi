@@ -1,4 +1,4 @@
-# condition handling -----------
+# general condition handling (any package) -----------
 
 # Try/catch for executing functions that should not disrupt overall flow
 # (conceptually similar to purrr::safely but has more detailed conditions summary)
@@ -239,6 +239,7 @@ format_cnds <- function(
 # this is usually not called directly but with show_cnds() or abort_cnds()
 # @inheritParams summarize_cnds
 # @inheritParams format_cnds
+# @param include_cnds whether to show the cnds
 # @return empty vector unless there's either a summary message OR at least 1 condition
 summarize_and_format_cnds <- function(
   conditions,
@@ -249,8 +250,9 @@ summarize_and_format_cnds <- function(
   summary_format = "{issues} {message}",
   message = NULL,
   # for format_cnds
-  indent_cnds = include_summary,
+  include_cnds = TRUE,
   include_cnd_calls = TRUE,
+  indent_cnds = include_summary,
   call = caller_call()
 ) {
   # safety
@@ -273,7 +275,8 @@ summarize_and_format_cnds <- function(
   }
 
   # single issue and summary --> make one line for both
-  if (include_summary && nrow(conditions) == 1L) {
+  formatted_cnds <- c()
+  if (include_cnds && include_summary && nrow(conditions) == 1L) {
     # single condition
     summary_line <- paste(
       summary_line,
@@ -282,11 +285,10 @@ summarize_and_format_cnds <- function(
         conditions,
         include_call = include_cnd_calls,
         include_symbol = FALSE,
-        call_format = "{.strong {call}()}:",
+        call_format = "{.strong {call}()}: ",
       )
     )
-    formatted_cnds <- c()
-  } else {
+  } else if (include_cnds) {
     # multiple conditions
     formatted_cnds <- conditions |>
       format_cnds(
