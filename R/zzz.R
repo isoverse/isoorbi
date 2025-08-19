@@ -1,5 +1,5 @@
 # on package load
-.onLoad <- function(libname, pkgname) {
+.onAttach <- function(libname, pkgname) {
   # if we're knitting, enable full ansi output (turn off with orbi_options(auto_use_ansi = FALSE))
   if (
     orbi_get_option("auto_use_ansi") &&
