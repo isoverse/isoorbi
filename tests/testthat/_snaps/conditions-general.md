@@ -232,36 +232,36 @@
     Code
       format_cnds(out$conditions, indent = 1)
     Output
-                                                                                        
-                                                           "! in wrap_f(): we're here!" 
-                                                                                        
-                                                                         "! no context" 
-                                                                                        
-        "! in my_f(): long trouble! This sentences is easily longer than a single line" 
-                                                                                        
-      "in standard line width and therefore needs a sensible linebreak somewhere along" 
-                                                                                        
-                                                                             "the way." 
-                                                                                        
-                                "x in internal_func(): oh no internal {{value}} error!" 
+                                                                                      
+                                                         "! in wrap_f(): we're here!" 
+                                                                                      
+                                                                       "! no context" 
+                                                                                      
+      "! in my_f(): long trouble! This sentences is easily longer than a single line" 
+                                                                                      
+          "in standard line width and therefore needs a sensible linebreak somewhere" 
+                                                                                      
+                                                                     "along the way." 
+                                                                                      
+                              "x in internal_func(): oh no internal {{value}} error!" 
 
 ---
 
     Code
       format_cnds(out$conditions, indent = 3)
     Output
-                                                                                       
-                                                      "    ! in wrap_f(): we're here!" 
-                                                                                       
-                                                                    "    ! no context" 
-                                                                                       
-        "    ! in my_f(): long trouble! This sentences is easily longer than a single" 
-                                                                                       
-      "line in standard line width and therefore needs a sensible linebreak somewhere" 
-                                                                                       
-                                                                      "along the way." 
-                                                                                       
-                           "    x in internal_func(): oh no internal {{value}} error!" 
+                                                                                     
+                                                    "    ! in wrap_f(): we're here!" 
+                                                                                     
+                                                                  "    ! no context" 
+                                                                                     
+      "    ! in my_f(): long trouble! This sentences is easily longer than a single" 
+                                                                                     
+          "    line in standard line width and therefore needs a sensible linebreak" 
+                                                                                     
+                                                      "    somewhere along the way." 
+                                                                                     
+                         "    x in internal_func(): oh no internal {{value}} error!" 
 
 ---
 
@@ -346,9 +346,9 @@
                                                                                                                      
       "\033[33m!\033[39m in \033[1mmy_f()\033[22m: long trouble! This sentences is easily longer than a single line" 
                                                                                                                      
-                                   "in standard line width and therefore needs a sensible linebreak somewhere along" 
+                                         "in standard line width and therefore needs a sensible linebreak somewhere" 
                                                                                                                      
-                                                                                                          "the way." 
+                                                                                                    "along the way." 
                                                                                                                      
                               "\033[31m✖\033[39m in \033[1minternal_func()\033[22m: oh no internal {{value}} error!" 
 
@@ -364,9 +364,9 @@
                                                                                                                     
       "    \033[33m!\033[39m in \033[1mmy_f()\033[22m: long trouble! This sentences is easily longer than a single" 
                                                                                                                     
-                                   "line in standard line width and therefore needs a sensible linebreak somewhere" 
+                                         "    line in standard line width and therefore needs a sensible linebreak" 
                                                                                                                     
-                                                                                                   "along the way." 
+                                                                                     "    somewhere along the way." 
                                                                                                                     
                          "    \033[31m✖\033[39m in \033[1minternal_func()\033[22m: oh no internal {{value}} error!" 
 
@@ -404,8 +404,7 @@
         > ! no context
         > ! in my_f(): long trouble! This sentences is easily longer than a single
         line in standard line width and therefore needs a sensible linebreak
-        somewhere
-        along the way.
+        somewhere along the way.
         > x in internal_func(): oh no internal {value} error!
 
 ---
@@ -418,8 +417,7 @@
         > ! no context
         > ! in my_f(): long trouble! This sentences is easily longer than a single
         line in standard line width and therefore needs a sensible linebreak
-        somewhere
-        along the way.
+        somewhere along the way.
         > x in internal_func(): oh no internal {value} error!
 
 # show_cnds() [fancy]
@@ -432,8 +430,7 @@
         → [33m![39m no context
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
         line in standard line width and therefore needs a sensible linebreak
-        somewhere
-        along the way.
+        somewhere along the way.
         → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
 
 ---
@@ -446,8 +443,7 @@
         → [33m![39m no context
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
         line in standard line width and therefore needs a sensible linebreak
-        somewhere
-        along the way.
+        somewhere along the way.
         → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
 
 # abort_cnds() [plain]
@@ -460,8 +456,8 @@
         > ! in wrap_f(): we're here!
         > ! no context
         > ! in my_f(): long trouble! This sentences is easily longer than a single
-        line in standard line width and therefore needs a sensible linebreak somewhere
-        along the way.
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
         > x in internal_func(): oh no internal {value} error!
 
 ---
@@ -474,8 +470,8 @@
         > ! in wrap_f(): we're here!
         > ! no context
         > ! in my_f(): long trouble! This sentences is easily longer than a single
-        line in standard line width and therefore needs a sensible linebreak somewhere
-        along the way.
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
         > x in internal_func(): oh no internal {value} error!
 
 # abort_cnds() [fancy]
@@ -488,8 +484,8 @@
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
-        line in standard line width and therefore needs a sensible linebreak somewhere
-        along the way.
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
         → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
 
 ---
@@ -502,7 +498,7 @@
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
-        line in standard line width and therefore needs a sensible linebreak somewhere
-        along the way.
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
         → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
 

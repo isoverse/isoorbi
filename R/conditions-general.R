@@ -208,30 +208,28 @@ format_cnds <- function(
           }
         ),
       message_w_type = paste0(
-        # add here so format_bullets_raw gets the line breaks right
-        rep("__", indent) |> paste(collapse = ""),
         prefix,
         if (include_symbol) .data$symbol,
         if (include_call) .data$call_label,
         .data$message
       )
     ) |>
-    pull(.data$message_w_type) |>
-    # takes care of line breaks and escapes {}
-    format_bullets_raw()
+    pull(.data$message_w_type)
+
+  # take care of proper line breaks (also covers escaping {})
+  out <-
+    withr::with_options(
+      list(cli.width = console_width() - indent * 2),
+      format_bullets_raw(out)
+    )
 
   # indendation
   if (indent > 0) {
-    # re-place leading __ with the non-breaking space after the format_bullets_raw() to preserve the spaces
-    # note: long lines are wrapped correctly in subsequent cli_bullets but the indents are not preserved after
-    # the line breaks, this could potentially be further improved by re-implementing the wrapping with that
-    out <- sub(
-      sprintf("^_{%d}", indent * 2),
-      rep("\u00a0", (indent - 1) * 2) |> paste(collapse = ""),
-      out
-    )
-    # first space via names to support both bullets and aborts
-    out <- set_names(out, " ")
+    out <-
+      # additional indents after first
+      paste0(rep("\u00a0", (indent - 1) * 2) |> paste(collapse = ""), out) |>
+      # first space via names to support both bullets and aborts
+      set_names(" ")
   }
 
   return(out)
@@ -317,7 +315,9 @@ show_cnds <- function(
   # output as cli_bullets
   if (nrow(conditions) > 0) {
     summarize_and_format_cnds(conditions, ..., call = call) |>
-      cli_bullets()
+      cli_bullets() |>
+      # add this to make multiline text more compact (instead of individual paragraphs)
+      cli()
   }
 }
 
