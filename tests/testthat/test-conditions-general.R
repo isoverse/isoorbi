@@ -241,11 +241,11 @@ test_that("summarize_and_format_cnds()", {
         expect_snapshot()
 
       # without cnd calls
-      test_summarize_and_format_cnds(nclude_cnd_calls = FALSE) |>
+      test_summarize_and_format_cnds(include_cnd_calls = FALSE) |>
         expect_snapshot()
 
       # without cnd indentation
-      test_summarize_and_format_cnds(out$conditions, indent_cnds = FALSE) |>
+      test_summarize_and_format_cnds(indent_cnds = FALSE) |>
         expect_snapshot()
     }
   )
@@ -264,7 +264,7 @@ test_that("show_cnds()", {
     configs = c("plain", "fancy"),
     {
       # default outside a function
-      show_cnds(out$conditions, call = NULL) |> expect_snapshot()
+      show_cnds(out$conditions, .call = NULL) |> expect_snapshot()
 
       # inside a function
       test_show_cnds <- function(
@@ -299,7 +299,7 @@ test_that("abort_cnds()", {
     configs = c("plain", "fancy"),
     {
       # default outside a function
-      abort_cnds(out$conditions, call = NULL) |> expect_snapshot(error = TRUE)
+      abort_cnds(out$conditions, .call = NULL) |> expect_snapshot(error = TRUE)
 
       # inside a function
       test_abort_cnds <- function(

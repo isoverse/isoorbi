@@ -414,10 +414,334 @@
       [5] "along the way."                                                                                                             
       [6] "\033[32mx\033[39m = \033[31m✖\033[39m in \033[1minternal_func()\033[22m: oh no internal {{value}} error!"                   
 
+# summarize_and_format_cnds() [plain]
+
+    Code
+      cli_bullets(summarize_and_format_cnds(out$conditions, .call = NULL))
+    Message
+      x 3 warnings and 1 error
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds()
+    Message
+      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_symbol = FALSE)
+    Message
+      in test_summarize_and_format_cnds(): 3 warnings and 1 error
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_summary = FALSE)
+    Message
+      ! in wrap_f(): we're here!
+      ! no context
+      ! in my_f(): long trouble! This sentences is easily longer than a single line
+      in standard line width and therefore needs a sensible linebreak somewhere along
+      the way.
+      x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_call = FALSE)
+    Message
+      x 3 warnings and 1 error
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[1:3, ])
+    Message
+      ! in test_summarize_and_format_cnds(): 3 warnings
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[1, ])
+    Message
+      ! in test_summarize_and_format_cnds(): 1 warning > wrap_f(): we're here!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[c(), ])
+    Message
+      v in test_summarize_and_format_cnds(): no issues
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_cnds = FALSE)
+    Message
+      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+
+---
+
+    Code
+      test_summarize_and_format_cnds(message = "even more {fun}")
+    Message
+      x in test_summarize_and_format_cnds(): 3 warnings and 1 error even more {fun}
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(message = format_inline("another {.field field}"))
+    Message
+      x in test_summarize_and_format_cnds(): 3 warnings and 1 error another field
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(summary_format = "{message} = {issues} {.strong yeah!}")
+    Message
+      x in test_summarize_and_format_cnds(): = 3 warnings and 1 error yeah!
+        > ! in wrap_f(): we're here!
+        > ! no context
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        > x in internal_func(): oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_cnd_calls = FALSE)
+    Message
+      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+        > ! we're here!
+        > ! no context
+        > ! long trouble! This sentences is easily longer than a single line in
+        standard line width and therefore needs a sensible linebreak somewhere along
+        the way.
+        > x oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(indent_cnds = FALSE)
+    Message
+      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+      ! in wrap_f(): we're here!
+      ! no context
+      ! in my_f(): long trouble! This sentences is easily longer than a single line
+      in standard line width and therefore needs a sensible linebreak somewhere along
+      the way.
+      x in internal_func(): oh no internal {value} error!
+
+# summarize_and_format_cnds() [fancy]
+
+    Code
+      cli_bullets(summarize_and_format_cnds(out$conditions, .call = NULL))
+    Message
+      [31m✖[39m [33m3 warnings[39m and [31m1 error[39m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds()
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_symbol = FALSE)
+    Message
+      in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_summary = FALSE)
+    Message
+      [33m![39m in [1mwrap_f()[22m: we're here!
+      [33m![39m no context
+      [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single line
+      in standard line width and therefore needs a sensible linebreak somewhere along
+      the way.
+      [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_call = FALSE)
+    Message
+      [31m✖[39m [33m3 warnings[39m and [31m1 error[39m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[1:3, ])
+    Message
+      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[1, ])
+    Message
+      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m1 warning[39m → [1mwrap_f()[22m: we're here!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[c(), ])
+    Message
+      [32m✔[39m in [1mtest_summarize_and_format_cnds()[22m: [32mno issues[39m
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_cnds = FALSE)
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+
+---
+
+    Code
+      test_summarize_and_format_cnds(message = "even more {fun}")
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m even more {fun}
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(message = format_inline("another {.field field}"))
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m another [32mfield[39m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(summary_format = "{message} = {issues} {.strong yeah!}")
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: = [33m3 warnings[39m and [31m1 error[39m [1myeah![22m
+        → [33m![39m in [1mwrap_f()[22m: we're here!
+        → [33m![39m no context
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
+        → [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(include_cnd_calls = FALSE)
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+        → [33m![39m we're here!
+        → [33m![39m no context
+        → [33m![39m long trouble! This sentences is easily longer than a single line in
+        standard line width and therefore needs a sensible linebreak somewhere along
+        the way.
+        → [31m✖[39m oh no internal {value} error!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(indent_cnds = FALSE)
+    Message
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [33m![39m in [1mwrap_f()[22m: we're here!
+      [33m![39m no context
+      [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single line
+      in standard line width and therefore needs a sensible linebreak somewhere along
+      the way.
+      [31m✖[39m in [1minternal_func()[22m: oh no internal {value} error!
+
 # show_cnds() [plain]
 
     Code
-      show_cnds(out$conditions, call = NULL)
+      show_cnds(out$conditions, .call = NULL)
     Message
       x 3 warnings and 1 error
         > ! in wrap_f(): we're here!
@@ -443,7 +767,7 @@
 # show_cnds() [fancy]
 
     Code
-      show_cnds(out$conditions, call = NULL)
+      show_cnds(out$conditions, .call = NULL)
     Message
       [31m✖[39m [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
@@ -469,7 +793,7 @@
 # abort_cnds() [plain]
 
     Code
-      abort_cnds(out$conditions, call = NULL)
+      abort_cnds(out$conditions, .call = NULL)
     Condition
       Error:
       ! 3 warnings and 1 error
@@ -497,7 +821,7 @@
 # abort_cnds() [fancy]
 
     Code
-      abort_cnds(out$conditions, call = NULL)
+      abort_cnds(out$conditions, .call = NULL)
     Condition
       [1m[33mError[39m:[22m
       [1m[22m[33m![39m [33m3 warnings[39m and [31m1 error[39m

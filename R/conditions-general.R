@@ -253,10 +253,10 @@ summarize_and_format_cnds <- function(
   include_cnds = TRUE,
   include_cnd_calls = TRUE,
   indent_cnds = include_summary,
-  call = caller_call()
+  .call = caller_call()
 ) {
   # safety
-  force(call)
+  force(.call)
   if (missing(conditions) || !is.data.frame(conditions)) {
     cli_abort("{.var conditions} must be provided as a data frame")
   }
@@ -270,7 +270,7 @@ summarize_and_format_cnds <- function(
       include_symbol = include_symbol,
       include_call = include_call,
       summary_format = summary_format,
-      .call = call,
+      .call = .call,
     )
   }
 
@@ -312,11 +312,11 @@ summarize_and_format_cnds <- function(
 show_cnds <- function(
   conditions,
   ...,
-  call = caller_call()
+  .call = caller_call()
 ) {
   # output as cli_bullets
   if (nrow(conditions) > 0) {
-    summarize_and_format_cnds(conditions, ..., call = call) |>
+    summarize_and_format_cnds(conditions, ..., .call = .call) |>
       cli_bullets() |>
       # add this to make multiline text more compact (instead of individual paragraphs)
       cli()
@@ -330,8 +330,8 @@ abort_cnds <- function(
   conditions,
   ...,
   include_symbol = FALSE,
-  call = caller_call(),
-  env = caller_env()
+  .call = caller_call(),
+  .env = caller_env()
 ) {
   # throw an error
   if (nrow(conditions) > 0) {
@@ -339,11 +339,11 @@ abort_cnds <- function(
       conditions,
       ...,
       include_symbol = include_symbol,
-      call = call
+      .call = .call
     ) |>
       cli_abort(
-        call = call,
-        trace = trace_back(bottom = env)
+        call = .call,
+        trace = trace_back(bottom = .env)
       )
   }
 }
