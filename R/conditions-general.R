@@ -278,17 +278,18 @@ summarize_and_format_cnds <- function(
   # single issue and summary --> make one line for both
   formatted_cnds <- c()
   if (include_cnds && include_summary && nrow(conditions) == 1L) {
-    # single condition
-    summary_line <- paste(
-      summary_line,
-      format_inline("{cli::symbol$arrow_right}"),
-      format_cnds(
-        conditions,
-        include_call = include_cnd_calls,
-        include_symbol = FALSE,
-        call_format = "{.strong {call}()}: ",
+    # attach single condition to last summary line
+    summary_line[length(summary_line)] <-
+      paste(
+        summary_line[length(summary_line)],
+        format_inline("{cli::symbol$arrow_right}"),
+        format_cnds(
+          conditions,
+          include_call = include_cnd_calls,
+          include_symbol = FALSE,
+          call_format = "{.strong {call}()}: ",
+        )
       )
-    )
   } else if (include_cnds) {
     # multiple conditions
     formatted_cnds <- conditions |>
