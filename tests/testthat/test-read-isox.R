@@ -1,113 +1,98 @@
-# Tests: Functions to load, pre-filter and simplify IsoX data
-
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-test_that("orbi_find_isox", {
+# orbi_find_isox() ============
+
+test_that("orbi_find_isox()", {
   # safety checks
-  expect_error(
-    orbi_find_isox(),
-    "argument \"folder\" is missing, with no default",
-    fixed = TRUE
-  )
-  expect_error(orbi_find_isox(42), "invalid filename argument")
-  expect_error(
-    orbi_find_isox("DNE"),
-    "folder` must be an existing directory",
-    fixed = TRUE
-  )
+  orbi_find_isox() |>
+    expect_error("must point to an existing directory")
+  orbi_find_isox(42) |> expect_error("must point to an existing directory")
+  orbi_find_isox(c(42, "DNE")) |>
+    expect_error("must point to existing directories")
 })
 
-test_that("orbi_read_isox() tests", {
+# orbi_read_isox() ============
+
+test_that("orbi_read_isox()", {
   # safety checks
-  expect_error(orbi_read_isox(), "no file path supplied", fixed = TRUE)
-  expect_error(orbi_read_isox(42), "`file` has to be at least one filepath")
-  expect_error(
-    orbi_read_isox(character()),
-    "`file` has to be at least one filepath"
-  )
-  expect_error(orbi_read_isox("DNE"), "does not exist", fixed = TRUE)
+  orbi_read_isox() |> expect_error("must be a file path")
+  orbi_read_isox(character()) |> expect_error("must be a file path")
+  orbi_read_isox(42) |> expect_error("must be a file path")
+  orbi_read_isox("DNE") |> expect_error("does not exist")
+  orbi_read_isox(c("DNE", "DNE2")) |> expect_error("do not exist")
 
+  # wrong extension
   temp_file <- tempfile(fileext = ".wrong")
-
   cat("empty", file = temp_file) # create the temp file
-
-  expect_error(
-    orbi_read_isox(temp_file),
-    "unrecognized file extension",
-    fixed = TRUE
-  )
-
+  orbi_read_isox(temp_file) |> expect_error("unrecognized file extension")
   unlink(temp_file) # destroy the temp file
 
-  # corrupt files - missing columns
-  expect_error(
-    orbi_read_isox(file.path(base_dir, "test_files", "missing_column.isox")),
-    "file format error"
-  ) |>
-    suppressMessages()
-  # corrupt files
-  expect_error(
-    orbi_read_isox(file.path(
-      base_dir,
-      "test_files",
-      "missing_column.isox"
-    )),
-    "file format error",
-    fixed = TRUE
-  ) |>
-    suppressMessages()
+  # read files
+  test_that_cli(
+    "orbi_read_isox()",
+    configs = c("plain", "fancy"),
+    {
+      # corrupt files - missing column
+      orbi_read_isox(file.path(
+        base_dir,
+        "test_files",
+        "missing_column.isox"
+      )) |>
+        expect_snapshot(error = TRUE)
 
-  # test reading a file
-  expect_true(
-    is.tbl(
-      df <- orbi_read_isox(system.file(
-        "extdata",
-        "testfile_dual_inlet.isox",
-        package = "isoorbi"
-      ))
-    )
-  ) |>
-    suppressMessages()
-
-  expect_equal(
-    names(df),
-    c(
-      "filepath",
-      "filename",
-      "scan.no",
-      "time.min",
-      "compound",
-      "isotopocule",
-      "ions.incremental",
-      "tic",
-      "it.ms"
-    )
-  )
-
-  expect_equal(nrow(df), 5184)
-
-  # test reading multiple files
-  expect_true(
-    is.tbl(
-      df2 <-
-        orbi_read_isox(c(
-          system.file(
-            "extdata",
-            "testfile_dual_inlet.isox",
-            package = "isoorbi"
-          ),
-          system.file("extdata", "testfile_flow.isox", package = "isoorbi")
+      # read single file
+      expect_snapshot({
+        df <- orbi_read_isox(system.file(
+          "extdata",
+          "testfile_dual_inlet.isox",
+          package = "isoorbi"
         ))
-    )
+      })
+
+      # check output
+      expect_equal(
+        names(df),
+        c(
+          "filepath",
+          "filename",
+          "scan.no",
+          "time.min",
+          "compound",
+          "isotopocule",
+          "ions.incremental",
+          "tic",
+          "it.ms"
+        )
+      )
+
+      # number of rows
+      expect_equal(nrow(df), 5184)
+
+      # read multiple files
+      expect_snapshot({
+        df2 <-
+          orbi_read_isox(c(
+            system.file(
+              "extdata",
+              "testfile_dual_inlet.isox",
+              package = "isoorbi"
+            ),
+            system.file("extdata", "testfile_flow.isox", package = "isoorbi")
+          ))
+
+        # check result
+        expect_equal(nrow(df2), 11633)
+      })
+    }
   ) |>
-    suppressMessages()
-  expect_equal(nrow(df2), 11633)
+    withr::with_options(new = list(show_exec_times = FALSE))
 })
 
-# orbi_simplify_isox
-test_that("orbi_simplify_isox() tests", {
-  # success
+# orbi_simplify_isox() =========
+
+test_that("test orbi_simplify_isox()", {
+  #  test file
   df <- orbi_read_isox(system.file(
     "extdata",
     "testfile_dual_inlet.isox",
@@ -115,9 +100,7 @@ test_that("orbi_simplify_isox() tests", {
   )) |>
     suppressMessages()
 
-  expect_true(is.tbl(orbi_simplify_isox(df))) |> suppressMessages()
-
-  # test safety checks
+  # safety checks
   expect_error(orbi_simplify_isox(), "need a `dataset` data frame")
   expect_error(
     orbi_simplify_isox(dataset = "string"),
@@ -131,7 +114,6 @@ test_that("orbi_simplify_isox() tests", {
   )
   dataset = df[0, ]
   expect_error(orbi_simplify_isox(dataset), "dataset contains no rows")
-  # failure
 
   expect_error(
     orbi_simplify_isox(),
@@ -158,11 +140,14 @@ test_that("orbi_simplify_isox() tests", {
     "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
     fixed = TRUE
   )
+
+  # success
+  orbi_simplify_isox(df) |> expect_message("kept columns")
 })
 
-# orbi_filter_isox()
+# orbi_filter_isox() ===========
 
-test_that("orbi_filter_isox() tests", {
+test_that("test orbi_filter_isox()", {
   # success
   df <- orbi_read_isox(system.file(
     "extdata",

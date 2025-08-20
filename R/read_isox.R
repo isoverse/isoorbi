@@ -13,10 +13,19 @@
 #' @export
 orbi_find_isox <- function(folder, recursive = TRUE) {
   # safety check
-  stopifnot(
-    "`folder` must be an existing directory" = dir.exists(folder),
-    "`recursive` must a boolean" = is_scalar_logical(recursive)
+  check_arg(
+    folder,
+    !missing(folder) &&
+      is_character(folder) &&
+      length(folder) > 0 &&
+      all(dir.exists(folder)),
+    format_inline(
+      "must point to {qty(if(!missing(folder)) length(folder) else 1)}{?an/} existing director{?y/ies}"
+    ),
+    include_type = FALSE,
+    include_value = TRUE
   )
+  check_arg(recursive, is_scalar_logical(recursive), "must be TRUE or FALSE")
 
   # return
   list.files(
@@ -28,7 +37,7 @@ orbi_find_isox <- function(folder, recursive = TRUE) {
 }
 
 #' @title Read IsoX file
-#' @description Read an IsoX output file (`.isox`) into a tibble data frame.
+#' @description Read an IsoX dataput file (`.isox`) into a tibble data frame.
 #'
 #' @param file Path to the `.isox` file(s), single value or vector of paths
 #' @details Additional information on the columns:
@@ -59,76 +68,88 @@ orbi_find_isox <- function(folder, recursive = TRUE) {
 #' @export
 orbi_read_isox <- function(file) {
   # safety checks
-  stopifnot(
-    "no file path supplied" = !missing(file),
-    "`file` has to be at least one filepath" = is_character(file) &&
-      length(file) >= 1L
+
+  # file paths provided?
+  check_arg(
+    file,
+    !missing(file) && is_character(file) && length(file) > 0,
+    format_inline("must be a file path")
   )
 
-  if (any(missing <- !file.exists(file))) {
-    sprintf(
-      "file does not exist: '%s'",
-      paste(file[missing], collapse = "', '")
-    ) |>
-      abort()
-  }
+  # any files doen't exist
+  missing <- !file.exists(file)
+  check_arg(
+    file,
+    !any(missing),
+    format_inline(
+      "points to {?a/} file{?s} that do{?es/} not exist: {.file {file[missing]}}"
+    ),
+    include_type = FALSE,
+    include_value = FALSE
+  )
 
   # use base r to skip stringr dependency (since it's not used elsewhere)
   ext <- sub("^.+\\.([^.]+)$", "\\1", basename(file))
   if (any(ext != "isox")) {
-    abort("unrecognized file extension, only .isox is supported")
+    cli_abort(
+      "unrecognized file extension {.field .{ext}}, only {.field .isox} is supported"
+    )
   }
 
   # info
-  sprintf(
-    "orbi_read_isox() is loading .isox data from %d file(s)...",
-    length(file)
-  ) |>
-    message_standalone()
+  start <- start_info("is reading .isox data from {length(file)} file{?s}")
 
   # read files
   df <-
-    try_catch_all(
-      dplyr::tibble(filepath = file) |>
-        dplyr::mutate(
-          data = map(
-            .data$filepath,
-            ~ {
-              start_time <- Sys.time()
-              data <- readr::read_tsv(
-                .x,
-                col_types = list(
-                  filename = readr::col_factor(),
-                  scan.no = readr::col_integer(),
-                  time.min = readr::col_double(),
-                  compound = readr::col_factor(),
-                  isotopolog = readr::col_factor(),
-                  ions.incremental = readr::col_double(),
-                  tic = readr::col_double(),
-                  it.ms = readr::col_double()
-                )
-              )
-              end_time <- Sys.time()
-              sprintf(
-                " - loaded %d peaks for %d compounds (%s) with %d isotopocules (%s) from %s",
-                nrow(data),
-                length(levels(data$compound)),
-                paste(levels(data$compound), collapse = ", "),
-                length(levels(data$isotopolog)),
-                paste(levels(data$isotopolog), collapse = ", "),
-                basename(.x)
-              ) |>
-                message_standalone(start_time = start_time)
-              data
-            }
+    dplyr::tibble(filepath = file) |>
+    dplyr::mutate(
+      out = map(
+        .data$filepath,
+        ~ {
+          start_i <- start_info()
+          out <- readr::read_tsv(
+            .x,
+            col_types = list(
+              filename = readr::col_factor(),
+              scan.no = readr::col_integer(),
+              time.min = readr::col_double(),
+              compound = readr::col_factor(),
+              isotopolog = readr::col_factor(),
+              ions.incremental = readr::col_double(),
+              tic = readr::col_double(),
+              it.ms = readr::col_double()
+            )
+          ) |>
+            try_catch_cnds()
+          # individual file info
+          finish_info(
+            "loaded {nrow(out$result)} peak{?s}",
+            if ("compound" %in% names(out$result)) {
+              " for {length(levels(out$result$compound))} compound{?s} ({.field {levels(out$result$compound)}})"
+            },
+            if ("isotopolog" %in% names(out$result)) {
+              " with {length(levels(out$result$isotopolog))} isotopocule{?s} ({.field {levels(out$result$isotopolog)}})"
+            },
+            " from {.file {basename(.x)}}",
+            start = start_i,
+            func = FALSE,
+            conditions = out$conditions
           )
-        ) |>
-        tidyr::unnest("data") |>
-        # .isox format should eventually change as well to `isotopocule`
-        dplyr::rename(isotopocule = "isotopolog"),
-      "file format error: ",
-      newline = FALSE
+          out
+        }
+      )
     )
+
+  # encountered issues
+  conditions <- purrr::map(df$out, ~ .x$conditions) |> dplyr::bind_rows()
+
+  # unnest results
+  df <- df |>
+    dplyr::mutate(result = purrr::map(.data$out, ~ .x$result)) |>
+    dplyr::select(-"out") |>
+    tidyr::unnest("result") |>
+    # .isox format should eventually change as well to `isotopocule`
+    dplyr::rename(dplyr::any_of(c(isotopocule = "isotopolog")))
 
   # check that all the most important columns are present
   req_cols <-
@@ -143,15 +164,19 @@ orbi_read_isox <- function(file) {
       "it.ms"
     )
 
+  # check for missing columns
   missing_cols <- setdiff(req_cols, names(df))
-
   if (length(missing_cols) > 0) {
-    paste0(
-      "Missing required column(s): ",
-      paste(missing_cols, collapse = ", ")
-    ) |>
-      abort()
+    cli_abort("missing required column{?s}: {.field {missing_cols}}")
   }
+
+  # info
+  finish_info(
+    "read {.file .isox} data from {length(file)} file{?s}",
+    start = start,
+    conditions = conditions,
+    show_conditions = FALSE
+  )
 
   return(df)
 }
@@ -200,24 +225,23 @@ orbi_simplify_isox <- function(dataset, add = c()) {
 
   # info
   cols <- names(dataset)[names(dataset) %in% c(cols, add)]
-  start_time <-
-    sprintf(
-      "orbi_simplify_isox() will keep only columns '%s'... ",
-      paste(cols, collapse = "', '")
-    ) |>
-    message_start()
+  start <- start_info("will keep only column{?s} {.field {cols}}")
 
   # select
-  dataset_out <- try_catch_all(
-    dataset |> dplyr::select(!!!cols),
-    "format error: "
-  )
+  out <-
+    dataset |>
+    dplyr::select(!!!cols) |>
+    try_catch_cnds(catch_errors = FALSE, catch_warnings = FALSE)
 
   # info
-  sprintf("complete") |> message_finish(start_time = start_time)
+  finish_info(
+    "kept column{?s} {.field {cols}}",
+    start = start,
+    conditions = out$conditions
+  )
 
   # return
-  return(dataset_out)
+  return(out$result)
 }
 
 #' @title Basic generic filter for IsoX data
@@ -307,12 +331,12 @@ orbi_filter_isox <-
 
     # info
     n_row_start <- nrow(dataset)
-    start_time <-
+    start <-
       sprintf(
         "orbi_filter_isox() is filtering the dataset by %s... ",
         paste(filters, collapse = ", ")
       ) |>
-      message_start()
+      start_info()
 
     # filtering
     dataset <-
@@ -357,7 +381,7 @@ orbi_filter_isox <-
       n_row_start,
       (n_row_start - nrow(dataset)) / n_row_start * 100
     ) |>
-      message_finish(start_time = start_time)
+      finish_info(start = start)
 
     # return
     return(dataset |> droplevels())
