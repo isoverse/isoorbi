@@ -142,7 +142,13 @@ test_that("test orbi_simplify_isox()", {
   )
 
   # success
-  orbi_simplify_isox(df) |> expect_message("kept columns")
+  expect_message(
+    {
+      df <- orbi_simplify_isox(df)
+    },
+    "kept columns"
+  )
+  expect_equal(nrow(df), 5184L)
 })
 
 # orbi_filter_isox() ===========
