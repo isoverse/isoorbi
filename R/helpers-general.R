@@ -19,15 +19,16 @@ check_arg <- function(
   x,
   condition,
   msg,
-  arg = caller_arg(x),
-  call = caller_env(),
   include_type = TRUE,
-  include_value = FALSE
+  include_value = FALSE,
+  .arg = caller_arg(x),
+  .call = caller_env(),
+  .env = caller_env()
 ) {
   if (!condition) {
     if (is_missing(maybe_missing(x))) {
       type = if (include_type) ", not missing" else ""
-      cli_abort("argument {.field {arg}} {msg}{type}", call = call)
+      cli_abort("argument {.field {(.arg)}} {msg}{type}", call = .call)
     } else {
       type <- if (include_type) {
         format_inline(", not {.obj_type_friendly {x}}")
@@ -35,7 +36,11 @@ check_arg <- function(
         ""
       }
       value <- if (include_value) format_inline(" ({.val {x}})") else ""
-      cli_abort("argument {.field {arg}}{value} {msg}{type}", call = call)
+      cli_abort(
+        "argument {.field {(.arg)}}{value} {msg}{type}",
+        call = .call,
+        trace = trace_back(bottom = .env)
+      )
     }
   }
 }
@@ -44,23 +49,23 @@ check_arg <- function(
 check_tibble <- function(
   df,
   req_cols = c(),
-  arg = caller_arg(df),
-  call = caller_env()
+  .arg = caller_arg(df),
+  .call = caller_env()
 ) {
   check_arg(
     df,
     !missing(df) && is.data.frame(df),
     "must be a data frame or tibble",
-    arg = arg,
-    call = call
+    .arg = .arg,
+    .call = .call
   )
   if (length(missing <- setdiff(req_cols, names(df))) > 0) {
     cli_abort(
       c(
-        "{qty(missing)} column{?s} {.field {missing}} {?is/are} missing from {.field {arg}}",
+        "{qty(missing)} column{?s} {.field {missing}} {?is/are} missing from {.field {(.arg)}}",
         "i" = "available columns: {.field {names(df)}}"
       ),
-      call = call
+      call = .call
     )
   }
 }
@@ -115,7 +120,7 @@ start_info <- function(
 # print out info end message
 # @param ... message pieces
 # @param start the progress bar and start_time info (if there is any)
-# @param time whether to include time
+# @param time whether to include time (used to disable time displays during snapshot testing)
 # @param func whether to include the function name
 # @param conditions any conditions that might have been encountered
 # @param show_conditions whether to show conditions if any have been encountered
@@ -124,7 +129,7 @@ start_info <- function(
 finish_info <- function(
   ...,
   start = list(pb = NULL, start_time = NULL),
-  time = TRUE,
+  time = getOption("show_exec_times", default = TRUE),
   func = TRUE,
   conditions = tibble(),
   show_conditions = TRUE,
