@@ -26,11 +26,11 @@ orbi_calculate_ratios <- function(dataset) {
   )
 
   # info message
-  start_time <-
+  start <-
     sprintf(
       "orbi_calculate_ratios() is calculating all isotopocule/base peak ratios... "
     ) |>
-    message_start()
+    start_info()
 
   # mutate
   dataset <- dataset |> factorize_dataset("isotopocule")
@@ -52,7 +52,7 @@ orbi_calculate_ratios <- function(dataset) {
     length(levels(dataset$isotopocule)),
     paste(levels(dataset$isotopocule), collapse = ", ")
   ) |>
-    message_finish(start_time = start_time)
+    finish_info(start = start)
 
   # return
   return(dataset)
@@ -389,36 +389,29 @@ orbi_summarize_results <- function(
   include_unused_data = FALSE
 ) {
   # basic checks
-  if (missing(dataset)) {
-    stop("no input for dataset supplied", call. = TRUE)
-  }
-
-  if (is.data.frame(dataset) == FALSE) {
-    stop("dataset must be a data frame", call. = TRUE)
-  }
-
-  if (missing(ratio_method)) {
-    stop("no input for ratio_method supplied", call. = TRUE)
-  }
-
-  # make sure the ratio method argument is valid
-  ratio_method <- rlang::arg_match(ratio_method)
+  check_arg(
+    dataset,
+    !missing(dataset) && is.data.frame(dataset),
+    "must be a data frame or tibble"
+  )
+  check_arg(
+    ratio_method,
+    !missing(ratio_method) && is_scalar_character(ratio_method),
+    "must be a valid method"
+  )
+  ratio_method <- arg_match(ratio_method)
 
   # check that required data columns are present
   base_group_cols <- c("filename", "compound", "basepeak", "isotopocule")
-  req_cols <- c(
-    base_group_cols,
-    "time.min",
-    "ions.incremental",
-    "basepeak_ions"
+  check_tibble(
+    dataset,
+    c(
+      base_group_cols,
+      "time.min",
+      "ions.incremental",
+      "basepeak_ions"
+    )
   )
-  if (length(missing_cols <- setdiff(req_cols, names(dataset))) > 0) {
-    paste0(
-      "Missing required column(s): ",
-      paste(missing_cols, collapse = ", ")
-    ) |>
-      stop(call. = FALSE)
-  }
 
   # filter flagged data
   n_all <- nrow(dataset)
@@ -460,97 +453,96 @@ orbi_summarize_results <- function(
   }
 
   # info message
-  start_time <-
-    sprintf(
-      "orbi_summarize_results() is grouping the data by %s and summarizing ratios from %d peaks (%s %d flagged peaks; %s %d unused peaks) using the '%s' method...",
-      sprintf("'%s'", dplyr::group_vars(df.group)) |> paste(collapse = ", "),
-      if (include_flagged_data && include_unused_data) {
-        n_all
-      } else if (include_flagged_data) {
-        n_all - n_unused
-      } else if (include_unused_data) {
-        n_all - n_flagged
-      } else {
-        n_all - n_unused - n_flagged
-      },
-      if (include_flagged_data) "including" else "excluded",
-      n_flagged,
-      if (include_unused_data) "including" else "excluded",
-      n_unused,
-      ratio_method
-    ) |>
-    message_start()
+  n_peaks <-
+    if (include_flagged_data && include_unused_data) {
+      n_all
+    } else if (include_flagged_data) {
+      n_all - n_unused
+    } else if (include_unused_data) {
+      n_all - n_flagged
+    } else {
+      n_all - n_unused - n_flagged
+    }
+  start <- start_info("is running")
 
   # calculations
-  df.stat <-
-    try_catch_all(
-      {
-        # run calculations
-        df.group |>
+  out <-
+    # run calculations
+    df.group |>
 
-          dplyr::summarize(
-            # scan information
-            start_scan.no = min(.data$scan.no),
-            end_scan.no = max(.data$scan.no),
+    dplyr::summarize(
+      # scan information
+      start_scan.no = min(.data$scan.no),
+      end_scan.no = max(.data$scan.no),
 
-            # time information
-            start_time.min = min(.data$time.min),
-            mean_time.min = mean(.data$time.min),
-            end_time.min = max(.data$time.min),
+      # time information
+      start_time.min = min(.data$time.min),
+      mean_time.min = mean(.data$time.min),
+      end_time.min = max(.data$time.min),
 
-            # ratio calculation
-            ratio = orbi_calculate_summarized_ratio(
-              .data$ions.incremental,
-              .data$basepeak_ions,
-              ratio_method = !!ratio_method
-            ),
+      # ratio calculation
+      ratio = orbi_calculate_summarized_ratio(
+        .data$ions.incremental,
+        .data$basepeak_ions,
+        ratio_method = !!ratio_method
+      ),
 
-            shot_noise_permil = 1000 *
-              (sqrt(
-                (sum(.data$ions.incremental) + sum(.data$basepeak_ions)) /
-                  (sum(.data$ions.incremental) * sum(.data$basepeak_ions))
-              )),
+      shot_noise_permil = 1000 *
+        (sqrt(
+          (sum(.data$ions.incremental) + sum(.data$basepeak_ions)) /
+            (sum(.data$ions.incremental) * sum(.data$basepeak_ions))
+        )),
 
-            ratio_sem = calculate_ratios_sem(
-              ratios = .data$ions.incremental / .data$basepeak_ions
-            ),
+      ratio_sem = calculate_ratios_sem(
+        ratios = .data$ions.incremental / .data$basepeak_ions
+      ),
 
-            minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
-              (max(.data$time.min) - min(.data$time.min)),
+      minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
+        (max(.data$time.min) - min(.data$time.min)),
 
-            number_of_scans = length(
-              .data$ions.incremental / .data$basepeak_ions
-            ),
+      number_of_scans = length(
+        .data$ions.incremental / .data$basepeak_ions
+      ),
 
-            .groups = "drop"
-          ) |>
+      .groups = "drop"
+    ) |>
 
-          dplyr::mutate(
-            ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)
-          ) |>
+    dplyr::mutate(
+      ratio_relative_sem_permil = 1000 * (.data$ratio_sem / .data$ratio)
+    ) |>
 
-          # round values for output
-          dplyr::mutate(
-            ratio = round(.data$ratio, 8),
-            ratio_sem = round(.data$ratio_sem, 8),
-            ratio_relative_sem_permil = round(
-              .data$ratio_relative_sem_permil,
-              3
-            ),
-            shot_noise_permil = round(.data$shot_noise_permil, 3),
-            minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
-          ) |>
-          # sort table by the grouping variables
-          dplyr::arrange(!!!lapply(dplyr::group_vars(df.group), rlang::sym)) |>
-          # rearrange column order
-          dplyr::relocate("ratio_relative_sem_permil", .after = "ratio")
-      },
-      "something went wrong summarizing the results: "
-    )
+    # round values for output
+    dplyr::mutate(
+      ratio = round(.data$ratio, 8),
+      ratio_sem = round(.data$ratio_sem, 8),
+      ratio_relative_sem_permil = round(
+        .data$ratio_relative_sem_permil,
+        3
+      ),
+      shot_noise_permil = round(.data$shot_noise_permil, 3),
+      minutes_to_1e6_ions = round(.data$minutes_to_1e6_ions, 2)
+    ) |>
+    # sort table by the grouping variables
+    dplyr::arrange(!!!lapply(dplyr::group_vars(df.group), rlang::sym)) |>
+    # rearrange column order
+    dplyr::relocate("ratio_relative_sem_permil", .after = "ratio") |>
+    try_catch_cnds()
 
   # info
-  message_finish("completed", start_time = start_time)
+  info_flagged <- if (include_flagged_data) "including" else "excluding"
+  info_unused <- if (include_unused_data) "including" else "excluding"
+  finish_info(
+    "summarized ratios from {n_peaks} peak{?s} ",
+    if (n_flagged > 0 || n_unused > 0) {
+      "({.emph {info_flagged}} {n_flagged} flagged peaks; {.emph {info_unused}} {n_unused} unused peaks) "
+    },
+    "using the {.emph {.strong {ratio_method}}} method ",
+    "and grouping the data by {.field {dplyr::group_vars(df.group)}}",
+    start = start,
+    conditions = out$conditions,
+    abort_if_errors = TRUE
+  )
 
   # return
-  return(df.stat)
+  return(out$result)
 }
