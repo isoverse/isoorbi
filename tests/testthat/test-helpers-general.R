@@ -66,7 +66,8 @@ test_that("start_info() / finish_info()", {
   conditions <- try_catch_cnds(wrap_f())$conditions
   expect_s3_class(conditions, "data.frame")
 
-  # cli tests
+  # cli tests --> this is nested instead of at the top level (with test_that_cli)
+  # so that the positron testing framework recognizes the test exists
   test_that_cli(
     "start/finish_info()",
     configs = c("plain", "fancy"),
