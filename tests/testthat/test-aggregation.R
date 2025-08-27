@@ -28,44 +28,38 @@ test_that("get_data()", {
 
   # working snapshots
 
-  test_that_cli(
-    "get_data()",
-    configs = c("plain", "fancy"),
-    {
-      # messages
-      expect_snapshot({
-        out <-
-          list(
-            a = tibble(id = c("a", "b"), info = paste(id, "info")),
-            b = tibble(id = "a", x = 1:10, y = 42),
-            data = tibble(id = "a", x = 1:10, z = x * 10)
-          ) |>
-          get_data(
-            a = everything(),
-            b = c("id", "x"),
-            data = everything(),
-            by = c("id", "x")
-          )
-      })
+  test_run1 <- function() {
+    list(
+      a = tibble(id = c("a", "b"), info = paste(id, "info")),
+      b = tibble(id = "a", x = 1:10, y = 42),
+      data = tibble(id = "a", x = 1:10, z = x * 10)
+    ) |>
+      get_data(
+        a = everything(),
+        b = c("id", "x"),
+        data = everything(),
+        by = c("id", "x")
+      )
+  }
 
-      # data
-      expect_snapshot_value(out)
+  test_run2 <- function() {
+    get_data(
+      list(a = cars, b = cars),
+      a = everything(),
+      b = everything(),
+      by = "speed",
+      relationship = "many-to-many"
+    )
+  }
 
-      # messages
-      expect_snapshot({
-        out2 <-
-          get_data(
-            list(a = cars, b = cars),
-            a = everything(),
-            b = everything(),
-            by = "speed",
-            relationship = "many-to-many"
-          )
-      })
-
-      # data
-      expect_snapshot_value(out2)
-    }
-  ) |>
+  # messages
+  test_that_cli("get_data()", configs = c("plain", "fancy"), {
+    expect_snapshot(out <- test_run1())
+    expect_snapshot(out <- test_run2())
+  }) |>
     withr::with_options(new = list(show_exec_times = FALSE))
+
+  # data
+  expect_snapshot_value(test_run1(), style = "json2")
+  expect_snapshot_value(test_run2(), style = "json2")
 })
