@@ -35,9 +35,7 @@ orbi_export_data_to_excel <- function(
   )
 
   # info
-  start <- start_info(
-    "Exporting {.field dataset} ({nrow(dataset)} row{?s}, {ncol(dataset)} column{?s}) to {.file {file}}"
-  )
+  start <- start_info("is running")
 
   # make excel workbook
   wb <- openxlsx::createWorkbook()
@@ -57,7 +55,7 @@ orbi_export_data_to_excel <- function(
 
   # info
   finish_info(
-    "Exported {.field dataset} ({nrow(dataset)} row{?s}, {ncol(dataset)} column{?s}) to {.file {file}}",
+    "exported {.field dataset} ({nrow(dataset)} row{?s}, {ncol(dataset)} column{?s}) to {.file {file}}",
     start = start
   )
 

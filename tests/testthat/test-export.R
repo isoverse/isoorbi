@@ -31,7 +31,7 @@ test_that("test orbi_export_data_to_excel()", {
   # success
   tmp_file <- tempfile()
   orbi_export_data_to_excel(mtcars, tmp_file, 2, int_format = "0") |>
-    expect_message("Exporting.*dataset.*32 rows.*11 columns") |>
+    expect_message("exported.*dataset.*32 rows.*11 columns") |>
     suppressMessages()
   unlink(tmp_file)
 })
