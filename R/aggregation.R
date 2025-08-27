@@ -290,7 +290,10 @@ aggregate_files <- function(
       show_cnds(
         problems,
         call = call,
-        summary_message = sprintf("for {.emph %s}", basename(file_path))
+        summary_message = sprintf(
+          "{issues} for {.emph %s}",
+          basename(file_path)
+        )
       )
     }
 
@@ -551,14 +554,18 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
 # @param .ds the list of datasets (uses .ds to avoid accidental partial mapping by ...)
 # @param ... named arguments for each dataset that should be included with a tidyselect expression for the columns to include
 # @param by which columns to use for join by operations (if there are any)
-# @param relationship passed to inner_join
+# @param relationship passed to inner_join, default expectation is one to many
 get_data <- function(
   .ds,
   ...,
   by = c(),
-  call = rlang::caller_env(),
-  relationship = NULL
+  relationship = "one-to-many",
+  .env = caller_env(),
+  .call = caller_call()
 ) {
+  # start
+  start <- start_info("is running", .call = .call)
+
   # basic safety checks
   stopifnot(
     "`.ds` must be a list" = !missing(.ds) && is_list(.ds),
@@ -571,10 +578,13 @@ get_data <- function(
   selectors <- rlang::enquos(...)
   selectors <- selectors[!purrr::map_lgl(selectors, quo_is_null)]
   if (length(selectors) == 0) {
-    cli_abort(c(
-      "no dataset column selections provided",
-      "i" = "available dataset{?s}: {.emph {names(.ds)}}"
-    ))
+    cli_abort(
+      c(
+        "no dataset column selections provided",
+        "i" = "available dataset{?s}: {.emph {names(.ds)}}"
+      ),
+      call = .env
+    )
   }
 
   # valid selectors?
@@ -584,7 +594,7 @@ get_data <- function(
         "dataset{?s} not in the data: {.emph {names(selectors)[missing]}}",
         "i" = "available dataset{?s}: {.emph {names(.ds)}}"
       ),
-      call = call
+      call = .env
     )
   }
 
@@ -602,7 +612,7 @@ get_data <- function(
             "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(.ds[[names(selectors)[i]]])}}"
           ),
           parent = cnd,
-          call = call
+          call = .env
         )
       }
     )
@@ -624,9 +634,26 @@ get_data <- function(
             "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(new_data)}}",
             "i" = "columns in {.emph {names(selectors)[1:(i-1)]}}: {.var {names(out)}}"
           ),
-          call = call
+          call = .env
         )
       }
+
+      # catch join error/warnings
+      catch_error_and_warning <- function(cnd) {
+        cli_abort(
+          c(
+            paste(
+              "encountered issue when joining {.emph {names(selectors)[i]}}",
+              "with {.emph {names(selectors)[1:(i-1)]}} by {.var {join_by}}",
+              "with relationship \"{relationship}\""
+            ),
+            "i" = "are you sure the by column{?s} ({.var {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
+          ),
+          parent = cnd,
+          call = .env
+        )
+      }
+
       out <-
         tryCatch(
           dplyr::inner_join(
@@ -635,19 +662,8 @@ get_data <- function(
             by = join_by,
             relationship = relationship
           ),
-          warning = function(cnd) {
-            cli_abort(
-              c(
-                paste(
-                  "encountered warning when joining {.emph {names(selectors)[i]}}",
-                  "with {.emph {names(selectors)[1:(i-1)]}} by {.var {join_by}}"
-                ),
-                "i" = "are you sure the by column{?s} ({.var {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
-              ),
-              parent = cnd,
-              call = call
-            )
-          }
+          warning = catch_error_and_warning,
+          error = catch_error_and_warning
         )
       join_bys <- c(join_bys, join_by)
     } else {
@@ -669,12 +685,18 @@ get_data <- function(
     } else {
       sprintf("{col_blue('%s')} (%s)", names(selectors), n_rows)
     }
+  details <- details |> purrr::map_chr(format_inline)
 
-  format_inline(
-    "Retrieved {prettyunits::pretty_num(nrow(out))} records from {qty(length(selectors))}",
-    "{?/the combination of }{details}{?/ via }{?/{.var {unique(unlist(join_bys))}}}"
-  ) |>
-    cli_alert_success(wrap = TRUE)
+  # info
+  finish_info(
+    "retrieved {prettyunits::pretty_num(nrow(out))} records from ",
+    if (length(selectors) > 0) "the combination of ",
+    "{details}",
+    if (length(selectors) > 0) " via {.field {unique(unlist(join_bys))}}",
+    start = start,
+    .call = .call
+    # don't pass parent .env since we want these glues to execute in THIS env
+  )
 
   # return
   return(out)
