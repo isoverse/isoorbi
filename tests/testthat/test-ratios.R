@@ -372,7 +372,8 @@ test_that("orbi_summarize_results()", {
     expect_snapshot({
       res <- orbi_summarize_results(df, ratio_method = "sum")
     })
-  })
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
 
   # capture sucess data without blocks
   df |>
