@@ -500,7 +500,16 @@
       test_summarize_and_format_cnds(conditions = out$conditions[1, ])
     Message
       ! in test_summarize_and_format_cnds(): 1 warning > wrap_f(): we're here!
-        > ! in wrap_f(): we're here!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[3, ])
+    Message
+      ! in test_summarize_and_format_cnds(): 1 warning
+        > ! in my_f(): long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
 
 ---
 
@@ -663,7 +672,16 @@
       test_summarize_and_format_cnds(conditions = out$conditions[1, ])
     Message
       [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m1 warning[39m → [1mwrap_f()[22m: we're here!
-        → [33m![39m in [1mwrap_f()[22m: we're here!
+
+---
+
+    Code
+      test_summarize_and_format_cnds(conditions = out$conditions[3, ])
+    Message
+      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m1 warning[39m
+        → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
+        line in standard line width and therefore needs a sensible linebreak
+        somewhere along the way.
 
 ---
 

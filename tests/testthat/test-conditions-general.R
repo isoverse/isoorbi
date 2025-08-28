@@ -218,6 +218,10 @@ test_that("summarize_and_format_cnds()", {
       test_summarize_and_format_cnds(conditions = out$conditions[1, ]) |>
         expect_snapshot()
 
+      # single long issue
+      test_summarize_and_format_cnds(conditions = out$conditions[3, ]) |>
+        expect_snapshot()
+
       # without issues
       test_summarize_and_format_cnds(conditions = out$conditions[c(), ]) |>
         expect_snapshot()

@@ -309,6 +309,7 @@ summarize_and_format_cnds <- function(
 
     # if the cnds are a single line long --> combine with summary
     if (include_summary && length(formatted_cnds) == 1) {
+      formatted_cnds <- c()
       summary_line <-
         c(
           head(summary_line, -1),
