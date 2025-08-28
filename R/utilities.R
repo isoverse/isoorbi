@@ -71,7 +71,7 @@ try_catch_all <- function(expr, error, warn = error, newline = TRUE) {
   )
 }
 
-# Common utility functions to clean and annotate data ------------------------------------
+# Common utility functions to clean and annotate data ========
 
 #' @title Function replaced by `orbi_flag_satellite_peaks()`
 #' @param ... parameters passed on to the new function [orbi_flag_satellite_peaks()].
@@ -604,6 +604,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     "must be a single text value identifying the isotopocule to use as the basepeak"
   )
   ## bsepeak_def in isotopocules
+  dataset <- dataset |> factorize_dataset(cols = "isotopocule")
   check_arg(
     basepeak_def,
     basepeak_def %in%
@@ -618,16 +619,11 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   dataset <- dataset |> factorize_dataset("isotopocule")
 
   # info message
-  start <-
-    sprintf(
-      "orbi_define_basepeak() is setting the '%s' isotopocule as the ratio denominator... ",
-      basepeak_def
-    ) |>
-    start_info()
+  start <- start_info("is running")
 
   # identify `basepeak` for each scan
-  df.out <-
-    try_catch_all(
+  out <-
+    tryCatch(
       {
         df.out <- dataset |>
           dplyr::mutate(basepeak = !!basepeak_def) |>
@@ -655,7 +651,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
           dplyr::ungroup()
       },
       # error catching
-      function(p) {
+      error = function(p) {
         # analyze scans (is slow so only done if error)
         df_summary <-
           dataset |>
@@ -680,11 +676,11 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
           nrow(too_many_bps) > 0 && !"is_satellite_peak" %in% names(dataset)
         ) {
           # too many base peaks
-          sprintf(
-            "the %s isotopocule exists multiple times in some scans, make sure to run orbi_flag_satellite_peaks() first",
-            basepeak_def
-          ) |>
-            abort()
+          cli_abort(
+            "the {.field {basepeak_def}} isotopocule exists multiple times in some scans, make sure to run {.strong orbi_flag_satellite_peaks()} first",
+            parent = p,
+            call = expr(mutate())
+          )
         } else if (nrow(too_few_bps) > 0) {
           info <-
             too_few_bps |>
@@ -698,52 +694,61 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
                 .data$filename
               )
             ) |>
-            dplyr::pull(.data$label)
-
-          sprintf(
-            "the '%s' isotopocule does not exist in some scans, consider using `orbi_filter_isox()` to focus on specific file(s) and/or compound(s): \n - %s",
-            basepeak_def,
-            paste(info, collapse = "\n - ")
-          ) |>
-            abort()
+            dplyr::pull(.data$label) |>
+            paste(collapse = "\n - ")
+          abort(
+            format_inline(
+              "the {.field {basepeak_def}} isotopocule does not exist in some scans, consider using {.strong orbi_filter_isox()} to focus on specific file(s) and/or compound(s): \n - {info}"
+            ),
+            parent = p,
+            call = expr(mutate())
+          )
         } else {
           # some other error
           abort(
             "something went wrong identifying the base peak for each scan",
-            parent = p
+            abort(parent = p, call = expr(mutate()))
           )
         }
       }
-    )
+    ) |>
+    try_catch_cnds()
 
-  # remove basepeak from isotopocule list
-  df.out <-
-    try_catch_all(
-      df.out |>
-        dplyr::filter(.data$isotopocule != basepeak_def) |>
-        droplevels(),
-      "something went wrong removing the base peak isotopocule"
-    )
+  # remove basepeak from isotopocule list (only if no error yet)
+  if (nrow(out$conditions) == 0) {
+    out <-
+      out$result |>
+      dplyr::filter(.data$isotopocule != basepeak_def) |>
+      droplevels() |>
+      try_catch_cnds()
+  }
 
-  # calculate ratios
-  df.out <-
-    try_catch_all(
-      df.out |>
-        dplyr::mutate(
-          ratio = .data$ions.incremental / .data$basepeak_ions,
-          .after = "ions.incremental"
-        ),
-      "something went wrong calculating ratios: "
-    )
+  # calculate ratios (only if no error yet)
+  if (nrow(out$conditions) == 0) {
+    out <-
+      out$result |>
+      dplyr::mutate(
+        ratio = .data$ions.incremental / .data$basepeak_ions,
+        .after = "ions.incremental"
+      ) |>
+      try_catch_cnds()
+  }
+
+  # result
+  df.out <- out$result
 
   # info message
-  sprintf(
-    "set base peak and calculated %d ratios for %d isotopocules/base peak (%s)",
-    nrow(df.out),
-    length(levels(df.out$isotopocule)),
-    paste(levels(df.out$isotopocule), collapse = ", ")
-  ) |>
-    finish_info(start = start)
+  finish_info(
+    "set {.field {basepeak_def}} as the ratio denominator ",
+    if (is.data.frame(df.out)) "and calculated {nrow(df.out)} ratios ",
+    if (is.data.frame(df.out) && "isotopocule" %in% names(df.out)) {
+      "for {length(levels(df.out$isotopocule))} isotopocules/base peak ({.field {levels(df.out$isotopocule)}})"
+    },
+    start = start,
+    conditions = out$conditions,
+    # don't proceed if there are issues
+    abort_if_errors = TRUE
+  )
 
   # return
   return(df.out)
