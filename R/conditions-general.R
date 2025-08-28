@@ -356,6 +356,7 @@ abort_cnds <- function(
   conditions,
   ...,
   include_symbol = FALSE,
+  include_call = FALSE,
   .call = caller_call(),
   .env = caller_env()
 ) {
@@ -365,6 +366,7 @@ abort_cnds <- function(
       conditions,
       ...,
       include_symbol = include_symbol,
+      include_call = include_call,
       .call = .call
     ) |>
       cli_abort(

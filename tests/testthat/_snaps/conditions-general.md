@@ -834,7 +834,7 @@
       test_abort_cnds()
     Condition
       Error in `test_abort_cnds()`:
-      ! in test_abort_cnds(): 3 warnings and 1 error
+      ! 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -862,7 +862,7 @@
       test_abort_cnds()
     Condition
       [1m[33mError[39m in `test_abort_cnds()`:[22m
-      [1m[22m[33m![39m in [1mtest_abort_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [1m[22m[33m![39m [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
