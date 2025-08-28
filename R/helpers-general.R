@@ -15,6 +15,7 @@ factor_in_order <- function(x) {
 }
 
 # check function argument for condition (instead of stopifnot) for more informative error messages
+# note: throws error if `condition` evaluates to FALSE
 check_arg <- function(
   x,
   condition,
@@ -22,13 +23,12 @@ check_arg <- function(
   include_type = TRUE,
   include_value = FALSE,
   .arg = caller_arg(x),
-  .call = caller_env(),
   .env = caller_env()
 ) {
   if (!condition) {
     if (is_missing(maybe_missing(x))) {
       type = if (include_type) ", not missing" else ""
-      cli_abort("argument {.field {(.arg)}} {msg}{type}", call = .call)
+      cli_abort("argument {.field {(.arg)}} {msg}{type}", call = .env)
     } else {
       type <- if (include_type) {
         format_inline(", not {.obj_type_friendly {x}}")
@@ -38,7 +38,7 @@ check_arg <- function(
       value <- if (include_value) format_inline(" ({.val {x}})") else ""
       cli_abort(
         "argument {.field {(.arg)}}{value} {msg}{type}",
-        call = .call,
+        call = .env,
         trace = trace_back(bottom = .env)
       )
     }
@@ -50,14 +50,14 @@ check_tibble <- function(
   df,
   req_cols = c(),
   .arg = caller_arg(df),
-  .call = caller_env()
+  .env = caller_env()
 ) {
   check_arg(
     df,
     !missing(df) && is.data.frame(df),
     "must be a data frame or tibble",
     .arg = .arg,
-    .call = .call
+    .env = .env
   )
   if (length(missing <- setdiff(req_cols, names(df))) > 0) {
     cli_abort(
@@ -65,7 +65,7 @@ check_tibble <- function(
         "{qty(missing)} column{?s} {.field {missing}} {?is/are} missing from {.field {(.arg)}}",
         "i" = "available columns: {.field {names(df)}}"
       ),
-      call = .call
+      call = .env
     )
   }
 }
@@ -87,11 +87,16 @@ start_info <- function(
 ) {
   # safety
   stopifnot(is_scalar_logical(func), is_scalar_logical(keep))
-  call <- as_label(.call[1])
+
+  # call
+  call <- as.character(.call[1])
+  if (is.null(.call[1])) {
+    func <- FALSE # con't include if it's NULL
+  }
 
   # message
   msg <- c(
-    if (func) sprintf("{.strong %s} ", call),
+    if (func) sprintf("{.strong %s()} ", call),
     ...,
     "..."
   )
@@ -152,8 +157,13 @@ finish_info <- function(
     cli_progress_done(id = start$pb, .envir = .env)
   }
 
-  # assemble message
+  # call
   call <- as.character(.call[1])
+  if (is.null(.call[1])) {
+    func <- FALSE # con't include if it's NULL
+  }
+
+  # assemble message
   msg <-
     paste(
       if (time && !is.null(start$start_time)) {
