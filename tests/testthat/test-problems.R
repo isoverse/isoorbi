@@ -1,4 +1,4 @@
-test_that("orbi_get_problems() works", {
+test_that("orbi_get_problems()", {
   # safety checks
   expect_error(
     orbi_get_problems(),
@@ -27,6 +27,11 @@ test_that("orbi_get_problems() works", {
       message = NA_character_,
       condition = list(NULL)
     )
+  )
+  expect_equal(
+    test |> orbi_get_problems(),
+    list(conditions = tibble(type = c("warning", "error"))) |>
+      orbi_get_problems()
   )
 
   # can get problems from nested data frames
