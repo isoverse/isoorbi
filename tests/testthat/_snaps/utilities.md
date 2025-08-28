@@ -1,3 +1,125 @@
+# orbi_flag_weak_isotopocules() [plain]
+
+    Code
+      out <- orbi_flag_weak_isotopocules(mutate(df, block = as.factor("block1"),
+      segment = as.factor("segment2"), injection = as.factor("injection3")),
+      min_percent = 1)
+    Message
+      v orbi_flag_weak_isotopocules() confirmed there are no weak isotopocules: all
+      are detected in at least 1% of scans in each of the 6 data groups (based on
+      filename, compound, block, segment, injection, and isotopocule)
+
+---
+
+    Code
+      out <- orbi_flag_weak_isotopocules(filter(df, !(isotopocule %in% c("15N", "17O") &
+        scan.no > 10)), min_percent = 50)
+    Message
+      v orbi_flag_weak_isotopocules() flagged 2 of 6 isotopocules as weak because
+      they were NOT present in at least 50% of scans in each of the 6 data groups
+      (based on filename, compound, and isotopocule) > use
+      orbi_plot_isotopocule_coverage() to visualize them
+
+# orbi_flag_weak_isotopocules() [fancy]
+
+    Code
+      out <- orbi_flag_weak_isotopocules(mutate(df, block = as.factor("block1"),
+      segment = as.factor("segment2"), injection = as.factor("injection3")),
+      min_percent = 1)
+    Message
+      [32m✔[39m [1morbi_flag_weak_isotopocules()[22m confirmed there are no weak isotopocules: all
+      are detected in at least 1% of scans in each of the 6 data groups (based on
+      [32mfilename[39m, [32mcompound[39m, [32mblock[39m, [32msegment[39m, [32minjection[39m, and [32misotopocule[39m)
+
+---
+
+    Code
+      out <- orbi_flag_weak_isotopocules(filter(df, !(isotopocule %in% c("15N", "17O") &
+        scan.no > 10)), min_percent = 50)
+    Message
+      [32m✔[39m [1morbi_flag_weak_isotopocules()[22m flagged 2 of 6 isotopocules as weak because
+      they were NOT present in at least 50% of scans in each of the 6 data groups
+      (based on [32mfilename[39m, [32mcompound[39m, and [32misotopocule[39m) → use
+      [1morbi_plot_isotopocule_coverage()[22m to visualize them
+
+# orbi_flag_outliers() [plain]
+
+    Code
+      out <- orbi_flag_outliers(df, agc_window = c(10, 90))
+    Message
+      v orbi_flag_outliers() flagged 172/864 scans (19.9%) as outliers based on AGC
+      window (10% to 90%) cutoff, i.e. based on scans whose number of ions tic *
+      it.ms in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)
+      quantiles > use orbi_plot_raw_data(y = tic * it.ms) to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(df, agc_fold_cutoff = 1.01)
+    Message
+      v orbi_flag_outliers() flagged 146/864 scans (16.9%) as outliers based on 1.01
+      fold AGC cutoff, i.e. based on scans below 1/1.01 and above 1.01 times the
+      average number of ions tic * it.ms in the Orbitrap analyzer > use
+      orbi_plot_raw_data(y = tic * it.ms) to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(filter(df, row_number() < 5), agc_window = c(10, 90))
+    Message
+      v orbi_flag_outliers() confirmed that none of the 1 scans are outliers based on
+      AGC window (10% to 90%) cutoff, i.e. based on scans whose number of ions tic *
+      it.ms in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)
+      quantiles
+
+---
+
+    Code
+      out <- orbi_flag_outliers(df, agc_fold_cutoff = 2)
+    Message
+      v orbi_flag_outliers() confirmed that none of the 864 scans are outliers based
+      on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
+      average number of ions tic * it.ms in the Orbitrap analyzer
+
+# orbi_flag_outliers() [fancy]
+
+    Code
+      out <- orbi_flag_outliers(df, agc_window = c(10, 90))
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m flagged 172/864 scans (19.9%) as outliers based on [32mAGC[39m
+      [32mwindow (10% to 90%) cutoff[39m, i.e. based on [3mscans whose number of ions [32mtic[39m *[23m
+      [3m[32mit.ms[39m in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)[23m
+      [3mquantiles[23m → use [1morbi_plot_raw_data(y = tic * it.ms)[22m to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(df, agc_fold_cutoff = 1.01)
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m flagged 146/864 scans (16.9%) as outliers based on [32m1.01[39m
+      [32mfold AGC cutoff[39m, i.e. based on [3mscans below 1/1.01 and above 1.01 times the[23m
+      [3maverage number of ions [32mtic[39m * [32mit.ms[39m in the Orbitrap analyzer[23m → use
+      [1morbi_plot_raw_data(y = tic * it.ms)[22m to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(filter(df, row_number() < 5), agc_window = c(10, 90))
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m confirmed that none of the 1 scans are outliers based on
+      [32mAGC window (10% to 90%) cutoff[39m, i.e. based on [3mscans whose number of ions [32mtic[39m *[23m
+      [3m[32mit.ms[39m in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)[23m
+      [3mquantiles[23m
+
+---
+
+    Code
+      out <- orbi_flag_outliers(df, agc_fold_cutoff = 2)
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m confirmed that none of the 864 scans are outliers based
+      on [32m2 fold AGC cutoff[39m, i.e. based on [3mscans below 1/2 and above 2 times the[23m
+      [3maverage number of ions [32mtic[39m * [32mit.ms[39m in the Orbitrap analyzer[23m
+
 # orbi_define_basepeak() [plain]
 
     Code

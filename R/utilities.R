@@ -43,34 +43,6 @@ count_grouped_distinct <- function(dataset, column) {
     sum()
 }
 
-# internal function to wrap around expressions that should throw errors whenever anything unexpected happens
-# error/warn can be text or function
-try_catch_all <- function(expr, error, warn = error, newline = TRUE) {
-  tryCatch(
-    {{ expr }},
-    error = function(p) {
-      if (newline) {
-        cat("\n")
-      }
-      if (is_function(error)) {
-        error(p)
-      } else {
-        abort(error, parent = p)
-      }
-    },
-    warning = function(p) {
-      if (newline) {
-        cat("\n")
-      }
-      if (is_function(warn)) {
-        warn(p)
-      } else {
-        abort(warn, parent = p)
-      }
-    }
-  )
-}
-
 # Common utility functions to clean and annotate data ========
 
 #' @title Function replaced by `orbi_flag_satellite_peaks()`
@@ -125,27 +97,26 @@ orbi_flag_satellite_peaks <- function(dataset) {
   )
 
   # info
-  start <- start_info(
-    "orbi_flag_satellite_peaks() is flagging minor signals (satellite peaks)... "
-  )
+  start <- start_info("is running")
 
   # calculation
-  dataset <-
-    try_catch_all(
-      dataset |>
-        dplyr::group_by(
-          .data$filename,
-          .data$compound,
-          .data$scan.no,
-          .data$isotopocule
-        ) |>
-        dplyr::mutate(
-          is_satellite_peak = .data$ions.incremental <
-            max(.data$ions.incremental)
-        ) |>
-        dplyr::ungroup(),
-      "something went wrong tying to flag satellite peaks: "
-    )
+  out <-
+    dataset |>
+    dplyr::group_by(
+      .data$filename,
+      .data$compound,
+      .data$scan.no,
+      .data$isotopocule
+    ) |>
+    dplyr::mutate(
+      is_satellite_peak = .data$ions.incremental < max(.data$ions.incremental)
+    ) |>
+    dplyr::ungroup() |>
+    try_catch_cnds()
+
+  # abort if issues
+  abort_cnds(out$conditions)
+  dataset <- out$result
 
   # info
   sat_peaks <- sum(dataset$is_satellite_peak)
@@ -245,46 +216,49 @@ orbi_flag_weak_isotopocules <-
       )
 
     # info
-    start <-
-      sprintf(
-        "orbi_flag_weak_isotopocules() is flagging isotopocules from data that are detected in less than %s%% of scans in %d data group(s) (based on '%s')... ",
-        min_percent,
-        dplyr::n_groups(dataset_out),
-        paste(dplyr::group_vars(dataset_out), collapse = "', '")
-      ) |>
-      start_info()
+    start <- start_info("is running")
     starting_isotopocules <- dataset_out |>
       count_grouped_distinct("isotopocule")
 
     # minor peak removal
-    dataset_out <-
-      try_catch_all(
-        dataset_out |>
-          dplyr::mutate(max.scans = length(unique(.data$scan.no))) |>
-          dplyr::group_by(.data$isotopocule, .add = TRUE) |>
-          dplyr::mutate(obs.scans = length(unique(.data$scan.no))) |>
-          dplyr::mutate(
-            is_weak_isotopocule = .data$obs.scans <
-              min_percent / 100 * .data$max.scans
-          ) |>
-          dplyr::select(-"obs.scans", -"max.scans"),
-        "something went wrong flagging weak isotopocules: "
-      )
+    out <-
+      dataset_out |>
+      dplyr::mutate(max.scans = length(unique(.data$scan.no))) |>
+      dplyr::group_by(.data$isotopocule, .add = TRUE) |>
+      dplyr::mutate(obs.scans = length(unique(.data$scan.no))) |>
+      dplyr::mutate(
+        is_weak_isotopocule = .data$obs.scans <
+          min_percent / 100 * .data$max.scans
+      ) |>
+      dplyr::select(-"obs.scans", -"max.scans") |>
+      try_catch_cnds()
+
+    # stop if there are errors
+    abort_cnds(out$conditions)
+    dataset_out <- out$result
 
     # info
     removed_isotopocules <- dataset_out |>
       dplyr::filter(.data$is_weak_isotopocule) |>
       count_grouped_distinct("isotopocule")
+    n_groups <- dplyr::n_groups(dataset_out)
     if (removed_isotopocules > 0) {
-      sprintf(
-        "flagged %d/%d isotopocules across all data groups (use `orbi_plot_isotopocule_coverage()` to visualize them)",
-        removed_isotopocules,
-        starting_isotopocules
-      ) |>
-        finish_info(start = start)
+      finish_info(
+        "flagged {removed_isotopocules} of {starting_isotopocules} isotopocules as weak ",
+        "because they were NOT present in at least {min_percent}% of scans ",
+        if (n_groups > 0) {
+          "in each of the {dplyr::n_groups(dataset_out)} data groups (based on {.field {dplyr::group_vars(dataset_out)}}) "
+        },
+        "{cli::symbol$arrow_right} use {.strong orbi_plot_isotopocule_coverage()} to visualize them",
+        start = start
+      )
     } else {
       finish_info(
-        "confirmed there are no weak isotopocules",
+        "confirmed there are no weak isotopocules: ",
+        "all are detected in at least {min_percent}% of scans ",
+        if (n_groups > 0) {
+          "in each of the {dplyr::n_groups(dataset_out)} data groups (based on {.field {dplyr::group_vars(dataset_out)}})"
+        },
         start = start
       )
     }
@@ -389,21 +363,17 @@ orbi_flag_outliers <- function(
   method_msg <- ""
   method_type <- ""
   if (method == "agc_window") {
-    method_msg <- sprintf(
-      "%s %% of scans with the lowest and above %s %% of scans with the highest number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
-      agc_window[1],
-      agc_window[2]
+    method_msg <- format_inline(
+      "scans whose number of ions {.field tic} * {.field it.ms} in the Orbitrap analyzer fall into the lowest (<{agc_window[1]}%) or highest (>{agc_window[2]}%) quantiles"
     )
     method_type <- sprintf(
-      "AGC window (%s to %s %%)",
+      "AGC window (%s%% to %s%%) cutoff",
       agc_window[1],
       agc_window[2]
     )
   } else if (method == "agc_fold_cutoff") {
-    method_msg <- sprintf(
-      "scans below 1/%s and above %s times the average number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
-      agc_fold_cutoff,
-      agc_fold_cutoff
+    method_msg <- format_inline(
+      "scans below 1/{agc_fold_cutoff} and above {agc_fold_cutoff} times the average number of ions {.field tic} * {.field it.ms} in the Orbitrap analyzer"
     )
     method_type <- sprintf("%s fold AGC cutoff", agc_fold_cutoff)
   }
@@ -413,18 +383,11 @@ orbi_flag_outliers <- function(
     group_if_exists(c("filename", "block", "segment", "injection"), add = TRUE)
 
   # info
-  start <-
-    sprintf(
-      "orbi_flag_outliers() is flagging the %s in %d data group(s) (based on '%s')... ",
-      method_msg,
-      dplyr::n_groups(dataset_out),
-      paste(dplyr::group_vars(dataset_out), collapse = "', '")
-    ) |>
-    start_info()
+  start <- start_info("is running")
   n_scans <- dataset_out |> count_grouped_distinct("scan.no")
 
   # calculation
-  dataset_out <- try_catch_all(
+  out <- try_catch_cnds(
     if (method == "agc_window") {
       dataset_out |>
         dplyr::mutate(
@@ -444,9 +407,12 @@ orbi_flag_outliers <- function(
             .data$TICxIT > agc_fold_cutoff * .data$TICxIT_mean
         ) |>
         dplyr::select(-"TICxIT", -"TICxIT_mean")
-    },
-    "something went wrong flagging outliers: "
+    }
   )
+
+  # stop if error
+  abort_cnds(out$conditions)
+  dataset_out <- out$result
 
   # dataset outlier and type update
   if (!"is_outlier" %in% names(dataset_out)) {
@@ -468,17 +434,24 @@ orbi_flag_outliers <- function(
   n_scans_removed <- dataset_out |>
     dplyr::filter(.data$is_outlier) |>
     count_grouped_distinct("scan.no")
+  n_groups <- dplyr::n_groups(dataset_out)
   if (n_scans_removed > 0) {
-    sprintf(
-      "flagged %d/%d scans (%.1f%%) as outliers (use `orbi_plot_raw_data(y = tic * it.ms)` to visualize them) across all data groups",
-      n_scans_removed,
-      n_scans,
-      n_scans_removed / n_scans * 100
-    ) |>
-      finish_info(start = start)
+    finish_info(
+      "flagged {n_scans_removed}/{n_scans} scans ({round(n_scans_removed / n_scans * 100, 1)}%) as outliers ",
+      "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
+      if (n_groups > 1) {
+        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(dataset_out)}}) "
+      },
+      " {cli::symbol$arrow_right} use {.strong orbi_plot_raw_data(y = tic * it.ms)} to visualize them",
+      start = start
+    )
   } else {
     finish_info(
-      "confirmed there are no outliers based on this method",
+      "confirmed that none of the {n_scans} scans are outliers ",
+      "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
+      if (n_groups > 1) {
+        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(dataset_out)}}) "
+      },
       start = start
     )
   }
@@ -532,7 +505,7 @@ orbi_filter_flagged_data <- function(dataset) {
   noutliers <- 0L
 
   # remove flagged
-  start <- Sys.time()
+  start <- start_info()
   details <- c()
   if ("is_satellite_peak" %in% names(dataset)) {
     dataset <- dataset |> filter(!.data$is_satellite_peak)
@@ -552,7 +525,7 @@ orbi_filter_flagged_data <- function(dataset) {
 
   # info
   sprintf(
-    "orbi_filter_flagged_data() removed %d flagged records (%.1f%%)%s",
+    "removed %d flagged records (%.1f%%)%s",
     nsat_peaks + nweak_isos + noutliers,
     100 * (nsat_peaks + nweak_isos + noutliers) / nall,
     if (length(details) > 0) {
@@ -561,7 +534,7 @@ orbi_filter_flagged_data <- function(dataset) {
       ""
     }
   ) |>
-    message_standalone(start = start)
+    finish_info(start = start)
 
   # return
   return(dataset |> droplevels())
@@ -714,25 +687,30 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     ) |>
     try_catch_cnds()
 
-  # remove basepeak from isotopocule list (only if no error yet)
-  if (nrow(out$conditions) == 0) {
-    out <-
-      out$result |>
-      dplyr::filter(.data$isotopocule != basepeak_def) |>
-      droplevels() |>
-      try_catch_cnds()
-  }
+  # abort if issues
+  abort_cnds(out$conditions)
+
+  # remove basepeak from isotopocule list
+  out <-
+    out$result |>
+    dplyr::filter(.data$isotopocule != basepeak_def) |>
+    droplevels() |>
+    try_catch_cnds()
+
+  # abort if issues
+  abort_cnds(out$conditions)
 
   # calculate ratios (only if no error yet)
-  if (nrow(out$conditions) == 0) {
-    out <-
-      out$result |>
-      dplyr::mutate(
-        ratio = .data$ions.incremental / .data$basepeak_ions,
-        .after = "ions.incremental"
-      ) |>
-      try_catch_cnds()
-  }
+  out <-
+    out$result |>
+    dplyr::mutate(
+      ratio = .data$ions.incremental / .data$basepeak_ions,
+      .after = "ions.incremental"
+    ) |>
+    try_catch_cnds()
+
+  # abort if issues
+  abort_cnds(out$conditions)
 
   # result
   df.out <- out$result

@@ -221,15 +221,41 @@ test_that("orbi_flag_weak_isotopocules()", {
       block = as.factor("block1"),
       segment = as.factor("segment2"),
       injection = as.factor("injection3")
-    )
+    ) |>
+    orbi_flag_weak_isotopocules(min_percent = 1)
 
   # success
-  expect_true(
-    suppressMessages(is.tbl(orbi_flag_weak_isotopocules(
-      dataset = df3,
-      min_percent = 1
-    )))
-  )
+  ## message
+  test_that_cli(
+    "orbi_flag_weak_isotopocules()",
+    configs = c("plain", "fancy"),
+    {
+      # no weak isotopocules
+      expect_snapshot(
+        out <- df |>
+          mutate(
+            block = as.factor("block1"),
+            segment = as.factor("segment2"),
+            injection = as.factor("injection3")
+          ) |>
+          orbi_flag_weak_isotopocules(min_percent = 1)
+      )
+
+      # some weak ones
+      expect_snapshot(
+        out <- df |>
+          filter(!(isotopocule %in% c("15N", "17O") & scan.no > 10)) |>
+          orbi_flag_weak_isotopocules(min_percent = 50)
+      )
+    }
+  ) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
+
+  # ## data
+  # expect_snapshot_value(
+  #   orbi_flag_weak_isotopocules(dataset = df, min_percent = 1),
+  #   style = "json2"
+  # )
 })
 
 ## orbi_filter_scan_intensity() =============
@@ -264,9 +290,12 @@ test_that("orbi_flag_outliers()", {
     fixed = TRUE
   )
 
-  df <- read.csv(
-    file.path(base_dir, "test_files", "first10rows.csv"),
-    stringsAsFactors = T
+  df <- suppressMessages(
+    orbi_read_isox(system.file(
+      "extdata",
+      "testfile_dual_inlet.isox",
+      package = "isoorbi"
+    ))
   )
 
   expect_error(
@@ -315,41 +344,31 @@ test_that("orbi_flag_outliers()", {
     fixed = TRUE
   )
 
-  df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
   expect_error(
-    orbi_flag_outliers(dataset = df2, agc_window = 1),
+    df |>
+      mutate(dummy = 1) |>
+      select(-"scan.no") |>
+      orbi_flag_outliers(agc_fold_cutoff = 1),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`",
     fixed = TRUE
   )
 
   # success
-  expect_true(
-    suppressMessages(is.tbl(orbi_flag_outliers(
-      dataset = df,
-      agc_window = c(10, 90)
-    )))
-  )
 
-  df3 <-
-    suppressMessages(
-      orbi_read_isox(system.file(
-        "extdata",
-        "testfile_dual_inlet.isox",
-        package = "isoorbi"
-      )) |>
-        mutate(
-          block = as.factor("block1"),
-          segment = as.factor("segment2"),
-          injection = as.factor("injection3")
-        )
+  ## messages
+  test_that_cli("orbi_flag_outliers()", configs = c("plain", "fancy"), {
+    # some outliers
+    expect_snapshot(out <- df |> orbi_flag_outliers(agc_window = c(10, 90)))
+    expect_snapshot(out <- df |> orbi_flag_outliers(agc_fold_cutoff = 1.01))
+    # no outliers
+    expect_snapshot(
+      out <- df |>
+        filter(row_number() < 5) |>
+        orbi_flag_outliers(agc_window = c(10, 90))
     )
-
-  expect_true(
-    suppressMessages(is.tbl(orbi_flag_outliers(
-      dataset = df3,
-      agc_window = c(10, 90)
-    )))
-  )
+    expect_snapshot(out <- df |> orbi_flag_outliers(agc_fold_cutoff = 2))
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
 })
 
 ## orbi_define_basepeak() =============
