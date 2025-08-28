@@ -1,7 +1,7 @@
 # testing functions
 wrap_f <- function(show_message = FALSE) {
   warning("we're here!")
-  rlang::warn("no context")
+  warn("no context {value}")
   return(my_f(show_message = show_message))
 }
 
@@ -13,7 +13,8 @@ my_f <- function(show_message = FALSE) {
     "long trouble! This sentences is easily longer than a single line in standard line width and therefore needs a sensible linebreak somewhere along the way."
   )
   internal_func <- function() {
-    rlang::abort("oh no internal {value} error!")
+    #rlang::abort("oh no internal {value} error!")
+    cli_abort("formatted! {.field test} {.url https://isoorbi.isoverse.org}")
   }
   internal_func()
   return("success")

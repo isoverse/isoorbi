@@ -94,16 +94,12 @@ try_catch_cnds <- function(
     result <- tryCatch(error = handle_error, withCallingHandlers(expr))
   }
 
-  # format conditions nicely
+  # pull out call and message
   conds <- conds |>
     dplyr::mutate(
       call = .data$condition |>
         purrr::map_chr(~ as.character(conditionCall(.x))[1]),
-      message = .data$condition |>
-        # strip ansi since this is just the problems summary
-        purrr::map_chr(
-          ~ gsub("\\n", " ", cli::ansi_strip(conditionMessage(.x)))
-        ),
+      message = .data$condition |> purrr::map_chr(conditionMessage),
       .before = "condition"
     )
 
@@ -168,7 +164,12 @@ summarize_cnds <- function(
   }
 
   # takes care of line breaks and escapes {}
-  return(format_bullets_raw(summary))
+  # it seems cli_escape in format_bullets_raw does NOT properly escape < and >
+  # might be fixed if https://github.com/r-lib/cli/issues/789 is addressed
+  summary |>
+    gsub(pattern = "<", replacement = "<<", fixed = TRUE) |>
+    gsub(pattern = ">", replacement = ">>", fixed = TRUE) |>
+    format_bullets_raw()
 }
 
 # helper to cli format conditions into a bullet list
@@ -208,20 +209,37 @@ format_cnds <- function(
             }
           }
         ),
-      message_w_type = paste0(
-        prefix,
-        if (include_symbol) .data$symbol,
-        if (include_call) .data$call_label,
-        .data$message
-      )
+      # account for multi-line messages
+      message_w_type = strsplit(.data$message, "\n", fixed = TRUE) |>
+        list(.data$symbol, .data$call_label) |>
+        purrr::pmap(
+          function(msg, symbol, call) {
+            c(
+              # add prefix/symbol/call to first line of the message
+              paste0(
+                !!prefix,
+                if (!!include_symbol) symbol,
+                if (!!include_call) call,
+                head(msg, 1)
+              ),
+              tail(msg, -1)
+            )
+          }
+        )
     ) |>
-    pull(.data$message_w_type)
+    pull(.data$message_w_type) |>
+    unlist()
 
   # take care of proper line breaks (also covers escaping {})
   out <-
     withr::with_options(
       list(cli.width = console_width() - indent * 2),
-      format_bullets_raw(out)
+      out |>
+        # it seems cli_escape in format_bullets_raw does NOT properly escape < and >
+        # might be fixed if https://github.com/r-lib/cli/issues/789 is addressed
+        gsub(pattern = "<", replacement = "<<", fixed = TRUE) |>
+        gsub(pattern = ">", replacement = ">>", fixed = TRUE) |>
+        format_bullets_raw()
     )
 
   # indendation
@@ -275,23 +293,9 @@ summarize_and_format_cnds <- function(
     )
   }
 
-  # single issue and summary --> make one line for both
+  # format the cnds
   formatted_cnds <- c()
-  if (include_cnds && include_summary && nrow(conditions) == 1L) {
-    # attach single condition to last summary line
-    summary_line[length(summary_line)] <-
-      paste(
-        summary_line[length(summary_line)],
-        format_inline("{cli::symbol$arrow_right}"),
-        format_cnds(
-          conditions,
-          include_call = include_cnd_calls,
-          include_symbol = FALSE,
-          call_format = "{.strong {call}()}: ",
-        )
-      )
-  } else if (include_cnds) {
-    # multiple conditions
+  if (include_cnds) {
     formatted_cnds <- conditions |>
       format_cnds(
         include_call = include_cnd_calls,
@@ -302,8 +306,27 @@ summarize_and_format_cnds <- function(
           ""
         }
       )
-  }
 
+    # if the cnds are a single line long --> combine with summary
+    if (include_summary && length(formatted_cnds) == 1) {
+      summary_line <-
+        c(
+          head(summary_line, -1),
+          paste(
+            tail(summary_line, 1),
+            format_inline("{cli::symbol$arrow_right}"),
+            # attach to last summary line
+            format_cnds(
+              conditions,
+              include_call = include_cnd_calls,
+              include_symbol = FALSE,
+              call_format = "{.strong {call}()}: ",
+            ) |>
+              paste(collapse = " ")
+          )
+        )
+    }
+  }
   # output
   return(c(summary_line, formatted_cnds))
 }
