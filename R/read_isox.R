@@ -225,7 +225,7 @@ orbi_simplify_isox <- function(dataset, add = c()) {
 
   # info
   cols <- names(dataset)[names(dataset) %in% c(cols, add)]
-  start <- start_info("will keep only column{?s} {.field {cols}}")
+  start <- start_info("is running")
 
   # select
   out <-
