@@ -530,7 +530,7 @@
     Code
       test_summarize_and_format_cnds(message = "even more {fun}")
     Message
-      x in test_summarize_and_format_cnds(): 3 warnings and 1 error even more {fun}
+      x in test_summarize_and_format_cnds(): even more {fun} 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -543,7 +543,7 @@
     Code
       test_summarize_and_format_cnds(message = format_inline("another {.field field}"))
     Message
-      x in test_summarize_and_format_cnds(): 3 warnings and 1 error another field
+      x in test_summarize_and_format_cnds(): another field 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -702,7 +702,7 @@
     Code
       test_summarize_and_format_cnds(message = "even more {fun}")
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m even more {fun}
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: even more {fun} [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -715,7 +715,7 @@
     Code
       test_summarize_and_format_cnds(message = format_inline("another {.field field}"))
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m another [32mfield[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: another [32mfield[39m [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single

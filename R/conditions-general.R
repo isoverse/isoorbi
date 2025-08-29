@@ -266,7 +266,7 @@ summarize_and_format_cnds <- function(
   include_symbol = TRUE,
   include_summary = TRUE,
   include_call = include_summary,
-  summary_format = "{issues} {message}",
+  summary_format = "{message} {issues}",
   message = NULL,
   # for format_cnds
   include_cnds = TRUE,
@@ -337,12 +337,32 @@ summarize_and_format_cnds <- function(
 # only prints if there are any conditions at all
 show_cnds <- function(
   conditions,
-  ...,
+  # for summarize_cnds
+  include_symbol = TRUE,
+  include_summary = TRUE,
+  include_call = include_summary,
+  summary_format = "{message} {issues}",
+  message = NULL,
+  # for format_cnds
+  include_cnds = TRUE,
+  include_cnd_calls = TRUE,
+  indent_cnds = include_summary,
+  # call info
   .call = caller_call()
 ) {
   # output as cli_bullets
   if (nrow(conditions) > 0) {
-    summarize_and_format_cnds(conditions, ..., .call = .call) |>
+    summarize_and_format_cnds(
+      conditions,
+      include_symbol = include_symbol,
+      include_summary = include_summary,
+      include_call = include_call,
+      summary_format = summary_format,
+      message = message,
+      include_cnds = include_cnds,
+      include_cnd_calls = include_cnd_calls,
+      .call = .call
+    ) |>
       cli_bullets() |>
       # add this to make multiline text more compact (instead of individual paragraphs)
       cli()
@@ -354,9 +374,17 @@ show_cnds <- function(
 # only aborts if there are any conditions at all
 abort_cnds <- function(
   conditions,
-  ...,
+  # for summarize_cnds
   include_symbol = FALSE,
+  include_summary = TRUE,
   include_call = FALSE,
+  summary_format = "{message} {issues}",
+  message = NULL,
+  # for format_cnds
+  include_cnds = TRUE,
+  include_cnd_calls = TRUE,
+  indent_cnds = include_summary,
+  # call and envinfo
   .call = caller_call(),
   .env = caller_env()
 ) {
@@ -364,9 +392,13 @@ abort_cnds <- function(
   if (nrow(conditions) > 0) {
     summarize_and_format_cnds(
       conditions,
-      ...,
       include_symbol = include_symbol,
+      include_summary = include_summary,
       include_call = include_call,
+      summary_format = summary_format,
+      message = message,
+      include_cnds = include_cnds,
+      include_cnd_calls = include_cnd_calls,
       .call = .call
     ) |>
       cli_abort(
