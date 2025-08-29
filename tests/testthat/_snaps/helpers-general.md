@@ -42,15 +42,16 @@
     Code
       test_info(conditions = conditions[1, ])
     Message
-      !  test_info() done with x = 5 but encountered 1 warning > wrap_f(): my warning
+      !  test_info() done with x = 5 but encountered 1 warning
+        > ! in wrap_f(): my warning
 
 ---
 
     Code
       test_info(conditions = conditions[2, ])
     Message
-      x test_info() done with x = 5 but encountered 1 error > internal_func(): my
-      error
+      x test_info() done with x = 5 but encountered 1 error
+        > x in internal_func(): my error
 
 ---
 
@@ -116,15 +117,16 @@
     Code
       test_info(conditions = conditions[1, ])
     Message
-      [33m![39m [1mtest_info()[22m done with [32mx = 5[39m but encountered [33m1 warning[39m → [1mwrap_f()[22m: my warning
+      [33m![39m [1mtest_info()[22m done with [32mx = 5[39m but encountered [33m1 warning[39m
+        → [33m![39m in [1mwrap_f()[22m: my warning
 
 ---
 
     Code
       test_info(conditions = conditions[2, ])
     Message
-      [31m✖[39m [1mtest_info()[22m done with [32mx = 5[39m but encountered [31m1 error[39m → [1minternal_func()[22m: my
-      error
+      [31m✖[39m [1mtest_info()[22m done with [32mx = 5[39m but encountered [31m1 error[39m
+        → [31m✖[39m in [1minternal_func()[22m: my error
 
 ---
 

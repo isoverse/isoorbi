@@ -5,7 +5,8 @@
     Message
       !  loaded 6 peaks for 1 compound (NO3-) with 6 isotopocules (15N, 17O, 18O,
       15N18O, 17O18O, and 18O18O) from 'missing_column.isox' but encountered 1
-      warning > The following named parsers don't match the column names: tic
+      warning
+        > ! The following named parsers don't match the column names: tic
     Condition
       Error in `orbi_read_isox()`:
       ! missing required column: tic
@@ -41,7 +42,8 @@
     Message
       [33m![39m loaded 6 peaks for 1 compound ([32mNO3-[39m) with 6 isotopocules ([32m15N[39m, [32m17O[39m, [32m18O[39m,
       [32m15N18O[39m, [32m17O18O[39m, and [32m18O18O[39m) from [34mmissing_column.isox[39m but encountered [33m1[39m
-      [33mwarning[39m → The following named parsers don't match the column names: tic
+      [33mwarning[39m
+        → [33m![39m The following named parsers don't match the column names: tic
     Condition
       [1m[33mError[39m in `orbi_read_isox()`:[22m
       [1m[22m[33m![39m missing required column: [32mtic[39m
