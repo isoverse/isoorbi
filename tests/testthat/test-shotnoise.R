@@ -4,69 +4,42 @@
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 # orbi_analyze_shot_noise
-test_that("orbi_analyze_shot_noise() tests", {
-  # failure
-  expect_error(
-    orbi_analyze_shot_noise(),
-    "need a `dataset` data frame",
-    fixed = TRUE
-  )
+test_that("orbi_analyze_shot_noise()", {
+  # errors
+  orbi_analyze_shot_noise() |> expect_error("must be a data frame")
+  orbi_analyze_shot_noise(42) |> expect_error("must be a data frame")
+  orbi_analyze_shot_noise(mtcars) |> expect_error("columns.*are missing")
 
-  expect_error(
-    orbi_analyze_shot_noise(42),
-    "need a `dataset` data frame",
-    fixed = TRUE
-  )
-
+  # test data
   df <- orbi_read_isox(system.file(
     "extdata",
     "testfile_dual_inlet.isox",
     package = "isoorbi"
   )) |>
     suppressMessages()
-
-  df_2 <- subset(df, select = -filename)
-
-  expect_error(
-    orbi_analyze_shot_noise(df_2),
-    "`dataset` requires columns `filename`, `compound` and `isotopocule`",
-    fixed = TRUE
-  )
 
   df_results <-
     df |>
     # define base peak
     orbi_define_basepeak("15N") |>
     suppressMessages()
-  df_results2 <- subset(df_results, select = -basepeak_ions)
 
   expect_error(
-    orbi_calculate_ratios(df_results2),
+    df_results |> select(-"basepeak_ions") |> orbi_calculate_ratios(),
     "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
     fixed = TRUE
   )
 
   # success
-
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
-    orbi_simplify_isox() |>
-    orbi_define_basepeak(basepeak_def = "15N") |>
-    suppressMessages()
-
-  expect_true(is.tbl(orbi_analyze_shot_noise(df))) |>
-    suppressMessages()
-
-  expect_type(orbi_analyze_shot_noise(df), "list") |>
-    suppressMessages()
+  expect_message(
+    out <- orbi_analyze_shot_noise(df_results),
+    "analyzed the shot noise"
+  )
 })
 
 # orbi_plot_shot_noise
 
-test_that("orbi_plot_shot_noise() tests", {
+test_that("orbi_plot_shot_noise()", {
   # failure
   expect_error(orbi_plot_shot_noise(), "shotnoise.* must be a data frame")
 
@@ -100,17 +73,13 @@ test_that("orbi_plot_shot_noise() tests", {
     fixed = TRUE
   )
 
-  df_2 <- subset(df, select = -filename)
-
   expect_error(
-    orbi_plot_shot_noise(df_2),
+    df |> select(-"filename") |> orbi_plot_shot_noise(),
     "column.*filename.*is missing from.*shotnoise"
   )
 
-  df_2 <- subset(df, select = -ratio_rel_se.permil)
-
   expect_error(
-    orbi_plot_shot_noise(df_2),
+    df |> select(-"ratio_rel_se.permil") |> orbi_plot_shot_noise(),
     "requires columns.*make sure to run.*orbi_analyze_shot_noise()"
   )
 
