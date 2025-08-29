@@ -423,7 +423,7 @@
     Code
       cli_bullets(summarize_and_format_cnds(out$conditions, .call = NULL))
     Message
-      x 3 warnings and 1 error
+      x encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -436,7 +436,7 @@
     Code
       test_summarize_and_format_cnds()
     Message
-      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+      x in test_summarize_and_format_cnds(): encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -449,7 +449,7 @@
     Code
       test_summarize_and_format_cnds(include_symbol = FALSE)
     Message
-      in test_summarize_and_format_cnds(): 3 warnings and 1 error
+      in test_summarize_and_format_cnds(): encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -474,7 +474,7 @@
     Code
       test_summarize_and_format_cnds(include_call = FALSE)
     Message
-      x 3 warnings and 1 error
+      x encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -487,7 +487,7 @@
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[1:3, ])
     Message
-      ! in test_summarize_and_format_cnds(): 3 warnings
+      ! in test_summarize_and_format_cnds(): encountered 3 warnings
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -499,14 +499,15 @@
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[1, ])
     Message
-      ! in test_summarize_and_format_cnds(): 1 warning > wrap_f(): we're here!
+      ! in test_summarize_and_format_cnds(): encountered 1 warning > wrap_f(): we're
+      here!
 
 ---
 
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[3, ])
     Message
-      ! in test_summarize_and_format_cnds(): 1 warning
+      ! in test_summarize_and_format_cnds(): encountered 1 warning
         > ! in my_f(): long trouble! This sentences is easily longer than a single
         line in standard line width and therefore needs a sensible linebreak
         somewhere along the way.
@@ -516,21 +517,22 @@
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[c(), ])
     Message
-      v in test_summarize_and_format_cnds(): no issues
+      v in test_summarize_and_format_cnds(): encountered no issues
 
 ---
 
     Code
       test_summarize_and_format_cnds(include_cnds = FALSE)
     Message
-      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+      x in test_summarize_and_format_cnds(): encountered 3 warnings and 1 error
 
 ---
 
     Code
       test_summarize_and_format_cnds(message = "even more {fun}")
     Message
-      x in test_summarize_and_format_cnds(): even more {fun} 3 warnings and 1 error
+      x in test_summarize_and_format_cnds(): even more {fun} encountered 3 warnings
+      and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -543,7 +545,8 @@
     Code
       test_summarize_and_format_cnds(message = format_inline("another {.field field}"))
     Message
-      x in test_summarize_and_format_cnds(): another field 3 warnings and 1 error
+      x in test_summarize_and_format_cnds(): another field encountered 3 warnings and
+      1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -569,7 +572,7 @@
     Code
       test_summarize_and_format_cnds(include_cnd_calls = FALSE)
     Message
-      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+      x in test_summarize_and_format_cnds(): encountered 3 warnings and 1 error
         > ! we're here!
         > ! no context {value}
         > ! long trouble! This sentences is easily longer than a single line in
@@ -582,7 +585,7 @@
     Code
       test_summarize_and_format_cnds(indent_cnds = FALSE)
     Message
-      x in test_summarize_and_format_cnds(): 3 warnings and 1 error
+      x in test_summarize_and_format_cnds(): encountered 3 warnings and 1 error
       ! in wrap_f(): we're here!
       ! no context {value}
       ! in my_f(): long trouble! This sentences is easily longer than a single line
@@ -595,7 +598,7 @@
     Code
       cli_bullets(summarize_and_format_cnds(out$conditions, .call = NULL))
     Message
-      [31m✖[39m [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -608,7 +611,7 @@
     Code
       test_summarize_and_format_cnds()
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -621,7 +624,7 @@
     Code
       test_summarize_and_format_cnds(include_symbol = FALSE)
     Message
-      in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      in [1mtest_summarize_and_format_cnds()[22m: encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -646,7 +649,7 @@
     Code
       test_summarize_and_format_cnds(include_call = FALSE)
     Message
-      [31m✖[39m [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -659,7 +662,7 @@
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[1:3, ])
     Message
-      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m
+      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m3 warnings[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -671,14 +674,15 @@
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[1, ])
     Message
-      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m1 warning[39m → [1mwrap_f()[22m: we're here!
+      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m1 warning[39m → [1mwrap_f()[22m: we're
+      here!
 
 ---
 
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[3, ])
     Message
-      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: [33m1 warning[39m
+      [33m![39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m1 warning[39m
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
         line in standard line width and therefore needs a sensible linebreak
         somewhere along the way.
@@ -688,21 +692,22 @@
     Code
       test_summarize_and_format_cnds(conditions = out$conditions[c(), ])
     Message
-      [32m✔[39m in [1mtest_summarize_and_format_cnds()[22m: [32mno issues[39m
+      [32m✔[39m in [1mtest_summarize_and_format_cnds()[22m: encountered [32mno issues[39m
 
 ---
 
     Code
       test_summarize_and_format_cnds(include_cnds = FALSE)
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m3 warnings[39m and [31m1 error[39m
 
 ---
 
     Code
       test_summarize_and_format_cnds(message = "even more {fun}")
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: even more {fun} [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: even more {fun} encountered [33m3 warnings[39m
+      and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -715,7 +720,8 @@
     Code
       test_summarize_and_format_cnds(message = format_inline("another {.field field}"))
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: another [32mfield[39m [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: another [32mfield[39m encountered [33m3 warnings[39m and
+      [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -741,7 +747,7 @@
     Code
       test_summarize_and_format_cnds(include_cnd_calls = FALSE)
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m we're here!
         → [33m![39m no context {value}
         → [33m![39m long trouble! This sentences is easily longer than a single line in
@@ -754,7 +760,7 @@
     Code
       test_summarize_and_format_cnds(indent_cnds = FALSE)
     Message
-      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_summarize_and_format_cnds()[22m: encountered [33m3 warnings[39m and [31m1 error[39m
       [33m![39m in [1mwrap_f()[22m: we're here!
       [33m![39m no context {value}
       [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single line
@@ -767,7 +773,7 @@
     Code
       show_cnds(out$conditions, .call = NULL)
     Message
-      x 3 warnings and 1 error
+      x encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -780,7 +786,7 @@
     Code
       test_show_cnds()
     Message
-      x in test_show_cnds(): 3 warnings and 1 error
+      x in test_show_cnds(): encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -793,7 +799,7 @@
     Code
       show_cnds(out$conditions, .call = NULL)
     Message
-      [31m✖[39m [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -806,7 +812,7 @@
     Code
       test_show_cnds()
     Message
-      [31m✖[39m in [1mtest_show_cnds()[22m: [33m3 warnings[39m and [31m1 error[39m
+      [31m✖[39m in [1mtest_show_cnds()[22m: encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -820,7 +826,7 @@
       abort_cnds(out$conditions, .call = NULL)
     Condition
       Error:
-      ! 3 warnings and 1 error
+      ! encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -834,7 +840,7 @@
       test_abort_cnds()
     Condition
       Error in `test_abort_cnds()`:
-      ! 3 warnings and 1 error
+      ! encountered 3 warnings and 1 error
         > ! in wrap_f(): we're here!
         > ! no context {value}
         > ! in my_f(): long trouble! This sentences is easily longer than a single
@@ -848,7 +854,7 @@
       abort_cnds(out$conditions, .call = NULL)
     Condition
       [1m[33mError[39m:[22m
-      [1m[22m[33m![39m [33m3 warnings[39m and [31m1 error[39m
+      [1m[22m[33m![39m encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single
@@ -862,7 +868,7 @@
       test_abort_cnds()
     Condition
       [1m[33mError[39m in `test_abort_cnds()`:[22m
-      [1m[22m[33m![39m [33m3 warnings[39m and [31m1 error[39m
+      [1m[22m[33m![39m encountered [33m3 warnings[39m and [31m1 error[39m
         → [33m![39m in [1mwrap_f()[22m: we're here!
         → [33m![39m no context {value}
         → [33m![39m in [1mmy_f()[22m: long trouble! This sentences is easily longer than a single

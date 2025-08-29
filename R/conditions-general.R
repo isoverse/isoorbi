@@ -259,6 +259,7 @@ format_cnds <- function(
 # @inheritParams summarize_cnds
 # @inheritParams format_cnds
 # @param include_cnds whether to show the cnds
+# @param collapse_single_line_cnd - collapse cnd onto the summary line if there's only one
 # @return empty vector unless there's either a summary message OR at least 1 condition
 summarize_and_format_cnds <- function(
   conditions,
@@ -266,12 +267,13 @@ summarize_and_format_cnds <- function(
   include_symbol = TRUE,
   include_summary = TRUE,
   include_call = include_summary,
-  summary_format = "{message} {issues}",
+  summary_format = "{message} encountered {issues}",
   message = NULL,
   # for format_cnds
   include_cnds = TRUE,
   include_cnd_calls = TRUE,
   indent_cnds = include_summary,
+  collapse_single_line_cnd = TRUE,
   .call = caller_call()
 ) {
   # safety
@@ -308,7 +310,9 @@ summarize_and_format_cnds <- function(
       )
 
     # if the cnds are a single line long --> combine with summary
-    if (include_summary && length(formatted_cnds) == 1) {
+    if (
+      collapse_single_line_cnd && include_summary && length(formatted_cnds) == 1
+    ) {
       formatted_cnds <- c()
       summary_line <-
         c(
@@ -341,12 +345,13 @@ show_cnds <- function(
   include_symbol = TRUE,
   include_summary = TRUE,
   include_call = include_summary,
-  summary_format = "{message} {issues}",
+  summary_format = "{message} encountered {issues}",
   message = NULL,
   # for format_cnds
   include_cnds = TRUE,
   include_cnd_calls = TRUE,
   indent_cnds = include_summary,
+  collapse_single_line_cnd = FALSE,
   # call info
   .call = caller_call()
 ) {
@@ -361,6 +366,7 @@ show_cnds <- function(
       message = message,
       include_cnds = include_cnds,
       include_cnd_calls = include_cnd_calls,
+      collapse_single_line_cnd = collapse_single_line_cnd,
       .call = .call
     ) |>
       cli_bullets() |>
@@ -378,12 +384,13 @@ abort_cnds <- function(
   include_symbol = FALSE,
   include_summary = TRUE,
   include_call = FALSE,
-  summary_format = "{message} {issues}",
+  summary_format = "{message} encountered {issues}",
   message = NULL,
   # for format_cnds
   include_cnds = TRUE,
   include_cnd_calls = TRUE,
   indent_cnds = include_summary,
+  collapse_single_line_cnd = FALSE,
   # call and envinfo
   .call = caller_call(),
   .env = caller_env()
@@ -399,6 +406,7 @@ abort_cnds <- function(
       message = message,
       include_cnds = include_cnds,
       include_cnd_calls = include_cnd_calls,
+      collapse_single_line_cnd = collapse_single_line_cnd,
       .call = .call
     ) |>
       cli_abort(
