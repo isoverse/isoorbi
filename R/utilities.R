@@ -115,7 +115,10 @@ orbi_flag_satellite_peaks <- function(dataset) {
     try_catch_cnds()
 
   # abort if issues
-  abort_cnds(out$conditions)
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong tying to flag satellite peaks:"
+  )
   dataset <- out$result
 
   # info
@@ -234,7 +237,10 @@ orbi_flag_weak_isotopocules <-
       try_catch_cnds()
 
     # stop if there are errors
-    abort_cnds(out$conditions)
+    abort_cnds(
+      out$conditions,
+      message = "something went wrong flagging weak isotopocules:"
+    )
     dataset_out <- out$result
 
     # info
@@ -411,7 +417,10 @@ orbi_flag_outliers <- function(
   )
 
   # stop if error
-  abort_cnds(out$conditions)
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong flagging outliers:"
+  )
   dataset_out <- out$result
 
   # dataset outlier and type update
@@ -678,17 +687,17 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
           )
         } else {
           # some other error
-          abort(
-            "something went wrong identifying the base peak for each scan",
-            abort(parent = p, call = expr(mutate()))
-          )
+          abort(parent = p, call = expr(mutate()))
         }
       }
     ) |>
     try_catch_cnds()
 
   # abort if issues
-  abort_cnds(out$conditions)
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong identifying the base peak:"
+  )
 
   # remove basepeak from isotopocule list
   out <-
@@ -698,7 +707,10 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     try_catch_cnds()
 
   # abort if issues
-  abort_cnds(out$conditions)
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong removing the base peak isotopocule:"
+  )
 
   # calculate ratios (only if no error yet)
   out <-
@@ -710,7 +722,10 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     try_catch_cnds()
 
   # abort if issues
-  abort_cnds(out$conditions)
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating ratios:"
+  )
 
   # result
   df.out <- out$result
