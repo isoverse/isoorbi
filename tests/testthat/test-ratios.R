@@ -274,7 +274,7 @@ test_that("orbi_calculate_summarized_ratio()", {
       denominator = vector("numeric", 1),
       "direct"
     ),
-    "`numerator` and `denominator` must be vectors of equal length"
+    "something went wrong calculating ratios"
   )
 
   expect_error(
@@ -331,10 +331,10 @@ test_that("orbi_calculate_ratios()", {
     fixed = TRUE
   )
 
-  df_results2 <- select(df_results, -"basepeak_ions")
-
   expect_error(
-    orbi_calculate_ratios(df_results2),
+    df_results |>
+      select(-"basepeak_ions") |>
+      orbi_calculate_ratios(),
     "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
     fixed = TRUE
   )

@@ -35,15 +35,21 @@ orbi_calculate_ratios <- function(dataset) {
   # mutate
   dataset <- dataset |> factorize_dataset("isotopocule")
 
-  dataset <-
-    try_catch_all(
+  out <-
+    try_catch_cnds(
       dataset |>
         dplyr::mutate(
           ratio = .data$ions.incremental / .data$basepeak_ions,
           .after = "ions.incremental"
-        ),
-      "something went wrong calculating ratios: "
+        )
     )
+
+  # abort if errors
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating ratios:"
+  )
+  dataset <- out$result
 
   # info message
   sprintf(
@@ -78,10 +84,13 @@ calculate_ratios_sem <- function(ratios) {
   )
 
   # calculation
-  try_catch_all(
-    stats::sd(ratios) / sqrt(length(ratios)),
-    "something went wrong calculating the standard error: "
+  out <- try_catch_cnds(stats::sd(ratios) / sqrt(length(ratios)))
+
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating the standard error:"
   )
+  out$result
 }
 
 # @title Internal function to calculate geometric mean
@@ -98,10 +107,13 @@ calculate_ratios_gmean <- function(ratios) {
   )
 
   # calculation
-  try_catch_all(
-    exp(mean(log(ratios))),
-    "something went wrong calculating the geometic mean: "
+  out <- try_catch_cnds(exp(mean(log(ratios))))
+
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating the geometic mean:"
   )
+  out$result
 }
 
 
@@ -122,10 +134,15 @@ calculate_ratios_gsd <- function(ratios) {
       1L
   )
 
-  try_catch_all(
-    exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios))),
-    "something went wrong calculating geometric standard deviaton: "
+  out <- try_catch_cnds(
+    exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios)))
   )
+
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating geometric standard deviaton:"
+  )
+  out$result
 }
 
 # @title Internal function to calculate standard error (geometric)
@@ -145,11 +162,16 @@ calculate_ratios_gse <- function(ratios) {
       1L
   )
 
-  try_catch_all(
+  out <- try_catch_cnds(
     (exp(mean(log(ratios)) + stats::sd(log(ratios))) - exp(mean(log(ratios)))) /
-      sqrt(length(ratios)),
-    "something went wrong calculating the geometric standard error: "
+      sqrt(length(ratios))
   )
+
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating the geometric standard error:"
+  )
+  out$result
 }
 
 # @title Internal function for ratio_method `slope`
@@ -179,12 +201,17 @@ calculate_ratios_slope <- function(x, y) {
     "`x` and `y` need to be vectors of equal length" = length(x) == length(y)
   )
 
-  model <-
-    try_catch_all(
+  out <-
+    try_catch_cnds(
       # Note order of x and y to get correct slope!
-      stats::lm(x ~ y + 0, weights = x),
-      "something went wrong calculating the ratio as slope using a linear model: "
+      stats::lm(x ~ y + 0, weights = x)
     )
+
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating the ratio as slope using a linear model:"
+  )
+  model <- out$result
 
   sl <- model$coefficients[[1]]
 
@@ -228,14 +255,17 @@ calculate_ratios_weighted_sum <- function(x, y) {
   weighted.x <- avg.ions / scan.ions * as.numeric(df[, 1])
   weighted.y <- avg.ions / scan.ions * as.numeric(df[, 2])
 
-  ratio <-
-    try_catch_all(
+  out <-
+    try_catch_cnds(
       # Note order of x and y to get correct slope!
-      sum(weighted.x) / sum(weighted.y),
-      "something went wrong calculating the ratio from weighted sums: "
+      sum(weighted.x) / sum(weighted.y)
     )
 
-  return(ratio)
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating the ratio from weighted sums:"
+  )
+  out$result
 }
 
 
@@ -305,8 +335,8 @@ orbi_calculate_summarized_ratio <- function(
   )
 
   # calculation
-  o <-
-    try_catch_all(
+  out <-
+    try_catch_cnds(
       {
         if (ratio_method == "direct") {
           stopifnot(
@@ -331,11 +361,14 @@ orbi_calculate_summarized_ratio <- function(
         } else {
           rlang::arg_match(ratio_method)
         }
-      },
-      "something went wrong calculating ratios:",
-      newline = FALSE
+      }
     )
-  return(o)
+
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong calculating ratios:"
+  )
+  out$result
 }
 
 #' @title Generate the results table
