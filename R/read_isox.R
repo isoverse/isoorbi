@@ -331,16 +331,11 @@ orbi_filter_isox <-
 
     # info
     n_row_start <- nrow(dataset)
-    start <-
-      sprintf(
-        "orbi_filter_isox() is filtering the dataset by %s... ",
-        paste(filters, collapse = ", ")
-      ) |>
-      start_info()
+    start <- start_info("is running")
 
     # filtering
-    dataset <-
-      try_catch_all(
+    out <-
+      try_catch_cnds(
         {
           # file: filenames
           if (!is.null(filenames)) {
@@ -370,13 +365,19 @@ orbi_filter_isox <-
 
           # return
           dataset
-        },
-        "something went wrong trying to filter dataset: "
+        }
       )
+
+    # stop for errors
+    abort_cnds(
+      out$conditions,
+      message = "something went wrong trying to filter dataset:"
+    )
+    dataset <- out$result
 
     # info
     sprintf(
-      "removed %d/%d rows (%.1f%%)",
+      "filtered the dataset by {.field {filters}} and removed a total of %d/%d rows (%.1f%%)",
       n_row_start - nrow(dataset),
       n_row_start,
       (n_row_start - nrow(dataset)) / n_row_start * 100
