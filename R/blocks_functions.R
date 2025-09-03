@@ -46,9 +46,9 @@ orbi_define_block_for_flow_injection <- function(
   set_by_scan <- !rlang::is_empty(start_scan.no) &&
     !rlang::is_empty(end_scan.no)
   if (set_by_time && set_by_scan) {
-    abort("block definition can either be by time or by scan but not both")
+    cli_abort("block definition can either be by time or by scan but not both")
   } else if (!set_by_time && !set_by_scan) {
-    abort(
+    cli_abort(
       "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`"
     )
   }
@@ -58,17 +58,16 @@ orbi_define_block_for_flow_injection <- function(
     dataset |>
     factorize_dataset("filename") |>
     dplyr::mutate(..row_id = dplyr::row_number())
-  start_time <-
-    sprintf(
-      "orbi_define_block_for_flow_injection() is adding new block (%s) to %d files... ",
-      if (set_by_time) {
-        sprintf("%s to %s min", start_time.min, end_time.min)
-      } else {
-        sprintf("scan %s to %s", start_scan.no, end_scan.no)
-      },
-      length(levels(dataset$filename))
-    ) |>
-    message_start()
+
+  block_info <-
+    if (set_by_time) {
+      sprintf("%s to %s min", start_time.min, end_time.min)
+    } else {
+      sprintf("scan %s to %s", start_scan.no, end_scan.no)
+    }
+  start <- start_info(
+    "is adding new block ({block_info}) to {length(levels(dataset$filename))} files"
+  )
 
   # get scans with blocks and data types from the data set
   scans <- dataset |>
@@ -128,8 +127,8 @@ orbi_define_block_for_flow_injection <- function(
     tidyr::unnest("data")
 
   # actualize changes
-  scans <-
-    try_catch_all(
+  out <-
+    try_catch_cnds(
       scans |>
         # introduce updated segment, block, data type and sample_name
         dplyr::mutate(
@@ -152,20 +151,22 @@ orbi_define_block_for_flow_injection <- function(
           segment = NA_integer_
         ) |>
         # determine data groups
-        determine_data_groups(),
-      "error trying to update scan blocks:"
+        determine_data_groups()
     )
+
+  abort_cnds(out$conditions, message = "error trying to update scan blocks")
+  scans <- out$result
 
   # NOTE: should this provide more information and/or allow an argument to make
   # the new plot definition flexible? (snap_to_blocks = TRUE?)
   if (any(scans$block > 0L & scans$new_block > scans$block)) {
     cat("\n")
-    abort("new block definition overlaps with existing block")
+    cli_abort("new block definition overlaps with existing block")
   }
 
   # combine with the whole dataset
-  updated_dataset <-
-    try_catch_all(
+  out <-
+    try_catch_cnds(
       dataset |>
         dplyr::select(
           -dplyr::any_of(c(
@@ -188,12 +189,21 @@ orbi_define_block_for_flow_injection <- function(
               "segment"
             ),
           by = c("filename", "scan.no")
-        ),
-      "error trying to update dataset with new block: "
+        )
     )
 
+  # stop if errors
+  abort_cnds(
+    out$conditions,
+    message = "error trying to update dataset with new block"
+  )
+  updated_dataset <- out$result
+
   # info
-  message_finish("complete", start_time = start_time)
+  finish_info(
+    "added a new block ({block_info}) to {length(levels(dataset$filename))} files",
+    start = start
+  )
 
   # return updated dataset (original row order restored)
   return(
@@ -271,9 +281,7 @@ orbi_define_blocks_for_dual_inlet <- function(
   }
 
   # info message
-  start_time <- message_start(
-    "orbi_define_blocks_for_dual_inlet() is assessing block structure... "
-  )
+  start <- start_info("is running")
 
   # get blocks
   blocks <- dataset |>
@@ -333,20 +341,14 @@ orbi_define_blocks_for_dual_inlet <- function(
     determine_data_groups()
 
   # info message
-  sprintf(
-    "identified %d blocks (%s '%s', %s '%s') in data from %d file(s)",
-    blocks |> dplyr::filter(.data$block > 0) |> nrow(),
-    blocks |>
-      dplyr::filter(.data$block > 0, .data$sample_name == ref_block_name) |>
-      nrow(),
-    ref_block_name,
-    blocks |>
-      dplyr::filter(.data$block > 0, .data$sample_name == sample_block_name) |>
-      nrow(),
-    sample_block_name,
-    blocks |> dplyr::select("filename") |> dplyr::distinct() |> nrow()
-  ) |>
-    message_finish(start_time = start_time)
+  finish_info(
+    "identified {blocks |> dplyr::filter(.data$block > 0) |> nrow()} blocks ",
+    "({blocks |> dplyr::filter(.data$block > 0, .data$sample_name == ref_block_name) |> nrow()} {.field {ref_block_name}}, ",
+    "{blocks |> dplyr::filter(.data$block > 0, .data$sample_name == sample_block_name) |> nrow()} {.field {sample_block_name}}) ",
+    "in data from ",
+    "{blocks |> dplyr::select('filename') |> dplyr::distinct() |> nrow()} file{?s}",
+    start = start
+  )
 
   # combine with the whole dataset
   dataset_with_blocks <-
@@ -519,6 +521,9 @@ orbi_adjust_block <- function(
     )
   }
 
+  # start info
+  start <- start_info("is running")
+
   # find old start/end
   block_scans <- file_scans |>
     dplyr::filter(
@@ -597,66 +602,68 @@ orbi_adjust_block <- function(
 
   # any changes?
   if (!change_start && !change_end) {
-    sprintf(
-      "orbi_adjust_block() is not making any changes to block %d in file %s as no actual changes were requested",
-      block,
-      filename
-    ) |>
-      message_standalone()
+    finish_info(
+      "made no changes to block {block} in file {.file {filename}} as no actual changes were requested",
+      start = start
+    )
     return(dataset)
   }
 
   # info message for changes
-  sprintf(
-    "orbi_adjust_block() is making the following block adjustments in file %s:",
-    filename
-  ) |>
-    message_standalone()
+  finish_info(
+    "made the following {.field block} adjustments in file {.file {filename}}:",
+    start = start
+  )
 
   if (change_start) {
     sprintf(
-      " - moving block %d start from scan %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} start from scan %d (%.2f min) to %d (%.2f min)",
       block,
       old_start_scan,
       old_start_time,
       new_start_scan,
       new_start_time
     ) |>
-      message_standalone()
+      setNames(" ") |>
+      cli_bullets()
   }
   if (change_end) {
     sprintf(
-      " - moving block %d end from scan %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} end from scan %d (%.2f min) to %d (%.2f min)",
       block,
       old_end_scan,
       old_end_time,
       new_end_scan,
       new_end_time
     ) |>
-      message_standalone()
+      setNames(" ") |>
+      cli_bullets()
   }
   if (new_start_row$block < block) {
     sprintf(
-      " - moving block %d end to the new start of block %d",
+      "{cli::symbol$arrow_right} moved {.field block %d} end to the new start of {.field block %d}",
       new_start_row$block,
       block
     ) |>
-      message_standalone()
+      setNames(" ") |>
+      cli_bullets()
   }
   if (new_end_row$block > block) {
     sprintf(
-      " - moving block %d start to the new end of block %d",
+      "{cli::symbol$arrow_right} moved {.field block %d} start to the new end of {.field block %d}",
       new_end_row$block,
       block
     ) |>
-      message_standalone()
+      setNames(" ") |>
+      cli_bullets()
   }
   if (length(removed_blocks) > 0) {
     sprintf(
-      " - removing block %s entirely, as a result of the block adjustments",
+      "{cli::symbol$arrow_right} removed {.field block %d} entirely, as a result of the block adjustments",
       paste(removed_blocks, collapse = " / ")
     ) |>
-      message_standalone()
+      setNames(" ") |>
+      cli_bullets()
   }
 
   # actualize changes
@@ -797,17 +804,7 @@ orbi_segment_blocks <- function(
 
   # info
   dataset <- dataset |> factorize_dataset("filename")
-  start_time <-
-    sprintf(
-      "orbi_segment_blocks() is segmenting %d data blocks in %d file(s)... ",
-      dataset |>
-        dplyr::filter(.data$block > 0) |>
-        dplyr::select("filename", "block") |>
-        dplyr::distinct() |>
-        nrow(),
-      length(levels(dataset$filename))
-    ) |>
-    message_start()
+  start <- start_info("is running")
 
   # get scans
   scans <- dataset |>
@@ -854,12 +851,21 @@ orbi_segment_blocks <- function(
       n_scans_avg = mean(n),
       .groups = "drop"
     )
-  sprintf(
-    "created %s segments / block (on average) with %s scans / segment (on average)",
-    info_sum$n_segments |> mean() |> signif(2),
-    info_sum$n_scans_avg |> mean() |> signif(2)
-  ) |>
-    message_finish(start_time = start_time)
+
+  n_blocks <- dataset |>
+    dplyr::filter(.data$block > 0) |>
+    dplyr::select("filename", "block") |>
+    dplyr::distinct() |>
+    nrow()
+  finish_info(
+    "segmented {.field {n_blocks} data block{?s}} ",
+    "in {.file {length(levels(dataset$filename))} file{?s}} ",
+    "creating {info_sum$n_segments |> mean() |> signif(2)} ",
+    "segments per block (on average) with ",
+    "{info_sum$n_scans_avg |> mean() |> signif(2)} ",
+    "scans per segment (on average)",
+    start = start
+  )
 
   # combine with the whole dataset
   updated_dataset <-
