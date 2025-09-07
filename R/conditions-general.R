@@ -357,21 +357,26 @@ show_cnds <- function(
 ) {
   # output as cli_bullets
   if (nrow(conditions) > 0) {
-    summarize_and_format_cnds(
-      conditions,
-      include_symbol = include_symbol,
-      include_summary = include_summary,
-      include_call = include_call,
-      summary_format = summary_format,
-      message = message,
-      include_cnds = include_cnds,
-      include_cnd_calls = include_cnd_calls,
-      collapse_single_line_cnd = collapse_single_line_cnd,
-      .call = .call
-    ) |>
-      cli_bullets() |>
-      # add this to make multiline text more compact (instead of individual paragraphs)
-      cli()
+    output <-
+      summarize_and_format_cnds(
+        conditions,
+        include_symbol = include_symbol,
+        include_summary = include_summary,
+        include_call = include_call,
+        summary_format = summary_format,
+        message = message,
+        include_cnds = include_cnds,
+        include_cnd_calls = include_cnd_calls,
+        collapse_single_line_cnd = collapse_single_line_cnd,
+        .call = .call
+      )
+    if (is_interactive()) {
+      # use bullets in interactive to work with progress bars
+      cli_bullets(output)
+    } else {
+      # add cli in notebooks to make multiline text more compact (instead of individual paragraphs)
+      cli(cli_bullets(output))
+    }
   }
 }
 
