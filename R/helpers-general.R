@@ -82,6 +82,8 @@ start_info <- function(
   pb_type = "tasks",
   pb_total = NA,
   pb_extra = NULL,
+  pb_status = NULL,
+  show_progress = rlang::is_interactive(),
   .env = caller_env(),
   .call = caller_call()
 ) {
@@ -106,18 +108,19 @@ start_info <- function(
   } else if (keep) {
     # message is permanent
     cli_text(c("{col_blue(cli::symbol$info)} ", msg), .envir = .env)
-  } else if (rlang::is_interactive()) {
+  } else if (show_progress) {
     # message is a progress bar (only in interactive mode)
     retval$pb <- cli_progress_bar(
       format = c("{cli::pb_spin} ", msg),
       type = pb_type,
-      total = pb_type,
+      total = pb_total,
       extra = pb_extra,
+      status = pb_status,
       # make sure it closes if process in .env fails
       .auto_close = TRUE,
       .envir = .env
     )
-    cli_progress_update(id = retval$pb, force = TRUE, .envir = .env)
+    cli_progress_update(id = retval$pb, inc = 0, force = TRUE, .envir = .env)
   }
   return(invisible(retval))
 }
@@ -136,6 +139,7 @@ finish_info <- function(
   start = list(pb = NULL, start_time = NULL),
   time = getOption("show_exec_times", default = TRUE),
   func = TRUE,
+  success_format = "{col_green(symbol$tick)} {msg}",
   conditions = tibble(),
   show_conditions = TRUE,
   abort_if_warnings = abort_if_errors,
@@ -204,6 +208,6 @@ finish_info <- function(
     )
   } else if (...length() > 0) {
     # success message
-    cli_text("{col_green(symbol$tick)} {msg}")
+    cli_text(success_format)
   }
 }
