@@ -19,7 +19,7 @@ orbi_aggregate_raw <- function(
     files_data,
     aggregator,
     show_progress = show_progress,
-    show_problems = show_progress
+    show_problems = show_problems
   )
 }
 
@@ -44,15 +44,28 @@ orbi_get_data <- function(
   problems = NULL,
   by = c("uid", "scan")
 ) {
-  get_data(
+  spectra_quo <- enquo(spectra)
+  # get data
+  out <- get_data(
     .ds = aggregated_data,
     file_info = {{ file_info }},
     scans = {{ scans }},
     peaks = {{ peaks }},
-    spectra = {{ spectra }},
+    spectra = !!spectra_quo,
     problems = {{ problems }},
     by = by
   )
+  # warn about missing spectra
+  if (
+    !quo_is_null(spectra_quo) &&
+      "spectra" %in% names(aggregated_data) &&
+      nrow(aggregated_data$spectra) == 0
+  ) {
+    cli_text(
+      "{cli::col_yellow('!')} {.strong Warning}: there are no {.field spectra} in the data, make sure to include them when reading the raw files e.g. with {.strong orbi_read_raw(include_spectra = c(1, 10, 100))}"
+    )
+  }
+  return(out)
 }
 
 # design aggregators (general) =====
@@ -373,9 +386,9 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
   # check which datasets are available
   check_datasets <- function(aggregator) {
     if (length(missing <- setdiff(aggregator$dataset, names(datasets))) > 0) {
-      warning(format_inline(
+      cli_warn(
         "dataset{?s} {.var {missing}} do{?es/} not exist and will be skipped during aggregation"
-      ))
+      )
     }
     aggregator |> filter(!.data$dataset %in% missing)
   }
@@ -482,6 +495,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
         )
       }
     )
+
     return(value)
   }
 
@@ -502,6 +516,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     if (length(source) == 0) {
       return(list(result = default_value, conditions = NULL))
     }
+
     # run safely
     out <-
       try_catch_cnds(
@@ -512,6 +527,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     if (show_problems) {
       show_cnds(out$conditions)
     }
+
     return(out)
   }
 
@@ -520,8 +536,13 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     purrr::pmap(as.list(aggregator_applied), aggregation_wrapper)
 
   # separate call to simplify stack trace
+  # note: unnest_wider conflates integer()/numeric() with NULL and can NOT be used here
   aggregator_applied <- aggregator_applied |>
-    tidyr::unnest_wider("value", simplify = FALSE)
+    dplyr::mutate(
+      result = map(.data$value, `[[`, 1),
+      conditions = map(.data$value, `[[`, 2)
+    ) |>
+    dplyr::select(-"value")
 
   # get out uid
   uid <- filter(aggregator_applied, .data$column == "uid")$result[[1]]
@@ -549,6 +570,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
       out = list(.data$result |> setNames(.data$column) |> as_tibble())
     )
   datasets <- aggregator_summary$out |> setNames(aggregator_summary$dataset)
+
   problems <-
     dplyr::bind_rows(
       datasets$conditions,
@@ -694,18 +716,18 @@ get_data <- function(
 
   details <-
     if (length(selectors) == 1) {
-      sprintf("{cli::col_blue('%s')}", names(selectors))
+      sprintf("{.field %s}", names(selectors))
     } else {
-      sprintf("{cli::col_blue('%s')} (%s)", names(selectors), n_rows)
+      sprintf("{.field %s} (%s)", names(selectors), n_rows)
     }
   details <- details |> purrr::map_chr(format_inline)
 
   # info
   finish_info(
     "retrieved {prettyunits::pretty_num(nrow(out))} records from ",
-    if (length(selectors) > 0) "the combination of ",
+    if (length(selectors) > 1) "the combination of ",
     "{details}",
-    if (length(selectors) > 0) " via {.field {unique(unlist(join_bys))}}",
+    if (length(selectors) > 1) " via {.field {unique(unlist(join_bys))}}",
     start = start,
     .call = .call
     # don't pass parent .env since we want these glues to execute in THIS env

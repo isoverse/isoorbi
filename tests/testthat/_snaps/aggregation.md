@@ -19,15 +19,15 @@
     Code
       out <- test_run1()
     Message
-      [32m✔[39m [1mtest_run1()[22m retrieved 10 records from the combination of [34ma[39m (2), [34mb[39m (10), and
-      [34mdata[39m (10) via [32mid[39m and [32mx[39m
+      [32m✔[39m [1mtest_run1()[22m retrieved 10 records from the combination of [32ma[39m (2), [32mb[39m (10), and
+      [32mdata[39m (10) via [32mid[39m and [32mx[39m
 
 ---
 
     Code
       out <- test_run2()
     Message
-      [32m✔[39m [1mtest_run2()[22m retrieved 162 records from the combination of [34ma[39m (50) and [34mb[39m (50)
+      [32m✔[39m [1mtest_run2()[22m retrieved 162 records from the combination of [32ma[39m (50) and [32mb[39m (50)
       via [32mspeed[39m
 
 ---

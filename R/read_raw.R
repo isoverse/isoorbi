@@ -132,7 +132,7 @@ check_for_raw_reader <- function(
 #' @param file_paths paths to the `.raw` file(s), single value or vector of paths. Use [orbi_find_raw()] to get all raw files in a folder.
 #' @param show_progress whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with `show_progress = FALSE`
 #' @param show_problems whether to show problems encountered along the way (rather than just keeping track of them with [orbi_get_problems()]). Set to `show_problems = FALSE` to turn off the live printout. Either way, all encountered problems can be retrieved with running [orbi_get_problems()] for the returned list
-#' @param include_scan_spectra whether to include the spectral data from specific scans (e.g. `include_scan_spectra = c(5, 100, 200)`) or from all scans (`include_scan_spectra = TRUE`). Including many or all scan spectra makes the read process slower (especially if `cache_spectra = FALSE`) and the returned data frame tibble significantely larger. The default is `FALSE` (i.e. scan spectra are not returned).
+#' @param include_spectra whether to include the spectral data from specific scans (e.g. `include_spectra = c(5, 100, 200)` reads out the spectra from scans 5, 100, and 200 for each file if they exist) or from all scans (`include_spectra = TRUE`). Including many or all scan spectra makes the read process slower (especially if `cache_spectra = FALSE`) and the returned data frame tibble significantely larger. The default is `FALSE` (i.e. scan spectra are not returned).
 #' @param cache whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)
 #' @param cache_spectra whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as `cache`
 #' @param read_cache whether to read the file from cached .parquet files (if they exist) or anew
@@ -142,7 +142,7 @@ orbi_read_raw <- function(
   file_paths,
   show_progress = rlang::is_interactive(),
   show_problems = TRUE,
-  include_scan_spectra = FALSE,
+  include_spectra = FALSE,
   cache = TRUE,
   cache_spectra = cache,
   read_cache = TRUE
@@ -163,18 +163,18 @@ orbi_read_raw <- function(
   )
 
   # check what kind of spectra are requested
-  if (identical(include_scan_spectra, TRUE)) {
+  if (identical(include_spectra, TRUE)) {
     # all
     all_spectra <- TRUE
     select_spectra <- NULL
-  } else if (identical(include_scan_spectra, FALSE)) {
+  } else if (identical(include_spectra, FALSE)) {
     # none
     all_spectra <- FALSE
     select_spectra <- integer()
   } else {
     # some subset
     all_spectra <- FALSE
-    select_spectra <- as.integer(include_scan_spectra) |> na.omit()
+    select_spectra <- as.integer(include_spectra) |> na.omit()
   }
 
   # keep track of total time

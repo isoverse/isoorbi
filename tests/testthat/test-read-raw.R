@@ -79,23 +79,44 @@ test_that("orbi_read_raw() works", {
   expect_message(orbi_read_raw("DNE"), "encountered.*1 error") |>
     suppressMessages()
 
-  # succesful read
-  expect_message(
-    x <- system.file("extdata", package = "isoorbi") |>
-      orbi_find_raw() |>
-      orbi_read_raw(cache = FALSE, include_scan_spectra = 1),
-    "finished reading 2 files"
-  ) |>
-    suppressMessages()
-  expect_snapshot(x |> select(-"file_path"))
+  # succesful read without spectra (default)
+  expect_snapshot(
+    {
+      x <- system.file("extdata", package = "isoorbi") |>
+        orbi_find_raw() |>
+        orbi_read_raw(cache = FALSE, read_cache = FALSE)
+      x |>
+        select(-"file_path")
+    }
+  )
 
-  # plus aggregate
-  expect_message(
-    y <- orbi_aggregate_raw(x, show_progress = FALSE),
-    "aggregated"
-  ) |>
-    expect_snapshot()
+  # plus aggregate and get
+  expect_snapshot(y <- orbi_aggregate_raw(x, show_progress = FALSE))
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
   expect_snapshot(y)
-})
+  expect_snapshot(
+    y |> orbi_get_data(scans = everything(), spectra = everything())
+  )
+
+  # succesful read with spectra
+  expect_snapshot(
+    {
+      x <- system.file("extdata", package = "isoorbi") |>
+        orbi_find_raw() |>
+        orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
+      x |>
+        select(-"file_path")
+    }
+  )
+
+  # plus aggregate and get
+  expect_snapshot(y <- orbi_aggregate_raw(x, show_progress = FALSE))
+  y$file_info$file_path <- NULL # OS dependent
+  y$file_info$`Creation date` <- NULL # OS dependent
+  expect_snapshot(y)
+  expect_snapshot(
+    y |> orbi_get_data(scans = everything(), spectra = everything())
+  )
+}) |>
+  withr::with_options(new = list(show_exec_times = FALSE))
