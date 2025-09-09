@@ -76,21 +76,24 @@ test_that("orbi_read_raw() works", {
   expect_error(orbi_read_raw(), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(42), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(character()), "file_paths.*must be at least one")
-  expect_message(orbi_read_raw("DNE"), "encountered.*1.*error") |>
-    expect_message("does not exist")
+  expect_message(orbi_read_raw("DNE"), "encountered.*1 error") |>
+    suppressMessages()
 
   # succesful read
   expect_message(
     x <- system.file("extdata", package = "isoorbi") |>
       orbi_find_raw() |>
-      orbi_read_raw(cache = FALSE),
-    "Read 2 raw files"
+      orbi_read_raw(cache = FALSE, include_scan_spectra = 1),
+    "finished reading 2 files"
   ) |>
     suppressMessages()
   expect_snapshot(x |> select(-"file_path"))
 
   # plus aggregate
-  expect_message(y <- orbi_aggregate_raw(x), "Aggregated") |>
+  expect_message(
+    y <- orbi_aggregate_raw(x, show_progress = FALSE),
+    "aggregated"
+  ) |>
     expect_snapshot()
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent

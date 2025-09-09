@@ -1,12 +1,11 @@
-# Tests: utility functions to clean and annotate data ------------------------------------
-
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 # Internal utility functions =============
 
-# factorize_dataset
-test_that("factorize_dataset() tests", {
+## factorize_dataset() =============
+
+test_that("factorize_dataset()", {
   # failure
   expect_error(
     factorize_dataset(),
@@ -24,8 +23,9 @@ test_that("factorize_dataset() tests", {
   expect_silent(factorize_dataset(df))
 })
 
-# group_if_exists
-test_that("group_if_exists() tests", {
+## group_if_exists() =============
+
+test_that("group_if_exists()", {
   # failure
   expect_error(
     group_if_exists(),
@@ -38,8 +38,9 @@ test_that("group_if_exists() tests", {
   )
 })
 
-# group_by_same_groups
-test_that("group_by_same_groups() tests", {
+## group_by_same_groups() =============
+
+test_that("group_by_same_groups()", {
   # failure
   expect_error(
     group_by_same_groups(),
@@ -53,8 +54,9 @@ test_that("group_by_same_groups() tests", {
   )
 })
 
-# count_grouped_distinct
-test_that("count_grouped_distinct() tests", {
+## count_grouped_distinct() =============
+
+test_that("count_grouped_distinct()", {
   # failure
   expect_error(
     count_grouped_distinct(),
@@ -68,11 +70,11 @@ test_that("count_grouped_distinct() tests", {
   )
 })
 
-# Common utility functions to clean and annotate data ------------------------------------
+# Common utility functions to clean and annotate data ========
 
-# orbi_filter_satellite_peaks
+## orbi_filter_satellite_peaks() =============
 
-test_that("orbi_filter_satellite_peaks() tests", {
+test_that("orbi_filter_satellite_peaks()", {
   df <- suppressMessages(
     orbi_read_isox(system.file(
       "extdata",
@@ -89,8 +91,9 @@ test_that("orbi_filter_satellite_peaks() tests", {
     suppressWarnings() # cascade suppressed
 })
 
-# orbi_flag_satellite_peaks
-test_that("orbi_flag_satellite_peaks() tests", {
+## orbi_flag_satellite_peaks() =============
+
+test_that("orbi_flag_satellite_peaks()", {
   # success
   df <- suppressMessages(
     orbi_read_isox(system.file(
@@ -127,8 +130,9 @@ test_that("orbi_flag_satellite_peaks() tests", {
   )
 })
 
-# orbi_filter_weak_isotopocules
-test_that("orbi_filter_weak_isotopocules() tests", {
+## orbi_filter_weak_isotopocules() =============
+
+test_that("orbi_filter_weak_isotopocules()", {
   df <- suppressMessages(
     orbi_read_isox(system.file(
       "extdata",
@@ -146,8 +150,9 @@ test_that("orbi_filter_weak_isotopocules() tests", {
 })
 
 
-# orbi_flag_weak_isotopocules
-test_that("orbi_flag_weak_isotopocules() tests", {
+## orbi_flag_weak_isotopocules() =============
+
+test_that("orbi_flag_weak_isotopocules()", {
   # failure
   expect_error(
     orbi_flag_weak_isotopocules(),
@@ -216,20 +221,46 @@ test_that("orbi_flag_weak_isotopocules() tests", {
       block = as.factor("block1"),
       segment = as.factor("segment2"),
       injection = as.factor("injection3")
-    )
+    ) |>
+    orbi_flag_weak_isotopocules(min_percent = 1)
 
   # success
-  expect_true(
-    suppressMessages(is.tbl(orbi_flag_weak_isotopocules(
-      dataset = df3,
-      min_percent = 1
-    )))
-  )
+  ## message
+  test_that_cli(
+    "orbi_flag_weak_isotopocules()",
+    configs = c("plain", "fancy"),
+    {
+      # no weak isotopocules
+      expect_snapshot(
+        out <- df |>
+          mutate(
+            block = as.factor("block1"),
+            segment = as.factor("segment2"),
+            injection = as.factor("injection3")
+          ) |>
+          orbi_flag_weak_isotopocules(min_percent = 1)
+      )
+
+      # some weak ones
+      expect_snapshot(
+        out <- df |>
+          filter(!(isotopocule %in% c("15N", "17O") & scan.no > 10)) |>
+          orbi_flag_weak_isotopocules(min_percent = 50)
+      )
+    }
+  ) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
+
+  # ## data
+  # expect_snapshot_value(
+  #   orbi_flag_weak_isotopocules(dataset = df, min_percent = 1),
+  #   style = "json2"
+  # )
 })
 
-# orbi_filter_scan_intensity
+## orbi_filter_scan_intensity() =============
 
-test_that("orbi_filter_scan_intensity() tests", {
+test_that("orbi_filter_scan_intensity()", {
   df <- suppressMessages(
     orbi_read_isox(system.file(
       "extdata",
@@ -246,9 +277,9 @@ test_that("orbi_filter_scan_intensity() tests", {
     suppressWarnings() # cascade suppressed
 })
 
-# orbi_flag_outliers
+## orbi_flag_outliers() =============
 
-test_that("orbi_flag_outliers() tests", {
+test_that("orbi_flag_outliers()", {
   # failure
 
   expect_error(orbi_flag_outliers(), "need a `dataset` data frame")
@@ -259,9 +290,12 @@ test_that("orbi_flag_outliers() tests", {
     fixed = TRUE
   )
 
-  df <- read.csv(
-    file.path(base_dir, "test_files", "first10rows.csv"),
-    stringsAsFactors = T
+  df <- suppressMessages(
+    orbi_read_isox(system.file(
+      "extdata",
+      "testfile_dual_inlet.isox",
+      package = "isoorbi"
+    ))
   )
 
   expect_error(
@@ -310,46 +344,36 @@ test_that("orbi_flag_outliers() tests", {
     fixed = TRUE
   )
 
-  df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
   expect_error(
-    orbi_flag_outliers(dataset = df2, agc_window = 1),
+    df |>
+      mutate(dummy = 1) |>
+      select(-"scan.no") |>
+      orbi_flag_outliers(agc_fold_cutoff = 1),
     "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`",
     fixed = TRUE
   )
 
   # success
-  expect_true(
-    suppressMessages(is.tbl(orbi_flag_outliers(
-      dataset = df,
-      agc_window = c(10, 90)
-    )))
-  )
 
-  df3 <-
-    suppressMessages(
-      orbi_read_isox(system.file(
-        "extdata",
-        "testfile_dual_inlet.isox",
-        package = "isoorbi"
-      )) |>
-        mutate(
-          block = as.factor("block1"),
-          segment = as.factor("segment2"),
-          injection = as.factor("injection3")
-        )
+  ## messages
+  test_that_cli("orbi_flag_outliers()", configs = c("plain", "fancy"), {
+    # some outliers
+    expect_snapshot(out <- df |> orbi_flag_outliers(agc_window = c(10, 90)))
+    expect_snapshot(out <- df |> orbi_flag_outliers(agc_fold_cutoff = 1.01))
+    # no outliers
+    expect_snapshot(
+      out <- df |>
+        filter(row_number() < 5) |>
+        orbi_flag_outliers(agc_window = c(10, 90))
     )
-
-  expect_true(
-    suppressMessages(is.tbl(orbi_flag_outliers(
-      dataset = df3,
-      agc_window = c(10, 90)
-    )))
-  )
+    expect_snapshot(out <- df |> orbi_flag_outliers(agc_fold_cutoff = 2))
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
 })
 
-# orbi_define_basepeak()
+## orbi_define_basepeak() =============
 
-test_that("orbi_define_basepeak() tests", {
+test_that("orbi_define_basepeak()", {
   # failure
 
   expect_error(
@@ -362,6 +386,7 @@ test_that("orbi_define_basepeak() tests", {
     "must be a data frame"
   )
 
+  # test data
   df <- read.csv(
     file.path(base_dir, "test_files", "first10rows.csv"),
     stringsAsFactors = T
@@ -387,37 +412,42 @@ test_that("orbi_define_basepeak() tests", {
     "basepeak_def.*is not an isotopocule in the dataset"
   )
 
-  df2 <- df |> select(-scan.no)
   expect_error(
-    orbi_define_basepeak(dataset = df2, basepeak_def = "M0"),
+    orbi_define_basepeak(
+      dataset = df |> select(-"scan.no"),
+      basepeak_def = "M0"
+    ),
     "column.*scan.no.*is missing"
   )
 
-  df3 <- df
-  df3[df3 == "17O"] <- "M0"
-
-  expect_error(
-    orbi_define_basepeak(df3, basepeak_def = "M0"),
-    "the M0 isotopocule exists multiple times in some scans, make sure to run orbi_flag_satellite_peaks() first",
-    fixed = TRUE
-  ) |>
+  df |>
+    mutate(isotopocule = if_else(isotopocule == "17O", "M0", isotopocule)) |>
+    orbi_define_basepeak(basepeak_def = "M0") |>
+    expect_error(
+      "exists multiple times in some scans.*run.*orbi_flag_satellite_peaks"
+    ) |>
     suppressMessages()
 
-  df3[df3 == "M0"] <- "17O"
-
-  suppressMessages(expect_error(
-    orbi_define_basepeak(df3, basepeak_def = "M0"),
-    "the 'M0' isotopocule does not exist in some scans, consider using `orbi_filter_isox()` to focus on specific file(s) and/or compound(s): \n - basepeak 'M0' is missing in 2 scans (100.0%) of compound 'HSO4-' in file 's3744'",
-    fixed = TRUE
-  ))
+  df |>
+    filter(isotopocule != "M0") |>
+    orbi_define_basepeak(basepeak_def = "M0") |>
+    expect_error(
+      "does not exist in some scans.*consider.*orbi_filter_isox"
+    ) |>
+    suppressMessages()
 
   # success
-  expect_message(
-    expect_true(is.tbl(orbi_define_basepeak(
-      dataset = df,
-      basepeak_def = "M0"
-    ))),
-    "setting.*denominator"
-  ) |>
-    suppressMessages()
+  ## message
+  test_that_cli("orbi_define_basepeak()", configs = c("plain", "fancy"), {
+    expect_snapshot(
+      out <- orbi_define_basepeak(dataset = df, basepeak_def = "M0")
+    )
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
+
+  ## data
+  expect_snapshot_value(
+    orbi_define_basepeak(dataset = df, basepeak_def = "M0"),
+    style = "deparse" # json2 doesn't work because of loss of precision in the ratios
+  )
 })

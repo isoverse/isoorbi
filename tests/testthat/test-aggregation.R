@@ -1,4 +1,4 @@
-test_that("get_data() works", {
+test_that("get_data()", {
   # errors
   get_data() |> expect_error("must be.*list")
   get_data(42) |> expect_error("must be.*list")
@@ -24,28 +24,42 @@ test_that("get_data() works", {
     b = everything(),
     by = "speed"
   ) |>
-    expect_error("encountered warning") # many-to-many relationship
+    expect_error("encountered issue") # many-to-many relationship
 
-  # works
-  list(
-    a = tibble(id = c("a", "b"), info = paste(id, "info")),
-    b = tibble(id = "a", x = 1:10, y = 42),
-    data = tibble(id = "a", x = 1:10, z = x * 10)
-  ) |>
-    get_data(
-      a = everything(),
-      b = c("id", "x"),
-      data = everything(),
-      by = c("id", "x")
+  # working snapshots
+
+  test_run1 <- function() {
+    list(
+      a = tibble(id = c("a", "b"), info = paste(id, "info")),
+      b = tibble(id = "a", x = 1:10, y = 42),
+      data = tibble(id = "a", x = 1:10, z = x * 10)
     ) |>
-    expect_snapshot()
+      get_data(
+        a = everything(),
+        b = c("id", "x"),
+        data = everything(),
+        by = c("id", "x")
+      )
+  }
 
-  get_data(
-    list(a = cars, b = cars),
-    a = everything(),
-    b = everything(),
-    by = "speed",
-    relationship = "many-to-many"
-  ) |>
-    expect_snapshot()
+  test_run2 <- function() {
+    get_data(
+      list(a = cars, b = cars),
+      a = everything(),
+      b = everything(),
+      by = "speed",
+      relationship = "many-to-many"
+    )
+  }
+
+  # messages
+  test_that_cli("get_data()", configs = c("plain", "fancy"), {
+    expect_snapshot(out <- test_run1())
+    expect_snapshot(out <- test_run2())
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
+
+  # data
+  expect_snapshot_value(test_run1(), style = "json2")
+  expect_snapshot_value(test_run2(), style = "json2")
 })

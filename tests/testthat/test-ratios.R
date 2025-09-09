@@ -1,10 +1,9 @@
-# Tests: Functions to calculate ratios and stats --------------------------------------------
-
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-# calculate_ratios_sem
-test_that("test calculate_ratios_sem()", {
+# calculate_ratios_sem() ============
+
+test_that("calculate_ratios_sem()", {
   # success
   expect_equal(calculate_ratios_sem(ratios = c(1, 2, 3)), 0.57735026919)
   expect_type(calculate_ratios_sem(ratios = c(1, 2, 3)), "double")
@@ -36,8 +35,10 @@ test_that("test calculate_ratios_sem()", {
   )
 })
 
+# calculate_ratios_gmean() ============
+
 # calculate_ratios_gmean
-test_that("test calculate_ratios_gmean()", {
+test_that("calculate_ratios_gmean()", {
   # success
   list <- c(4, 5, 6)
   expect_type(calculate_ratios_gmean(ratios = list), "double")
@@ -59,8 +60,10 @@ test_that("test calculate_ratios_gmean()", {
   )
 })
 
+# calculate_ratios_gsd() ============
+
 # calculate_ratios_gsd
-test_that("test calculate_ratios_gsd()", {
+test_that("calculate_ratios_gsd()", {
   # success
   expect_type(calculate_ratios_gsd(ratios = c(1, 2, 3)), "double")
 
@@ -86,8 +89,10 @@ test_that("test calculate_ratios_gsd()", {
   )
 })
 
+# calculate_ratios_gse() ============
+
 # calculate_ratios_gse
-test_that("test calculate_ratios_gse()", {
+test_that("calculate_ratios_gse()", {
   # success
   expect_type(calculate_ratios_gse(ratios = c(4, 5, 6)), "double")
 
@@ -113,8 +118,10 @@ test_that("test calculate_ratios_gse()", {
   )
 })
 
+# calculate_ratios_slope() ============
+
 # calculate_ratios_slope
-test_that("test calculate_ratios_slope()", {
+test_that("calculate_ratios_slope()", {
   # success
   x <- c(0, 1, 2, 3)
   y <- c(0, 1, 2, 3)
@@ -177,8 +184,10 @@ test_that("test calculate_ratios_slope()", {
   )
 })
 
+# calculate_ratios_weighted_sum() ============
+
 # calculate_ratios_weighted_sum
-test_that("test calculate_ratios_weighted_sum()", {
+test_that("calculate_ratios_weighted_sum()", {
   # success
   x <- c(2, 4, 6)
   y <- c(3, 5, 7)
@@ -239,8 +248,10 @@ test_that("test calculate_ratios_weighted_sum()", {
   )
 })
 
+# orbi_calculate_summarized_ratio() ============
+
 # orbi_calculate_ratio
-test_that("test orbi_calculate_summarized_ratio()", {
+test_that("orbi_calculate_summarized_ratio()", {
   a <- 1:10
   b <- 1:10
 
@@ -263,7 +274,7 @@ test_that("test orbi_calculate_summarized_ratio()", {
       denominator = vector("numeric", 1),
       "direct"
     ),
-    "`numerator` and `denominator` must be vectors of equal length"
+    "something went wrong calculating ratios"
   )
 
   expect_error(
@@ -297,8 +308,10 @@ test_that("test orbi_calculate_summarized_ratio()", {
   )
 })
 
+# orbi_calculate_ratios() ============
+
 # orbi_calculate_ratios
-test_that("test orbi_calculate_ratios()", {
+test_that("orbi_calculate_ratios()", {
   df <- orbi_read_isox(system.file(
     "extdata",
     "testfile_dual_inlet.isox",
@@ -311,17 +324,17 @@ test_that("test orbi_calculate_ratios()", {
     orbi_define_basepeak("15N") |>
     suppressMessages()
 
-  # failure
+  # errors
   expect_error(
     orbi_calculate_ratios(),
     "need a `dataset` data frame",
     fixed = TRUE
   )
 
-  df_results2 <- subset(df_results, select = -basepeak_ions)
-
   expect_error(
-    orbi_calculate_ratios(df_results2),
+    df_results |>
+      select(-"basepeak_ions") |>
+      orbi_calculate_ratios(),
     "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
     fixed = TRUE
   )
@@ -331,10 +344,10 @@ test_that("test orbi_calculate_ratios()", {
     suppressMessages()
 })
 
-# orbi_summarize_results
-test_that("test orbi_summarize_results()", {
-  # success
+# orbi_summarize_results() ============
 
+test_that("orbi_summarize_results()", {
+  # test data
   df <- orbi_read_isox(system.file(
     "extdata",
     "testfile_dual_inlet.isox",
@@ -344,58 +357,38 @@ test_that("test orbi_summarize_results()", {
     orbi_define_basepeak(basepeak_def = "15N") |>
     suppressMessages()
 
-  expect_true(is.tbl(orbi_summarize_results(df, ratio_method = "sum"))) |>
-    suppressMessages()
+  # errors
+  orbi_summarize_results() |> expect_error("must be a data frame")
+  orbi_summarize_results(df) |> expect_error("must be a valid method")
+  orbi_summarize_results(df, "foo") |>
+    expect_error(
+      "ratio_method.* must be one of.*mean.*sum.*median.*geometric_mean.*slope.*weighted_sum"
+    )
+  orbi_summarize_results(mtcars, "sum") |>
+    expect_error("columns.*missing")
 
-  df2 <- df |>
+  # capture success message
+  test_that_cli("cli", configs = c("plain", "fancy"), {
+    expect_snapshot({
+      res <- orbi_summarize_results(df, ratio_method = "sum")
+    })
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
+
+  # capture sucess data without blocks
+  df |>
+    orbi_summarize_results(ratio_method = "sum") |>
+    select(-"filename") |>
+    expect_snapshot_value(style = "json2")
+
+  # capture success data with blocks and a different method
+  df |>
     mutate(
       block = as.factor("block1"),
       segment = as.factor("segment2"),
       injection = as.factor("injection3"),
       sample_name = as.factor("sample_name4")
-    )
-
-  expect_true(is.tbl(orbi_summarize_results(df2, ratio_method = "sum"))) |>
-    suppressMessages()
-
-  # failure
-  expect_error(
-    orbi_summarize_results(),
-    "no input for dataset supplied",
-    fixed = TRUE
-  )
-
-  expect_error(
-    orbi_summarize_results(dataset = as.matrix(df)),
-    "dataset must be a data frame",
-    fixed = TRUE
-  )
-
-  expect_error(
-    orbi_summarize_results(dataset = df),
-    "no input for ratio_method supplied",
-    fixed = TRUE
-  )
-
-  expect_error(
-    orbi_summarize_results(dataset = df, ratio_method = "foo"),
-    "ratio_method.* must be one of.*mean.*sum.*median.*geometric_mean.*slope.*weighted_sum"
-  )
-
-  expect_error(
-    orbi_summarize_results(dataset = df, ratio_method = "sum", .by = "foo"),
-    "foo.*doesn't exist"
-  )
-  expect_error(
-    orbi_summarize_results(dataset = df, ratio_method = "sum", .by = foo),
-    "foo.*doesn't exist"
-  )
-
-  df3 <- df |> mutate(dummy = 1) |> select(-"ions.incremental")
-
-  expect_error(
-    orbi_summarize_results(dataset = df3, ratio_method = "sum"),
-    "Missing required column(s): ions.incremental",
-    fixed = TRUE
-  )
+    ) |>
+    orbi_summarize_results(ratio_method = "mean") |>
+    expect_snapshot_value(style = "json2")
 })

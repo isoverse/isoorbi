@@ -201,8 +201,10 @@ aggregate_files <- function(
   show_problems = TRUE,
   call = rlang::caller_call()
 ) {
+  # keep track of current env to anchor progress bars
+  root_env <- current_env()
+
   # safety checks
-  force(call)
   if (missing(files_data) || !is.data.frame(files_data)) {
     cli_abort("{.var files_data} is not a data frame")
   }
@@ -237,29 +239,30 @@ aggregate_files <- function(
   # get started
   start <- Sys.time()
 
-  # progress bar
-  pb <- NULL
-  if (show_progress) {
-    old <- options(cli.progress_show_after = 0)
-    on.exit(options(old))
-    pb <- cli_progress_bar(
-      total = nrow(files_data),
-      format = paste(
-        "Aggregating {pb_current}/{pb_total}",
-        "file data {pb_bar} {pb_percent}",
-        "| {pb_elapsed} | ETA{pb_eta} | {.emph {pb_status}}"
-      )
-    )
-    on.exit(cli_process_done(), add = TRUE)
-    cli_progress_update(id = pb, inc = 0, status = "initializing")
-  }
+  # info
+  start <- start_info(
+    "is aggregating {pb_current}/{pb_total} cached raw files {pb_bar} ",
+    "file data {pb_bar} {pb_percent}",
+    "| {pb_elapsed} | ETA{pb_eta} | {.file {pb_status}}",
+    pb_total = nrow(files_data),
+    pb_status = "",
+    show_progress = show_progress,
+    .env = root_env
+  )
 
   # aggregate files safely and with progress info
   aggregate_safely_with_progress <- function(file_path, i) {
     # progress
-    if (show_progress) {
-      cli_progress_update(id = pb, status = basename(file_path))
+    if (!is.null(start$pb)) {
+      cli_progress_update(
+        id = start$pb,
+        status = basename(file_path),
+        .envir = root_env
+      )
     }
+
+    # start timer
+    file_start <- start_info()
 
     # read file but catch errors in case there are any uncaught ones
     out <-
@@ -286,11 +289,16 @@ aggregate_files <- function(
     out$result$problems <- bind_rows(files_data$problems[[i]], problems) |>
       dplyr::mutate(uid = out$result$file_info$uid) |>
       dplyr::relocate("uid", .before = 1L)
-    if (show_problems) {
-      show_cnds(
-        problems,
-        call = call,
-        summary_message = sprintf("for {.emph %s}", basename(file_path))
+
+    if (show_problems && nrow(problems) > 0) {
+      # info
+      finish_info(
+        "tried to aggregate {.file {basename{file_path}}",
+        start = file_start,
+        conditions = problems,
+        show_conditions = show_problems,
+        .call = call,
+        .env = root_env
       )
     }
 
@@ -310,24 +318,32 @@ aggregate_files <- function(
     purrr::map(~ purrr::map(results, `[[`, .x) |> dplyr::bind_rows())
 
   # info
-  if (show_progress) {
-    cli_progress_done(id = pb)
-  }
   n_rows <- map_int(results, nrow) |>
     prettyunits::pretty_num() |>
     # take care of leading/trailing whitespaces
     gsub(pattern = "(^ +| +$)", replacement = "")
-  details <- sprintf("{col_blue('%s')} (%s)", names(results), n_rows)
-  info <- format_inline(
-    "{col_green(symbol$tick)} ",
-    "Aggregated {head(details, -1)} from {nrow(files_data)} file{?s} ",
-    "in {prettyunits::pretty_sec(as.numeric(Sys.time() - start, 'secs'))} ",
-    summarize_cnds(
-      results$problems |> dplyr::filter(!is.na(.data$new) & .data$new),
-      "but encountered {issues} {symbol$arrow_right} check with `orbi_get_problems(x)`"
-    )
+  details <- sprintf("{.field %s} (%s)", names(results), n_rows) |>
+    purrr::map_chr(format_inline)
+  new_problems <- results$problems |>
+    dplyr::filter(!is.na(.data$new) & .data$new)
+  finish_info(
+    "aggregated {utils::head(details, -1)} from {nrow(files_data)} file{?s} ",
+    if (nrow(new_problems) > 0) {
+      # custom problems summary
+      summarize_cnds(
+        new_problems,
+        include_symbol = FALSE,
+        include_call = FALSE,
+        summary_format = "but encountered {issues} {symbol$arrow_right} check with {.strong orbi_get_problems(x)}"
+      )
+    },
+    success_format = if (nrow(new_problems) > 0) {
+      "{col_yellow('!')} {msg}"
+    } else {
+      "{col_green(symbol$tick)} {msg}"
+    },
+    start = start
   )
-  cli_text(info)
 
   # clean up problems
   results$problems <- dplyr::select(results$problems, -"new")
@@ -338,7 +354,7 @@ aggregate_files <- function(
       results,
       names(results),
       ~ format_inline(
-        "{symbol$arrow_right} {col_blue(.y)}: ",
+        "{symbol$arrow_right} {.field {.y}}: ",
         "{.emph {names(.x)}}"
       )
     ) |>
@@ -551,14 +567,18 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
 # @param .ds the list of datasets (uses .ds to avoid accidental partial mapping by ...)
 # @param ... named arguments for each dataset that should be included with a tidyselect expression for the columns to include
 # @param by which columns to use for join by operations (if there are any)
-# @param relationship passed to inner_join
+# @param relationship passed to inner_join, default expectation is one to many
 get_data <- function(
   .ds,
   ...,
   by = c(),
-  call = rlang::caller_env(),
-  relationship = NULL
+  relationship = "one-to-many",
+  .env = caller_env(),
+  .call = caller_call()
 ) {
+  # start
+  start <- start_info("is running", .call = .call)
+
   # basic safety checks
   stopifnot(
     "`.ds` must be a list" = !missing(.ds) && is_list(.ds),
@@ -571,10 +591,13 @@ get_data <- function(
   selectors <- rlang::enquos(...)
   selectors <- selectors[!purrr::map_lgl(selectors, quo_is_null)]
   if (length(selectors) == 0) {
-    cli_abort(c(
-      "no dataset column selections provided",
-      "i" = "available dataset{?s}: {.emph {names(.ds)}}"
-    ))
+    cli_abort(
+      c(
+        "no dataset column selections provided",
+        "i" = "available dataset{?s}: {.emph {names(.ds)}}"
+      ),
+      call = .env
+    )
   }
 
   # valid selectors?
@@ -584,7 +607,7 @@ get_data <- function(
         "dataset{?s} not in the data: {.emph {names(selectors)[missing]}}",
         "i" = "available dataset{?s}: {.emph {names(.ds)}}"
       ),
-      call = call
+      call = .env
     )
   }
 
@@ -602,7 +625,7 @@ get_data <- function(
             "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(.ds[[names(selectors)[i]]])}}"
           ),
           parent = cnd,
-          call = call
+          call = .env
         )
       }
     )
@@ -624,9 +647,26 @@ get_data <- function(
             "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(new_data)}}",
             "i" = "columns in {.emph {names(selectors)[1:(i-1)]}}: {.var {names(out)}}"
           ),
-          call = call
+          call = .env
         )
       }
+
+      # catch join error/warnings
+      catch_error_and_warning <- function(cnd) {
+        cli_abort(
+          c(
+            paste(
+              "encountered issue when joining {.emph {names(selectors)[i]}}",
+              "with {.emph {names(selectors)[1:(i-1)]}} by {.var {join_by}}",
+              "with relationship \"{relationship}\""
+            ),
+            "i" = "are you sure the by column{?s} ({.var {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
+          ),
+          parent = cnd,
+          call = .env
+        )
+      }
+
       out <-
         tryCatch(
           dplyr::inner_join(
@@ -635,19 +675,8 @@ get_data <- function(
             by = join_by,
             relationship = relationship
           ),
-          warning = function(cnd) {
-            cli_abort(
-              c(
-                paste(
-                  "encountered warning when joining {.emph {names(selectors)[i]}}",
-                  "with {.emph {names(selectors)[1:(i-1)]}} by {.var {join_by}}"
-                ),
-                "i" = "are you sure the by column{?s} ({.var {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
-              ),
-              parent = cnd,
-              call = call
-            )
-          }
+          warning = catch_error_and_warning,
+          error = catch_error_and_warning
         )
       join_bys <- c(join_bys, join_by)
     } else {
@@ -665,16 +694,22 @@ get_data <- function(
 
   details <-
     if (length(selectors) == 1) {
-      sprintf("{col_blue('%s')}", names(selectors))
+      sprintf("{cli::col_blue('%s')}", names(selectors))
     } else {
-      sprintf("{col_blue('%s')} (%s)", names(selectors), n_rows)
+      sprintf("{cli::col_blue('%s')} (%s)", names(selectors), n_rows)
     }
+  details <- details |> purrr::map_chr(format_inline)
 
-  format_inline(
-    "Retrieved {prettyunits::pretty_num(nrow(out))} records from {qty(length(selectors))}",
-    "{?/the combination of }{details}{?/ via }{?/{.var {unique(unlist(join_bys))}}}"
-  ) |>
-    cli_alert_success(wrap = TRUE)
+  # info
+  finish_info(
+    "retrieved {prettyunits::pretty_num(nrow(out))} records from ",
+    if (length(selectors) > 0) "the combination of ",
+    "{details}",
+    if (length(selectors) > 0) " via {.field {unique(unlist(join_bys))}}",
+    start = start,
+    .call = .call
+    # don't pass parent .env since we want these glues to execute in THIS env
+  )
 
   # return
   return(out)

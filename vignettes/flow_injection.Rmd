@@ -14,11 +14,12 @@ editor_options:
 
 ```{r, include=FALSE}
 # default chunk options
-knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>")
+knitr::opts_chunk$set(collapse = FALSE, message = TRUE)
 ```
 
 
 ```{r}
+#| message: false
 # load libraries
 library(isoorbi) # for Orbitrap functions
 library(dplyr) # for data wrangling

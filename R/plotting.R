@@ -416,21 +416,16 @@ orbi_plot_raw_data <- function(
   # generate y value and color to check if they work
   yquo <- enquo(y)
   colorquo <- enquo(color)
-  try_catch_all(
-    plot_df |>
-      dplyr::mutate(y = !!yquo),
-    sprintf(
-      "something went wrong generating the `y` variable with `%s`",
-      rlang::as_label(yquo)
-    )
+  out <- try_catch_cnds(plot_df |> dplyr::mutate(y = !!yquo))
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong generating the {.field y} variable with {.field {as_label(yquo)}}"
   )
-  try_catch_all(
-    plot_df |>
-      dplyr::mutate(color = !!colorquo),
-    sprintf(
-      "something went wrong generating the `color` variable with `%s`",
-      rlang::as_label(colorquo)
-    )
+
+  out <- try_catch_cnds(plot_df |> dplyr::mutate(color = !!colorquo))
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong generating the {.field color} variable with {.field {as_label(colorquo)}}"
   )
 
   # make plot

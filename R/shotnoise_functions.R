@@ -10,6 +10,13 @@
 #' @export
 orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
   # safety checks
+  check_arg(
+    dataset,
+    !missing(dataset) && is.data.frame(dataset),
+    "must be a data frame or tibble"
+  )
+  check_tibble(dataset, req_cols = c("filename", "compound", "isotopocule"))
+
   stopifnot(
     "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
     "`dataset` requires columns `filename`, `compound` and `isotopocule`" = all(
@@ -28,71 +35,73 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
   }
 
   # info message
-  start_time <-
-    sprintf(
-      "orbi_analyze_shot_noise() is analyzing the shot noise for %d peaks (%s %d flagged peaks)... ",
-      if (include_flagged_data) n_all else n_after,
-      if (include_flagged_data) "including" else "excluded",
-      n_all - n_after
-    ) |>
-    message_start()
+  start <- start_info("is running")
 
   # calculation
-  dataset <-
-    try_catch_all(
-      dataset |>
-        # preserve original row order
-        dplyr::mutate(..idx = dplyr::row_number()) |>
-        # make sure order is compatible with cumsum based calculations
-        dplyr::arrange(
-          .data$filename,
-          .data$compound,
-          .data$isotopocule,
-          .data$scan.no
-        ) |>
-        dplyr::mutate(
-          # group by filename, compound, isotopocule.
-          .by = c("filename", "compound", "isotopocule"),
-          # cumulative ions
-          n_isotopocule_ions = cumsum(.data$ions.incremental),
-          n_basepeak_ions = cumsum(.data$basepeak_ions),
-          n_effective_ions = .data$n_basepeak_ions *
-            .data$n_isotopocule_ions /
-            (.data$n_basepeak_ions + .data$n_isotopocule_ions),
-          # relative standard error
-          n_measurements = 1:n(),
-          ratio_mean = cumsum(.data$ratio) / .data$n_measurements,
-          ratio_gmean = exp(cumsum(log(.data$ratio)) / .data$n_measurements),
-          #ratio_sd = sqrt( cumsum( (ratio - ratio_mean)^2 ) / (n_measurements - 1L) ),
-          # alternative std. dev. formula compatible with cumsum
-          # note that adjustment for sample sdev --> sqrt(n/(n-1)) partially cancels with 1/sqrt(n) for SD to SE
-          ratio_se = sqrt(
-            cumsum(.data$ratio^2) / .data$n_measurements - .data$ratio_mean^2
-          ) *
-            sqrt(1 / (.data$n_measurements - 1L)),
-          # Q: do you really want to use gmean here but not in the std. dev calculation?
-          ratio_rel_se.permil = 1000 * .data$ratio_se / .data$ratio_gmean,
-          # shot noise - calc is same as 1000 * (1 / n_basepeak_ions + 1 / n_isotopocule_ions) ^ 0.5 but faster
-          shot_noise.permil = 1000 * .data$n_effective_ions^-0.5
-        ) |>
-        # restor original row order
-        dplyr::arrange(.data$..idx) |>
-        # remove columns not usually used downstream
-        select(
-          -"..idx",
-          -"n_basepeak_ions",
-          -"n_isotopocule_ions",
-          -"n_measurements",
-          -"ratio_mean",
-          -"ratio_gmean",
-          -"ratio_se"
-        ),
-      "something went wrong analyzing shot noise",
-      newline = TRUE
-    )
+  out <-
+    dataset |>
+    # preserve original row order
+    dplyr::mutate(..idx = dplyr::row_number()) |>
+    # make sure order is compatible with cumsum based calculations
+    dplyr::arrange(
+      .data$filename,
+      .data$compound,
+      .data$isotopocule,
+      .data$scan.no
+    ) |>
+    dplyr::mutate(
+      # group by filename, compound, isotopocule.
+      .by = c("filename", "compound", "isotopocule"),
+      # cumulative ions
+      n_isotopocule_ions = cumsum(.data$ions.incremental),
+      n_basepeak_ions = cumsum(.data$basepeak_ions),
+      n_effective_ions = .data$n_basepeak_ions *
+        .data$n_isotopocule_ions /
+        (.data$n_basepeak_ions + .data$n_isotopocule_ions),
+      # relative standard error
+      n_measurements = 1:n(),
+      ratio_mean = cumsum(.data$ratio) / .data$n_measurements,
+      ratio_gmean = exp(cumsum(log(.data$ratio)) / .data$n_measurements),
+      #ratio_sd = sqrt( cumsum( (ratio - ratio_mean)^2 ) / (n_measurements - 1L) ),
+      # alternative std. dev. formula compatible with cumsum
+      # note that adjustment for sample sdev --> sqrt(n/(n-1)) partially cancels with 1/sqrt(n) for SD to SE
+      ratio_se = sqrt(
+        cumsum(.data$ratio^2) / .data$n_measurements - .data$ratio_mean^2
+      ) *
+        sqrt(1 / (.data$n_measurements - 1L)),
+      # Q: do you really want to use gmean here but not in the std. dev calculation?
+      ratio_rel_se.permil = 1000 * .data$ratio_se / .data$ratio_gmean,
+      # shot noise - calc is same as 1000 * (1 / n_basepeak_ions + 1 / n_isotopocule_ions) ^ 0.5 but faster
+      shot_noise.permil = 1000 * .data$n_effective_ions^-0.5
+    ) |>
+    # restor original row order
+    dplyr::arrange(.data$..idx) |>
+    # remove columns not usually used downstream
+    select(
+      -"..idx",
+      -"n_basepeak_ions",
+      -"n_isotopocule_ions",
+      -"n_measurements",
+      -"ratio_mean",
+      -"ratio_gmean",
+      -"ratio_se"
+    ) |>
+    try_catch_cnds()
+
+  # stop if error
+  abort_cnds(out$conditions)
+  dataset <- out$result
 
   # info
-  sprintf("calculations finished") |> message_finish(start_time = start_time)
+  finish_info(
+    "analyzed the shot noise for {if (include_flagged_data) n_all else n_after} peaks (",
+    if (n_all == n_after) {
+      "there are no flagged peaks)"
+    } else {
+      "{if (include_flagged_data) 'including' else 'excluding'} {n_all - n_after} flagged peaks)"
+    },
+    start = start
+  )
 
   # return
   return(dataset)

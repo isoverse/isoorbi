@@ -73,7 +73,7 @@ test_that("test orbi_define_block_for_flow_injection()", {
     ),
     "column.*filename.*was turned into a factor"
   ) |>
-    suppressMessages()
+    expect_message("added a new block")
 })
 
 test_that("test internal find_intervals()", {
@@ -526,13 +526,13 @@ test_that("test orbi_adjust_block()", {
   # results check
   expect_message(
     result0 <- orbi_adjust_block(test_data, 1, "test1"),
-    "not making any changes"
+    "made no changes"
   )
   expect_equal(test_data, result0)
 
   expect_message(
     result1 <- orbi_adjust_block(test_data, 2, "test1", set_start_time.min = 0),
-    "is making the following block adjustments"
+    "made the following block adjustments"
   ) |>
     suppressMessages()
   expect_equal(result1$block, rep(2, 6))
@@ -547,7 +547,7 @@ test_that("test orbi_adjust_block()", {
       "test1",
       shift_start_scan.no = 1
     ),
-    "moving block 1 start from scan 1.*to 2"
+    "moved block 1 start from scan 1.*to 2"
   ) |>
     suppressMessages()
   expect_equal(result2$block, rep(c(1, 2), c(3, 3)))
@@ -562,7 +562,7 @@ test_that("test orbi_adjust_block()", {
       "test1",
       shift_start_time.min = -1
     ),
-    "moving block 1 end to the new start of block 2"
+    "moved block 1 end to the new start of block 2"
   ) |>
     suppressMessages()
   expect_equal(result3$block, rep(2, 6))
@@ -572,13 +572,13 @@ test_that("test orbi_adjust_block()", {
 
   expect_message(
     result4 <- orbi_adjust_block(test_data, 1, "test1", shift_end_scan.no = 1),
-    "moving block 1 end from scan 3.*to 4"
+    "moved block 1 end from scan 3.*to 4"
   ) |>
     suppressMessages()
 
   expect_message(
     result5 <- orbi_adjust_block(test_data, 1, "test1", shift_end_time.min = 1),
-    "moving block 2 start to the new end of block 1"
+    "moved block 2 start to the new end of block 1"
   ) |>
     suppressMessages()
 })
@@ -667,7 +667,7 @@ test_that("test orbi_segment_block()", {
 
   expect_message(
     res1 <- test_data |> orbi_segment_blocks(into_segments = 2),
-    "segmenting 3 data blocks"
+    "segmented.*3 data blocks"
   ) |>
     suppressMessages()
   expect_equal(

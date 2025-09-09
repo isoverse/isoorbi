@@ -81,11 +81,6 @@ get_pkg_options <- function() {
       default = "unused",
       check_fn = is_scalar_character
     ),
-    #' - `include_spectra` : whether to include the spectral data in [orbi_read_raw].
-    include_spectra = define_pkg_option(
-      default = FALSE,
-      check_fn = is_scalar_logical
-    ),
     #' - `raw_aggregator`: configuration for pulling data out of raw files
     raw_aggregator = define_pkg_option(
       default = orbi_start_aggregator(
@@ -219,7 +214,12 @@ get_pkg_options <- function() {
       }
     ),
     #' - `debug`: turn on debug mode
-    debug = define_pkg_option(default = FALSE, check_fn = is_scalar_logical)
+    debug = define_pkg_option(default = FALSE, check_fn = is_scalar_logical),
+    #' - `auto_use_ansi`: whether to automatically enable correct rendering of stylized (ansi) output in HTML reports from notebooks that call `library(isoorbi)`. Can be turned off by calling `isoorbi::orbi_options(auto_use_ansi = FALSE)` **before** call `library(isoorbi)`.
+    auto_use_ansi = define_pkg_option(
+      default = TRUE,
+      check_fn = is_scalar_logical
+    )
   )
 }
 
