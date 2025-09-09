@@ -9,7 +9,7 @@ orbi_export_data_to_excel(
   file,
   dbl_digits = 7,
   int_format = "0",
-  dbl_format = sprintf(sprintf("\%\%.\%df", dbl_digits), 0)
+  dbl_format = sprintf(sprintf("\%\%.\%sf", dbl_digits), 0)
 )
 }
 \arguments{

@@ -13,7 +13,7 @@ orbi_read_isox(file)
 A tibble containing at minimum the columns \code{filename}, \code{scan.no}, \code{time.min}, \code{compound}, \code{isotopocule}, \code{ions.incremental}, \code{tic}, \code{it.ms}
 }
 \description{
-Read an IsoX output file (\code{.isox}) into a tibble data frame.
+Read an IsoX dataput file (\code{.isox}) into a tibble data frame.
 }
 \details{
 Additional information on the columns:

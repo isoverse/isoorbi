@@ -2,23 +2,35 @@
 % Please edit documentation in R/problems.R
 \name{orbi_get_problems}
 \alias{orbi_get_problems}
+\alias{orbi_show_problems}
 \title{Retrieve parsing problems}
 \usage{
-orbi_get_problems(obj)
+orbi_get_problems(obj, strip_ansi = TRUE)
+
+orbi_show_problems(obj)
 }
 \arguments{
 \item{obj}{data object that holds problems information}
+
+\item{strip_ansi}{whether to remove ansi characters from the message, yes by default}
 }
 \value{
 tibble data frame with a list of problems encountered during
 }
 \description{
 This function retrieves parsing problems encountered during the reading and processing of files.
+
+This function prints out parsing problems encountered during the reading and processing of files.
 }
 \examples{
 
 orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
   orbi_read_raw() |>
   orbi_get_problems()
+
+
+orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
+  orbi_read_raw() |>
+  orbi_show_problems()
 
 }
