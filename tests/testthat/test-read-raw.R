@@ -87,20 +87,17 @@ test_that("orbi_read_raw() works", {
         orbi_read_raw(cache = FALSE)
       x |>
         select(-"file_path")
-    } |>
-      withr::with_options(new = list(show_exec_times = FALSE))
+    }
   )
 
-  # plus aggregate
-  expect_snapshot(
-    {
-      y <- orbi_aggregate_raw(x, show_progress = FALSE)
-    } |>
-      withr::with_options(new = list(show_exec_times = FALSE))
-  )
+  # plus aggregate and get
+  expect_snapshot(y <- orbi_aggregate_raw(x, show_progress = FALSE))
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
   expect_snapshot(y)
+  expect_snapshot(
+    y |> orbi_get_data(scans = everything(), spectra = everything())
+  )
 
   # succesful read with spectra
   expect_snapshot(
@@ -110,18 +107,16 @@ test_that("orbi_read_raw() works", {
         orbi_read_raw(cache = FALSE, include_spectra = 1)
       x |>
         select(-"file_path")
-    } |>
-      withr::with_options(new = list(show_exec_times = FALSE))
+    }
   )
 
-  # plus aggregate
-  expect_snapshot(
-    {
-      y <- orbi_aggregate_raw(x, show_progress = FALSE)
-    } |>
-      withr::with_options(new = list(show_exec_times = FALSE))
-  )
+  # plus aggregate and get
+  expect_snapshot(y <- orbi_aggregate_raw(x, show_progress = FALSE))
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
   expect_snapshot(y)
-})
+  expect_snapshot(
+    y |> orbi_get_data(scans = everything(), spectra = everything())
+  )
+}) |>
+  withr::with_options(new = list(show_exec_times = FALSE))

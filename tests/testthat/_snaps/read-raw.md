@@ -1,15 +1,14 @@
 # orbi_read_raw() works
 
     Code
-      withr::with_options({
-        x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-        cache = FALSE)
-        select(x, -"file_path")
-      }, new = list(show_exec_times = FALSE))
+      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
+      cache = FALSE)
     Message
       v orbi_read_raw() read 'nitrate_test_10scans.raw' from cache
       v orbi_read_raw() read 'nitrate_test_1scan.raw' from cache
       v orbi_read_raw() finished reading 2 files
+    Code
+      select(x, -"file_path")
     Output
       # A tibble: 2 x 5
         file_info         scans              peaks              spectra  problems
@@ -20,9 +19,7 @@
 ---
 
     Code
-      withr::with_options({
-        y <- orbi_aggregate_raw(x, show_progress = FALSE)
-      }, new = list(show_exec_times = FALSE))
+      y <- orbi_aggregate_raw(x, show_progress = FALSE)
     Message
       v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
       spectra (0) from 2 files
@@ -104,17 +101,33 @@
 ---
 
     Code
-      withr::with_options({
-        x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-        cache = FALSE, include_spectra = 1)
-        select(x, -"file_path")
-      }, new = list(show_exec_times = FALSE))
+      orbi_get_data(y, scans = everything(), spectra = everything())
+    Message
+      v orbi_get_data() retrieved 0 records from the combination of scans (11) and
+      spectra (0) via uid and scan
+      ! Warning: there are no spectra in the data, make sure to include them when
+      reading the raw files e.g. with orbi_read_raw(include_spectra = c(1, 10, 100))
+    Output
+      # A tibble: 0 x 16
+      # i 16 variables: uid <fct>, scan <int>, time.min <dbl>, tic <dbl>,
+      #   it.ms <dbl>, resolution <dbl>, basePeakIntensity <dbl>, rawOvFtT <dbl>,
+      #   intensCompFactor <dbl>, agc <chr>, agcTarget <int>, microscans <int>,
+      #   numberLockmassesFound <int>, analyzerTemperature <dbl>, mz <dbl>,
+      #   intensity <dbl>
+
+---
+
+    Code
+      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
+      cache = FALSE, include_spectra = 1)
     Message
       v orbi_read_raw() read 'nitrate_test_10scans.raw' from cache, included the
       spectrum from 1 scan
       v orbi_read_raw() read 'nitrate_test_1scan.raw' from cache, included the
       spectrum from 1 scan
       v orbi_read_raw() finished reading 2 files
+    Code
+      select(x, -"file_path")
     Output
       # A tibble: 2 x 5
         file_info         scans              peaks              spectra  problems
@@ -125,9 +138,7 @@
 ---
 
     Code
-      withr::with_options({
-        y <- orbi_aggregate_raw(x, show_progress = FALSE)
-      }, new = list(show_exec_times = FALSE))
+      y <- orbi_aggregate_raw(x, show_progress = FALSE)
     Message
       v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
       spectra (675) from 2 files
@@ -217,4 +228,30 @@
       # i 5 variables: uid <fct>, type <chr>, call <chr>, message <chr>,
       #   condition <list>
       
+
+---
+
+    Code
+      orbi_get_data(y, scans = everything(), spectra = everything())
+    Message
+      v orbi_get_data() retrieved 675 records from the combination of scans (11) and
+      spectra (675) via uid and scan
+    Output
+      # A tibble: 675 x 16
+         uid          scan time.min    tic it.ms resolution basePeakIntensity rawOvFtT
+         <fct>       <int>    <dbl>  <dbl> <dbl>      <dbl>             <dbl>    <dbl>
+       1 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       2 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       3 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       4 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       5 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       6 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       7 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       8 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+       9 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+      10 nitrate_te~     1  0.00454 4.34e6  68.3      60000           4046979  391227.
+      # i 665 more rows
+      # i 8 more variables: intensCompFactor <dbl>, agc <chr>, agcTarget <int>,
+      #   microscans <int>, numberLockmassesFound <int>, analyzerTemperature <dbl>,
+      #   mz <dbl>, intensity <dbl>
 

@@ -44,15 +44,28 @@ orbi_get_data <- function(
   problems = NULL,
   by = c("uid", "scan")
 ) {
-  get_data(
+  spectra_quo <- enquo(spectra)
+  # get data
+  out <- get_data(
     .ds = aggregated_data,
     file_info = {{ file_info }},
     scans = {{ scans }},
     peaks = {{ peaks }},
-    spectra = {{ spectra }},
+    spectra = !!spectra_quo,
     problems = {{ problems }},
     by = by
   )
+  # warn about missing spectra
+  if (
+    !quo_is_null(spectra_quo) &&
+      "spectra" %in% names(aggregated_data) &&
+      nrow(aggregated_data$spectra) == 0
+  ) {
+    cli_text(
+      "{cli::col_yellow('!')} {.strong Warning}: there are no {.field spectra} in the data, make sure to include them when reading the raw files e.g. with {.strong orbi_read_raw(include_spectra = c(1, 10, 100))}"
+    )
+  }
+  return(out)
 }
 
 # design aggregators (general) =====
@@ -703,18 +716,18 @@ get_data <- function(
 
   details <-
     if (length(selectors) == 1) {
-      sprintf("{cli::col_blue('%s')}", names(selectors))
+      sprintf("{.field %s}", names(selectors))
     } else {
-      sprintf("{cli::col_blue('%s')} (%s)", names(selectors), n_rows)
+      sprintf("{.field %s} (%s)", names(selectors), n_rows)
     }
   details <- details |> purrr::map_chr(format_inline)
 
   # info
   finish_info(
     "retrieved {prettyunits::pretty_num(nrow(out))} records from ",
-    if (length(selectors) > 0) "the combination of ",
+    if (length(selectors) > 1) "the combination of ",
     "{details}",
-    if (length(selectors) > 0) " via {.field {unique(unlist(join_bys))}}",
+    if (length(selectors) > 1) " via {.field {unique(unlist(join_bys))}}",
     start = start,
     .call = .call
     # don't pass parent .env since we want these glues to execute in THIS env
