@@ -9,7 +9,7 @@
     # are we in the process of knitting html?
     if (knitr::is_html_output()) {
       options(cli.num_colors = 256)
-      capture.output(fansi::set_knit_hooks(
+      utils::capture.output(fansi::set_knit_hooks(
         knitr::knit_hooks,
         which = c('output', 'warning', 'error', 'message')
       ))

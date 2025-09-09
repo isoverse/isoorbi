@@ -611,7 +611,7 @@ orbi_adjust_block <- function(
 
   # info message for changes
   finish_info(
-    "made the following {.field block} adjustments in file {.file {filename}}:",
+    "made the following {.field block} adjustments in file {.file {as.character(filename)}}:",
     start = start
   )
 

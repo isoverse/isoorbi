@@ -449,7 +449,7 @@ get_cache_info <- function(
       info = purrr::map2(.data$is_cached, .data$cache_info, read_cache_info)
     ) |>
     # unpack old info
-    tidyr::unnest(.data$info, keep_empty = TRUE) |>
+    tidyr::unnest("info", keep_empty = TRUE) |>
     dplyr::mutate(
       # use cached scans + peaks to estimate file size read for cache reads
       read_file_size = dplyr::case_when(
@@ -889,7 +889,7 @@ read_raw_file <- function(
     arrow::write_parquet(
       tibble(
         file_size = as.integer(cache_info$file_size),
-        isoorbi_version = as.character(packageVersion("isoorbi")),
+        isoorbi_version = as.character(utils::packageVersion("isoorbi")),
         cache_timestamp = Sys.time()
       ),
       sink = cache_info$cache_info

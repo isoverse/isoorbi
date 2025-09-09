@@ -107,7 +107,7 @@ start_info <- function(
     # no message, just return the start time
   } else if (keep) {
     # message is permanent
-    cli_text(c("{col_blue(cli::symbol$info)} ", msg), .envir = .env)
+    cli_text(c("{cli::col_blue(cli::symbol$info)} ", msg), .envir = .env)
   } else if (show_progress) {
     # message is a progress bar (only in interactive mode)
     retval$pb <- cli_progress_bar(

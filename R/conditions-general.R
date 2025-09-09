@@ -220,9 +220,9 @@ format_cnds <- function(
                 !!prefix,
                 if (!!include_symbol) symbol,
                 if (!!include_call) call,
-                head(msg, 1)
+                utils::head(msg, 1)
               ),
-              tail(msg, -1)
+              utils::tail(msg, -1)
             )
           }
         )
@@ -316,9 +316,9 @@ summarize_and_format_cnds <- function(
       formatted_cnds <- c()
       summary_line <-
         c(
-          head(summary_line, -1),
+          utils::head(summary_line, -1),
           paste(
-            tail(summary_line, 1),
+            utils::tail(summary_line, 1),
             format_inline("{cli::symbol$arrow_right}"),
             # attach to last summary line
             format_cnds(

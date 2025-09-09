@@ -327,7 +327,7 @@ aggregate_files <- function(
   new_problems <- results$problems |>
     dplyr::filter(!is.na(.data$new) & .data$new)
   finish_info(
-    "aggregated {head(details, -1)} from {nrow(files_data)} file{?s} ",
+    "aggregated {utils::head(details, -1)} from {nrow(files_data)} file{?s} ",
     if (nrow(new_problems) > 0) {
       # custom problems summary
       summarize_cnds(
@@ -694,9 +694,9 @@ get_data <- function(
 
   details <-
     if (length(selectors) == 1) {
-      sprintf("{col_blue('%s')}", names(selectors))
+      sprintf("{cli::col_blue('%s')}", names(selectors))
     } else {
-      sprintf("{col_blue('%s')} (%s)", names(selectors), n_rows)
+      sprintf("{cli::col_blue('%s')} (%s)", names(selectors), n_rows)
     }
   details <- details |> purrr::map_chr(format_inline)
 
