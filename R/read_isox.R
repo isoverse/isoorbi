@@ -132,8 +132,8 @@ orbi_read_isox <- function(file) {
             },
             " from {.file {basename(.x)}}",
             start = start_i,
-            func = FALSE,
-            conditions = out$conditions
+            conditions = out$conditions,
+            .call = expr(orbi_read_isox())
           )
           out
         }
@@ -171,12 +171,14 @@ orbi_read_isox <- function(file) {
   }
 
   # info
-  finish_info(
-    "read {.file .isox} data from {length(file)} file{?s}",
-    start = start,
-    conditions = conditions,
-    show_conditions = FALSE
-  )
+  if (length(file) > 0 || nrow(conditions) > 0) {
+    finish_info(
+      "read {.file .isox} data from {length(file)} file{?s}",
+      start = start,
+      conditions = conditions,
+      show_conditions = FALSE
+    )
+  }
 
   return(df)
 }
