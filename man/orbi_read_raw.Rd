@@ -8,7 +8,7 @@ orbi_read_raw(
   file_paths,
   show_progress = rlang::is_interactive(),
   show_problems = TRUE,
-  include_scan_spectra = FALSE,
+  include_spectra = FALSE,
   cache = TRUE,
   cache_spectra = cache,
   read_cache = TRUE
@@ -21,7 +21,7 @@ orbi_read_raw(
 
 \item{show_problems}{whether to show problems encountered along the way (rather than just keeping track of them with \code{\link[=orbi_get_problems]{orbi_get_problems()}}). Set to \code{show_problems = FALSE} to turn off the live printout. Either way, all encountered problems can be retrieved with running \code{\link[=orbi_get_problems]{orbi_get_problems()}} for the returned list}
 
-\item{include_scan_spectra}{whether to include the spectral data from specific scans (e.g. \code{include_scan_spectra = c(5, 100, 200)}) or from all scans (\code{include_scan_spectra = TRUE}). Including many or all scan spectra makes the read process slower (especially if \code{cache_spectra = FALSE}) and the returned data frame tibble significantely larger. The default is \code{FALSE} (i.e. scan spectra are not returned).}
+\item{include_spectra}{whether to include the spectral data from specific scans (e.g. \code{include_spectra = c(5, 100, 200)} reads out the spectra from scans 5, 100, and 200 for each file if they exist) or from all scans (\code{include_spectra = TRUE}). Including many or all scan spectra makes the read process slower (especially if \code{cache_spectra = FALSE}) and the returned data frame tibble significantely larger. The default is \code{FALSE} (i.e. scan spectra are not returned).}
 
 \item{cache}{whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)}
 
