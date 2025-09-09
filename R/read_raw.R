@@ -132,7 +132,7 @@ check_for_raw_reader <- function(
 #' @param file_paths paths to the `.raw` file(s), single value or vector of paths. Use [orbi_find_raw()] to get all raw files in a folder.
 #' @param show_progress whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with `show_progress = FALSE`
 #' @param show_problems whether to show problems encountered along the way (rather than just keeping track of them with [orbi_get_problems()]). Set to `show_problems = FALSE` to turn off the live printout. Either way, all encountered problems can be retrieved with running [orbi_get_problems()] for the returned list
-#' @param include_scan_spectra whether to include the spectral data from specific scans (e.g. `include_scan_spectra = c(5, 100, 200)`) or from all scans (`include_scan_spectra = TRUE`). Including many or all scan spectra makes the read process slower (especially if `cache_spectra = FALSE`) and the returned data frame tibble significantely larger. The default is `FALSE` (i.e. scan spectra are not retrieved).
+#' @param include_scan_spectra whether to include the spectral data from specific scans (e.g. `include_scan_spectra = c(5, 100, 200)`) or from all scans (`include_scan_spectra = TRUE`). Including many or all scan spectra makes the read process slower (especially if `cache_spectra = FALSE`) and the returned data frame tibble significantely larger. The default is `FALSE` (i.e. scan spectra are not returned).
 #' @param cache whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)
 #' @param cache_spectra whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as `cache`
 #' @param read_cache whether to read the file from cached .parquet files (if they exist) or anew
@@ -199,19 +199,26 @@ orbi_read_raw <- function(
       )
     }
 
-    # read file and catch errors
+    # start timer
     file_start <- start_info()
+
+    # function (so traceback is informative)
+    func_quo <- expr(
+      (!!func)(
+        cache_info = info,
+        all_spectra = all_spectra,
+        select_spectra = select_spectra,
+        cache = cache,
+        cache_spectra = cache_spectra,
+        pb = start$pb,
+        .env = root_env
+      )
+    )
+
+    # call with error handling
     out <-
       try_catch_cnds(
-        func(
-          cache_info = info,
-          all_spectra = all_spectra,
-          select_spectra = select_spectra,
-          cache = cache,
-          cache_spectra = cache_spectra,
-          pb = start$pb,
-          .env = root_env
-        ),
+        eval_tidy(func_quo),
         error_value = tibble(
           file_path = info$file_path,
           problems = list(tibble())
@@ -280,7 +287,7 @@ orbi_read_raw <- function(
       split(1:nrow(cached_files)) |>
       purrr::map(
         read_safely,
-        func = read_cached_raw_file,
+        func = "read_cached_raw_file",
         "{if(!has_file_info) 'tried to '}",
         "read {.file {basename(info$file_path)}} from cache",
         "{if(n_spectra_scans > 0) format_inline(', included the {.field spectr{?um/a}} from {n_spectra_scans} {.field scan{?s}}')}"
@@ -329,10 +336,10 @@ orbi_read_raw <- function(
       split(1:nrow(read_files)) |>
       purrr::map(
         read_safely,
-        func = read_raw_file,
+        func = "read_raw_file",
         "{if(info$is_cached) 're-read' else 'read'} ",
         "{.file {basename(info$file_path)}} ",
-        "({prettyunits::pretty_bytes(info$file_size)})",
+        "({if (info$file_exists) prettyunits::pretty_bytes(info$file_size) else '? B'})",
         "{if(n_spectra_scans > 0) format_inline(', included the {.field spectr{?um/a}} from {n_spectra_scans} {.field scan{?s}}')}"
       ) |>
       dplyr::bind_rows()
@@ -381,16 +388,6 @@ get_cache_info <- function(
   file_paths,
   read_cache = TRUE
 ) {
-  # safety checks
-  if (any(missing <- !file.exists(file_paths))) {
-    cli_abort(
-      c(
-        "{qty(sum(missing))} file{?s} {?does/do} not exist",
-        basename(file_paths[missing]) |> set_names("x")
-      )
-    )
-  }
-
   # read existing cache info
   empty_info <- tibble(
     old_file_size = integer(),
@@ -413,7 +410,10 @@ get_cache_info <- function(
       return(empty_info)
     }
     return(
-      cache_info$result |> set_names(paste0("old_", names(cache_info$result)))
+      cache_info$result |>
+        # backwards compatibility
+        dplyr::mutate(isoorbi_version = as.character(.data$isoorbi_version)) |>
+        set_names(paste0("old_", names(cache_info$result)))
     )
   }
 
@@ -460,18 +460,6 @@ get_cache_info <- function(
       ),
       .after = "file_size"
     )
-
-  # double check if there is a problem for rereads
-  # most of the time this is caught earlier except if cache paths are passed in!
-  missing <- !cache_info$is_cached & !cache_info$file_exists
-  if (any(missing)) {
-    cli_abort(
-      c(
-        "{qty(sum(missing))} file{?s} {?does/do} not exist but are required for re-reads",
-        basename(file_paths[missing]) |> set_names("x")
-      )
-    )
-  }
 
   # return
   return(cache_info)
@@ -699,7 +687,7 @@ read_raw_file <- function(
 ) {
   # safety checks
   if (!cache_info$file_exists) {
-    cli_abort("cannot find original .raw file")
+    cli_abort("cannot find this .raw file")
   }
 
   # simplify progress updates
@@ -797,8 +785,8 @@ read_raw_file <- function(
   )
   problems <- bind_rows(problems, indices_parsed$conditions)
 
-  ## read spectra (always needed to get all scan info even if spectra not returned)
-  update_progress("reading spectra")
+  ## read spectra/scans (always needed to get all scan info even if spectra not returned)
+  update_progress("reading scans")
   spectra_raw <- try_catch_cnds(
     rawrr::readSpectrum(
       cache_info$file_path,
