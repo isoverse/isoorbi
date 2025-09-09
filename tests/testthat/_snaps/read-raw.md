@@ -12,7 +12,7 @@
 ---
 
     Code
-      expect_message(y <- orbi_aggregate_raw(x), "Aggregated")
+      expect_message(y <- orbi_aggregate_raw(x, show_progress = FALSE), "aggregated")
     Message
         > file_info: uid, file_path, RAW file, RAW file version, Creation date,
         Operator, Number of instruments, Description, Instrument model, Instrument
@@ -80,11 +80,20 @@
       # i 128 more rows
       
       $spectra
-      # A tibble: 2 x 4
-        uid                       scan    mz intensity
-        <fct>                    <int> <dbl>     <dbl>
-      1 nitrate_test_10scans.raw    NA    NA        NA
-      2 nitrate_test_1scan.raw      NA    NA        NA
+      # A tibble: 675 x 4
+         uid                       scan    mz intensity
+         <fct>                    <int> <dbl>     <dbl>
+       1 nitrate_test_10scans.raw     1  60.9        0 
+       2 nitrate_test_10scans.raw     1  60.9        0 
+       3 nitrate_test_10scans.raw     1  60.9        0 
+       4 nitrate_test_10scans.raw     1  60.9        0 
+       5 nitrate_test_10scans.raw     1  62.0        0 
+       6 nitrate_test_10scans.raw     1  62.0        0 
+       7 nitrate_test_10scans.raw     1  62.0        0 
+       8 nitrate_test_10scans.raw     1  62.0        0 
+       9 nitrate_test_10scans.raw     1  62.0      496.
+      10 nitrate_test_10scans.raw     1  62.0      935.
+      # i 665 more rows
       
       $problems
       # A tibble: 0 x 5

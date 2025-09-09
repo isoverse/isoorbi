@@ -201,8 +201,10 @@ aggregate_files <- function(
   show_problems = TRUE,
   call = rlang::caller_call()
 ) {
+  # keep track of current env to anchor progress bars
+  root_env <- current_env()
+
   # safety checks
-  force(call)
   if (missing(files_data) || !is.data.frame(files_data)) {
     cli_abort("{.var files_data} is not a data frame")
   }
@@ -237,29 +239,30 @@ aggregate_files <- function(
   # get started
   start <- Sys.time()
 
-  # progress bar
-  pb <- NULL
-  if (show_progress) {
-    old <- options(cli.progress_show_after = 0)
-    on.exit(options(old))
-    pb <- cli_progress_bar(
-      total = nrow(files_data),
-      format = paste(
-        "Aggregating {pb_current}/{pb_total}",
-        "file data {pb_bar} {pb_percent}",
-        "| {pb_elapsed} | ETA{pb_eta} | {.emph {pb_status}}"
-      )
-    )
-    on.exit(cli_process_done(), add = TRUE)
-    cli_progress_update(id = pb, inc = 0, status = "initializing")
-  }
+  # info
+  start <- start_info(
+    "is aggregating {pb_current}/{pb_total} cached raw files {pb_bar} ",
+    "file data {pb_bar} {pb_percent}",
+    "| {pb_elapsed} | ETA{pb_eta} | {.file {pb_status}}",
+    pb_total = nrow(files_data),
+    pb_status = "",
+    show_progress = show_progress,
+    .env = root_env
+  )
 
   # aggregate files safely and with progress info
   aggregate_safely_with_progress <- function(file_path, i) {
     # progress
-    if (show_progress) {
-      cli_progress_update(id = pb, status = basename(file_path))
+    if (!is.null(start$pb)) {
+      cli_progress_update(
+        id = start$pb,
+        status = basename(file_path),
+        .envir = root_env
+      )
     }
+
+    # start timer
+    file_start <- start_info()
 
     # read file but catch errors in case there are any uncaught ones
     out <-
@@ -286,14 +289,16 @@ aggregate_files <- function(
     out$result$problems <- bind_rows(files_data$problems[[i]], problems) |>
       dplyr::mutate(uid = out$result$file_info$uid) |>
       dplyr::relocate("uid", .before = 1L)
-    if (show_problems) {
-      show_cnds(
-        problems,
-        call = call,
-        summary_message = sprintf(
-          "{issues} for {.emph %s}",
-          basename(file_path)
-        )
+
+    if (show_problems && nrow(problems) > 0) {
+      # info
+      finish_info(
+        "tried to aggregate {.file {basename{file_path}}",
+        start = file_start,
+        conditions = problems,
+        show_conditions = show_problems,
+        .call = call,
+        .env = root_env
       )
     }
 
@@ -313,24 +318,32 @@ aggregate_files <- function(
     purrr::map(~ purrr::map(results, `[[`, .x) |> dplyr::bind_rows())
 
   # info
-  if (show_progress) {
-    cli_progress_done(id = pb)
-  }
   n_rows <- map_int(results, nrow) |>
     prettyunits::pretty_num() |>
     # take care of leading/trailing whitespaces
     gsub(pattern = "(^ +| +$)", replacement = "")
-  details <- sprintf("{col_blue('%s')} (%s)", names(results), n_rows)
-  info <- format_inline(
-    "{col_green(symbol$tick)} ",
-    "Aggregated {head(details, -1)} from {nrow(files_data)} file{?s} ",
-    "in {prettyunits::pretty_sec(as.numeric(Sys.time() - start, 'secs'))} ",
-    summarize_cnds(
-      results$problems |> dplyr::filter(!is.na(.data$new) & .data$new),
-      "but encountered {issues} {symbol$arrow_right} check with `orbi_get_problems(x)`"
-    )
+  details <- sprintf("{.field %s} (%s)", names(results), n_rows) |>
+    purrr::map_chr(format_inline)
+  new_problems <- results$problems |>
+    dplyr::filter(!is.na(.data$new) & .data$new)
+  finish_info(
+    "aggregated {head(details, -1)} from {nrow(files_data)} file{?s} ",
+    if (nrow(new_problems) > 0) {
+      # custom problems summary
+      summarize_cnds(
+        new_problems,
+        include_symbol = FALSE,
+        include_call = FALSE,
+        summary_format = "but encountered {issues} {symbol$arrow_right} check with {.strong orbi_get_problems(x)}"
+      )
+    },
+    success_format = if (nrow(new_problems) > 0) {
+      "{col_yellow('!')} {msg}"
+    } else {
+      "{col_green(symbol$tick)} {msg}"
+    },
+    start = start
   )
-  cli_text(info)
 
   # clean up problems
   results$problems <- dplyr::select(results$problems, -"new")
@@ -341,7 +354,7 @@ aggregate_files <- function(
       results,
       names(results),
       ~ format_inline(
-        "{symbol$arrow_right} {col_blue(.y)}: ",
+        "{symbol$arrow_right} {.field {.y}}: ",
         "{.emph {names(.x)}}"
       )
     ) |>
