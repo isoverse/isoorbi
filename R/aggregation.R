@@ -19,7 +19,7 @@ orbi_aggregate_raw <- function(
     files_data,
     aggregator,
     show_progress = show_progress,
-    show_problems = show_progress
+    show_problems = show_problems
   )
 }
 
@@ -373,9 +373,9 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
   # check which datasets are available
   check_datasets <- function(aggregator) {
     if (length(missing <- setdiff(aggregator$dataset, names(datasets))) > 0) {
-      warning(format_inline(
+      cli_warn(
         "dataset{?s} {.var {missing}} do{?es/} not exist and will be skipped during aggregation"
-      ))
+      )
     }
     aggregator |> filter(!.data$dataset %in% missing)
   }
@@ -482,6 +482,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
         )
       }
     )
+
     return(value)
   }
 
@@ -502,6 +503,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     if (length(source) == 0) {
       return(list(result = default_value, conditions = NULL))
     }
+
     # run safely
     out <-
       try_catch_cnds(
@@ -512,6 +514,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     if (show_problems) {
       show_cnds(out$conditions)
     }
+
     return(out)
   }
 
@@ -520,8 +523,13 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
     purrr::pmap(as.list(aggregator_applied), aggregation_wrapper)
 
   # separate call to simplify stack trace
+  # note: unnest_wider conflates integer()/numeric() with NULL and can NOT be used here
   aggregator_applied <- aggregator_applied |>
-    tidyr::unnest_wider("value", simplify = FALSE)
+    dplyr::mutate(
+      result = map(.data$value, `[[`, 1),
+      conditions = map(.data$value, `[[`, 2)
+    ) |>
+    dplyr::select(-"value")
 
   # get out uid
   uid <- filter(aggregator_applied, .data$column == "uid")$result[[1]]
@@ -549,6 +557,7 @@ aggregate_data <- function(datasets, aggregator, show_problems = TRUE) {
       out = list(.data$result |> setNames(.data$column) |> as_tibble())
     )
   datasets <- aggregator_summary$out |> setNames(aggregator_summary$dataset)
+
   problems <-
     dplyr::bind_rows(
       datasets$conditions,
