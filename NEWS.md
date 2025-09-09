@@ -7,6 +7,7 @@ There are no breaking changes in this release (all changes and new features are 
 ## New features
 
 * implemented direct reading and caching of orbitrap IRMS raw files (`orbi_read_read()`)
+* use CLI for clearer and more informative info messages for all functions
 
 ## Enhancements
 
