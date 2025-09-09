@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,17 @@
 <span>  <span class="fu"><a href="../reference/orbi_define_block_for_flow_injection.html">orbi_define_block_for_flow_injection</a></span><span class="op">(</span>start_time.min <span class="op">=</span> <span class="fl">0.1</span>, end_time.min <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># flag extreme TICxIT values</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [167ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5</span></span>
+<span><span class="co">## isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [236ms] orbi_read_isox() read .isox data from 1 file</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [7ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,</span></span>
+<span><span class="co">## time.min, compound, isotopocule, ions.incremental, tic, and it.ms</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [169ms] orbi_define_block_for_flow_injection() added a new block (0.1 to 0.9</span></span>
+<span><span class="co">## min) to 3 files</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [79ms] orbi_flag_outliers() confirmed that none of the 1290 scans are</span></span>
+<span><span class="co">## outliers based on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2</span></span>
+<span><span class="co">## times the average number of ions tic * it.ms in the Orbitrap analyzer, in 6</span></span>
+<span><span class="co">## data groups (based on filename, block, and segment)</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -100,12 +111,18 @@
 <code class="sourceCode R"><span><span class="co"># basepeak &amp; ratios</span></span>
 <span><span class="va">data_w_basepeak</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># ratio summaries</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [71ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated</span></span>
+<span><span class="co">## 5159 ratios for 4 isotopocules/base peak (33S, 17O, 34S, and 18O)</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># ratio summaries</span></span>
 <span><span class="va">data_summary</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data_w_basepeak</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [101ms] orbi_summarize_results() summarized ratios from 4139 peaks (excluding</span></span>
+<span><span class="co">## 0 flagged peaks; excluding 1020 unused peaks) using the sum method and grouping</span></span>
+<span><span class="co">## the data by filename, compound, basepeak, isotopocule, block, sample_name,</span></span>
+<span><span class="co">## segment, data_group, and data_type</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -114,7 +131,7 @@
 <div class="section level3">
 <h3 id="visualize-data">Visualize data<a class="anchor" aria-label="anchor" href="#visualize-data"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span><span class="va">data</span>, y <span class="op">=</span> <span class="va">ions.incremental</span>, y_scale <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="flow_injection_files/figure-html/fig-raw-data-1.png" alt="Ions of isotopocules in time" width="576"><p class="caption">
@@ -125,7 +142,7 @@ Ions of isotopocules in time
 <div class="section level3">
 <h3 id="raw-ratios">Raw ratios<a class="anchor" aria-label="anchor" href="#raw-ratios"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_w_basepeak</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span> </span></code></pre></div>
 <div class="figure">
 <img src="flow_injection_files/figure-html/fig-ratios-1.png" alt="Isotopocule ratios vs M0" width="576"><p class="caption">
@@ -136,7 +153,7 @@ Isotopocule ratios vs M0
 <div class="section level3">
 <h3 id="ratios-for-18o">Ratios for 18O<a class="anchor" aria-label="anchor" href="#ratios-for-18o"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fig</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data_summary</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">isotopocule</span> <span class="op">==</span> <span class="st">"18O"</span><span class="op">)</span> <span class="op">|&gt;</span></span>

@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,6 +95,19 @@ al. (2023)</a>.</p>
 <span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">90</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># see if there are any AGC outliers</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [163ms] orbi_read_isox() loaded 1931 peaks for 4 compounds (Alanine,</span></span>
+<span><span class="co">## Arginine, Methionine, and Phenylalanine) with 6 isotopocules (M0, 15N, 13C, 2H,</span></span>
+<span><span class="co">## 33S, and 34S) from testfile_shotnoise.isox</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [240ms] orbi_read_isox() read .isox data from 1 file</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [70ms] orbi_flag_satellite_peaks() flagged 33/1931 peaks in 3 isotopocules</span></span>
+<span><span class="co">## ("M0", "15N", "13C") as satellite peaks (1.7%)</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [39ms] orbi_flag_weak_isotopocules() flagged 3 of 18 isotopocules as weak</span></span>
+<span><span class="co">## because they were NOT present in at least 90% of scans in each of the 18 data</span></span>
+<span><span class="co">## groups (based on filename, compound, and isotopocule) → use</span></span>
+<span><span class="co">## orbi_plot_isotopocule_coverage() to visualize them</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [30ms] orbi_flag_outliers() confirmed that none of the 114 scans are outliers</span></span>
+<span><span class="co">## based on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the</span></span>
+<span><span class="co">## average number of ions tic * it.ms in the Orbitrap analyzer</span></span></code></pre>
 <p>This indicates that there were a few satellite peaks and weak
 isotopocules but no outliers.</p>
 </div>
@@ -154,21 +167,27 @@ Isotopocule intensity for M0 ion
 <code class="sourceCode R"><span><span class="co"># calculate ratios vs basepeak</span></span>
 <span><span class="va">data_w_bp</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># calculate shot noise</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [41ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated</span></span>
+<span><span class="co">## 1458 ratios for 5 isotopocules/base peak (15N, 13C, 2H, 33S, and 34S)</span></span></code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calculate shot noise</span></span>
 <span><span class="va">shot_noise</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">data_w_bp</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_analyze_shot_noise.html">orbi_analyze_shot_noise</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># export shot noise to an Excel file</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_analyze_shot_noise.html">orbi_analyze_shot_noise</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [20ms] orbi_analyze_shot_noise() analyzed the shot noise for 1254 peaks</span></span>
+<span><span class="co">## (excluding 204 flagged peaks)</span></span></code></pre>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># export shot noise to an Excel file</span></span>
 <span><span class="va">shot_noise</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel</a></span><span class="op">(</span><span class="st">"shot_noise.xlsx"</span><span class="op">)</span> </span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [292ms] orbi_export_data_to_excel() exported dataset (1254 rows, 33 columns)</span></span>
+<span><span class="co">## to shot_noise.xlsx</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="table">Table<a class="anchor" aria-label="anchor" href="#table"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example of the first few rows of the shot-noise calculations</span></span>
 <span><span class="va">shot_noise</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">compound</span>, <span class="va">isotopocule</span>, <span class="va">scan.no</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -292,7 +311,7 @@ Isotopocule intensity for M0 ion
 <div class="section level3">
 <h3 id="visualize-ratios-vs-time">Visualize ratios vs time<a class="anchor" aria-label="anchor" href="#visualize-ratios-vs-time"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_w_bp</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="shot_noise_files/figure-html/fig-mrfa-ratios-1.png" alt="Isotopocule ratios vs M0" width="768"><p class="caption">
@@ -303,7 +322,7 @@ Isotopocule ratios vs M0
 <div class="section level3">
 <h3 id="visualize-shot-noise">Visualize shot noise<a class="anchor" aria-label="anchor" href="#visualize-shot-noise"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shot_noise</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_shot_noise.html">orbi_plot_shot_noise</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="shot_noise_files/figure-html/fig-mrfa-shotnoise-1.png" alt="amino acids shotnoise" width="768"><p class="caption">

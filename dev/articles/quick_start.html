@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,9 +84,14 @@
 <span>  <span class="co"># reads .isox test data</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># optionally: keeps only most important columns; equivalent to simplify check box in IsoX</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># If you wish to read a whole folder of files, you can use the orbi_find_isox() function</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [165ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5</span></span>
+<span><span class="co">## isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [232ms] orbi_read_isox() read .isox data from 1 file</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [6ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,</span></span>
+<span><span class="co">## time.min, compound, isotopocule, ions.incremental, tic, and it.ms</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># If you wish to read a whole folder of files, you can use the orbi_find_isox() function</span></span>
 <span><span class="co"># df &lt;- "path_to_your_folder" |&gt; orbi_find_isox() |&gt; orbi_read_isox()</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -94,29 +99,42 @@
 </h2>
 <p>Now that the data is loaded, check for satellite peaks, weak
 isotopocules and outliers.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># check for noise and outliers</span></span>
 <span><span class="va">df_flagged</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># removes minor signals that were reported by IsoX in the same tolerance window where the peak of interest is</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># removes signals of isotopocules that were not detected at least in min_percent scans</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># removes outlying scans that have more than 2 times or less than 1/2 times the average number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [218ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [33ms] orbi_flag_weak_isotopocules() confirmed there are no weak</span></span>
+<span><span class="co">## isotopocules: all are detected in at least 2% of scans in each of the 15 data</span></span>
+<span><span class="co">## groups (based on filename, compound, and isotopocule)</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [40ms] orbi_flag_outliers() confirmed that none of the 1290 scans are</span></span>
+<span><span class="co">## outliers based on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2</span></span>
+<span><span class="co">## times the average number of ions tic * it.ms in the Orbitrap analyzer, in 3</span></span>
+<span><span class="co">## data groups (based on filename)</span></span></code></pre>
 <p>The info messages from these functions suggest that no data was
 flagged.</p>
 </div>
 <div class="section level2">
 <h2 id="calculate">Calculate<a class="anchor" aria-label="anchor" href="#calculate"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># define base peak and calculate the results table</span></span>
 <span><span class="va">df_results</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">df_flagged</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span><span class="op">|&gt;</span> <span class="co"># sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span> <span class="co"># calculates ratios and generates a results table</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [86ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated</span></span>
+<span><span class="co">## 5159 ratios for 4 isotopocules/base peak (33S, 17O, 34S, and 18O)</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [92ms] orbi_summarize_results() summarized ratios from 5159 peaks using the</span></span>
+<span><span class="co">## sum method and grouping the data by filename, compound, basepeak, and</span></span>
+<span><span class="co">## isotopocule</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="visualize">Visualize<a class="anchor" aria-label="anchor" href="#visualize"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># use a ggplot to plot the data</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">df_results</span> <span class="op">|&gt;</span></span>
