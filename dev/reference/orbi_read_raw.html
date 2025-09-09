@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.2</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
 <span>  <span class="va">file_paths</span>,</span>
 <span>  show_progress <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_interactive.html" class="external-link">is_interactive</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  show_problems <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_scan_spectra <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  include_spectra <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cache <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cache_spectra <span class="op">=</span> <span class="va">cache</span>,</span>
 <span>  read_cache <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -67,8 +67,8 @@
 <dd><p>whether to show problems encountered along the way (rather than just keeping track of them with <code><a href="problems.html">orbi_get_problems()</a></code>). Set to <code>show_problems = FALSE</code> to turn off the live printout. Either way, all encountered problems can be retrieved with running <code><a href="problems.html">orbi_get_problems()</a></code> for the returned list</p></dd>
 
 
-<dt id="arg-include-scan-spectra">include_scan_spectra<a class="anchor" aria-label="anchor" href="#arg-include-scan-spectra"></a></dt>
-<dd><p>whether to include the spectral data from specific scans (e.g. <code>include_scan_spectra = c(5, 100, 200)</code>) or from all scans (<code>include_scan_spectra = TRUE</code>). Including many or all scan spectra makes the read process slower (especially if <code>cache_spectra = FALSE</code>) and the returned data frame tibble significantely larger. The default is <code>FALSE</code> (i.e. scan spectra are not returned).</p></dd>
+<dt id="arg-include-spectra">include_spectra<a class="anchor" aria-label="anchor" href="#arg-include-spectra"></a></dt>
+<dd><p>whether to include the spectral data from specific scans (e.g. <code>include_spectra = c(5, 100, 200)</code> reads out the spectra from scans 5, 100, and 200 for each file if they exist) or from all scans (<code>include_spectra = TRUE</code>). Including many or all scan spectra makes the read process slower (especially if <code>cache_spectra = FALSE</code>) and the returned data frame tibble significantely larger. The default is <code>FALSE</code> (i.e. scan spectra are not returned).</p></dd>
 
 
 <dt id="arg-cache">cache<a class="anchor" aria-label="anchor" href="#arg-cache"></a></dt>

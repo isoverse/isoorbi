@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.2</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,20 +86,20 @@
 <span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># removes signals of isotopocules that were not detected at least in min_percent scans</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># removes outlying scans that have more than 2 times or less than 1/2 times the average number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span> <span class="co"># sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [180ms] orbi_read_isox() loaded 9862 peaks for 1 compound (NO3) with 4</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [160ms] orbi_read_isox() loaded 9862 peaks for 1 compound (NO3) with 4</span></span>
 <span><span class="co">## isotopocules (M0, 15N, 17O, and 18O) from testfile_dual_inlet_new.isox</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [250ms] orbi_read_isox() read .isox data from 1 file</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [6ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [225ms] orbi_read_isox() read .isox data from 1 file</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [5ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,</span></span>
 <span><span class="co">## time.min, compound, isotopocule, ions.incremental, tic, and it.ms</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [316ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [39ms] orbi_flag_weak_isotopocules() confirmed there are no weak</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [284ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks</span></span></code></pre>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [35ms] orbi_flag_weak_isotopocules() confirmed there are no weak</span></span>
 <span><span class="co">## isotopocules: all are detected in at least 10% of scans in each of the 4 data</span></span>
 <span><span class="co">## groups (based on filename, compound, and isotopocule)</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [49ms] orbi_flag_outliers() flagged 5/2467 scans (0.2%) as outliers based on</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [45ms] orbi_flag_outliers() flagged 5/2467 scans (0.2%) as outliers based on</span></span>
 <span><span class="co">## 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the average</span></span>
 <span><span class="co">## number of ions tic * it.ms in the Orbitrap analyzer → use orbi_plot_raw_data(y</span></span>
 <span><span class="co">## = tic * it.ms) to visualize them</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [148ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [136ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated</span></span>
 <span><span class="co">## 7395 ratios for 3 isotopocules/base peak (15N, 17O, and 18O)</span></span></code></pre>
 <p>No satellite peaks, no weak isotopocules, a few AGC fold
 outliers:</p>
@@ -126,9 +126,9 @@ outliers:</p>
 <span>  <span class="co"># fine adjustments</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">1</span>, shift_start_time.min <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># the 1st reference block is shorter by 2 min, cut from the start</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">4</span>, set_start_time.min <span class="op">=</span> <span class="fl">38</span>, set_end_time.min <span class="op">=</span> <span class="fl">44</span><span class="op">)</span> <span class="co"># the start and end of the 2nd reference block are manually set</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [204ms] orbi_define_blocks_for_dual_inlet() identified 7 blocks (4 reference,</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [201ms] orbi_define_blocks_for_dual_inlet() identified 7 blocks (4 reference,</span></span>
 <span><span class="co">## 3 sample) in data from 1 file</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [60ms] orbi_adjust_block() made the following block adjustments in file</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [59ms] orbi_adjust_block() made the following block adjustments in file</span></span>
 <span><span class="co">## 20230518_05_USGS32_vs_USGS34:</span></span></code></pre>
 <pre class="fansi fansi-message"><code><span><span class="co">##   → moved block 1 start from scan 825 (5.01 min) to 1155 (7.02 min)</span></span></code></pre>
 <pre class="fansi fansi-message"><code><span><span class="co">## ✔ [61ms] orbi_adjust_block() made the following block adjustments in file</span></span>
@@ -441,9 +441,9 @@ outliers:</p>
 <span>    ratio_method <span class="op">=</span> <span class="st">"sum"</span>,</span>
 <span>    include_unused_data <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [986ms] orbi_segment_blocks() segmented 7 data blocks in 1 file creating 3</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [948ms] orbi_segment_blocks() segmented 7 data blocks in 1 file creating 3</span></span>
 <span><span class="co">## segments per block (on average) with 85 scans per segment (on average)</span></span></code></pre>
-<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [595ms] orbi_summarize_results() summarized ratios from 7380 peaks (excluding</span></span>
+<pre class="fansi fansi-message"><code><span><span class="co">## ✔ [573ms] orbi_summarize_results() summarized ratios from 7380 peaks (excluding</span></span>
 <span><span class="co">## 15 flagged peaks; including 2073 unused peaks) using the sum method and</span></span>
 <span><span class="co">## grouping the data by filename, compound, basepeak, isotopocule, block,</span></span>
 <span><span class="co">## sample_name, segment, data_group, and data_type</span></span></code></pre>
