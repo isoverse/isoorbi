@@ -2,10 +2,10 @@
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-      cache = FALSE)
+      cache = FALSE, read_cache = FALSE)
     Message
-      v orbi_read_raw() read 'nitrate_test_10scans.raw' from cache
-      v orbi_read_raw() read 'nitrate_test_1scan.raw' from cache
+      v orbi_read_raw() read 'nitrate_test_10scans.raw' (124.68 kB)
+      v orbi_read_raw() read 'nitrate_test_1scan.raw' (84.10 kB)
       v orbi_read_raw() finished reading 2 files
     Code
       select(x, -"file_path")
@@ -119,11 +119,11 @@
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-      cache = FALSE, include_spectra = 1)
+      cache = FALSE, read_cache = FALSE, include_spectra = 1)
     Message
-      v orbi_read_raw() read 'nitrate_test_10scans.raw' from cache, included the
+      v orbi_read_raw() read 'nitrate_test_10scans.raw' (124.68 kB), included the
       spectrum from 1 scan
-      v orbi_read_raw() read 'nitrate_test_1scan.raw' from cache, included the
+      v orbi_read_raw() read 'nitrate_test_1scan.raw' (84.10 kB), included the
       spectrum from 1 scan
       v orbi_read_raw() finished reading 2 files
     Code

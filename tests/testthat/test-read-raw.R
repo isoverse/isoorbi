@@ -84,7 +84,7 @@ test_that("orbi_read_raw() works", {
     {
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw() |>
-        orbi_read_raw(cache = FALSE)
+        orbi_read_raw(cache = FALSE, read_cache = FALSE)
       x |>
         select(-"file_path")
     }
@@ -104,7 +104,7 @@ test_that("orbi_read_raw() works", {
     {
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw() |>
-        orbi_read_raw(cache = FALSE, include_spectra = 1)
+        orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
       x |>
         select(-"file_path")
     }
