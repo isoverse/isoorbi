@@ -81,11 +81,6 @@ get_pkg_options <- function() {
       default = "unused",
       check_fn = is_scalar_character
     ),
-    #' - `include_spectra` : whether to include the spectral data in [orbi_read_raw].
-    include_spectra = define_pkg_option(
-      default = FALSE,
-      check_fn = is_scalar_logical
-    ),
     #' - `raw_aggregator`: configuration for pulling data out of raw files
     raw_aggregator = define_pkg_option(
       default = orbi_start_aggregator(
