@@ -65,7 +65,11 @@ unlink("data_summary.xlsx")
 
 ## Package layout
 
-![](man/figures/figure_flowchart.png){width=60%}
+```{r}
+#| echo: false
+#| results: asis
+readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
+```
 
 ## Getting help
 
