@@ -72,6 +72,7 @@ unlink("data_summary.xlsx")
 #| results: asis
 if (params$generating_pkgdown_index) {
   # if we're in index.md
+  cat("<p>Click on the individual functions to jump straight to their documenation.</p>\n")
   readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
 } else {
   # if we're making README.md
