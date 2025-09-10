@@ -171,7 +171,7 @@ orbi_read_isox <- function(file) {
   }
 
   # info
-  if (length(file) > 0 || nrow(conditions) > 0) {
+  if (length(file) > 1 || nrow(conditions) > 0) {
     finish_info(
       "read {.file .isox} data from {length(file)} file{?s}",
       start = start,
