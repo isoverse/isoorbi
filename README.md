@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # isoorbi <a href='https://isoorbi.isoverse.org/'> <img src="inst/www/logo.png" align="right" height="138" /> </a>
@@ -23,17 +22,13 @@ It expects <code>.isox</code> files created by IsoX as input.
 
 You can install the current CRAN version of `isoorbi` with:
 
-``` r
-install.packages("isoorbi")
-```
+    install.packages("isoorbi")
 
 To use the latest updates, you can install the development version of
 `isoorbi` from [GitHub](https://github.com/) with:
 
-``` r
-if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
-pak::pak("isoverse/isoorbi")
-```
+    if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
+    pak::pak("isoverse/isoorbi")
 
 > Important: reading .raw files directly is made possible by the [rawrr
 > package](https://github.com/fgcz/rawrr), which wraps Thermo’s
@@ -45,20 +40,18 @@ pak::pak("isoverse/isoorbi")
 
 ## Show me some code
 
-``` r
-library(isoorbi)
+    library(isoorbi)
 
-system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
-  orbi_read_isox() |>
-  orbi_flag_satellite_peaks() |>
-  orbi_define_basepeak(basepeak_def = "M0")|> 
-  orbi_summarize_results(ratio_method = "sum") |>
-  orbi_export_data_to_excel(file = "data_summary.xlsx")
-```
+    system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
+      orbi_read_isox() |>
+      orbi_flag_satellite_peaks() |>
+      orbi_define_basepeak(basepeak_def = "M0")|> 
+      orbi_summarize_results(ratio_method = "sum") |>
+      orbi_export_data_to_excel(file = "data_summary.xlsx")
 
-## Package layout
+## Package structure
 
-<img src="man/figures/figure_flowchart.png" style="width:60.0%" />
+![](man/figures/figure_flowchart.svg)
 
 ## Getting help
 
