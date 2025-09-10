@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.3</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,9 +80,8 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_flow.isox"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[148ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6449 peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[161ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6449 peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> isotopocules (<span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>) from <span style="color: #0000BB;">testfile_flow.isox</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[195ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> read <span style="color: #0000BB;">.isox</span> data from 1 file</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ions_18O</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">isotopocule</span> <span class="op">==</span> <span class="st">"18O"</span><span class="op">)</span><span class="op">$</span><span class="va">ions.incremental</span></span></span>
 <span class="r-in"><span><span class="va">ions_M0</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">isotopocule</span> <span class="op">==</span> <span class="st">"M0"</span><span class="op">)</span><span class="op">$</span><span class="va">ions.incremental</span></span></span>
