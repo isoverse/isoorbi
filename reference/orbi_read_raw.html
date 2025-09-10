@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
     </div>
 
     <div class="ref-description section level2">
-    <p>Read raw data files (<code>.raw</code>) from Orbitrap IRMS runs directly. This function extracts all available information and thus can be relatively slow (~1s / Mb on a typical personal computer) but with the caching this is only true the first time. The results can be used directly or, more typically, are aggregated with <code><a href="orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code> to safely extract the relevant information for downstream processing.  This function is designed to be fail save by safely catching errors and reporting back on them (see <code><a href="orbi_get_problems.html">orbi_get_problems()</a></code>).</p>
+    <p>Read raw data files (<code>.raw</code>) from Orbitrap IRMS runs directly. This function extracts all available information and thus can be relatively slow (~1s / Mb on a typical personal computer) but with the caching this is only true the first time. The results can be used directly or, more typically, are aggregated with <code><a href="orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code> to safely extract the relevant information for downstream processing.  This function is designed to be fail save by safely catching errors and reporting back on them (see <code><a href="problems.html">orbi_get_problems()</a></code>).</p>
     </div>
 
     <div class="section level2">
@@ -44,8 +44,9 @@
 <span>  <span class="va">file_paths</span>,</span>
 <span>  show_progress <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_interactive.html" class="external-link">is_interactive</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  show_problems <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_spectra <span class="op">=</span> <span class="fu"><a href="orbi_options.html">orbi_get_option</a></span><span class="op">(</span><span class="st">"include_spectra"</span><span class="op">)</span>,</span>
+<span>  include_spectra <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cache <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cache_spectra <span class="op">=</span> <span class="va">cache</span>,</span>
 <span>  read_cache <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -63,15 +64,19 @@
 
 
 <dt id="arg-show-problems">show_problems<a class="anchor" aria-label="anchor" href="#arg-show-problems"></a></dt>
-<dd><p>whether to show problems encountered along the way (rather than just keeping track of them with <code><a href="orbi_get_problems.html">orbi_get_problems()</a></code>). Set to <code>show_problems = FALSE</code> to turn off the live printout. Either way, all encountered problems can be retrieved with running <code><a href="orbi_get_problems.html">orbi_get_problems()</a></code> for the returned list</p></dd>
+<dd><p>whether to show problems encountered along the way (rather than just keeping track of them with <code><a href="problems.html">orbi_get_problems()</a></code>). Set to <code>show_problems = FALSE</code> to turn off the live printout. Either way, all encountered problems can be retrieved with running <code><a href="problems.html">orbi_get_problems()</a></code> for the returned list</p></dd>
 
 
 <dt id="arg-include-spectra">include_spectra<a class="anchor" aria-label="anchor" href="#arg-include-spectra"></a></dt>
-<dd><p>whether to include the whole spectral data in the returned tibble (makes it much larger and takes longer to read in)</p></dd>
+<dd><p>whether to include the spectral data from specific scans (e.g. <code>include_spectra = c(5, 100, 200)</code> reads out the spectra from scans 5, 100, and 200 for each file if they exist) or from all scans (<code>include_spectra = TRUE</code>). Including many or all scan spectra makes the read process slower (especially if <code>cache_spectra = FALSE</code>) and the returned data frame tibble significantely larger. The default is <code>FALSE</code> (i.e. scan spectra are not returned).</p></dd>
 
 
 <dt id="arg-cache">cache<a class="anchor" aria-label="anchor" href="#arg-cache"></a></dt>
 <dd><p>whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)</p></dd>
+
+
+<dt id="arg-cache-spectra">cache_spectra<a class="anchor" aria-label="anchor" href="#arg-cache-spectra"></a></dt>
+<dd><p>whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as <code>cache</code></p></dd>
 
 
 <dt id="arg-read-cache">read_cache<a class="anchor" aria-label="anchor" href="#arg-read-cache"></a></dt>
@@ -80,7 +85,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically <code>file_info</code>, <code>scans</code>, <code>peaks</code>, and <code>spectra</code>). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use <code><a href="orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code> to extract safely across files.</p>
+    <p>a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically <code>cache_info</code>, <code>scans</code>, <code>peaks</code>, and <code>spectra</code>). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use <code><a href="orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code> to extract safely across files.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

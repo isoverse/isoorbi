@@ -38,7 +38,6 @@
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_data.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_isotopocule_coverage.html</loc></url>
-<url><loc>https://isoorbi.isoverse.org/reference/orbi_get_problems.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_settings.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_options.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_isotopocule_coverage.html</loc></url>
@@ -51,5 +50,6 @@
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_set_settings.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_summarize_results.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/problems.html</loc></url>
 </urlset>
 

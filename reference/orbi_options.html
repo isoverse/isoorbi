@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,9 +80,9 @@
 <li><p><code>data_type_startup</code>: the text used to flag raw data as being part of the startup</p></li>
 <li><p><code>data_type_changeover</code>: the text used to flag raw data as being part of a changeover</p></li>
 <li><p><code>data_type_unused</code>: the text used to flag raw data as being unused</p></li>
-<li><p><code>include_spectra</code> : whether to include the spectral data in <a href="orbi_read_raw.html">orbi_read_raw</a>.</p></li>
 <li><p><code>raw_aggregator</code>: configuration for pulling data out of raw files</p></li>
 <li><p><code>debug</code>: turn on debug mode</p></li>
+<li><p><code>auto_use_ansi</code>: whether to automatically enable correct rendering of stylized (ansi) output in HTML reports from notebooks that call <code><a href="https://isoorbi.isoverse.org/">library(isoorbi)</a></code>. Can be turned off by calling <code>isoorbi::orbi_options(auto_use_ansi = FALSE)</code> <strong>before</strong> call <code><a href="https://isoorbi.isoverse.org/">library(isoorbi)</a></code>.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -107,9 +107,6 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $data_type_unused</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "unused"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $include_spectra</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $raw_aggregator</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 22 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    dataset   column              source     default regexp cast     func  args  </span>
@@ -128,6 +125,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $debug</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $auto_use_ansi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Options that contain 'data' in the name</span></span></span>
