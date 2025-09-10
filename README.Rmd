@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: md_document
+params:
+  generating_pkgdown_index: false
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -68,7 +70,29 @@ unlink("data_summary.xlsx")
 ```{r}
 #| echo: false
 #| results: asis
-readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
+if (params$generating_pkgdown_index) {
+  # if we're in index.md
+  readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
+} else {
+  # if we're making README.md
+  cat("![Package Structure Flowchart](man/figures/figure_flowchart.svg)")
+}
+```
+
+```{r}
+#| label: generate pkgdown index.md
+#| include: false
+# trigger index.md generation
+if (!params$generating_pkgdown_index) {
+  out <- xfun::Rscript_call(
+    rmarkdown::render,
+    args = list(
+      input = "README.Rmd", 
+      output_file = "pkgdown/index.md",
+      params = list(generating_pkgdown_index = TRUE)
+    )
+  )
+}
 ```
 
 ## Getting help
