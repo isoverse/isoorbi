@@ -65,7 +65,7 @@ unlink("data_summary.xlsx")
 ```
 
 
-## Package layout
+## Package structure
 
 ```{r}
 #| echo: false
@@ -75,7 +75,7 @@ if (params$generating_pkgdown_index) {
   readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
 } else {
   # if we're making README.md
-  cat("![Package Structure Flowchart](man/figures/figure_flowchart.svg)")
+  cat("![](man/figures/figure_flowchart.svg)")
 }
 ```
 

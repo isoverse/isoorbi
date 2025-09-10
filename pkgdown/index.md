@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # isoorbi <a href='https://isoorbi.isoverse.org/'> <img src="inst/www/logo.png" align="right" height="138" /> </a>
@@ -23,17 +22,13 @@ It expects <code>.isox</code> files created by IsoX as input.
 
 You can install the current CRAN version of `isoorbi` with:
 
-``` r
-install.packages("isoorbi")
-```
+    install.packages("isoorbi")
 
 To use the latest updates, you can install the development version of
 `isoorbi` from [GitHub](https://github.com/) with:
 
-``` r
-if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
-pak::pak("isoverse/isoorbi")
-```
+    if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
+    pak::pak("isoverse/isoorbi")
 
 > Important: reading .raw files directly is made possible by the [rawrr
 > package](https://github.com/fgcz/rawrr), which wraps Thermo’s
@@ -45,23 +40,19 @@ pak::pak("isoverse/isoorbi")
 
 ## Show me some code
 
-``` r
-library(isoorbi)
+    library(isoorbi)
 
-system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
-  orbi_read_isox() |>
-  orbi_flag_satellite_peaks() |>
-  orbi_define_basepeak(basepeak_def = "M0")|> 
-  orbi_summarize_results(ratio_method = "sum") |>
-  orbi_export_data_to_excel(file = "data_summary.xlsx")
-```
+    system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
+      orbi_read_isox() |>
+      orbi_flag_satellite_peaks() |>
+      orbi_define_basepeak(basepeak_def = "M0")|> 
+      orbi_summarize_results(ratio_method = "sum") |>
+      orbi_export_data_to_excel(file = "data_summary.xlsx")
 
-## Package layout
+## Package structure
 
 <?xml version="1.0" encoding="UTF-8"?>
-
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 874.48 1403.08">
-
 <metadata><c2pa:manifest xmlns:c2pa="http://c2pa.org/manifest">AAA0RWp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAADQfanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46dXVpZDplZmU3ODMzYi0zYzdiLTRkYWQtYmU2Yi01NzVjYzI0YmM1NmUAAAABtGp1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAANdqdW1iAAAAJmp1bWRjYm9yABEAEIAAAKoAOJtxA2MycGEuYWN0aW9ucwAAAACpY2JvcqFnYWN0aW9uc4GjZmFjdGlvbmtjMnBhLmVkaXRlZG1zb2Z0d2FyZUFnZW50bUFkb2JlIEZpcmVmbHlxZGlnaXRhbFNvdXJjZVR5cGV4U2h0dHA6Ly9jdi5pcHRjLm9yZy9uZXdzY29kZXMvZGlnaXRhbHNvdXJjZXR5cGUvY29tcG9zaXRlV2l0aFRyYWluZWRBbGdvcml0aG1pY01lZGlhAAAArGp1bWIAAAAoanVtZGNib3IAEQAQgAAAqgA4m3EDYzJwYS5oYXNoLmRhdGEAAAAAfGNib3KlamV4Y2x1c2lvbnOBomVzdGFydBjkZmxlbmd0aBlFtGRuYW1lbmp1bWJmIG1hbmlmZXN0Y2FsZ2ZzaGEyNTZkaGFzaFggLvc4uNHlqiGx9nGavPGOCB+6GjLgs2OIGm959F9JeAljcGFkSQAAAAAAAAAAAAAAAgxqdW1iAAAAJGp1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0AAAAB4GNib3KoaGRjOnRpdGxlb0dlbmVyYXRlZCBJbWFnZWlkYzpmb3JtYXRtaW1hZ2Uvc3ZnK3htbGppbnN0YW5jZUlEeCx4bXA6aWlkOjliYzZmNGVhLTU3MjYtNDljZS1hY2ExLTU5MmFmMmViYjY1ZW9jbGFpbV9nZW5lcmF0b3J4N0Fkb2JlX0lsbHVzdHJhdG9yLzI5LjcgYWRvYmVfYzJwYS8wLjEyLjIgYzJwYS1ycy8wLjMyLjV0Y2xhaW1fZ2VuZXJhdG9yX2luZm+Bv2RuYW1lcUFkb2JlIElsbHVzdHJhdG9yZ3ZlcnNpb25kMjkuN/9pc2lnbmF0dXJleBlzZWxmI2p1bWJmPWMycGEuc2lnbmF0dXJlamFzc2VydGlvbnOComN1cmx4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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2WQEADJlEs2xrtZS+2wqOAN7M5NZlTu1GBpFC3iaHnMHeCxvbfZRTK1EDk9LVcWrvB6p3oCSKuthIfmI42tO2CDKD5tjt2p/9TUa8H8NGSSlQ40B3aQpcGgQdD6HZVpLqUA6K4NtkgJHf9UbXiFHPd+M0lrWBIkOu16fVARwQjDi8k8KuyybonBs84f0pIuNELFypbIieE7dL/JmMcX75Ek4p/x13FOtL0uhRzHt1aZpftgGIAQhCY4eq0zhKPeeGvMN45OsYr51wkKuvJofO6i8AbwpiHXyp3ckdkt6J5jnHy3WHmyZv9NFxyZvreZMzywWScdkFCQ4lNri7ksK9eDybCQ==</c2pa:manifest></metadata>
 <!-- Generator: Adobe Illustrator 29.7.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 8)  -->
 <defs>
@@ -69,118 +60,152 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
       .st0, .st1, .st2, .st3, .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12, .st13, .st14, .st15, .st16, .st17, .st18, .st19, .st20, .st21, .st22, .st23 {
         fill: none;
       }
-&#10;      .st1, .st2, .st3, .st24, .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12, .st25, .st13, .st14, .st15, .st16, .st17, .st18, .st19, .st20, .st21, .st22, .st23 {
+
+      .st1, .st2, .st3, .st24, .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12, .st25, .st13, .st14, .st15, .st16, .st17, .st18, .st19, .st20, .st21, .st22, .st23 {
         stroke: #231f20;
         stroke-miterlimit: 10;
       }
-&#10;      .st1, .st4, .st6, .st9 {
+
+      .st1, .st4, .st6, .st9 {
         stroke-width: 2.46px;
       }
-&#10;      .st1, .st5 {
+
+      .st1, .st5 {
         stroke-dasharray: 6;
       }
-&#10;      .st2, .st3, .st8, .st11, .st12, .st14, .st15, .st18 {
+
+      .st2, .st3, .st8, .st11, .st12, .st14, .st15, .st18 {
         stroke-width: 2px;
       }
-&#10;      .st2, .st9 {
+
+      .st2, .st9 {
         stroke-dasharray: 5.93 5.93;
       }
-&#10;      .st3 {
+
+      .st3 {
         stroke-dasharray: 7.04 7.04;
       }
-&#10;      .st26 {
+
+      .st26 {
         fill: #010101;
       }
-&#10;      .st27, .st28, .st29 {
+
+      .st27, .st28, .st29 {
         fill: #231f20;
       }
-&#10;      .st30 {
+
+      .st30 {
         fill: #fbb042;
       }
-&#10;      .st24 {
+
+      .st24 {
         stroke-width: 1.53px;
       }
-&#10;      .st24, .st25 {
+
+      .st24, .st25 {
         fill: #cdacd1;
       }
-&#10;      .st4 {
+
+      .st4 {
         stroke-dasharray: 6 6;
       }
-&#10;      .st5 {
+
+      .st5 {
         stroke-width: 2.36px;
       }
-&#10;      .st6 {
+
+      .st6 {
         stroke-dasharray: 5.95 5.95;
       }
-&#10;      .st7 {
+
+      .st7 {
         stroke-dasharray: 8.62;
         stroke-width: 3.53px;
       }
-&#10;      .st8 {
+
+      .st8 {
         stroke-dasharray: 6 6;
       }
-&#10;      .st28 {
+
+      .st28 {
         font-size: 19.94px;
       }
-&#10;      .st28, .st29 {
+
+      .st28, .st29 {
         font-family: ArialMT, Arial;
       }
-&#10;      .st29 {
+
+      .st29 {
         font-size: 17px;
       }
-&#10;      .st10 {
+
+      .st10 {
         stroke-dasharray: 8.23;
         stroke-width: 3.38px;
       }
-&#10;      .st11 {
+
+      .st11 {
         stroke-dasharray: 7.95;
       }
-&#10;      .st12 {
+
+      .st12 {
         stroke-dasharray: 7.75;
       }
-&#10;      .st25, .st22 {
+
+      .st25, .st22 {
         stroke-width: 2.66px;
       }
-&#10;      .st13 {
+
+      .st13 {
         stroke-dasharray: 6.17 6.17;
         stroke-width: 2.56px;
       }
-&#10;      .st15 {
+
+      .st15 {
         stroke-dasharray: 8.01;
       }
-&#10;      .st16 {
+
+      .st16 {
         stroke-width: 2.15px;
       }
-&#10;      .st31 {
+
+      .st31 {
         fill: #5ebb55;
       }
-&#10;      .st17 {
+
+      .st17 {
         stroke-dasharray: 7.26;
         stroke-width: 2.1px;
       }
-&#10;      .st32 {
+
+      .st32 {
         fill: #e2e2e2;
       }
-&#10;      .st18 {
+
+      .st18 {
         stroke-dasharray: 6.98;
       }
-&#10;      .st33 {
+
+      .st33 {
         fill: #5f88c6;
       }
-&#10;      .st19 {
+
+      .st19 {
         stroke-width: 4px;
       }
-&#10;      .st20 {
+
+      .st20 {
         stroke-width: 3px;
       }
-&#10;      .st21 {
+
+      .st21 {
         stroke-width: 2.49px;
       }
-&#10;      .st23 {
+
+      .st23 {
         stroke-width: 2.64px;
       }
     </style>
-
 </defs> <g id="Layer_1"> <g>
 <line class="st19" x1="407.02" y1="181.96" x2="407.02" y2="266"/>
 <polygon class="st27" points="395.05 262.49 407.02 283.22 418.99 262.49 395.05 262.49"/>
@@ -192,18 +217,18 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st20" x="319.38" y="286.36" width="172.29" height="41.92" rx="4.23" ry="4.23"/>
 </g>
 <path class="st26" d="M333.7,307.32l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(364.23 311.86)"><tspan x="0" y="0">orbi_read_isox</tspan></text>
+<text class="st29" transform="translate(364.23 311.86)"><tspan x="0" y="0">orbi\_read\_isox</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="130.88" y="403.02" width="172.29" height="41.92" rx="4.23" ry="4.23"/>
 <rect class="st1" x="130.88" y="403.02" width="172.29" height="41.92" rx="4.23" ry="4.23"/>
 </g>
 <path class="st26" d="M145.2,423.98l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(175.73 428.51)"><tspan x="0" y="0">orbi_filter_isox</tspan></text>
+<text class="st29" transform="translate(175.73 428.51)"><tspan x="0" y="0">orbi\_filter\_isox</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="508.34" y="669.2" width="302.37" height="41.92" rx="5.6" ry="5.6"/>
 <rect class="st11" x="508.34" y="669.2" width="302.37" height="41.92" rx="5.6" ry="5.6"/>
 </g>
-<text class="st29" transform="translate(553.19 694.7)"><tspan x="0" y="0">orbi_plot_raw_data(y
+<text class="st29" transform="translate(553.19 694.7)"><tspan x="0" y="0">orbi\_plot\_raw\_data(y
 = intensity)</tspan></text>
 <path class="st26" d="M521.67,680.18c0-.92-.74-1.66-1.66-1.66s-1.66.74-1.66,1.66v17.47c0,2.3,1.86,4.16,4.16,4.16h20.8c.92,0,1.66-.74,1.66-1.66s-.74-1.66-1.66-1.66h-20.8c-.46,0-.83-.37-.83-.83v-17.47ZM542.81,684.68c.65-.65.65-1.71,0-2.36s-1.71-.65-2.36,0l-5.47,5.48-2.98-2.98c-.65-.65-1.71-.65-2.36,0l-5.82,5.82c-.65.65-.65,1.71,0,2.36s1.71.65,2.36,0l4.65-4.64,2.98,2.98c.65.65,1.71.65,2.36,0l6.65-6.65h0Z"/>
 </g> <g> <g>
@@ -211,13 +236,13 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st20" x="279.38" y="473.15" width="243.53" height="41.92" rx="5.03" ry="5.03"/>
 </g>
 <path class="st26" d="M293.7,494.1l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(324.24 498.64)"><tspan x="0" y="0">orbi_flag_satellite_peaks</tspan></text>
+<text class="st29" transform="translate(324.24 498.64)"><tspan x="0" y="0">orbi\_flag\_satellite\_peaks</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="508.18" y="724.31" width="272" height="41.92" rx="5.31" ry="5.31"/>
 <rect class="st12" x="508.18" y="724.31" width="272" height="41.92" rx="5.31" ry="5.31"/>
 </g>
 <path class="st26" d="M519.49,745.27l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(546.03 749.81)"><tspan x="0" y="0">orbi_flag_weak_isotopocules</tspan></text>
+<text class="st29" transform="translate(546.03 749.81)"><tspan x="0" y="0">orbi\_flag\_weak\_isotopocules</tspan></text>
 </g> <g>
 <line class="st19" x1="405.52" y1="328.28" x2="405.52" y2="452.21"/>
 <polygon class="st27" points="393.56 448.71 405.52 469.43 417.49 448.71 393.56 448.71"/>
@@ -254,14 +279,14 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st31" x="509.36" y="917.82" width="276.02" height="41.92" rx="5.8" ry="5.8"/>
 <rect class="st10" x="509.36" y="917.82" width="276.02" height="41.92" rx="5.8" ry="5.8"/>
 </g>
-<text class="st29" transform="translate(554.21 943.32)"><tspan x="0" y="0">orbi_plot_raw_data(y
+<text class="st29" transform="translate(554.21 943.32)"><tspan x="0" y="0">orbi\_plot\_raw\_data(y
 = ratio)</tspan></text>
 <path class="st26" d="M522.69,928.8c0-.92-.74-1.66-1.66-1.66s-1.66.74-1.66,1.66v17.47c0,2.3,1.86,4.16,4.16,4.16h20.8c.92,0,1.66-.74,1.66-1.66s-.74-1.66-1.66-1.66h-20.8c-.46,0-.83-.37-.83-.83v-17.47ZM543.83,933.31c.65-.65.65-1.71,0-2.36s-1.71-.65-2.36,0l-5.47,5.48-2.98-2.98c-.65-.65-1.71-.65-2.36,0l-5.82,5.82c-.65.65-.65,1.71,0,2.36s1.71.65,2.36,0l4.65-4.64,2.98,2.98c.65.65,1.71.65,2.36,0l6.65-6.65h0Z"/>
 </g> <g> <g>
 <rect class="st31" x="509.36" y="974.32" width="302.37" height="41.92" rx="6.07" ry="6.07"/>
 <rect class="st7" x="509.36" y="974.32" width="302.37" height="41.92" rx="6.07" ry="6.07"/>
 </g>
-<text class="st29" transform="translate(554.21 999.81)"><tspan x="0" y="0">orbi_plot_raw_data(y
+<text class="st29" transform="translate(554.21 999.81)"><tspan x="0" y="0">orbi\_plot\_raw\_data(y
 = tic \* it.ms)</tspan></text>
 <path class="st26" d="M522.69,985.3c0-.92-.74-1.66-1.66-1.66s-1.66.74-1.66,1.66v17.47c0,2.3,1.86,4.16,4.16,4.16h20.8c.92,0,1.66-.74,1.66-1.66s-.74-1.66-1.66-1.66h-20.8c-.46,0-.83-.37-.83-.83v-17.47ZM543.83,989.8c.65-.65.65-1.71,0-2.36s-1.71-.65-2.36,0l-5.47,5.48-2.98-2.98c-.65-.65-1.71-.65-2.36,0l-5.82,5.82c-.65.65-.65,1.71,0,2.36s1.71.65,2.36,0l4.65-4.64,2.98,2.98c.65.65,1.71.65,2.36,0l6.65-6.65h0Z"/>
 </g> <g>
@@ -280,7 +305,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st31" x="586.58" y="473.15" width="241.2" height="41.92" rx="5.11" ry="5.11"/>
 <rect class="st17" x="586.58" y="473.15" width="241.2" height="41.92" rx="5.11" ry="5.11"/>
 </g>
-<text class="st29" transform="translate(631.44 498.64)"><tspan x="0" y="0">orbi_plot_satellite_peaks</tspan></text>
+<text class="st29" transform="translate(631.44 498.64)"><tspan x="0" y="0">orbi\_plot\_satellite\_peaks</tspan></text>
 <path class="st26" d="M596.88,483.94c0-.92-.74-1.66-1.66-1.66s-1.66.74-1.66,1.66v17.47c0,2.3,1.86,4.16,4.16,4.16h20.8c.92,0,1.66-.74,1.66-1.66s-.74-1.66-1.66-1.66h-20.8c-.46,0-.83-.37-.83-.83v-17.47ZM618.02,488.44c.65-.65.65-1.71,0-2.36s-1.71-.65-2.36,0l-5.47,5.48-2.98-2.98c-.65-.65-1.71-.65-2.36,0l-5.82,5.82c-.65.65-.65,1.71,0,2.36s1.71.65,2.36,0l4.65-4.64,2.98,2.98c.65.65,1.71.65,2.36,0l6.65-6.65h0Z"/>
 </g> <g>
 <line class="st8" x1="535.46" y1="493.54" x2="559.99" y2="493.54"/>
@@ -289,7 +314,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st31" x="572.33" y="374.26" width="293.33" height="41.92" rx="5.65" ry="5.65"/>
 <rect class="st15" x="572.33" y="374.26" width="293.33" height="41.92" rx="5.65" ry="5.65"/>
 </g>
-<text class="st29" transform="translate(617.18 399.76)"><tspan x="0" y="0">orbi_plot_isotopocule_coverage</tspan></text>
+<text class="st29" transform="translate(617.18 399.76)"><tspan x="0" y="0">orbi\_plot\_isotopocule\_coverage</tspan></text>
 <path class="st26" d="M582.62,385.05c0-.92-.74-1.66-1.66-1.66s-1.66.74-1.66,1.66v17.47c0,2.3,1.86,4.16,4.16,4.16h20.8c.92,0,1.66-.74,1.66-1.66s-.74-1.66-1.66-1.66h-20.8c-.46,0-.83-.37-.83-.83v-17.47ZM603.76,389.55c.65-.65.65-1.71,0-2.36s-1.71-.65-2.36,0l-5.47,5.48-2.98-2.98c-.65-.65-1.71-.65-2.36,0l-5.82,5.82c-.65.65-.65,1.71,0,2.36s1.71.65,2.36,0l4.65-4.64,2.98,2.98c.65.65,1.71.65,2.36,0l6.65-6.65h0Z"/>
 </g> <g>
 <line class="st8" x1="418.4" y1="391.22" x2="547.92" y2="391.22"/>
@@ -322,7 +347,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st5" x="149.71" y="230.82" width="167.14" height="41.92" rx="4.23" ry="4.23"/>
 </g>
 <path class="st26" d="M164.03,252.78l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(194.56 257.31)"><tspan x="0" y="0">orbi_find_isox</tspan></text>
+<text class="st29" transform="translate(194.56 257.31)"><tspan x="0" y="0">orbi\_find\_isox</tspan></text>
 </a> </g> <g>
 <a xlink:href="https://isoorbi.isoverse.org/reference/orbi_simplify_isox.html">
 <g>
@@ -330,7 +355,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st9" x="123.35" y="349.3" width="187.36" height="41.92" rx="4.41" ry="4.41"/>
 </g>
 <path class="st26" d="M134.66,370.26l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(165.2 374.79)"><tspan x="0" y="0">orbi_simplify_isox</tspan></text>
+<text class="st29" transform="translate(165.2 374.79)"><tspan x="0" y="0">orbi\_simplify\_isox</tspan></text>
 </a> </g> <g>
 <line class="st8" x1="346.28" y1="906.69" x2="386.81" y2="906.69"/>
 <polygon class="st27" points="383.89 916.66 401.16 906.69 383.89 896.71 383.89 916.66"/>
@@ -348,7 +373,7 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st2" x="148.36" y="885.73" width="187.36" height="41.92" rx="4.41" ry="4.41"/>
 </g>
 <path class="st26" d="M159.68,906.68l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(184.14 912.22)"><tspan x="0" y="0">orbi_flag_outliers</tspan></text>
+<text class="st29" transform="translate(184.14 912.22)"><tspan x="0" y="0">orbi\_flag\_outliers</tspan></text>
 </g> <g>
 <line class="st8" x1="350.87" y1="1140.98" x2="380.81" y2="1140.98"/>
 <polygon class="st27" points="377.89 1150.95 395.16 1140.98 377.89 1131 377.89 1150.95"/>
@@ -360,31 +385,31 @@ system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
 <rect class="st13" x="137.63" y="1120.02" width="202.76" height="41.92" rx="4.59" ry="4.59"/>
 </g>
 <path class="st26" d="M146.95,1140.97l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(171.41 1145.51)"><tspan x="0" y="0">orbi_segment_blocks</tspan></text>
+<text class="st29" transform="translate(171.41 1145.51)"><tspan x="0" y="0">orbi\_segment\_blocks</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="294.07" y="1182.71" width="233.24" height="41.92" rx="4.92" ry="4.92"/>
 <rect class="st20" x="294.07" y="1182.71" width="233.24" height="41.92" rx="4.92" ry="4.92"/>
 </g>
 <path class="st26" d="M308.39,1203.67l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(331.93 1208.21)"><tspan x="0" y="0">orbi_summarize_results</tspan></text>
+<text class="st29" transform="translate(331.93 1208.21)"><tspan x="0" y="0">orbi\_summarize\_results</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="508.04" y="1030.95" width="241.67" height="41.92" rx="4.68" ry="4.68"/>
 <rect class="st7" x="508.04" y="1030.95" width="241.67" height="41.92" rx="4.68" ry="4.68"/>
 </g>
 <path class="st26" d="M519.36,1051.91l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(549.9 1056.45)"><tspan x="0" y="0">orbi_analyze_shot_noise</tspan></text>
+<text class="st29" transform="translate(549.9 1056.45)"><tspan x="0" y="0">orbi\_analyze\_shot\_noise</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="618.51" y="1124.47" width="210.56" height="41.92" rx="4.68" ry="4.68"/>
 <rect class="st10" x="618.51" y="1124.47" width="210.56" height="41.92" rx="4.68" ry="4.68"/>
 </g>
-<text class="st29" transform="translate(660.36 1149.96)"><tspan x="0" y="0">orbi_plot_shot_noise</tspan></text>
+<text class="st29" transform="translate(660.36 1149.96)"><tspan x="0" y="0">orbi\_plot\_shot\_noise</tspan></text>
 <path class="st26" d="M631.91,1135.44c0-.92-.74-1.66-1.66-1.66s-1.66.74-1.66,1.66v17.47c0,2.3,1.86,4.16,4.16,4.16h20.8c.92,0,1.66-.74,1.66-1.66s-.74-1.66-1.66-1.66h-20.8c-.46,0-.83-.37-.83-.83v-17.47ZM653.05,1139.95c.65-.65.65-1.71,0-2.36s-1.71-.65-2.36,0l-5.47,5.48-2.98-2.98c-.65-.65-1.71-.65-2.36,0l-5.82,5.82c-.65.65-.65,1.71,0,2.36s1.71.65,2.36,0l4.65-4.64,2.98,2.98c.65.65,1.71.65,2.36,0l6.65-6.65h0Z"/>
 </g> <g> <g>
 <rect class="st31" x="285.86" y="1265.6" width="253.12" height="41.92" rx="4.68" ry="4.68"/>
 <rect class="st20" x="285.86" y="1265.6" width="253.12" height="41.92" rx="4.68" ry="4.68"/>
 </g>
 <path class="st26" d="M297.18,1286.56l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(327.72 1291.09)"><tspan x="0" y="0">orbi_export_data_to_excel</tspan></text>
+<text class="st29" transform="translate(327.72 1291.09)"><tspan x="0" y="0">orbi\_export\_data\_to\_excel</tspan></text>
 </g> <g> <g>
 <rect class="st33" x="287.86" y="1351.93" width="248.29" height="41.92" rx="4.73" ry="4.73"/>
 <rect class="st20" x="287.86" y="1351.93" width="248.29" height="41.92" rx="4.73" ry="4.73"/>
@@ -398,32 +423,32 @@ spreadsheet (.xlsx)</tspan></text>
 </g>
 <path class="st26" d="M121.12,576.82l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
 <path class="st26" d="M121.12,610.66l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(144.66 611.74)"><tspan x="0" y="0">orbi_define_blocks_for_dual_inlet</tspan></text>
-<text class="st29" transform="translate(144.66 581.54)"><tspan x="0" y="0">orbi_define_block_for_flow_injection</tspan></text>
+<text class="st29" transform="translate(144.66 611.74)"><tspan x="0" y="0">orbi\_define\_blocks\_for\_dual\_inlet</tspan></text>
+<text class="st29" transform="translate(144.66 581.54)"><tspan x="0" y="0">orbi\_define\_block\_for\_flow\_injection</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="7.56" y="702.33" width="211.58" height="41.92" rx="4.36" ry="4.36"/>
 <rect class="st6" x="7.56" y="702.33" width="211.58" height="41.92" rx="4.36" ry="4.36"/>
 </g>
-<text class="st29" transform="translate(52.41 727.83)"><tspan x="0" y="0">orbi_get_blocks_info</tspan></text>
+<text class="st29" transform="translate(52.41 727.83)"><tspan x="0" y="0">orbi\_get\_blocks\_info</tspan></text>
 <path class="st26" d="M28.65,737.83c8.03,0,14.54-6.51,14.54-14.54s-6.51-14.54-14.54-14.54-14.54,6.51-14.54,14.54,6.51,14.54,14.54,14.54ZM26.38,727.84h1.36v-3.63h-1.36c-.76,0-1.36-.61-1.36-1.36s.61-1.36,1.36-1.36h2.73c.76,0,1.36.61,1.36,1.36v5h.45c.76,0,1.36.61,1.36,1.36s-.61,1.36-1.36,1.36h-4.54c-.76,0-1.36-.61-1.36-1.36s.61-1.36,1.36-1.36ZM28.65,716.02c1,0,1.82.81,1.82,1.82s-.81,1.82-1.82,1.82-1.82-.81-1.82-1.82.81-1.82,1.82-1.82Z"/>
 </g> <g> <g>
 <rect class="st31" x="572.02" y="319.47" width="286.52" height="41.92" rx="5.08" ry="5.08"/>
 <rect class="st3" x="572.02" y="319.47" width="286.52" height="41.92" rx="5.08" ry="5.08"/>
 </g>
-<text class="st29" transform="translate(616.87 344.96)"><tspan x="0" y="0">orbi_get_isotopocule_coverage</tspan></text>
+<text class="st29" transform="translate(616.87 344.96)"><tspan x="0" y="0">orbi\_get\_isotopocule\_coverage</tspan></text>
 <path class="st26" d="M593.11,354.97c8.03,0,14.54-6.51,14.54-14.54s-6.51-14.54-14.54-14.54-14.54,6.51-14.54,14.54,6.51,14.54,14.54,14.54ZM590.84,344.97h1.36v-3.63h-1.36c-.76,0-1.36-.61-1.36-1.36s.61-1.36,1.36-1.36h2.73c.76,0,1.36.61,1.36,1.36v5h.45c.76,0,1.36.61,1.36,1.36s-.61,1.36-1.36,1.36h-4.54c-.76,0-1.36-.61-1.36-1.36s.61-1.36,1.36-1.36ZM593.11,333.16c1,0,1.82.81,1.82,1.82s-.81,1.82-1.82,1.82-1.82-.81-1.82-1.82.81-1.82,1.82-1.82Z"/>
 </g> <g> <g>
 <rect class="st31" x="168.81" y="637.71" width="183.66" height="41.92" rx="4.36" ry="4.36"/>
 <rect class="st4" x="168.81" y="637.71" width="183.66" height="41.92" rx="4.36" ry="4.36"/>
 </g>
 <path class="st26" d="M183.12,658.67l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(207.66 663.21)"><tspan x="0" y="0">orbi_adjust_block</tspan></text>
+<text class="st29" transform="translate(207.66 663.21)"><tspan x="0" y="0">orbi\_adjust\_block</tspan></text>
 </g> <g> <g>
 <rect class="st31" x="303.08" y="823.39" width="218.69" height="41.92" rx="4.76" ry="4.76"/>
 <rect class="st20" x="303.08" y="823.39" width="218.69" height="41.92" rx="4.76" ry="4.76"/>
 </g>
 <path class="st26" d="M314.4,844.35l1.12-10.98c.08-.77.61-1.35,1.25-1.35h6.61c.59,0,1.06.58,1.06,1.3,0,.15-.02.31-.07.46l-1.81,5.94h5.46c.79,0,1.44.79,1.44,1.77,0,.36-.09.7-.25,1l-7.53,13.53c-.23.41-.61.66-1.01.66h-.11c-.62,0-1.12-.62-1.12-1.37,0-.11.01-.22.04-.33l1.84-9.08h-5.64c-.69,0-1.25-.69-1.25-1.54Z"/>
-<text class="st29" transform="translate(344.93 848.89)"><tspan x="0" y="0">orbi_define_basepeak</tspan></text>
+<text class="st29" transform="translate(344.93 848.89)"><tspan x="0" y="0">orbi\_define\_basepeak</tspan></text>
 </g> <g>
 <line class="st19" x1="566.39" y1="843.83" x2="548.18" y2="843.83"/>
 <polygon class="st27" points="551.69 831.86 530.96 843.83 551.69 855.8 551.69 831.86"/>

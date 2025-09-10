@@ -49,13 +49,9 @@ To use the latest updates, you can install the development version of
       orbi_summarize_results(ratio_method = "sum") |>
       orbi_export_data_to_excel(file = "data_summary.xlsx")
 
-## Package layout
+## Package structure
 
-<figure>
-<img src="man/figures/figure_flowchart.svg"
-alt="Package Structure Flowchart" />
-<figcaption aria-hidden="true">Package Structure Flowchart</figcaption>
-</figure>
+![](man/figures/figure_flowchart.svg)
 
 ## Getting help
 
