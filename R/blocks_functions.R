@@ -1077,15 +1077,14 @@ orbi_add_blocks_to_plot <- function(
     ggplot2::geom_rect(
       data = get_blocks,
       map = ggplot2::aes(
-        x = NULL,
         xmin = .data$xmin,
         xmax = .data$xmax,
-        y = NULL,
         color = NULL,
         ymin = if (y_log) 0 else -Inf,
         ymax = Inf,
         fill = {{ fill }}
       ),
+      inherit.aes = FALSE,
       alpha = alpha,
       linetype = 0,
       color = NA_character_,
