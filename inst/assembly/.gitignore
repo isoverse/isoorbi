@@ -1,0 +1,8 @@
+*.dll
+*.exe
+*.zip
+*.sln
+RawFileReader
+out
+output
+Gemfile.lock
