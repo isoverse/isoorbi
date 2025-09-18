@@ -1,8 +1,10 @@
-name: build+check isoraw
+name: isoraw test
+
+# auto-run if there are any changes to the assembly source files
 on:
-  workflow_dispatch:
-  release:
-    types: [published]
+  push:
+    paths:
+      - inst/assembly/src/*
 
 env:
   DOTNET_DOCKER: mcr.microsoft.com/dotnet/sdk:8.0
