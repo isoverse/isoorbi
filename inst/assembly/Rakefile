@@ -1,0 +1,132 @@
+# Rakefile
+require 'fileutils'
+require 'open3'
+require 'os'
+
+# parameters: parse command-line arguments in the format "var=value"
+parsed_args = {}
+ARGV.each do |arg|
+  key, value = arg.split('=')
+  if key && value
+    parsed_args[key.to_sym] = value
+  end
+end
+
+# set default values if the variables are not provided in the arguments
+file = parsed_args[:file] || "test.raw"
+scans = parsed_args[:scans] || "1,10,100,1000"
+
+# constants
+runtime = 
+  if OS.windows?
+    'win-x64'
+  elsif OS.mac?
+    'osx-x64'
+  elsif OS.linux?
+    'linux-x64'
+  else
+    raise "Unsupported OS: #{RUBY_PLATFORM}"
+  end
+executable =
+  if OS.windows?
+    "out/isoraw-#{runtime}.exe"
+  else
+    "out/isoraw-#{runtime}"
+  end
+docker = "mcr.microsoft.com/dotnet/sdk:8.0"
+
+### DEVELOPMENT ###
+
+desc "start automatic local run for development"
+task :dev do
+  sh "bundle executablec guard"
+end
+
+### BUILDING ###
+
+desc "Pull the .NET SDK docker image"
+task :setup do
+  sh "docker pull mcr.microsoft.com/dotnet/sdk:8.0"
+  sh "git clone --depth=1 https://github.com/thermofisherlsms/RawFileReader.git"
+end
+
+desc "Build the executablecutable(s) using docker"
+task :build => [:checkdocker] do
+  sh "docker run --rm -v #{Dir.pwd}:/app -w /app #{docker} /app/build.sh project=/app output=/app/out runtime=\"#{runtime}\""
+  FileUtils.chmod("+x", executable)
+end
+
+desc "Build all runtimes"
+task :buildAll=> [:checkdocker] do
+  sh "docker run --rm -v #{Dir.pwd}:/app -w /app #{docker} /app/build.sh project=/app output=/app/out"
+end
+
+desc "Build the executablecutable(s) with local dotnet (usually slower than docker)"
+task :buildLocal do
+  sh "./build.sh runtime=\"#{runtime}\""  
+  FileUtils.chmod("+x", executable)
+end
+
+desc "Check docker"
+task :checkdocker do
+  stdout, stderr, status = Open3.capture3("docker image inspect #{docker}")
+  unless status.success?
+    puts "Image '#{docker}' not found. Pulling..."
+    sh "docker pull #{docker}"
+  end
+end
+
+### RUNNING ###
+
+desc "Get the program version"
+task :version do
+  sh "#{executable} --version"
+end
+
+desc "Get the program help"
+task :help do
+  sh "#{executable} --help"
+end
+
+desc "Run the program (reads just the cans)"
+task :run do
+  sh "#{executable} --version --file #{file} --spectra #{scans}"
+end
+
+desc "Run the program reading everything including the scans"
+task :runAll do
+  sh "#{executable} --file #{file} --spectra all"
+end
+
+desc "Read just the fileInfo"
+task :fileInfo do
+  sh "#{executable} --file #{file} --skip peaks,scans"
+end
+
+desc "Read just the scans"
+task :scans do
+  sh "#{executable} --file #{file} --skip fileInfo,peaks"
+end
+
+desc "Read just the peaks"
+task :peaks do
+  sh "#{executable} --file #{file} --skip fileInfo,scans"
+end
+
+desc "Read just the spectra"
+task :spectra do
+  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks --spectra #{scans}"
+end
+
+desc "Read ALL spectra (generates large files)"
+task :spectraAll do
+  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks --spectra all"
+end
+
+desc "Run the program with local dotnet (faster for testing)"
+task :runLocal do
+  sh "bash ./check.sh"
+  sh "dotnet run --project src/isoraw.csproj -- --version --file #{file}"
+end
+
+
