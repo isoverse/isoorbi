@@ -2,7 +2,12 @@
 *.exe
 *.zip
 *.sln
+*.raw
+*.cache
+*.zip
 RawFileReader
+bin
+obj
 out
 output
 Gemfile.lock
