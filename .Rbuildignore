@@ -21,5 +21,6 @@
 ^Meta$
 ^revdep$
 ^paper
+^inst/assembly
 ^[\.]?air\.toml$
 ^\.vscode$
