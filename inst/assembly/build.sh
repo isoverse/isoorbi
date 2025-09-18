@@ -63,10 +63,15 @@ for runtime in $runtimes; do
     echo "Moving exectuable for $runtime to output folder"
     source_path="bin/Release/net8.0/$runtime/publish"
     suffix=""
+    # .exe suffix for windows
     if [[ "$runtime" == win-* ]]; then
         suffix=".exe"
     fi
     cp "$source_path/isoraw$suffix" "$output_folder/isoraw-$runtime$suffix"
+    # make executable for linux/mac os
+    if [[ "$runtime" == osx-* || "$runtime" == linux-* ]]; then
+      chmod +x "$output_folder/isoraw-$runtime$suffix"
+    fi
 done
 
 # Finish

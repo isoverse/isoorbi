@@ -26,7 +26,7 @@ if [[ -z "$project_folder" ]]; then
   exit 1
 fi
 
-# Check dependency
+# Check for RawFileReader dependency
 source_name="RawFileReader"
 if [ ! -d "$project_folder/RawFileReader" ]; then
     git clone --depth=1 https://github.com/thermofisherlsms/RawFileReader.git "$project_folder/RawFileReader"

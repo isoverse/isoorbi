@@ -53,7 +53,6 @@ end
 desc "Build the executablecutable(s) using docker"
 task :build => [:checkdocker] do
   sh "docker run --rm -v #{Dir.pwd}:/app -w /app #{docker} /app/build.sh project=/app output=/app/out runtime=\"#{runtime}\""
-  FileUtils.chmod("+x", executable)
 end
 
 desc "Build all runtimes"
@@ -63,8 +62,7 @@ end
 
 desc "Build the executablecutable(s) with local dotnet (usually slower than docker)"
 task :buildLocal do
-  sh "./build.sh runtime=\"#{runtime}\""  
-  FileUtils.chmod("+x", executable)
+  sh "./build.sh runtime=\"#{runtime}\""
 end
 
 desc "Check docker"
