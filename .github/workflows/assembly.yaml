@@ -1,0 +1,70 @@
+name: build+check isoraw
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+env:
+  DOTNET_DOCKER: mcr.microsoft.com/dotnet/sdk:8.0
+  EXAMPLE_RAW: test.raw
+  EXAMPLE_SPECTRA: all
+jobs:
+  build:
+    name: Build Assembly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull image
+        run: docker pull $DOTNET_DOCKER
+      - name: Build
+        run: cd inst/assembly && docker run --rm -v $PWD:/app -w /app $DOTNET_DOCKER /app/build.sh project=/app output=/app/out
+      - name: Publish results
+        uses: actions/upload-artifact@v4
+        with:
+          name: isoraw
+          path: inst/assembly/out
+          retention-days: 1
+  verify-linux:
+    name: Verify on Linux
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: isoraw
+      - name: List result
+        run: tree
+      - name: Run test file
+        run: ./isoraw-linux-x64 --file ./inst/assembly/$EXAMPLE_RAW --spectra $EXAMPLE_SPECTRA
+  verify-windows:
+    name: Verify on Windows
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: isoraw
+      - name: List result
+        run: dir
+      - name: Run test file
+        run: .\isoraw-win-x64.exe --file .\inst\assembly\$EXAMPLE_RAW --spectra $EXAMPLE_SPECTRA
+  verify-macos:
+    name: Verify on MacOS
+    runs-on: macos-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: isoraw
+      - name: List result
+        run: ls -l
+      - name: Run test file
+        run: ./isoraw-osx-x64 --file ./inst/assembly/$EXAMPLE_RAW --spectra $EXAMPLE_SPECTRA
+  
+  # not uploading the artifacts for releases since not all new releases require new executables
