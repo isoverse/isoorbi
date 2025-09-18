@@ -1,4 +1,4 @@
-# isoraw exceutable commandline options
+# isoraw executable commandline options
 
 ## Usage
 
