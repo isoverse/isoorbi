@@ -479,6 +479,24 @@ namespace Isoorbi
     {
 
         /// <summary>
+        /// Clean parquet file if it alreay exists to make sure there are no issues with writing new parquet files.
+        /// </summary>
+        public static void CleanFile(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning when trying to delete pre-existing {path}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Structure of the file info table (dyamic)
         /// </summary>
         public record FileInfoTable
@@ -489,6 +507,7 @@ namespace Isoorbi
 
         public static async Task WriteFileInfo(FileInfoTable fileInfo, string path)
         {
+            CleanFile(path);
             var schema = new ParquetSchema(fileInfo.fields.ToArray());
             using (Stream fs = System.IO.File.OpenWrite(path))
             {
@@ -507,6 +526,7 @@ namespace Isoorbi
 
         public static async Task WriteScans(ScansTable scans, string path)
         {
+            CleanFile(path);
             var schema = new ParquetSchema(scans.fields.ToArray());
             using (Stream fs = System.IO.File.OpenWrite(path))
             {
@@ -531,6 +551,7 @@ namespace Isoorbi
 
         public static async Task WritePeaks(PeaksTable peaks, string path)
         {
+            CleanFile(path);
             // define parquet schema
             var schema = new ParquetSchema(
                 new DataField<int>("scan.no"),
@@ -592,6 +613,9 @@ namespace Isoorbi
 
         public static async Task WriteSpectra(SpectraTable spectra, string path)
         {
+
+            CleanFile(path);
+
             // define parquet schema
             var schema = new ParquetSchema(
                 new DataField<int>("scan.no"),
