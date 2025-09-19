@@ -49,7 +49,7 @@ test_that("orbi_find_raw() works", {
   )
 
   # cache folders
-  dir.create(file.path(test_path, paste0(test_file1, ".cache")))
+  writeLines("tmp", file.path(test_path, paste0(test_file1, ".cache.zip")))
   expect_equal(
     # find original file instead of cache folder
     orbi_find_raw(test_path, recursive = FALSE),
@@ -57,9 +57,9 @@ test_that("orbi_find_raw() works", {
   )
   unlink(file.path(test_path, test_file1))
   expect_equal(
-    # if original doesn't exist, find cache folder
+    # if original doesn't exist, find cached file
     orbi_find_raw(test_path, recursive = FALSE),
-    file.path(test_path, paste0(test_file1, ".cache"))
+    file.path(test_path, paste0(test_file1, ".cache.zip"))
   )
   expect_equal(
     # expect if instructed not to find cache

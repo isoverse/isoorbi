@@ -447,20 +447,18 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
 
   # cached folders
   if (include_cache) {
-    folders <- list.files(
+    cache_files <- list.files(
       folder,
       pattern = "\\.raw\\.cache\\.zip$",
       full.names = TRUE,
-      include.dirs = TRUE,
       recursive = recursive
     ) |>
       unique()
-    folders <- folders[dir.exists(folders)]
-    if (length(folders) > 0) {
+    if (length(cache_files) > 0) {
       # include folders
-      linked_files <- gsub("\\.raw\\.cache\\.zip$", ".raw", folders)
-      folders <- folders[!linked_files %in% files]
-      files <- c(files, folders) |> unique() |> sort()
+      linked_files <- gsub("\\.raw\\.cache\\.zip$", ".raw", cache_files)
+      cache_files <- cache_files[!linked_files %in% files]
+      files <- c(files, cache_files) |> unique() |> sort()
     }
   }
 
@@ -568,7 +566,7 @@ orbi_read_raw <- function(
       try_catch_cnds(
         eval_tidy(func_quo),
         error_value = tibble(
-          file_path = info$file_path,
+          filepath = info$file_path,
           problems = list(tibble())
         ),
         catch_errors = !orbi_get_option("debug")
@@ -1017,7 +1015,8 @@ read_cached_raw_file <- function(
 
   # return
   tibble(
-    file_path = file_path_info$file_path,
+    # filepath instead of file_path for consistency with isox
+    filepath = file_path_info$file_path,
     file_info = list(file_info$result),
     scans = list(scans$result),
     peaks = list(peaks$result),
