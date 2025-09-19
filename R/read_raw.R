@@ -1,3 +1,234 @@
+# raw file reader installation ========
+
+#' Check for the isoorbi raw file reader
+#'
+#' By default, this will install the isoraw reader if it is missing or outdated.
+#'
+#' @param install_if_missing install the reader if it's missing
+#' @param reinstall_if_outdated install the reader if it's outdated (i.e. not at least `min_version`)
+#' @param reinstall_always whether to (re-)install no matter what
+#' @param min_version the minimum version number required
+#' @param source_url the URL where to find the raw file reader, by default this is the latests release of the executables on github
+#' @param ... passed on to `download.file` if (re-) installing the reader
+#' @examples
+#'
+#'
+#'
+#' @export
+orbi_check_isoraw <- function(
+  install_if_missing = TRUE,
+  reinstall_if_outdated = TRUE,
+  reinstall_always = FALSE,
+  min_version = "0.2.0",
+  source_url = "https://github.com/isoverse/isoorbi/releases/download/isoraw-v0.2.0",
+  ...
+) {
+  # start
+  start <- start_info()
+
+  # check existence
+  isoraw_exists <- file.exists(get_isoraw_path())
+  outdated <- FALSE
+
+  # version function
+  get_isoraw_version <- function() {
+    if (!file.exists(get_isoraw_path())) {
+      return(NULL)
+    }
+    version <- system2(
+      get_isoraw_path(),
+      args = c("--version"),
+      stdout = TRUE,
+      stderr = TRUE
+    )
+
+    if (
+      !is_scalar_character(version) ||
+        !grepl("isoraw version", version, fixed = TRUE)
+    ) {
+      cli_bullets(
+        c(
+          "!" = "Could not determine isoorbi raw file reader version, reader returned:",
+          version |>
+            purrr::map_chr(~ format_inline("{.emph {col_red(.x)}}")) |>
+            format_bullets_raw() |>
+            set_names(" ")
+        )
+      )
+      return(NULL)
+    }
+    # return
+    regmatches(version, regexpr("\\d+(\\.\\d+)*", version)) |> numeric_version()
+  }
+
+  # version
+  if (isoraw_exists) {
+    isoraw_version <- get_isoraw_version()
+    if (
+      is.null(isoraw_version) || isoraw_version < numeric_version(min_version)
+    ) {
+      outdated <- TRUE
+      if (!is.null(isoraw_version)) {
+        cli_bullets(
+          c(
+            "!" = "isoraw is outdated",
+            "i" = "found version {isoraw_version} but need at least version {numeric_version(min_version)}"
+          )
+        )
+      }
+    }
+  }
+
+  # do we need to install?
+  if (
+    reinstall_always ||
+      (!isoraw_exists && install_if_missing) ||
+      (outdated && reinstall_if_outdated)
+  ) {
+    # yes we do
+    cli_inform(c(
+      ">" = "Trying to {if (isoraw_exists) 're'}install the new isoorbi raw file reader for your operating system {.pkg {basename(get_isoraw_path())}} (this requires an internet connection and may take a moment)..."
+    ))
+
+    # create folder
+    dir.create(
+      dirname(get_isoraw_path()),
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
+
+    # download
+    tryCatch(
+      {
+        # download to temp file
+        tmpfile <- tempfile()
+        download.file(
+          file.path(source_url, basename(get_isoraw_path())),
+          destfile = tmpfile,
+          mode = "wb",
+          ...
+        )
+        # remove the existing one
+        if (isoraw_exists) {
+          unlink(get_isoraw_path())
+        }
+        # move the downloaded one
+        file.rename(tmpfile, get_isoraw_path())
+      },
+      error = function(cnd) {
+        cli_abort(
+          "could not download the isoorbi raw file reader",
+          parent = cnd
+        )
+      }
+    )
+
+    # make executable
+    Sys.chmod(get_isoraw_path(), mode = "0777", use_umask = TRUE)
+
+    # get new version
+    isoraw_version <- get_isoraw_version()
+    if (!is.null(isoraw_version)) {
+      finish_info(
+        "successfully installed the isoorbi raw file reader version {isoraw_version}",
+        start = start
+      )
+    }
+  }
+
+  # final check
+  if (
+    is.null(isoraw_version) || isoraw_version < numeric_version(min_version)
+  ) {
+    cli_abort(
+      "cannot proceed, required isoorbi raw file reader (version {numeric_version(min_version)}) is missing or does not work"
+    )
+  }
+
+  # license check
+  check_license()
+}
+
+# get the path to the executable
+get_isoraw_path <- function() {
+  libdir <- tools::R_user_dir("isoorbi", which = "cache")
+  d <- file.path(libdir, "assembly")
+  if (Sys.info()["sysname"] == "Darwin") {
+    f <- file.path(d, "isoraw-osx-x64")
+  } else if (Sys.info()["sysname"] == "Linux") {
+    f <- file.path(d, "isoraw-linux-x64")
+  } else {
+    f <- file.path(d, "isoraw-win-x64.exe")
+  }
+  return(f)
+}
+
+# check license acceptance
+check_license <- function(env = caller_env()) {
+  # path to license file
+  license_file <- file.path(
+    system.file(package = 'isoorbi'),
+    'licenses',
+    'RawFileReaderLicense.txt'
+  )
+  stopifnot(file.exists(license_file))
+
+  # does the user copy already exist and is answered with YES?
+  user_copy <- file.path(dirname(get_isoraw_path()), basename(license_file))
+  question <- "Do you accept this license agreement for the use of the Thermo RawFileReader (https://github.com/thermofisherlsms/RawFileReader)?"
+  if (
+    file.exists(user_copy) && readLines(user_copy, 1) == paste(question, "YES")
+  ) {
+    # agreement is accepted --> can proceed
+    return(invisible(TRUE))
+  }
+
+  # agreement is not yet accepted
+  if (!interactive()) {
+    # can't do it while knitting
+    cli_abort(
+      paste(
+        "Please run this code interactively the first time so you can answer the prompt:",
+        question
+      ),
+      call = env
+    )
+  }
+
+  # show the liense and ask the question
+  file.show(license_file)
+  cli_text("{.strong {symbol$arrow_right} {question}}")
+  response <- readline(prompt = "  Answer[Y/n]: ")
+  if (tolower(response) %in% c("y", "yes")) {
+    if (!dir.exists(dirname(user_copy))) {
+      dir.create(dirname(user_copy), recursive = TRUE)
+    }
+    # user answered yes --> save
+    writeLines(
+      c(paste(question, "YES"), readLines(license_file)),
+      user_copy
+    )
+    # double check
+    if (
+      file.exists(user_copy) &&
+        readLines(user_copy, 1) == paste(question, "YES")
+    ) {
+      return(invisible(TRUE))
+    }
+    cli_abort(
+      "Something went wrong saving your answer to {.file {user_copy}}, please try again.",
+      call = env
+    )
+  }
+
+  # not accepted, can't proceed
+  cli_abort(
+    "You have to accept the Thermo License agreement before using the RawFileReader.",
+    call = env
+  )
+}
+
+
 # auxiliary raw file functions ========
 
 #' Find raw files
@@ -60,69 +291,6 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
   return(files)
 }
 
-# make sure raw reader is available
-# note: this should really call rawrr:::.isAssemblyWorking()
-# but it's not exported so we have to read a test file to
-# triger it --> could save some processing time here,
-# consider reimplementing rawrr::.isAssemblyWorking() for
-# this purpose
-check_for_raw_reader <- function(
-  install_if_missing = TRUE,
-  call = caller_env()
-) {
-  # check for availability of rawrr
-  if (!requireNamespace("rawrr", quietly = TRUE)) {
-    cli_abort(
-      c(
-        "the {.pkg rwarr} package is required to read .raw files, please see {.url https://bioconductor.org/packages/rawrr/} for details",
-        "i" = "typically, running the following commands will work to install {.pkg rawrr}:",
-        " " = "{.emph install.packages(\"BiocManager\")}",
-        " " = "{.emph BiocManager::install(\"rawrr\")}"
-      ),
-      call = call
-    )
-  }
-  tryCatch(
-    # read a minimal file as a test
-    # note: index is fastest
-    rawrr::readIndex(system.file(
-      "extdata",
-      "nitrate_test_1scan.raw",
-      package = "isoorbi"
-    )),
-    error = function(cnd) {
-      # missing rawrrr exe
-      if (grepl("rawrr::installRawrrExe", conditionMessage(cnd))) {
-        if (install_if_missing) {
-          # try to install
-          cli_alert_warning(
-            "Could not find the executable for the RAW file reader:"
-          )
-          cli_inform(c(" " = "{.emph {cnd$message}}"))
-          cli_inform(c(
-            ">" = "Trying to install {.pkg rawrr.exe} (this requires an internet connection and may take a moment)..."
-          ))
-          rawrr::installRawrrExe()
-          return(check_for_raw_reader(install_if_missing = FALSE, call = call))
-        } else {
-          # failed to install
-          cli_abort(
-            "Failed to install the executable, please try manually",
-            parent = cnd,
-            call = call
-          )
-        }
-      } else {
-        cli_abort(
-          "Could not run the executable for the RAW file reader",
-          parent = cnd,
-          call = call
-        )
-      }
-    }
-  )
-}
-
 # read raw files =======
 
 #' Read RAW files
@@ -151,7 +319,7 @@ orbi_read_raw <- function(
   root_env <- current_env()
 
   # check for raw file reader
-  check_for_raw_reader()
+  orbi_check_isoraw()
 
   # safety checks
   check_arg(
