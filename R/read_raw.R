@@ -2,7 +2,9 @@
 
 #' Check for the isoorbi raw file reader
 #'
-#' By default, this will install the isoraw reader if it is missing or outdated.
+#' By default, this will install the isoraw reader if it is missing or outdated, and will ask the user to agree to Thermo's license agreement
+#' for the \href{https://github.com/thermofisherlsms/RawFileReader}{Thermo RawFileReader} before proceeding.
+#' This function runs automatically during a raw file read and does not usually need to be called directly by the user.
 #'
 #' @param install_if_missing install the reader if it's missing
 #' @param reinstall_if_outdated install the reader if it's outdated (i.e. not at least `min_version`)
@@ -10,10 +12,6 @@
 #' @param min_version the minimum version number required
 #' @param source_url the URL where to find the raw file reader, by default this is the latests release of the executables on github
 #' @param ... passed on to `download.file` if (re-) installing the reader
-#' @examples
-#'
-#'
-#'
 #' @export
 orbi_check_isoraw <- function(
   install_if_missing = TRUE,
@@ -29,37 +27,6 @@ orbi_check_isoraw <- function(
   # check existence
   isoraw_exists <- file.exists(get_isoraw_path())
   outdated <- FALSE
-
-  # version function
-  get_isoraw_version <- function() {
-    if (!file.exists(get_isoraw_path())) {
-      return(NULL)
-    }
-    version <- system2(
-      get_isoraw_path(),
-      args = c("--version"),
-      stdout = TRUE,
-      stderr = TRUE
-    )
-
-    if (
-      !is_scalar_character(version) ||
-        !grepl("isoraw version", version, fixed = TRUE)
-    ) {
-      cli_bullets(
-        c(
-          "!" = "Could not determine isoorbi raw file reader version, reader returned:",
-          version |>
-            purrr::map_chr(~ format_inline("{.emph {col_red(.x)}}")) |>
-            format_bullets_raw() |>
-            set_names(" ")
-        )
-      )
-      return(NULL)
-    }
-    # return
-    regmatches(version, regexpr("\\d+(\\.\\d+)*", version)) |> numeric_version()
-  }
 
   # version
   if (isoraw_exists) {
@@ -149,20 +116,6 @@ orbi_check_isoraw <- function(
   check_license()
 }
 
-# get the path to the executable
-get_isoraw_path <- function() {
-  libdir <- tools::R_user_dir("isoorbi", which = "cache")
-  d <- file.path(libdir, "assembly")
-  if (Sys.info()["sysname"] == "Darwin") {
-    f <- file.path(d, "isoraw-osx-x64")
-  } else if (Sys.info()["sysname"] == "Linux") {
-    f <- file.path(d, "isoraw-linux-x64")
-  } else {
-    f <- file.path(d, "isoraw-win-x64.exe")
-  }
-  return(f)
-}
-
 # check license acceptance
 check_license <- function(env = caller_env()) {
   # path to license file
@@ -228,13 +181,138 @@ check_license <- function(env = caller_env()) {
   )
 }
 
+# interactions with the isoraw file reader assembly =======
 
-# auxiliary raw file functions ========
+# get the path to the executable
+get_isoraw_path <- function() {
+  libdir <- tools::R_user_dir("isoorbi", which = "cache")
+  d <- file.path(libdir, "assembly")
+  if (Sys.info()["sysname"] == "Darwin") {
+    f <- file.path(d, "isoraw-osx-x64")
+  } else if (Sys.info()["sysname"] == "Linux") {
+    f <- file.path(d, "isoraw-linux-x64")
+  } else {
+    f <- file.path(d, "isoraw-win-x64.exe")
+  }
+  return(f)
+}
+
+# get version of the installed isoraw
+get_isoraw_version <- function() {
+  if (!file.exists(get_isoraw_path())) {
+    return(NULL)
+  }
+  version <- system2(
+    get_isoraw_path(),
+    args = c("--version"),
+    stdout = TRUE,
+    stderr = TRUE
+  )
+
+  if (
+    !is_scalar_character(version) ||
+      !grepl("isoraw version", version, fixed = TRUE)
+  ) {
+    cli_bullets(
+      c(
+        "!" = "Could not determine isoorbi raw file reader version, reader returned:",
+        version |>
+          purrr::map_chr(~ format_inline("{.emph {col_red(.x)}}")) |>
+          format_bullets_raw() |>
+          set_names(" ")
+      )
+    )
+    return(NULL)
+  }
+  # return
+  regmatches(version, regexpr("\\d+(\\.\\d+)*", version)) |> numeric_version()
+}
+
+# run the isoraw executable
+# @return the cache path where the files are located
+run_isoraw <- function(
+  path,
+  skip_file_info = FALSE,
+  skip_scans = FALSE,
+  skip_peaks = TRUE,
+  all_spectra = FALSE,
+  select_spectra = integer(0)
+) {
+  # safety checks
+  stopifnot(
+    is_scalar_character(path),
+    is_scalar_logical(skip_file_info),
+    is_scalar_logical(skip_scans),
+    is_scalar_logical(skip_peaks),
+    is_scalar_logical(all_spectra),
+    is_integerish(select_spectra)
+  )
+
+  # assemble arguments
+  args <- c("--file", sprintf("\"%s\"", path))
+  if (skip_file_info || skip_scans || skip_peaks) {
+    args <- c(
+      args,
+      "--skip",
+      paste(
+        c(
+          if (skip_file_info) "fileInfo",
+          if (skip_scans) "scans",
+          if (skip_peaks) "peaks"
+        ),
+        collapse = ","
+      )
+    )
+  }
+  if (all_spectra || length(select_spectra) > 0) {
+    args <- c(
+      args,
+      "--spectra",
+      if (all_spectra) "all" else paste(select_spectra, collapse = ",")
+    )
+  }
+
+  # ran the executable
+  output <- system2(
+    get_isoraw_path(),
+    args = args,
+    stdout = TRUE,
+    stderr = TRUE
+  )
+
+  # create the log file (if inital file exists)
+  logfile <- NULL
+  cache_path <- paste0(path, ".cache")
+  if (file.exists(path)) {
+    if (!dir.exists(cache_path)) {
+      dir.create(cache_path, recursive = TRUE)
+    }
+    logfile <- file.path(cache_path, "isoraw.log")
+    writeLines(output, logfile)
+  }
+
+  # check for errors
+  errors <- output[grepl("error", output, ignore.case = TRUE)]
+  if (length(errors) > 0) {
+    cli_abort(
+      c(
+        "encountered {length(errors)} error{?s} when running the isoraw raw file reader",
+        if (!is.null(logfile)) c("i" = "see {.file {logfile}} for details"),
+        errors |> set_names("x")
+      )
+    )
+  }
+
+  # return the path where the files are located
+  return(cache_path)
+}
+
+# finding raw files ========
 
 #' Find raw files
 #' @description Finds all .raw files in a folder.
 #' @param folder path to a folder with raw files
-#' @param include_cache whether to include .raw.cache folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files
+#' @param include_cache whether to include .raw.cache.zip folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files
 #' @param recursive whether to find files recursively
 #'
 #' @examples
@@ -272,7 +350,7 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
   if (include_cache) {
     folders <- list.files(
       folder,
-      pattern = "\\.raw\\.cache$",
+      pattern = "\\.raw\\.cache\\.zip$",
       full.names = TRUE,
       include.dirs = TRUE,
       recursive = recursive
@@ -281,7 +359,7 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
     folders <- folders[dir.exists(folders)]
     if (length(folders) > 0) {
       # include folders
-      linked_files <- gsub("\\.raw\\.cache$", ".raw", folders)
+      linked_files <- gsub("\\.raw\\.cache\\.zip$", ".raw", folders)
       folders <- folders[!linked_files %in% files]
       files <- c(files, folders) |> unique() |> sort()
     }
