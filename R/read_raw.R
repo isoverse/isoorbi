@@ -1,4 +1,4 @@
-# raw file reader installation ========
+# isoraw installation ========
 
 #' Check for the isoorbi raw file reader
 #'
@@ -10,15 +10,18 @@
 #' @param reinstall_if_outdated install the reader if it's outdated (i.e. not at least `min_version`)
 #' @param reinstall_always whether to (re-)install no matter what
 #' @param min_version the minimum version number required
-#' @param source_url the URL where to find the raw file reader, by default this is the latests release of the executables on github
+#' @param source the URL (or local path) where to find the raw file reader, by default this is the latests release of the executables on github
 #' @param ... passed on to `download.file` if (re-) installing the reader
 #' @export
 orbi_check_isoraw <- function(
   install_if_missing = TRUE,
   reinstall_if_outdated = TRUE,
   reinstall_always = FALSE,
-  min_version = "0.2.0",
-  source_url = "https://github.com/isoverse/isoorbi/releases/download/isoraw-v0.2.0",
+  min_version = "0.2.1",
+  source = paste0(
+    "https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
+    min_version
+  ),
   ...
 ) {
   # start
@@ -67,14 +70,19 @@ orbi_check_isoraw <- function(
     # download
     tryCatch(
       {
-        # download to temp file
         tmpfile <- tempfile()
-        download.file(
-          file.path(source_url, basename(get_isoraw_path())),
-          destfile = tmpfile,
-          mode = "wb",
-          ...
-        )
+        if (dir.exists(source)) {
+          # local folder (usually only used by developers)
+          file.copy(file.path(source, basename(get_isoraw_path())), tmpfile)
+        } else {
+          # download to temp file
+          download.file(
+            file.path(source, basename(get_isoraw_path())),
+            destfile = tmpfile,
+            mode = "wb",
+            ...
+          )
+        }
         # remove the existing one
         if (isoraw_exists) {
           unlink(get_isoraw_path())
@@ -181,7 +189,7 @@ check_license <- function(env = caller_env()) {
   )
 }
 
-# interactions with the isoraw file reader assembly =======
+# interactions with isoraw =======
 
 # get the path to the executable
 get_isoraw_path <- function() {
@@ -234,7 +242,7 @@ run_isoraw <- function(
   path,
   skip_file_info = FALSE,
   skip_scans = FALSE,
-  skip_peaks = TRUE,
+  skip_peaks = FALSE,
   all_spectra = FALSE,
   select_spectra = integer(0)
 ) {
@@ -247,6 +255,7 @@ run_isoraw <- function(
     is_scalar_logical(all_spectra),
     is_integerish(select_spectra)
   )
+  select_spectra <- as.integer(select_spectra) |> na.omit()
 
   # assemble arguments
   args <- c("--file", sprintf("\"%s\"", path))
@@ -282,13 +291,28 @@ run_isoraw <- function(
 
   # create the log file (if inital file exists)
   logfile <- NULL
-  cache_path <- paste0(path, ".cache")
+  output_path <- paste0(path, ".cache")
+  output_exists <- dir.exists(output_path)
   if (file.exists(path)) {
-    if (!dir.exists(cache_path)) {
-      dir.create(cache_path, recursive = TRUE)
+    if (!output_exists) {
+      dir.create(output_path, recursive = TRUE)
     }
-    logfile <- file.path(cache_path, "isoraw.log")
-    writeLines(output, logfile)
+    logfile <- file.path(output_path, "isoraw.log")
+    write(
+      c(
+        "\n==================",
+        sprintf(
+          "isoraw call on %s\n%s %s",
+          as.character(Sys.time()),
+          basename(get_isoraw_path()),
+          paste(args, collapse = " ")
+        ),
+        output
+      ),
+      file = logfile,
+      append = TRUE,
+      sep = "\n"
+    )
   }
 
   # check for errors
@@ -297,14 +321,89 @@ run_isoraw <- function(
     cli_abort(
       c(
         "encountered {length(errors)} error{?s} when running the isoraw raw file reader",
+        # having the log file makes it possible for users to click on the link and see exactly what's going wrong
         if (!is.null(logfile)) c("i" = "see {.file {logfile}} for details"),
         errors |> set_names("x")
       )
     )
   }
 
-  # return the path where the files are located
-  return(cache_path)
+  # check if cache path was created by the program
+  if (!output_exists) {
+    cli_abort(
+      c(
+        "encountered unknown issue when running the isoraw raw file reader, no output was created",
+        if (!is.null(logfile)) c("i" = "see {.file {logfile}} for details")
+      )
+    )
+  }
+
+  # return the path where the output files are located
+  return(output_path)
+}
+
+# read an isoraw output file
+read_isoraw_output <- function(path) {
+  if (!file.exists(path)) {
+    cli_abort("isoraw output file {.file {basename(path)}} is missing")
+  }
+  tryCatch(
+    arrow::read_parquet(path),
+    error = function(cnd) {
+      cli_abort(
+        "could not read isoraw output file {.file {basename(path)}}",
+        parent = cnd
+      )
+    }
+  )
+}
+
+# raw file caching ======
+
+# cache the isoraw output by storing it in a zip file
+cache_isoraw_output <- function(
+  output_path,
+  zip_path = paste0(output_path, ".zip")
+) {
+  if (file.exists(zip_path)) {
+    unlink(zip_path)
+  }
+  old <- setwd(dir = dirname(output_path))
+  on.exit(setwd(old))
+  files <- c(
+    basename(output_path),
+    list.files(basename(output_path), full.names = TRUE)
+  )
+  utils::zip(
+    zipfile = basename(zip_path),
+    files = files,
+    flags = "-q" # quiet
+  )
+}
+
+# read isoraw output file from zipped cache
+read_cached_isoraw_output <- function(
+  zip_path,
+  subfile,
+  zip_info = unzip(zip_path, list = TRUE)
+) {
+  stopifnot(subfile %in% zip_info$Name)
+  file_size <- zip_info$Length[zip_info$Name == subfile]
+  con <- unz(zip_path, subfile, open = "rb")
+  parquet_output <-
+    tryCatch(
+      con |>
+        readBin("raw", n = file_size) |>
+        arrow::read_parquet(),
+      error = function(cnd) {
+        cli_abort(
+          "could not read cached isoraw output file {.file {basename(subfile)}}",
+          parent = cnd
+        )
+      }
+    )
+  close(con)
+  return(parquet_output)
 }
 
 # finding raw files ========
@@ -379,19 +478,21 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
 #' @param show_progress whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with `show_progress = FALSE`
 #' @param show_problems whether to show problems encountered along the way (rather than just keeping track of them with [orbi_get_problems()]). Set to `show_problems = FALSE` to turn off the live printout. Either way, all encountered problems can be retrieved with running [orbi_get_problems()] for the returned list
 #' @param include_spectra whether to include the spectral data from specific scans (e.g. `include_spectra = c(5, 100, 200)` reads out the spectra from scans 5, 100, and 200 for each file if they exist) or from all scans (`include_spectra = TRUE`). Including many or all scan spectra makes the read process slower (especially if `cache_spectra = FALSE`) and the returned data frame tibble significantely larger. The default is `FALSE` (i.e. scan spectra are not returned).
+#' @param read_cache whether to read the file from cached .parquet files (if they exist) or anew
 #' @param cache whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)
 #' @param cache_spectra whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as `cache`
-#' @param read_cache whether to read the file from cached .parquet files (if they exist) or anew
-#' @return a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically `cache_info`, `scans`, `peaks`, and `spectra`). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use [orbi_aggregate_raw()] to extract safely across files.
+#' @param keep_chached_spectra whether to keep the spectra from a raw file that were previously cached whenever `include_spectra` changes and requires reading the file anew. Having this TRUE (the default) makes it faster to iterate on code that changes which spectra to read but leads to larger cache files.
+#' @return a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically `file_info`, `scans`, `peaks`, and `spectra`). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use [orbi_aggregate_raw()] to extract safely across files.
 #' @export
 orbi_read_raw <- function(
   file_paths,
   show_progress = rlang::is_interactive(),
   show_problems = TRUE,
   include_spectra = FALSE,
+  read_cache = TRUE,
   cache = TRUE,
   cache_spectra = cache,
-  read_cache = TRUE
+  keep_cached_spectra = cache
 ) {
   # keep track of current env to anchor progress bars
   root_env <- current_env()
@@ -412,7 +513,7 @@ orbi_read_raw <- function(
   if (identical(include_spectra, TRUE)) {
     # all
     all_spectra <- TRUE
-    select_spectra <- NULL
+    select_spectra <- integer()
   } else if (identical(include_spectra, FALSE)) {
     # none
     all_spectra <- FALSE
@@ -426,13 +527,13 @@ orbi_read_raw <- function(
   # keep track of total time
   start_time <- Sys.time()
 
-  # generate caching info (also checks that files exist)
-  cache_info <- get_cache_info(
+  # generate caching info
+  file_paths_info <- get_file_paths_info(
     file_paths = unique(file_paths),
     read_cache = read_cache
   )
 
-  # read files safetly
+  # read files safely
   read_safely <- function(info, func, ...) {
     # progress
     if (!is.null(start$pb) && info$idx > 1) {
@@ -451,11 +552,12 @@ orbi_read_raw <- function(
     # function (so traceback is informative)
     func_quo <- expr(
       (!!func)(
-        cache_info = info,
+        file_path_info = info,
         all_spectra = all_spectra,
         select_spectra = select_spectra,
         cache = cache,
         cache_spectra = cache_spectra,
+        keep_cached_spectra = keep_cached_spectra,
         pb = start$pb,
         .env = root_env
       )
@@ -478,7 +580,7 @@ orbi_read_raw <- function(
     # how many scans?
     n_spectra_scans <- 0
     if ("spectra" %in% names(out$result) && length(out$result$spectra) > 0) {
-      n_spectra_scans <- out$result$spectra[[1]]$scan |> unique() |> length()
+      n_spectra_scans <- out$result$spectra[[1]]$scan.no |> unique() |> length()
     }
 
     # merge new into the returned problems
@@ -498,7 +600,7 @@ orbi_read_raw <- function(
       .env = root_env
     )
 
-    # add index and whether there is file info to result
+    # add index and whether there is file info in the result
     return(
       out$result |>
         dplyr::mutate(idx = info$idx, has_file_info = !!has_file_info)
@@ -506,14 +608,14 @@ orbi_read_raw <- function(
   }
 
   # read cached files first
-  if (any(cache_info$is_cached)) {
+  if (any(file_paths_info$is_cached)) {
     # subset files to read just the cached ones
-    cached_files <- cache_info |>
+    cached_files <- file_paths_info |>
       dplyr::filter(.data$is_cached) |>
       dplyr::mutate(
         # progress bar info
-        step = cumsum(dplyr::lag(.data$read_file_size, default = 0)),
-        total = sum(.data$read_file_size),
+        step = cumsum(dplyr::lag(.data$cache_size, default = 0)),
+        total = sum(.data$cache_size),
       )
 
     # info
@@ -543,7 +645,7 @@ orbi_read_raw <- function(
 
     # stored cached data and figure out which files to (re)read
     cached_data <- results |> filter(.data$has_file_info)
-    read_files <- cache_info |>
+    read_files <- file_paths_info |>
       dplyr::left_join(
         results |> dplyr::select("idx", "has_file_info"),
         by = "idx"
@@ -552,7 +654,7 @@ orbi_read_raw <- function(
   } else {
     # nothing cached, read all
     cached_data <- tibble()
-    read_files <- cache_info
+    read_files <- file_paths_info
   }
 
   # any files to read?
@@ -560,8 +662,8 @@ orbi_read_raw <- function(
     read_files <- read_files |>
       dplyr::mutate(
         # progress bar info
-        step = cumsum(dplyr::lag(.data$read_file_size, default = 0)),
-        total = sum(.data$read_file_size)
+        step = cumsum(dplyr::lag(.data$file_size, default = 0)),
+        total = sum(.data$file_size)
       )
 
     # info / progress
@@ -629,93 +731,39 @@ orbi_read_raw <- function(
   return(all_files)
 }
 
-# fetch information about file caching
-get_cache_info <- function(
+# copmile information about the file paths
+get_file_paths_info <- function(
   file_paths,
   read_cache = TRUE
 ) {
-  # read existing cache info
-  empty_info <- tibble(
-    old_file_size = integer(),
-    old_isoorbi_version = character(),
-    old_cache_timestamp = as.POSIXct(integer())
+  tibble(
+    idx = seq_along(!!file_paths),
+    file_path = gsub("\\.cache\\.zip$", "", !!file_paths),
+    file_exists = file.exists(.data$file_path),
+    file_size = as.integer(file.size(.data$file_path)),
+    output_path = paste0(.data$file_path, ".cache"),
+    cache_path = paste0(.data$output_path, ".zip"),
+    cache_size = as.integer(file.size(.data$cache_path)),
+    cache_info = "cache_info.parquet",
+    file_info = "file_info.parquet",
+    scans = "scans.parquet",
+    peaks = "peaks.parquet",
+    problems = "problems.parquet",
+    spectra = "spectra.parquet",
+    is_cached = !!read_cache & file.exists(.data$cache_path),
+    read_file_size = if_else(
+      .data$is_cached,
+      as.integer(file.size(.data$cache_path)),
+      .data$file_size
+    )
   )
-  read_cache_info <- function(is_cached, cache_info_path) {
-    if (!is_cached) {
-      # not cached
-      return(empty_info)
-    }
-    cache_info <- try_catch_cnds(arrow::read_parquet(cache_info_path))
-    if (nrow(cache_info$conditions) > 0) {
-      # something wrong with the cache info
-      return(empty_info)
-    }
-    req_cols <- gsub("old_", "", names(empty_info))
-    if (!all(req_cols %in% names(cache_info$result))) {
-      # something's amiss in the cache info
-      return(empty_info)
-    }
-    return(
-      cache_info$result |>
-        # backwards compatibility
-        dplyr::mutate(isoorbi_version = as.character(.data$isoorbi_version)) |>
-        set_names(paste0("old_", names(cache_info$result)))
-    )
-  }
-
-  # caching info
-  cache_info <-
-    tibble(
-      idx = seq_along(!!file_paths),
-      file_path = gsub("\\.cache$", "", !!file_paths),
-      file_exists = file.exists(.data$file_path),
-      file_size = as.integer(file.size(.data$file_path)),
-      cache_path = paste0(.data$file_path, ".cache"),
-      cache_info = file.path(.data$cache_path, "cache_info.parquet"),
-      file_info = file.path(.data$cache_path, "file_info.parquet"),
-      scans = file.path(.data$cache_path, "scans.parquet"),
-      peaks = file.path(.data$cache_path, "peaks.parquet"),
-      problems = file.path(.data$cache_path, "problems.parquet"),
-      spectra = file.path(.data$cache_path, "spectra.parquet"),
-      is_cached = if (!!read_cache) {
-        file.exists(.data$cache_info) &
-          file.exists(.data$file_info) &
-          file.exists(.data$scans) &
-          file.exists(.data$peaks) &
-          file.exists(.data$problems)
-      } else {
-        FALSE
-      },
-      has_cached_spectra = if (!!read_cache) {
-        file.exists(.data$spectra)
-      } else {
-        FALSE
-      },
-      # read existing cache info
-      info = purrr::map2(.data$is_cached, .data$cache_info, read_cache_info)
-    ) |>
-    # unpack old info
-    tidyr::unnest("info", keep_empty = TRUE) |>
-    dplyr::mutate(
-      # use cached scans + peaks to estimate file size read for cache reads
-      read_file_size = dplyr::case_when(
-        !.data$is_cached ~ .data$file_size,
-        .data$has_cached_spectra ~
-          file.size(.data$scans) + file.size(.data$spectra),
-        TRUE ~ file.size(.data$scans)
-      ),
-      .after = "file_size"
-    )
-
-  # return
-  return(cache_info)
 }
 
 # reader for cached raw files
 # @param file_path can be used for a direct call (usually for testing only)
-# @param cache_info typically called with this parameter internally
+# @param file_path_info typically called with this parameter internally
 read_cached_raw_file <- function(
-  cache_info = get_cache_info(
+  file_path_info = get_file_paths_info(
     file_path,
     read_cache = read_cache
   ),
@@ -725,35 +773,72 @@ read_cached_raw_file <- function(
   read_cache = TRUE,
   cache = TRUE,
   cache_spectra = TRUE,
+  keep_cached_spectra = TRUE,
   pb = NULL,
   .env = caller_env()
 ) {
   # safety checks
   check_arg(
-    cache_info,
-    is.data.frame(cache_info) && nrow(cache_info) == 1,
+    file_path_info,
+    is.data.frame(file_path_info) && nrow(file_path_info) == 1,
     "must be a single line data frame"
   )
-  if (!cache_info$is_cached) {
+  if (!file_path_info$is_cached || !file.exists(file_path_info$cache_path)) {
     cli_abort(
-      "there's no cache to read for {.file {basename(cache_info$file_path)}}",
+      "there's no cache to read for {.file {basename(file_path_info$file_path)}}",
       .internal = TRUE
     )
   }
 
+  # check if cached files exist
+  zip_info <- unzip(file_path_info$cache_path, list = TRUE)
+  cache_path_subpaths <- file.path(
+    basename(file_path_info$output_path),
+    c(
+      file_path_info$cache_info,
+      file_path_info$file_info,
+      file_path_info$scans,
+      file_path_info$peaks,
+      file_path_info$problems
+    )
+  )
+  missing_subpaths <- !cache_path_subpaths %in% zip_info$Name
+  if (any(missing_subpaths)) {
+    cli_abort(
+      "cached archive is missing file{?s}: {.file {basename(cache_path_subpaths[missing_subpaths])}}"
+    )
+  }
+
+  # read cache info
+  read_cached_output <- function(file) {
+    read_cached_isoraw_output(
+      zip_path = file_path_info$cache_path,
+      subfile = file_path_info$output_path |>
+        basename() |>
+        file.path(file),
+      zip_info = zip_info
+    )
+  }
+  existing_cache_info <- try_catch_cnds(read_cached_output(
+    file_path_info$cache_info
+  ))
+  if (nrow(existing_cache_info$conditions) > 0) {
+    cli_abort("failed to read cache info")
+  }
+
   # check about file size
   if (
-    !is.na(cache_info$file_size) &&
-      cache_info$file_size != cache_info$old_file_size
+    !is.na(file_path_info$file_size) &&
+      file_path_info$file_size != existing_cache_info$result$file_size
   ) {
     cli_warn(
-      "file size has changed (from {prettyunits::pretty_bytes(cache_info$old_file_size)} to {prettyunits::pretty_bytes(cache_info$file_size)}), cache is outdated"
+      "file size has changed (from {prettyunits::pretty_bytes(existing_cache_info$result$file_size)} to {prettyunits::pretty_bytes(file_path_info$file_size)}), cache is outdated"
     )
     return(tibble())
   }
 
   # check about isoorbi version
-  # can use cache_info$old_isoorbi_version to determine whether a new read is necessary
+  # can use existing_cache_info$isoorbi_version to determine whether a new read is necessary
 
   # simplify progress updates
   update_progress <- function(status) {
@@ -769,28 +854,28 @@ read_cached_raw_file <- function(
 
   # read file_info from cache
   update_progress("reading cached file info")
-  file_info <- try_catch_cnds(arrow::read_parquet(cache_info$file_info))
+  file_info <- try_catch_cnds(read_cached_output(file_path_info$file_info))
   if (nrow(file_info$conditions) > 0) {
     cli_abort("failed to read cached file info")
   }
 
   # read scans from cache
   update_progress("reading cached scans")
-  scans <- try_catch_cnds(arrow::read_parquet(cache_info$scans))
+  scans <- try_catch_cnds(read_cached_output(file_path_info$scans))
   if (nrow(scans$conditions) > 0) {
     cli_abort("failed to read cached scans")
   }
 
   # read peaks from cache
   update_progress("reading cached peaks")
-  peaks <- try_catch_cnds(arrow::read_parquet(cache_info$peaks))
+  peaks <- try_catch_cnds(read_cached_output(file_path_info$peaks))
   if (nrow(peaks$conditions) > 0) {
     cli_abort("failed to read cached peaks")
   }
 
   # read problems from cache
   update_progress("reading cached problems")
-  problems <- try_catch_cnds(arrow::read_parquet(cache_info$problems))
+  problems <- try_catch_cnds(read_cached_output(file_path_info$problems))
   if (nrow(problems$conditions) > 0) {
     cli_abort("failed to read cached problems")
   }
@@ -799,79 +884,107 @@ read_cached_raw_file <- function(
 
   # read spectra from cache
   update_progress("reading cached spectra")
-  spectral_data <- list(
-    result = tibble(scan = integer()),
+  spectra <- list(
+    result = tibble(scan.no = integer()),
     conditions = tibble()
   )
 
   # are any spectra actually requested?
   if (all_spectra || length(select_spectra) > 0) {
     # read what's in the cache
-    if (cache_info$has_cached_spectra) {
-      spectral_data <- try_catch_cnds(arrow::read_parquet(cache_info$spectra))
-      if (nrow(spectral_data$conditions) > 0) {
+    if (
+      file.path(
+        basename(file_path_info$output_path),
+        file_path_info$spectra
+      ) %in%
+        zip_info$Name
+    ) {
+      spectra <- try_catch_cnds(read_cached_output(
+        file_path_info$spectra
+      ))
+      if (nrow(spectra$conditions) > 0) {
         cli_abort("failed to read cached spectra")
       }
     }
 
-    # is what we got enough?
+    # do we have missing spectra?
     missing_spectra <-
       if (all_spectra) {
-        scans$result$scan |> setdiff(spectral_data$result$scan)
+        scans$result$scan.no |> setdiff(spectra$result$scan.no)
       } else {
         select_spectra |>
-          intersect(scans$result$scan) |>
-          setdiff(spectral_data$result$scan)
+          intersect(scans$result$scan.no) |>
+          setdiff(spectra$result$scan.no)
       }
 
-    # no --> let's see if we can get the missing spectra
+    # yes --> let's see if we can get the missing spectra
     if (length(missing_spectra) > 0) {
-      if (cache_info$file_exists) {
+      if (file_path_info$file_exists) {
         # try to read missing spectra
-        update_progress("reading spectra")
-        spectra_raw <- try_catch_cnds(
-          rawrr::readSpectrum(
-            cache_info$file_path,
-            scan = missing_spectra
-          ),
-          error_value = list(),
-          catch_errors = !orbi_get_option("debug")
-        )
-        problems <- bind_rows(problems, spectra_raw$conditions)
+        update_progress("running isoraw")
 
-        # try to parse missing spectra
-        update_progress("parsing spectra")
-        spectra_parsed <- try_catch_cnds(
-          spectra_raw$result |>
-            parse_spectra() |>
-            parse_spectral_data(),
-          error_value = tibble(scan = integer(0), mZ = numeric(0)),
+        # do we keep the cached spectra?
+        if (!all_spectra && keep_cached_spectra) {
+          select_spectra <- select_spectra |>
+            union(spectra$result$scan.no)
+        }
+
+        # unzip the cache file
+        unlink(file_path_info$output_path, recursive = TRUE)
+        unzip(
+          file_path_info$cache_path,
+          exdir = dirname(file_path_info$output_path)
+        )
+
+        # run isoraw only for the spectra
+        out <- try_catch_cnds(
+          run_isoraw(
+            file_path_info$file_path,
+            skip_file_info = TRUE,
+            skip_scans = TRUE,
+            skip_peaks = TRUE,
+            all_spectra = all_spectra,
+            select_spectra = select_spectra
+          ),
+          error_value = NULL,
           catch_errors = !orbi_get_option("debug")
         )
-        problems <- bind_rows(problems, spectra_parsed$conditions)
+        problems <- dplyr::bind_rows(problems, out$conditions)
+
+        update_progress("reading spectra")
+        spectra <- try_catch_cnds(
+          read_isoraw_output(file.path(
+            file_path_info$output_path,
+            file_path_info$spectra
+          )),
+          error_value = tibble(scan.no = integer(0))
+        )
+        problems <- dplyr::bind_rows(problems, spectra$conditions)
 
         # still missing?
-        missing_spectra <- setdiff(missing_spectra, spectra_parsed$result$scan)
+        missing_spectra <- setdiff(missing_spectra, spectra$result$scan.no)
         if (length(missing_spectra) > 0) {
           # can't get everything
           cli_warn(
             "missing {length(missing_spectra)} spectr{?um/a} that {?is/are} not cached and could not be read from the .raw file"
           )
-        }
-
-        # combine if there are new spectra
-        if (nrow(spectra_parsed$result) > 0) {
-          spectral_data$result <- spectral_data$result |>
-            dplyr::bind_rows(spectra_parsed$result) |>
-            dplyr::arrange(.data$scan, .data$mZ)
-
-          # caching
-          if (cache && cache_spectra) {
-            arrow::write_parquet(
-              spectral_data$result,
-              sink = cache_info$spectra
+        } else if (cache && cache_spectra) {
+          # none missing and we're caching --> zip up the cache files
+          out <- try_catch_cnds(cache_isoraw_output(
+            file_path_info$output_path,
+            file_path_info$cache_path
+          ))
+          if (nrow(out$conditions) > 0) {
+            show_cnds(
+              out$conditions,
+              message = "encountered these issues while generating cache file {file_path_info$cache_path}"
             )
           }
+        }
+
+        # cleanup
+        if (dir.exists(file_path_info$output_path)) {
+          unlink(file_path_info$output_path, recursive = TRUE)
         }
       } else {
         cli_warn(
@@ -881,8 +994,8 @@ read_cached_raw_file <- function(
     }
     # subset what we got if we don't want all
     if (!all_spectra) {
-      spectral_data$result <- spectral_data$result |>
-        dplyr::filter(.data$scan %in% !!select_spectra)
+      spectra$result <- spectra$result |>
+        dplyr::filter(.data$scan.no %in% !!select_spectra)
     }
   }
 
@@ -899,25 +1012,25 @@ read_cached_raw_file <- function(
     problems |>
       # CANNOT cache the actual error ojects
       dplyr::select(-"condition") |>
-      arrow::write_parquet(sink = cache_info$problems)
+      arrow::write_parquet(sink = file_path_info$problems)
   }
 
   # return
   tibble(
-    file_path = cache_info$file_path,
+    file_path = file_path_info$file_path,
     file_info = list(file_info$result),
     scans = list(scans$result),
     peaks = list(peaks$result),
-    spectra = list(spectral_data$result),
+    spectra = list(spectra$result),
     problems = list(problems)
   )
 }
 
 # raw file reader
 # @param file_path can be used for a direct call (usually for testing only)
-# @param cache_info typically called with this parameter internally
+# @param file_path_info typically called with this parameter internally
 read_raw_file <- function(
-  cache_info = get_cache_info(
+  file_path_info = get_file_paths_info(
     file_path,
     read_cache = read_cache
   ),
@@ -925,14 +1038,14 @@ read_raw_file <- function(
   all_spectra = FALSE,
   select_spectra = integer(0),
   read_cache = TRUE,
-  from_cache = tibble(),
   cache = TRUE,
   cache_spectra = cache,
   pb = NULL,
-  .env = caller_env()
+  .env = caller_env(),
+  ...
 ) {
   # safety checks
-  if (!cache_info$file_exists) {
+  if (!file_path_info$file_exists) {
     cli_abort("cannot find this .raw file")
   }
 
@@ -949,174 +1062,75 @@ read_raw_file <- function(
     }
   }
 
-  # start problems
-  problems <- tibble()
-
-  # wrapper for executing rawrr reading functions
-  # to catch issues with the underlying rawfile reader
-  # NOTE: this may become easier in rawrr version 1.17 with a parameter to
-  # readFileHeader for the stderr/out (set to true and then capture.output)
-  # see https://github.com/fgcz/rawrr/issues/92
-  read_headers <- function(call = caller_call()) {
-    tryCatch(
-      rawrr::readFileHeader(cache_info$file_path),
-      error = function(cnd) {
-        if (
-          grepl("failed for an unknown reason", conditionMessage(cnd)) &&
-            grepl("Please check the debug files", conditionMessage(cnd))
-        ) {
-          cli_abort(
-            "the Thermo RawFileReader could not parse this file, it may not be a valid RAW file",
-            call = call
-          )
-        }
-        stop(cnd)
-      }
-    )
+  # clear output path
+  if (dir.exists(file_path_info$output_path)) {
+    unlink(file_path_info$output_path, recursive = TRUE)
   }
 
-  ## read headers
-  update_progress("reading headers")
-  headers <- try_catch_cnds(
-    read_headers(),
-    error_value = tibble(),
-    catch_errors = !orbi_get_option("debug")
-  )
-  problems <- bind_rows(problems, headers$conditions)
-
-  if (nrow(headers$conditions) > 0) {
-    # this raw file cannot be read by the RawFileReader
-    # --> return what we have and leave it at that
-    return(
-      tibble(
-        file_path = cache_info$file_path,
-        problems = problems
-      )
-    )
-  }
-
-  ## parse headers
-  update_progress("parsing headers")
-  parse_headers <- function() convert_list_to_tibble(headers$result)
-  headers_parsed <- try_catch_cnds(
-    parse_headers(),
-    error_value = tibble(),
-    catch_errors = !orbi_get_option("debug")
-  )
-  problems <- bind_rows(problems, headers_parsed$conditions)
-  file_info <- headers_parsed$result
-
-  ## read indices
-  update_progress("reading indices")
-  indices <- try_catch_cnds(
-    rawrr::readIndex(cache_info$file_path),
-    error_value = tibble(scan = integer(0)),
-    catch_errors = !orbi_get_option("debug")
-  )
-  problems <- bind_rows(problems, indices$conditions)
-
-  ## parse indices
-  update_progress("parsing indices")
-  parse_indices <- function() {
-    if (!"scan" %in% names(indices$result)) {
-      cli_abort("no {.var scan} column found in scan index")
-    }
-    indices$result$scan <- as.integer(indices$result$scan)
-    return(tibble::as_tibble(indices$result))
-  }
-  indices_parsed <- try_catch_cnds(
-    parse_indices(),
-    error_value = tibble(scan = integer(0)),
-    catch_errors = !orbi_get_option("debug")
-  )
-  problems <- bind_rows(problems, indices_parsed$conditions)
-
-  ## read spectra/scans (always needed to get all scan info even if spectra not returned)
-  update_progress("reading scans")
-  spectra_raw <- try_catch_cnds(
-    rawrr::readSpectrum(
-      cache_info$file_path,
-      scan = indices_parsed$result$scan
+  # run isoraw
+  update_progress("running isoraw")
+  out <- try_catch_cnds(
+    run_isoraw(
+      file_path_info$file_path,
+      all_spectra = all_spectra,
+      select_spectra = select_spectra
     ),
-    error_value = list(),
+    error_value = NULL,
     catch_errors = !orbi_get_option("debug")
   )
-  problems <- bind_rows(problems, spectra_raw$conditions)
+  problems <- out$conditions
 
-  ## parse spectral data
-  update_progress("parsing spectra")
-  spectra_parsed <- try_catch_cnds(
-    parse_spectra(spectra_raw$result),
-    error_value = tibble(scan = integer(0)),
-    catch_errors = !orbi_get_option("debug")
-  )
-  problems <- bind_rows(problems, spectra_parsed$conditions)
-
-  ## parse scans info
-  update_progress("parsing scans")
-  parse_scan_info <- function() {
-    scan_info_cols <- !grepl(
-      "^(centroid\\.|mZ|intensity)",
-      names(spectra_parsed$result)
-    )
-    scan_info <- spectra_parsed$result[, scan_info_cols]
-    scan_cols <- setdiff(names(indices_parsed$result), names(scan_info))
-    indices_parsed$result[c("scan", scan_cols)] |>
-      dplyr::left_join(scan_info, by = "scan")
-  }
-  indices_w_scan_info <- try_catch_cnds(
-    parse_scan_info(),
-    error_value = tibble(scan = integer(0)),
-    catch_errors = !orbi_get_option("debug")
-  )
-  problems <- bind_rows(problems, indices_w_scan_info$conditions)
-  scans <- indices_w_scan_info$result
-
-  ## parsing peaks
-  update_progress("parsing peaks")
-  parse_peaks <- function() {
-    peak_cols <- grepl("^centroid\\.", names(spectra_parsed$result))
-    if (!any(peak_cols)) {
-      rlang::abort(
-        "no centroid data found in spectra, returning empty peaks"
+  # read file_info from output
+  update_progress("reading file info")
+  file_info <- try_catch_cnds(
+    read_isoraw_output(
+      file.path(
+        file_path_info$output_path,
+        file_path_info$file_info
       )
-    }
-    spectra_parsed$result[
-      names(spectra_parsed$result) == "scan" | peak_cols
-    ] |>
-      tibble::as_tibble() |>
-      tidyr::unnest(-"scan")
-  }
-  parsed_peaks <- try_catch_cnds(
-    parse_peaks(),
-    error_value = tibble(scan = integer(0)),
-    catch_errors = !orbi_get_option("debug")
+    ),
+    error_value = tibble()
   )
-  problems <- bind_rows(problems, parsed_peaks$conditions)
-  peaks <- parsed_peaks$result
+  problems <- dplyr::bind_rows(problems, file_info$conditions)
 
-  # decide what spectra to return
-  spectra <- tibble(scan = integer(0))
+  # read scans from output
+  update_progress("reading scans")
+  scans <- try_catch_cnds(
+    read_isoraw_output(file.path(
+      file_path_info$output_path,
+      file_path_info$scans
+    )),
+    error_value = tibble(scan.no = integer(0))
+  )
+  problems <- dplyr::bind_rows(problems, scans$conditions)
+
+  # read peaks from output
+  update_progress("reading peaks")
+  peaks <- try_catch_cnds(
+    read_isoraw_output(file.path(
+      file_path_info$output_path,
+      file_path_info$peaks
+    )),
+    error_value = tibble(scan.no = integer(0))
+  )
+  problems <- dplyr::bind_rows(problems, peaks$conditions)
+
+  # read spectra from output
   if (all_spectra || length(select_spectra) > 0) {
-    update_progress("selecting spectra")
-    spectral_data <- try_catch_cnds(
-      spectra_parsed$result |>
-        # everything OR the requested ones
-        dplyr::filter(!!all_spectra | .data$scan %in% !!select_spectra) |>
-        parse_spectral_data(),
-      error_value = tibble(scan = integer(0)),
-      catch_errors = !orbi_get_option("debug")
+    update_progress("reading spectra")
+    spectra <- try_catch_cnds(
+      read_isoraw_output(file.path(
+        file_path_info$output_path,
+        file_path_info$spectra
+      )),
+      error_value = tibble(scan.no = integer(0))
     )
-    problems <- bind_rows(problems, spectral_data$conditions)
-    spectra <- spectral_data$result
+    problems <- dplyr::bind_rows(problems, spectra$conditions)
+  } else {
+    spectra <- list(result = tibble(scan.no = integer(0)))
   }
 
-  #Sys.sleep(0.5) # FIXME
-  # if (grepl("_10scans", cache_info$file_path)) {
-  #   cli_abort("something totally wrong")
-  # } # FIXME
-
-  ## wrapping up
+  # wrapping up
   update_progress("finalizing")
   problems <- problems |>
     dplyr::filter(
@@ -1124,92 +1138,57 @@ read_raw_file <- function(
       dplyr::n() == 1L | !purrr::map_lgl(.data$condition, is_empty)
     )
 
-  ## caching
-  if (cache) {
-    # do we need to create the cache path?
-    if (!dir.exists(cache_info$cache_path)) {
-      dir.create(cache_info$cache_path)
-    }
-
+  # caching (only if at least the isoraw read had no issues)
+  cleanup <- nrow(out$conditions) == 0L
+  if (cache && cleanup) {
     # cache info
     arrow::write_parquet(
       tibble(
-        file_size = as.integer(cache_info$file_size),
+        file_size = as.integer(file_path_info$file_size),
         isoorbi_version = as.character(utils::packageVersion("isoorbi")),
         cache_timestamp = Sys.time()
       ),
-      sink = cache_info$cache_info
+      sink = file.path(file_path_info$output_path, file_path_info$cache_info)
     )
 
-    # file info
-    arrow::write_parquet(file_info, sink = cache_info$file_info)
-
-    # scan info
-    arrow::write_parquet(scans, sink = cache_info$scans)
-
-    # cache peaks
-    arrow::write_parquet(peaks, sink = cache_info$peaks)
-
-    # spectra
-    if (cache_spectra) {
-      arrow::write_parquet(spectra, sink = cache_info$spectra)
-    }
-
-    # problems
+    # caching problems
     problems |>
       # CANNOT cache the actual error ojects
       dplyr::select(-"condition") |>
-      arrow::write_parquet(sink = cache_info$problems)
+      arrow::write_parquet(
+        sink = file.path(file_path_info$output_path, file_path_info$problems)
+      )
+
+    # zipping up the cache file
+    out <- try_catch_cnds(cache_isoraw_output(
+      file_path_info$output_path,
+      file_path_info$cache_path
+    ))
+    if (nrow(out$conditions) > 0) {
+      cleanup <- FALSE # stop cleanup, something went wrong
+      show_cnds(
+        out$conditions,
+        message = "encountered these issues while generating cache file {file_path_info$cache_path}"
+      )
+    }
+  }
+
+  # cleanup
+  if (cleanup) {
+    unlink(file_path_info$output_path, recursive = TRUE)
   }
 
   # combine
   out <-
     tibble(
-      file_path = cache_info$file_path,
-      file_info = list(file_info),
-      scans = list(scans),
-      peaks = list(peaks),
-      spectra = list(spectra),
+      file_path = file_path_info$file_path,
+      file_info = list(file_info$result),
+      scans = list(scans$result),
+      peaks = list(peaks$result),
+      spectra = list(spectra$result),
       problems = list(problems)
     )
 
   # return
   return(out)
-}
-
-# here because it's used in both read_cached_raw_file and read_raw_file
-parse_spectra <- function(spectra_raw) {
-  spectra_raw |>
-    map(
-      function(spectrum) {
-        if (!"scan" %in% names(spectrum)) {
-          cli_abort("no {.var scan} column found in spectrum")
-        }
-        spectrum$scan <- as.integer(spectrum$scan)
-        convert_list_to_tibble(spectrum)
-      }
-    ) |>
-    dplyr::bind_rows()
-}
-
-# here because it's used in both read_cached_raw_file and read_raw_file
-parse_spectral_data <- function(spectra_parsed) {
-  data_cols <- grepl("^(mZ|intensity)", names(spectra_parsed))
-  if (!any(data_cols)) {
-    cli_abort(
-      "no raw data ({.var mZ} & {.var intensity}) found in spectra, returning empty raw data table"
-    )
-  }
-  spectra_parsed[names(spectra_parsed) == "scan" | data_cols] |>
-    tibble::as_tibble() |>
-    tidyr::unnest(-"scan")
-}
-
-# utility function ==========
-
-# turns multi value entries into list columns and omits NULL values
-convert_list_to_tibble <- function(cache_info_list) {
-  lens <- lengths(cache_info_list)
-  cache_info_list[lens > 1] <- lapply(cache_info_list[lens > 1], list)
-  return(tibble::as_tibble(cache_info_list[lens > 0]))
 }
