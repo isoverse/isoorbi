@@ -1,3 +1,18 @@
+/*
+  This implementation by Sebastian Kopf <sebastian.kopf@colorado.edu> is optimized
+  for reading data relevant to Orbitrap IRMS instrumentation and storing the resulting
+  data in parquet files for easy + type-safe + fast access from R and Python. 
+  
+  It would not have been possible without the example provided by Jim Shofstahl at
+  https://github.com/thermofisherlsms/RawFileReader and the raw file reader developed
+  by Witold Wolski, Christian Panse, Christian Trachsel, and Tobias Kockmann as part
+  of the rawrr R package at https://github.com/fgcz/rawrr
+    
+  Using this code is subject to agreeing to the Thermo license agreement for the Thermo RawFileReader 
+  available at https://github.com/thermofisherlsms/RawFileReader and included with this repository
+  (inst/licenses/RawFileReaderLicense.txt)
+*/
+
 // System libraries
 using System;
 using System.Collections.Generic;
@@ -36,6 +51,18 @@ namespace Isoorbi
         /// </summary>
         /// <param name="path">
         /// Path to the raw file.
+        /// </param>
+        /// <param name="output">
+        /// Where to save the resulting parquet files to.
+        /// </param>
+        /// <param name="skipFileInfo">
+        /// Whether to skip reading the file info from the headers and instrument details.
+        /// </param>
+        /// <param name="skipScans">
+        /// Whether to skip reading the scans info.
+        /// </param>
+        /// <param name="skipPeaks">
+        /// Whether to skip reading the peaks.
         /// </param>
         /// <param name="allSpectra">
         /// [Optional] If set to true, reads all available scan spectra and ignores the 'spectra' parameter.
@@ -604,7 +631,7 @@ namespace Isoorbi
         /// <summary>
         /// The main routine for this program. This implementation is based on a single-threaded application because the multi-threading does not seem to work on all platforms.
         /// </summary>
-        /// <param name="args">The command line arguments for this program. Run the program without arguments to get the usage help.
+        /// <param name="args">The command line arguments for this program. Run the program without arguments or with --help to get the usage help.
         public static async Task Main(string[] args)
         {
 
