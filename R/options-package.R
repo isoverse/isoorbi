@@ -81,9 +81,9 @@ get_pkg_options <- function() {
       default = "unused",
       check_fn = is_scalar_character
     ),
-    #' - `aggregators`: data aggregators for pulling data out of raw files. The list of available aggregators is accessible via `orbi_get_option("aggregators")`. Individiual aggregators are available via the shortcut helper function `orbi_get_aggregator("default")`. Register new/overwrite existing aggregators via `orbi_register_aggregator()`.
+    #' - `aggregators`: data aggregators for pulling data out of raw files. The list of available aggregators is accessible via `orbi_get_option("aggregators")`. Individiual aggregators are available via the shortcut helper function `orbi_get_aggregator("standard")`. Register new/overwrite existing aggregators via `orbi_register_aggregator()`.
     aggregators = define_pkg_option(
-      default = list(), # default aggregator is registered in zzz.R
+      default = list(), # default aggregators are registered in zzz.R
       check_fn = function(x) {
         if (
           missing(x) ||

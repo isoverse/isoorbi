@@ -5,13 +5,17 @@
 #' This function allows dynamic aggregation and validation of data read by `orbi_read_raw`. Like [orbi_read_raw()], it is designed to be fail save by safely catching errors and reporting back on them (see [orbi_get_problems()]). This function should work out of the box for most files without additional modification of the `aggregator`.
 #'
 #' @param files_data the files read in by orbi_read_raw
-#' @param aggregator typically the name of a registered aggregator ([orbi_get_aggregator()]) but can also be directly an aggregator tibble ([orbi_start_aggregator()]) that defines which data should be aggregated and how. Uses the default aggregator in the isoorbi package (`orbi_get_option("aggregators")`).
+#' @param aggregator typically the name of a registered aggregator (see all with `orbi_get_option("aggregators")`),
+#' default is the "standard" aggregator included in the package (`orbi_get_aggregator("standard")`).
+#' Other options are "minimal" (`orbi_get_aggregator("minimal")`) and "extended" (`orbi_get_aggregator("extended")`).
+#' The `aggregator` parameter can can also directly be an aggregator tibble (created/modified with [orbi_start_aggregator()]
+#' and/or [orbi_add_to_aggregator()]) that defines which data should be aggregated and how.
 #' @inheritParams orbi_read_raw
 #' @return a list of merged dataframes collected from the `files_data` based on the `aggregator` definitions
 #' @export
 orbi_aggregate_raw <- function(
   files_data,
-  aggregator = "default",
+  aggregator = "standard",
   show_progress = rlang::is_interactive(),
   show_problems = TRUE
 ) {
@@ -454,7 +458,7 @@ aggregate_files <- function(
         catch_errors = !orbi_get_option("debug")
       )
 
-    # add filepatht to file info
+    # add filepath to file info
     out$result$file_info <- c(
       # uidx is already in the dataset but faster to just add it in again
       list(uidx = uidx, filepath = filepath),
@@ -490,6 +494,23 @@ aggregate_files <- function(
   # read files (separate calls to simplify backtraces)
   results <- files_data$filepath |>
     map2(1:nrow(files_data), aggregate_safely_with_progress)
+
+  # unused columns (this is purely for information purpses)
+  fetch_unused_columns <- function(result, dataset) {
+    if (dataset %in% names(attr(result, "unused_columns"))) {
+      attr(result, "unused_columns")[[dataset]]
+    } else {
+      character(0)
+    }
+  }
+  unused_cols <-
+    as.list(unique(aggregator$dataset)) |>
+    setNames(unique(aggregator$dataset)) |>
+    purrr::map(
+      ~ purrr::map(results, fetch_unused_columns, .x) |>
+        unlist(recursive = TRUE) |>
+        unique()
+    )
 
   # combine results
   datasets <- c(unique(aggregator$dataset), "problems")
@@ -553,9 +574,16 @@ aggregate_files <- function(
             sprintf(" ({col_yellow('%s NA')})", n_na),
             ""
           ))
+        unused_cols <- sprintf(
+          "{.emph {col_yellow('%s')}}",
+          unused_cols[[name]]
+        )
         format_inline(
           "{symbol$arrow_right} {col_blue(name)}: ",
-          "{cols}"
+          "{glue::glue_collapse(cols, sep = ', ')}; ",
+          if (length(unused_cols) > 0) {
+            " ({.emph unused}: {glue::glue_collapse(unused_cols, sep = ', ')})"
+          }
         )
       }
     ) |>
@@ -594,9 +622,10 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
 
   # find source columns and deal with any regexps that need to be resolved
   # shouldn't throw errors relevant for user so not run with try_catch_cnds
+  all_columns <- purrr::map(datasets, names)
   find_source_columns <- function(dataset, column, source, regexp) {
     # find source columns
-    available_cols <- names(datasets[[dataset]])
+    available_cols <- all_columns[[dataset]]
     # find by regexp
     if (regexp && length(source) > 0) {
       sources <- grep(
@@ -667,14 +696,24 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
         .data$source,
         .data$regexp,
         function(source, regexp, non_regexp_sources) {
-          !regexp || !all(source %in% non_regexp_sources)
+          regexp && !any(source %in% non_regexp_sources)
         },
-        non_regexp_sources = list(
-          .data$source[!.data$regexp] |> unlist(recursive = TRUE)
-        )
+        non_regexp_sources = .data$source[!.data$regexp] |>
+          unlist(recursive = TRUE)
       )
     ) |>
     dplyr::filter(!.data$regexp | .data$regexp_col_only)
+
+  my_agg <<- aggregator_applied
+
+  # all used columns
+  used_columns <- aggregator_applied |>
+    dplyr::summarize(
+      .by = "dataset",
+      all_columns = list(all_columns[[.data$dataset[1]]]),
+      used_columns = list(.data$source |> unlist(recursive = TRUE) |> unique()),
+      unused_columns = list(setdiff(all_columns[[1]], used_columns[[1]]))
+    )
 
   # aggregate value for dataset/column from source
   aggregate_value <- function(dataset, column, source, cast, func, args) {
@@ -778,7 +817,11 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
     dplyr::mutate(uidx = !!uidx, .before = 1L)
 
   # return with problems
-  return(c(datasets, list(problems = problems)))
+  result <- c(datasets, list(problems = problems))
+  attr(result, "unused_columns ") <- used_columns |>
+    dplyr::select("dataset", "unused_columns") |>
+    tibble::deframe()
+  return(result)
 }
 
 # get data from aggregated ===========

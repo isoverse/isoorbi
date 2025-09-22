@@ -1,7 +1,8 @@
 # on package load
 .onAttach <- function(libname, pkgname) {
-  # register default aggregator
-  orbi_start_aggregator("default") |>
+  # register aggregators
+  agg_minimal <-
+    orbi_start_aggregator("minimal") |>
     orbi_add_to_aggregator(
       "file_info",
       "filename",
@@ -11,9 +12,9 @@
     ) |>
     orbi_add_to_aggregator(
       "file_info",
-      "\\1",
-      source = "(.*)",
-      regexp = TRUE
+      "creation_date",
+      source = "CreationDate",
+      cast = "as.POSIXct"
     ) |>
     orbi_add_to_aggregator("scans", "scan.no", cast = "as.integer") |>
     orbi_add_to_aggregator(
@@ -40,10 +41,74 @@
       source = c("FT Resolution", "Orbitrap Resolution"),
       cast = "as.numeric"
     ) |>
+    orbi_add_to_aggregator("peaks", "scan.no", cast = "as.integer") |>
+    orbi_add_to_aggregator(
+      "peaks",
+      "mzMeasured",
+      "mass",
+      cast = "as.numeric"
+    ) |>
+    orbi_add_to_aggregator("peaks", "intensity", cast = "as.numeric") |>
+    orbi_add_to_aggregator("peaks", "baseline", cast = "as.numeric") |>
+    orbi_add_to_aggregator(
+      "peaks",
+      "peakNoise",
+      "noise",
+      cast = "as.numeric"
+    ) |>
+    orbi_add_to_aggregator(
+      "peaks",
+      "peakResolution",
+      "resolution",
+      cast = "as.numeric"
+    ) |>
+    orbi_add_to_aggregator(
+      "peaks",
+      "isRefPeak",
+      "is_ref",
+      cast = "as.logical"
+    ) |>
+    orbi_add_to_aggregator(
+      "peaks",
+      "isLockPeak",
+      "is_lock_peak",
+      cast = "as.logical"
+    ) |>
+    orbi_add_to_aggregator("spectra", "scan.no", cast = "as.integer") |>
+    orbi_add_to_aggregator("spectra", "mz", "mass", cast = "as.numeric") |>
+    orbi_add_to_aggregator("spectra", "intensity", cast = "as.numeric") |>
+    orbi_register_aggregator("minimal")
+
+  # standard aggregator
+  agg_standard <- agg_minimal |>
+    orbi_add_to_aggregator(
+      "file_info",
+      "\\1",
+      source = "(.*)",
+      regexp = TRUE
+    ) |>
+    orbi_add_to_aggregator(
+      "scans",
+      "basePeakMz",
+      source = "BasePeakMass",
+      cast = "as.numeric"
+    ) |>
     orbi_add_to_aggregator(
       "scans",
       "basePeakIntensity",
       source = "BasePeakIntensity",
+      cast = "as.numeric"
+    ) |>
+    orbi_add_to_aggregator(
+      "scans",
+      "lowMass",
+      source = "LowMass",
+      cast = "as.numeric"
+    ) |>
+    orbi_add_to_aggregator(
+      "scans",
+      "highMass",
+      source = "HighMass",
       cast = "as.numeric"
     ) |>
     orbi_add_to_aggregator(
@@ -83,43 +148,17 @@
       source = "Analyzer Temperature",
       cast = "as.numeric"
     ) |>
-    orbi_add_to_aggregator("peaks", "scan.no", cast = "as.integer") |>
+    orbi_register_aggregator("standard")
+
+  # extended aggregator - pull in anthing else there is from file_info and scans
+  agg_extended <- agg_standard |>
     orbi_add_to_aggregator(
-      "peaks",
-      "mzMeasured",
-      "mass",
-      cast = "as.numeric"
+      "scans",
+      "\\1",
+      source = "(.*)",
+      regexp = TRUE
     ) |>
-    orbi_add_to_aggregator("peaks", "intensity", cast = "as.numeric") |>
-    orbi_add_to_aggregator("peaks", "baseline", cast = "as.numeric") |>
-    orbi_add_to_aggregator(
-      "peaks",
-      "peakNoise",
-      "noise",
-      cast = "as.numeric"
-    ) |>
-    orbi_add_to_aggregator(
-      "peaks",
-      "peakResolution",
-      "resolution",
-      cast = "as.numeric"
-    ) |>
-    orbi_add_to_aggregator(
-      "peaks",
-      "isRefPeak",
-      "is_ref",
-      cast = "as.logical"
-    ) |>
-    orbi_add_to_aggregator(
-      "peaks",
-      "isLockPeak",
-      "is_lock_peak",
-      cast = "as.logical"
-    ) |>
-    orbi_add_to_aggregator("spectra", "scan.no", cast = "as.integer") |>
-    orbi_add_to_aggregator("spectra", "mz", "mass", cast = "as.numeric") |>
-    orbi_add_to_aggregator("spectra", "intensity", cast = "as.numeric") |>
-    orbi_register_aggregator()
+    orbi_register_aggregator("extended")
 
   # if we're knitting, enable full ansi output (turn off with orbi_options(auto_use_ansi = FALSE))
   if (

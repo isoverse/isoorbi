@@ -1,0 +1,25 @@
+---
+title: "Raw Files"
+description: >
+  An example for reading raw files.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Raw Files}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, include=FALSE}
+# default chunk options
+knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
+```
+
+
+```{r}
+raw_file |> orbi_aggregate_raw("minimal") -> x
+raw_file |> orbi_aggregate_raw("standard") -> x
+raw_file |> orbi_aggregate_raw("extended") -> x
+```
