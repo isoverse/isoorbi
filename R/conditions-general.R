@@ -165,7 +165,7 @@ summarize_cnds <- function(
 
   # takes care of line breaks and escapes {}
   # it seems cli_escape in format_bullets_raw does NOT properly escape < and >
-  # might be fixed if https://github.com/r-lib/cli/issues/789 is addressed
+  # will be fixed in https://github.com/r-lib/cli/issues/789
   summary |>
     gsub(pattern = "<", replacement = "<<", fixed = TRUE) |>
     gsub(pattern = ">", replacement = ">>", fixed = TRUE) |>
