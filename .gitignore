@@ -49,6 +49,7 @@ vignettes/**/*.pdf
 tmp/
 docs/
 *.parquet
+*.zip
 
 # Pkgdown
 pkgdown/**
