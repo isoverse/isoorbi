@@ -38,7 +38,9 @@ reference:
   - orbi_read_raw
   - orbi_aggregate_raw
   - orbi_start_aggregator
-  - orbi_add_aggregator
+  - orbi_add_to_aggregator
+  - orbi_register_aggregator
+  - orbi_get_aggregator
   - orbi_get_data
   - orbi_get_problems
 
@@ -50,7 +52,7 @@ reference:
   - orbi_read_isox
   - orbi_simplify_isox
   
-- title: Core proessing functions
+- title: Core processing functions
   desc: >
     These core functions are essential to process the data read from RAW or ISOX files
   contents:
