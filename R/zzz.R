@@ -12,7 +12,7 @@
     orbi_add_to_aggregator(
       "file_info",
       "\\1",
-      source = "^(?!FileName$)(.*)",
+      source = "(.*)",
       regexp = TRUE
     ) |>
     orbi_add_to_aggregator("scans", "scan.no", cast = "as.integer") |>
