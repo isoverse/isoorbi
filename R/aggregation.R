@@ -269,7 +269,10 @@ print.orbi_aggregator <- function(x, ...) {
           ),
           function(col, value, default, regex, source) {
             if (regex) {
-              matches <- regmatches(source, gregexpr("\\([^()]*\\)", source))[[
+              matches <- regmatches(
+                source,
+                gregexpr("\\([^?)][^()]*\\)", source)
+              )[[
                 1
               ]]
               for (i in seq_along(matches)) {
@@ -394,33 +397,15 @@ aggregate_files <- function(
   root_env <- current_env()
 
   # safety checks
-  if (missing(files_data) || !is.data.frame(files_data)) {
-    cli_abort("{.var files_data} is not a data frame")
-  }
   files_req_cols <- c("filepath")
-  if (length(missing <- setdiff(files_req_cols, names(files_data)))) {
-    cli_abort(
-      "{.var files_data} is missing required column{?s} {.var {missing}}"
-    )
-  }
-  if (missing(aggregator) || !is.data.frame(aggregator)) {
-    cli_abort("{.var aggregator} is not a data frame")
-  }
-  aggregator_req_cols <- c(
-    "dataset",
-    "column",
-    "source",
-    "default",
-    "cast",
-    "regexp",
-    "func",
-    "args"
+  check_tibble(files_data, files_req_cols)
+  check_arg(
+    aggregator,
+    !missing(aggregator) &&
+      is_tibble(aggregator) &&
+      is(aggregator, "orbi_aggregator"),
+    format_inline("must be an {col_magenta('orbi_aggregator')} tibble")
   )
-  if (length(missing <- setdiff(aggregator_req_cols, names(aggregator)))) {
-    cli_abort(
-      "{.var aggregator} is missing required column{?s} {.var {missing}}"
-    )
-  }
   if (nrow(files_data) == 0) {
     cli_abort("there is nothing to aggregate, {.var files_data} has 0 rows")
   }
@@ -430,7 +415,7 @@ aggregate_files <- function(
 
   # info
   start <- start_info(
-    "is aggregating data from raw file {pb_current}/{pb_total} {pb_bar} ",
+    "is aggregating data from raw file {pb_current}/{pb_total} using {.emph {.strong {attr(aggregator, 'name')}}} aggregator {pb_bar} ",
     "file data {pb_bar} {pb_percent}",
     "| {pb_elapsed} | ETA{pb_eta} | {.file {pb_status}}",
     pb_total = nrow(files_data),
@@ -533,7 +518,7 @@ aggregate_files <- function(
   new_problems <- results$problems |>
     dplyr::filter(!is.na(.data$new) & .data$new)
   finish_info(
-    "aggregated {utils::head(details, -1)} from {nrow(files_data)} file{?s} ",
+    "aggregated {utils::head(details, -1)} from {nrow(files_data)} file{?s} using {.emph {.strong {attr(aggregator, 'name')}}} aggregator",
     if (nrow(new_problems) > 0) {
       # custom problems summary
       summarize_cnds(
@@ -586,9 +571,6 @@ aggregate_files <- function(
 # it can be used for any isoverse aggregation and should be considered
 # for porting to isoverse
 aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
-  # FIXME: here
-  # FIXME: implement an automated uidx for unique index for later matching between records! (better than a uid from the data)
-
   # check which datasets are available
   check_datasets <- function(aggregator) {
     if (length(missing <- setdiff(aggregator$dataset, names(datasets))) > 0) {
@@ -621,11 +603,18 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
         source[[1]],
         available_cols,
         value = TRUE,
-        ignore.case = TRUE
+        ignore.case = TRUE,
+        perl = TRUE
       )
       if (length(sources) > 0) {
         # found some matching regexps
-        columns <- gsub(source[[1]], column, sources, ignore.case = TRUE)
+        columns <- gsub(
+          source[[1]],
+          column,
+          sources,
+          ignore.case = TRUE,
+          perl = TRUE
+        )
         sources <- as.list(sources)
       } else {
         # none found
@@ -754,7 +743,6 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
   datasets <- aggregator_summary$out |> setNames(aggregator_summary$dataset)
 
   # add uidx to each tibble
-  print(uidx) # FIXME this is true instead of number!
   datasets <- datasets |>
     purrr::map(
       ~ {
@@ -765,8 +753,6 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
         }
       }
     )
-
-  my_data <<- datasets
 
   problems <-
     dplyr::bind_rows(

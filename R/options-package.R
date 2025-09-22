@@ -81,133 +81,17 @@ get_pkg_options <- function() {
       default = "unused",
       check_fn = is_scalar_character
     ),
-    #' - `raw_aggregator`: configuration for pulling data out of raw files
-    raw_aggregator = define_pkg_option(
-      default = orbi_start_aggregator(
-        "file_info",
-        uid_source = "RAW file",
-        cast = "as.factor"
-      ) |>
-        orbi_add_aggregator(
-          "file_info",
-          "\\1",
-          source = "(.*)",
-          regexp = TRUE
-        ) |>
-        orbi_add_aggregator("scans", "scan", cast = "as.integer") |>
-        orbi_add_aggregator(
-          "scans",
-          "time.min",
-          source = "StartTime",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "tic",
-          source = "TIC",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "it.ms",
-          source = "Ion Injection Time (ms):",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "resolution",
-          source = c("FT Resolution:", "Orbitrap Resolution:"),
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "basePeakIntensity",
-          source = "basePeak",
-          cast = "as.numeric",
-          func = "sapply",
-          args = list(`[`, 2)
-        ) |> # list column that needs 2nd value
-        orbi_add_aggregator(
-          "scans",
-          "rawOvFtT",
-          source = "RawOvFtT:",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "intensCompFactor",
-          source = "OT Intens Comp Factor:",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator("scans", "agc", source = "AGC:") |>
-        orbi_add_aggregator(
-          "scans",
-          "agcTarget",
-          source = "AGC Target:",
-          cast = "as.integer"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "microscans",
-          source = "Micro Scan Count:",
-          cast = "as.integer"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "numberLockmassesFound",
-          source = "Number of LM Found:",
-          cast = "as.integer"
-        ) |>
-        orbi_add_aggregator(
-          "scans",
-          "analyzerTemperature",
-          source = "Analyzer Temperature:",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator("peaks", "scan", cast = "as.integer") |>
-        orbi_add_aggregator(
-          "peaks",
-          "mzMeasured",
-          source = "centroid.PreferredMasses",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "peaks",
-          "intensity",
-          source = "centroid.intensity",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator(
-          "peaks",
-          "peakNoise",
-          source = "centroid.PreferredNoises",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator("spectra", "scan", cast = "as.integer") |>
-        orbi_add_aggregator(
-          "spectra",
-          "mz",
-          source = "mZ",
-          cast = "as.numeric"
-        ) |>
-        orbi_add_aggregator("spectra", "intensity", cast = "as.numeric"),
+    #' - `aggregators`: data aggregators for pulling data out of raw files. The list of available aggregators is accessible via `orbi_get_option("aggregators")`. Individiual aggregators are available via the shortcut helper function `orbi_get_aggregator("default")`. Register new/overwrite existing aggregators via `orbi_register_aggregator()`.
+    aggregators = define_pkg_option(
+      default = list(), # default aggregator is registered in zzz.R
       check_fn = function(x) {
-        if (missing(x) || !is.data.frame(x)) {
-          cli_abort("{.var raw_aggregator} is not a data frame")
-        }
-        aggregator_req_cols <- c(
-          "dataset",
-          "column",
-          "source",
-          "default",
-          "cast",
-          "regexp",
-          "func",
-          "args"
-        )
-        if (length(missing <- setdiff(aggregator_req_cols, names(x)))) {
+        if (
+          missing(x) ||
+            !is.list(x) ||
+            !all(purrr::map_lgl(x, is, "orbi_aggregator"))
+        ) {
           cli_abort(
-            "{.var raw_aggregator} is missing required column{?s} {.var {missing}}"
+            "{.var aggregators} is not a list of {col_magenta('orbi_aggregator')} objects. Please use {.strong orbi_register_aggregator()} too add individual aggregators."
           )
         }
         return(TRUE)
