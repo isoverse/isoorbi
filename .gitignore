@@ -50,6 +50,7 @@ tmp/
 docs/
 *.parquet
 *.zip
+*.log
 
 # Pkgdown
 pkgdown/**
