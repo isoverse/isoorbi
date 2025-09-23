@@ -11,17 +11,19 @@
 #' @param reinstall_always whether to (re-)install no matter what
 #' @param min_version the minimum version number required
 #' @param source the URL (or local path) where to find the raw file reader, by default this is the latests release of the executables on github
+#' @param accept_license explicitly accept Thermo's license agreement (if this is FALSE and the license has not previously been accepted, you will be asked about it)
 #' @param ... passed on to `download.file` if (re-) installing the reader
 #' @export
 orbi_check_isoraw <- function(
   install_if_missing = TRUE,
   reinstall_if_outdated = TRUE,
   reinstall_always = FALSE,
-  min_version = "0.2.1",
+  min_version = "0.2.0",
   source = paste0(
     "https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version
   ),
+  accept_license = FALSE,
   ...
 ) {
   # start
@@ -121,11 +123,11 @@ orbi_check_isoraw <- function(
   }
 
   # license check
-  check_license()
+  check_license(accept = accept_license)
 }
 
 # check license acceptance
-check_license <- function(env = caller_env()) {
+check_license <- function(env = caller_env(), accept = FALSE) {
   # path to license file
   license_file <- file.path(
     system.file(package = 'isoorbi'),
@@ -145,7 +147,7 @@ check_license <- function(env = caller_env()) {
   }
 
   # agreement is not yet accepted
-  if (!interactive()) {
+  if (!interactive() && !accept) {
     # can't do it while knitting
     cli_abort(
       paste(
@@ -156,10 +158,14 @@ check_license <- function(env = caller_env()) {
     )
   }
 
-  # show the liense and ask the question
-  file.show(license_file)
-  cli_text("{.strong {symbol$arrow_right} {question}}")
-  response <- readline(prompt = "  Answer[Y/n]: ")
+  # show the liense and ask the question if it's not already explicitly accepted
+  if (!accept) {
+    file.show(license_file)
+    cli_text("{.strong {symbol$arrow_right} {question}}")
+    response <- readline(prompt = "  Answer[Y/n]: ")
+  } else {
+    response <- "yes"
+  }
   if (tolower(response) %in% c("y", "yes")) {
     if (!dir.exists(dirname(user_copy))) {
       dir.create(dirname(user_copy), recursive = TRUE)
