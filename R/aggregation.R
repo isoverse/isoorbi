@@ -26,12 +26,75 @@ orbi_aggregate_raw <- function(
   if (is.character(aggregator)) {
     aggregator <- orbi_get_aggregator(aggregator)
   }
-  aggregate_files(
-    files_data,
-    aggregator,
-    show_progress = show_progress,
-    show_problems = show_problems
+  agg_data <-
+    aggregate_files(
+      files_data,
+      aggregator,
+      show_progress = show_progress,
+      show_problems = show_problems
+    )
+  class(agg_data) <- unique(c("orbi_aggregated_data"), class(agg_data))
+  return(agg_data)
+}
+
+#' @export
+print.orbi_aggregated_data <- function(x, ...) {
+  cli_rule(
+    center = "{.strong aggregated data from {nrow(x$file_info)} raw file{?s} - retrieve with orbi_get_data()}"
   )
+
+  # details on columns
+  x |>
+    purrr::map2_chr(
+      names(x),
+      function(dataset, name) {
+        # summarize problems
+        if (name == "problems") {
+          return(
+            summarize_cnds(
+              dataset,
+              include_symbol = FALSE,
+              include_call = FALSE,
+              summary_format = paste0(
+                "{symbol$arrow_right} {col_blue('",
+                name,
+                "')}: ",
+                "encountered {issues} ",
+                if (nrow(dataset) > 0) {
+                  "{symbol$arrow_right} check with {.strong orbi_get_problems(x)}"
+                }
+              )
+            )
+          )
+        }
+
+        # all other fields
+        n_rows <- nrow(dataset) |>
+          prettyunits::pretty_num() |>
+          # take care of leading/trailing whitespaces
+          gsub(pattern = "(^ +| +$)", replacement = "")
+        n_na <- purrr::map_int(dataset, ~ sum(is.na(.x)))
+        cols <- names(dataset) |>
+          sprintf(fmt = "{.field %s}") |>
+          paste0(if_else(
+            n_na > 0,
+            sprintf(" ({col_yellow('%s NA')})", n_na),
+            ""
+          ))
+        unused_cols <- sprintf(
+          "{.emph {col_yellow('%s')}}",
+          attr(dataset, "unused_columns")
+        )
+        format_inline(
+          "{symbol$arrow_right} {col_blue(name)} ({n_rows}): ",
+          "{glue::glue_collapse(cols, sep = ', ')}",
+          if (length(unused_cols) > 0) {
+            "; ({.emph not aggregated}: {glue::glue_collapse(unused_cols, sep = ', ')})"
+          }
+        )
+      }
+    ) |>
+    cli_bullets()
 }
 
 #' Get data frame from aggregated data
@@ -503,14 +566,6 @@ aggregate_files <- function(
       character(0)
     }
   }
-  unused_cols <-
-    as.list(unique(aggregator$dataset)) |>
-    setNames(unique(aggregator$dataset)) |>
-    purrr::map(
-      ~ purrr::map(results, fetch_unused_columns, .x) |>
-        unlist(recursive = TRUE) |>
-        unique()
-    )
 
   # combine results
   datasets <- c(unique(aggregator$dataset), "problems")
@@ -525,8 +580,15 @@ aggregate_files <- function(
     as.list(datasets) |>
     setNames(datasets) |>
     purrr::map(
-      ~ purrr::map(results, fetch_dataset, .x) |>
-        dplyr::bind_rows()
+      ~ {
+        data <- purrr::map(results, fetch_dataset, .x) |>
+          dplyr::bind_rows()
+        unused_cols <- purrr::map(results, fetch_unused_columns, .x) |>
+          unlist(recursive = TRUE) |>
+          unique()
+        attr(data, "unused_columns") <- unused_cols
+        data
+      }
     )
 
   # info
@@ -539,7 +601,7 @@ aggregate_files <- function(
   new_problems <- results$problems |>
     dplyr::filter(!is.na(.data$new) & .data$new)
   finish_info(
-    "aggregated {utils::head(details, -1)} from {nrow(files_data)} file{?s} using {.emph {.strong {attr(aggregator, 'name')}}} aggregator",
+    "aggregated {utils::head(details, -1)} from {nrow(files_data)} file{?s} using the {.emph {.strong {attr(aggregator, 'name')}}} aggregator",
     if (nrow(new_problems) > 0) {
       # custom problems summary
       summarize_cnds(
@@ -559,36 +621,6 @@ aggregate_files <- function(
 
   # clean up problems
   results$problems <- dplyr::select(results$problems, -"new")
-
-  # details on columns
-  cli_bullets(
-    purrr::map2_chr(
-      results,
-      names(results),
-      function(dataset, name) {
-        n_na <- purrr::map_int(dataset, ~ sum(is.na(.x)))
-        cols <- names(dataset) |>
-          sprintf(fmt = "{.field %s}") |>
-          paste0(if_else(
-            n_na > 0,
-            sprintf(" ({col_yellow('%s NA')})", n_na),
-            ""
-          ))
-        unused_cols <- sprintf(
-          "{.emph {col_yellow('%s')}}",
-          unused_cols[[name]]
-        )
-        format_inline(
-          "{symbol$arrow_right} {col_blue(name)}: ",
-          "{glue::glue_collapse(cols, sep = ', ')}",
-          if (length(unused_cols) > 0) {
-            "; ({.emph unused}: {glue::glue_collapse(unused_cols, sep = ', ')})"
-          }
-        )
-      }
-    ) |>
-      setNames(rep(" ", length(results)))
-  )
 
   # return
   return(results)
