@@ -59,7 +59,11 @@ print.orbi_aggregated_data <- function(x, ...) {
                 "{symbol$arrow_right} {cli::col_blue('",
                 name,
                 "')}: ",
-                "has a total of {issues} ",
+                if (nrow(dataset) > 0) {
+                  "has a total of {issues} "
+                } else {
+                  "has {issues}"
+                },
                 if (nrow(dataset) > 0) {
                   "{symbol$arrow_right} check with {.strong orbi_get_problems(x)}"
                 }
