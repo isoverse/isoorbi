@@ -580,9 +580,9 @@ aggregate_files <- function(
         )
         format_inline(
           "{symbol$arrow_right} {col_blue(name)}: ",
-          "{glue::glue_collapse(cols, sep = ', ')}; ",
+          "{glue::glue_collapse(cols, sep = ', ')}",
           if (length(unused_cols) > 0) {
-            " ({.emph unused}: {glue::glue_collapse(unused_cols, sep = ', ')})"
+            "; ({.emph unused}: {glue::glue_collapse(unused_cols, sep = ', ')})"
           }
         )
       }

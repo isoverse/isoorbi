@@ -726,7 +726,69 @@ orbi_read_raw <- function(
   }
 
   # return
+  class(all_files) <- unique(c("orbi_raw_files", class(all_files)))
   return(all_files)
+}
+
+#' @export
+print.orbi_raw_files <- function(x, ...) {
+  cli_rule(
+    center = "{.strong {length(x$filepath)} raw file{?s} - {?process/combine} {?it/them} with orbi_aggregate_raw()}"
+  )
+
+  n_digits <- function(x) {
+    ifelse(x == 0, 1, floor(log10(abs(x))) + 1)
+  }
+
+  x |>
+    dplyr::mutate(
+      idx = dplyr::row_number(),
+      idx_spacers = max(n_digits(idx)) - n_digits(idx),
+      filename_spacers = max(nchar(basename(filepath))) -
+        nchar(basename(filepath)),
+      n_scans = purrr::map_int(.data$scans, nrow),
+      scans_spacers = max(n_digits(n_scans)) - n_digits(n_scans),
+      n_peaks = purrr::map_int(.data$peaks, nrow),
+      peaks_spacers = max(n_digits(n_peaks)) - n_digits(n_peaks),
+      n_spectral_data = purrr::map_int(.data$spectra, nrow),
+      n_spectra = purrr::map_int(.data$spectra, ~ length(unique(.x$scan.no))),
+      n_problems = purrr::map_int(.data$problems, nrow),
+      problems_text = purrr::map_chr(
+        .data$problems,
+        summarize_cnds,
+        include_symbol = FALSE,
+        include_call = FALSE
+      )
+    ) |>
+    dplyr::mutate(
+      .by = "idx",
+      # format_inline needs a single line
+      label = paste0(
+        strrep("\u00a0", idx_spacers),
+        format_inline("{idx}. {col_blue(basename(filepath))} "),
+        strrep("\u00a0", filename_spacers),
+        if_else(
+          .data$n_problems > 0,
+          format_inline("encountered {problems_text}; has "),
+          "has "
+        ),
+        strrep("\u00a0", scans_spacers),
+        format_inline(
+          "{n_scans} {.field scans} with "
+        ),
+        strrep("\u00a0", peaks_spacers),
+        format_inline(
+          "{n_peaks} {.field peak{?s}}; ",
+          if_else(
+            .data$n_spectral_data > 0,
+            "+ loaded {n_spectra} {.field spectr{?um/a}} ({n_spectral_data} points)",
+            "no {.field spectra} were loaded"
+          )
+        )
+      )
+    ) |>
+    dplyr::pull(label) |>
+    cli_bullets_raw()
 }
 
 # copmile information about the file paths
