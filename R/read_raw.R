@@ -717,9 +717,9 @@ orbi_read_raw <- function(
         )
       },
       success_format = if (nrow(problems) > 0) {
-        "{col_yellow('!')} {msg}"
+        "{cli::col_yellow('!')} {msg}"
       } else {
-        "{col_green(symbol$tick)} {msg}"
+        "{cli::col_green(symbol$tick)} {msg}"
       },
       start = list(start_time = start_time)
     )
@@ -733,7 +733,7 @@ orbi_read_raw <- function(
 #' @export
 print.orbi_raw_files <- function(x, ...) {
   cli_rule(
-    center = "{.strong {length(x$filepath)} raw file{?s} - {?process/combine} {?it/them} with orbi_aggregate_raw()}"
+    center = "{.strong {length(x$filepath)} raw file{?s} - {?process/combine} with orbi_aggregate_raw()}"
   )
 
   n_digits <- function(x) {
@@ -765,7 +765,7 @@ print.orbi_raw_files <- function(x, ...) {
       # format_inline needs a single line
       label = paste0(
         strrep("\u00a0", idx_spacers),
-        format_inline("{idx}. {col_blue(basename(filepath))} "),
+        format_inline("{idx}. {cli::col_blue(basename(filepath))} "),
         strrep("\u00a0", filename_spacers),
         if_else(
           .data$n_problems > 0,
@@ -788,7 +788,13 @@ print.orbi_raw_files <- function(x, ...) {
       )
     ) |>
     dplyr::pull(label) |>
-    cli_bullets_raw()
+    cli_bullets_raw() |>
+    cli()
+}
+
+#' @export
+knit_print.orbi_raw_files <- function(x, ...) {
+  print(x, ...)
 }
 
 # copmile information about the file paths

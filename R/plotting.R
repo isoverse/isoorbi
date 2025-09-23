@@ -211,6 +211,48 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 
 # plot functions ==========
 
+# FIXME: implement
+# @param aggregated_data data aggregated by `orbi_aggregate_raw()` and, optionally, with isotopocules already identified by `orbi_identify_isotopocules()`
+# @param mz_min which mz to start the main plot window at. By default include all.
+# @param mz_max which mz to end the main plot window at. By default include all.
+# @param mz_foci which mz values to focus additiona panels on. Can be approximate (i.e. nominal masses). Typically only suppplied if auto_focus does not do the job.
+# @param auto_focus whether to find the isotopocules to focus on automatically. Use `mz_foci` to fine-tune what is shown. Basically searches for the next heighest peaks after the base peak and shows their nearby mass window (including neighboring peaks with similar nominal mass) in additional panels. If there are multiple files (or scans) with different peak distributions, uses foci that are most pronounced across all or most files.
+# @param max_cols how many panel columns to show at most (i.e. main window + mz_foci). Use `mz_focus` to specify which ones to show if the `auto_focus` does not do the trick.
+# @param max_rows how many panel rows to show at most (i.e. however many scans and files are in the dataset). Will issue a warning
+# @param label_peaks whether to label isotopocules with their name and m/z. Is ignored if isotopocules have not yet been identified in the dataaset.
+# @param label_unknown_peaks whether to also label unknown peaks (i.e. those without isotopocule identification) with their m/z
+# @param spectra will be automatically extracted from `aggregated_data` but can be supplied here independently for greater control
+# @param peaks will be automatically extracted from `aggregated_data` but can be supplied here independently for greater control
+orbi_plot_spectra <- function(
+  aggregated_data,
+  mz_min = 0,
+  mz_max = Inf,
+  mz_foci = c(),
+  auto_focus = TRUE,
+  max_cols = 5,
+  max_rows = 5,
+  label_peaks = TRUE,
+  label_unknown_peaks = TRUE,
+  spectra = orbi_get_data(
+    aggregated_data,
+    file_info = everything(),
+    scans = everything(),
+    spectra = everything()
+  ),
+  peaks = orbi_get_data(
+    aggregated_data,
+    file_info = everything(),
+    scans = everything(),
+    peaks = everything()
+  )
+) {
+  # safety checks
+
+  # FIXME: check the actual aggregated data class type once it's introduced!
+  # or actually probably only check spectra and peaks!
+  check_arg(aggregated_data, is.list(aggregated_data))
+}
+
 #' Visualize satellite peaks
 #'
 #' Call this function any time after flagging the satellite peaks to see where they are. Use the `isotopocules` argument to focus on the specific isotopocules of interest.

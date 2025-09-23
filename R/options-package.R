@@ -91,7 +91,7 @@ get_pkg_options <- function() {
             !all(purrr::map_lgl(x, is, "orbi_aggregator"))
         ) {
           cli_abort(
-            "{.var aggregators} is not a list of {col_magenta('orbi_aggregator')} objects. Please use {.strong orbi_register_aggregator()} too add individual aggregators."
+            "{.var aggregators} is not a list of {cli::col_magenta('orbi_aggregator')} objects. Please use {.strong orbi_register_aggregator()} too add individual aggregators."
           )
         }
         return(TRUE)

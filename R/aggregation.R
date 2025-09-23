@@ -56,7 +56,7 @@ print.orbi_aggregated_data <- function(x, ...) {
               include_symbol = FALSE,
               include_call = FALSE,
               summary_format = paste0(
-                "{symbol$arrow_right} {col_blue('",
+                "{symbol$arrow_right} {cli::col_blue('",
                 name,
                 "')}: ",
                 "encountered {issues} ",
@@ -86,7 +86,7 @@ print.orbi_aggregated_data <- function(x, ...) {
           attr(dataset, "unused_columns")
         )
         format_inline(
-          "{symbol$arrow_right} {col_blue(name)} ({n_rows}): ",
+          "{symbol$arrow_right} {cli::col_blue(name)} ({n_rows}): ",
           "{glue::glue_collapse(cols, sep = ', ')}",
           if (length(unused_cols) > 0) {
             "; ({.emph not aggregated}: {glue::glue_collapse(unused_cols, sep = ', ')})"
@@ -94,7 +94,12 @@ print.orbi_aggregated_data <- function(x, ...) {
         )
       }
     ) |>
-    cli_bullets()
+    cli_bullets() # no |> cli() at the to keep paragraphs a bit separated in knitted doc
+}
+
+#' @export
+knit_print.orbi_aggregated_data <- function(x, ...) {
+  print(x, ...)
 }
 
 #' Get data frame from aggregated data
@@ -111,12 +116,12 @@ print.orbi_aggregated_data <- function(x, ...) {
 #' @export
 orbi_get_data <- function(
   aggregated_data,
-  file_info = NULL,
+  file_info = c("filename"),
   scans = NULL,
   peaks = NULL,
   spectra = NULL,
   problems = NULL,
-  by = c("uid", "scan")
+  by = c("uidx", "scan.no")
 ) {
   spectra_quo <- enquo(spectra)
   # get data
@@ -206,7 +211,7 @@ orbi_add_to_aggregator <- function(
     !missing(aggregator) &&
       is_tibble(aggregator) &&
       is(aggregator, "orbi_aggregator"),
-    format_inline("must be an {col_magenta('orbi_aggregator')} tibble")
+    format_inline("must be an {cli::col_magenta('orbi_aggregator')} tibble")
   )
   check_arg(
     dataset,
@@ -290,7 +295,7 @@ orbi_register_aggregator <- function(
     !missing(aggregator) &&
       is_tibble(aggregator) &&
       is(aggregator, "orbi_aggregator"),
-    format_inline("must be an {col_magenta('orbi_aggregator')} tibble")
+    format_inline("must be an {cli::col_magenta('orbi_aggregator')} tibble")
   )
   check_arg(name, is_scalar_character(name), "must be a string")
   aggs <- orbi_get_option("aggregators")
@@ -347,7 +352,7 @@ print.orbi_aggregator <- function(x, ...) {
               }
               col <- gsub("\\", "\\\\", col, fixed = TRUE)
               format_inline(
-                "{symbol$arrow_right} {col_magenta(col)} = {.emph {value}}"
+                "{symbol$arrow_right} {cli::col_magenta(col)} = {.emph {value}}"
               )
             } else if (!is.na(default[[1]])) {
               format_inline(
@@ -365,15 +370,21 @@ print.orbi_aggregator <- function(x, ...) {
         .by = "dataset",
         label = list(c(
           format_inline(
-            "{.strong Dataset} {col_blue(.data$dataset[[1]])}:"
+            "{.strong Dataset} {cli::col_blue(.data$dataset[[1]])}:"
           ),
           paste0("\u00a0", .data$label)
         ))
       ) |>
       dplyr::pull(label) |>
       unlist() |>
-      cli_bullets_raw()
+      cli_bullets_raw() |>
+      cli()
   }
+}
+
+#' @export
+knit_print.orbi_aggregator <- function(x, ...) {
+  print(x, ...)
 }
 
 # summarize the aggregator this way
@@ -471,7 +482,7 @@ aggregate_files <- function(
     !missing(aggregator) &&
       is_tibble(aggregator) &&
       is(aggregator, "orbi_aggregator"),
-    format_inline("must be an {col_magenta('orbi_aggregator')} tibble")
+    format_inline("must be an {cli::col_magenta('orbi_aggregator')} tibble")
   )
   if (nrow(files_data) == 0) {
     cli_abort("there is nothing to aggregate, {.var files_data} has 0 rows")
@@ -596,7 +607,7 @@ aggregate_files <- function(
     prettyunits::pretty_num() |>
     # take care of leading/trailing whitespaces
     gsub(pattern = "(^ +| +$)", replacement = "")
-  details <- sprintf("{col_blue('%s')} (%s)", names(results), n_rows) |>
+  details <- sprintf("{cli::col_blue('%s')} (%s)", names(results), n_rows) |>
     purrr::map_chr(format_inline)
   new_problems <- results$problems |>
     dplyr::filter(!is.na(.data$new) & .data$new)
@@ -612,9 +623,9 @@ aggregate_files <- function(
       )
     },
     success_format = if (nrow(new_problems) > 0) {
-      "{col_yellow('!')} {msg}"
+      "{cli::col_yellow('!')} {msg}"
     } else {
-      "{col_green(symbol$tick)} {msg}"
+      "{cli::col_green(symbol$tick)} {msg}"
     },
     start = start
   )

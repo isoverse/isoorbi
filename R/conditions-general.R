@@ -133,15 +133,17 @@ summarize_cnds <- function(
   # issues
   issues <- c()
   if (nrow(conditions) == 0) {
-    issues <- format_inline("{col_green('no issues')}")
+    issues <- format_inline("{cli::col_green('no issues')}")
   }
   if ((n <- sum(conditions$type == 'warning')) > 0) {
-    issues <- format_inline("{col_yellow(format_inline('{n} warning{?s}'))}")
+    issues <- format_inline(
+      "{cli::col_yellow(format_inline('{n} warning{?s}'))}"
+    )
   }
   if ((n <- sum(conditions$type == 'error')) > 0) {
     issues <- c(
       issues,
-      format_inline("{col_red(format_inline('{n} error{?s}'))}")
+      format_inline("{cli::col_red(format_inline('{n} error{?s}'))}")
     )
   }
 

@@ -14,6 +14,7 @@
 #' @importFrom tibble is_tibble
 #' @importFrom utils data
 #' @importFrom ggplot2 %+% scale_color_manual scale_fill_manual
+#' @importFrom knitr knit_print
 ## usethis namespace: end
 NULL
 

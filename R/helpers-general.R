@@ -139,7 +139,7 @@ finish_info <- function(
   start = list(pb = NULL, start_time = NULL),
   time = getOption("show_exec_times", default = TRUE),
   func = TRUE,
-  success_format = "{col_green(symbol$tick)} {msg}",
+  success_format = "{cli::col_green(symbol$tick)} {msg}",
   conditions = tibble(),
   show_conditions = TRUE,
   abort_if_warnings = abort_if_errors,
