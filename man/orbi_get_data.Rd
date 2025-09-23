@@ -6,12 +6,12 @@
 \usage{
 orbi_get_data(
   aggregated_data,
-  file_info = NULL,
+  file_info = c("filename"),
   scans = NULL,
   peaks = NULL,
   spectra = NULL,
   problems = NULL,
-  by = c("uid", "scan")
+  by = c("uidx", "scan.no")
 )
 }
 \arguments{

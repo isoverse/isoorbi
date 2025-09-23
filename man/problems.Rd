@@ -15,7 +15,7 @@ orbi_show_problems(obj)
 \item{strip_ansi}{whether to remove ansi characters from the message, yes by default}
 }
 \value{
-tibble data frame with a list of problems encountered during
+tibble data frame with a list of problems encountered during processing
 }
 \description{
 This function retrieves parsing problems encountered during the reading and processing of files.

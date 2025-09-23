@@ -6,7 +6,7 @@
 \usage{
 orbi_aggregate_raw(
   files_data,
-  aggregator = orbi_get_option("raw_aggregator"),
+  aggregator = "standard",
   show_progress = rlang::is_interactive(),
   show_problems = TRUE
 )
@@ -14,7 +14,11 @@ orbi_aggregate_raw(
 \arguments{
 \item{files_data}{the files read in by orbi_read_raw}
 
-\item{aggregator}{an aggregator table (\code{\link[=orbi_start_aggregator]{orbi_start_aggregator()}}) that defines which data should be aggregated and how. By default takes the predefined aggregator for raw data files stored in the \code{\link[=orbi_options]{orbi_options()}}}
+\item{aggregator}{typically the name of a registered aggregator (see all with \code{orbi_get_option("aggregators")}),
+default is the "standard" aggregator included in the package (\code{orbi_get_aggregator("standard")}).
+Other options are "minimal" (\code{orbi_get_aggregator("minimal")}) and "extended" (\code{orbi_get_aggregator("extended")}).
+The \code{aggregator} parameter can can also directly be an aggregator tibble (created/modified with \code{\link[=orbi_start_aggregator]{orbi_start_aggregator()}}
+and/or \code{\link[=orbi_add_to_aggregator]{orbi_add_to_aggregator()}}) that defines which data should be aggregated and how.}
 
 \item{show_progress}{whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with \code{show_progress = FALSE}}
 
