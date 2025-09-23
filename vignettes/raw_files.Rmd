@@ -14,6 +14,9 @@ editor_options:
 ```{r, include=FALSE}
 # default chunk options
 knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
+
+# get isoraw reader (for compiling vignette on cran)
+isoorbi::orbi_check_isoraw(accept_license = TRUE)
 ```
 
 # Read raw files
