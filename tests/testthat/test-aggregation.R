@@ -18,8 +18,8 @@ test_that("orbi_add_to_aggregator()", {
   orbi_start_aggregator("test") |>
     orbi_add_to_aggregator() |>
     expect_error("dataset.*must be a string")
-  orbi_start_aggregator("test") |> Ò
-  orbi_add_to_aggregator("data") |>
+  orbi_start_aggregator("test") |>
+    orbi_add_to_aggregator("data") |>
     expect_error("column.*must be a string")
   orbi_start_aggregator("test") |>
     orbi_add_to_aggregator("data", "col", 42) |>

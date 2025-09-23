@@ -59,7 +59,7 @@ print.orbi_aggregated_data <- function(x, ...) {
                 "{symbol$arrow_right} {cli::col_blue('",
                 name,
                 "')}: ",
-                "encountered {issues} ",
+                "has a total of {issues} ",
                 if (nrow(dataset) > 0) {
                   "{symbol$arrow_right} check with {.strong orbi_get_problems(x)}"
                 }
@@ -873,11 +873,13 @@ aggregate_data <- function(uidx, datasets, aggregator, show_problems = TRUE) {
 # @param .ds the list of datasets (uses .ds to avoid accidental partial mapping by ...)
 # @param ... named arguments for each dataset that should be included with a tidyselect expression for the columns to include
 # @param by which columns to use for join by operations (if there are any)
+# @param always_include_by - include the by columns in any dataset where they exist
 # @param relationship passed to inner_join, default expectation is one to many
 get_data <- function(
   .ds,
   ...,
   by = c(),
+  always_include_by = TRUE,
   relationship = "one-to-many",
   .env = caller_env(),
   .call = caller_call()
@@ -900,7 +902,7 @@ get_data <- function(
     cli_abort(
       c(
         "no dataset column selections provided",
-        "i" = "available dataset{?s}: {.emph {names(.ds)}}"
+        "i" = "available dataset{?s}: {cli::col_blue(names(.ds))}"
       ),
       call = .env
     )
@@ -910,8 +912,8 @@ get_data <- function(
   if (any(missing <- !names(selectors) %in% names(.ds))) {
     cli_abort(
       c(
-        "dataset{?s} not in the data: {.emph {names(selectors)[missing]}}",
-        "i" = "available dataset{?s}: {.emph {names(.ds)}}"
+        "dataset{?s} not in the data: {cli::col_blue(names(selectors)[missing])}",
+        "i" = "available dataset{?s}: {cli::col_blue(names(.ds))}"
       ),
       call = .env
     )
@@ -923,12 +925,13 @@ get_data <- function(
   for (i in seq_along(selectors)) {
     # fetch
     new_data <- tryCatch(
-      .ds[[names(selectors)[i]]] |> dplyr::select(!!selectors[[i]]),
+      .ds[[names(selectors)[i]]] |>
+        dplyr::select(dplyr::any_of(!!by), !!selectors[[i]]),
       error = function(cnd) {
         cli_abort(
           c(
-            "encountered an error selecting columns for {.emph {names(selectors)[i]}}",
-            "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(.ds[[names(selectors)[i]]])}}"
+            "encountered an error selecting columns for {cli::col_blue(names(selectors)[i])}",
+            "i" = "columns in {cli::col_blue(names(selectors)[i])}: {.field {names(.ds[[names(selectors)[i]]])}}"
           ),
           parent = cnd,
           call = .env
@@ -942,16 +945,16 @@ get_data <- function(
         cli_abort(
           c(
             paste(
-              "unclear how to join {.emph {names(selectors)[i]}}",
-              "with {.emph {names(selectors)[1:(i-1)]}}"
+              "unclear how to join {cli::col_blue(names(selectors)[i])}",
+              "with {cli::col_blue(names(selectors)[1:(i-1)])}"
             ),
             "i" = if (length(by) == 0) {
               "there are no join columns defined in {.var by}"
             } else {
-              "allowed join columns: {.var {by}}"
+              "allowed join columns: {.field {by}}"
             },
-            "i" = "columns in {.emph {names(selectors)[i]}}: {.var {names(new_data)}}",
-            "i" = "columns in {.emph {names(selectors)[1:(i-1)]}}: {.var {names(out)}}"
+            "i" = "selected columns in {cli::col_blue(names(selectors)[i])}: {.field {names(new_data)}}",
+            "i" = "selected columns in {cli::col_blue(names(selectors)[1:(i-1)])}: {.field {names(out)}}"
           ),
           call = .env
         )
@@ -1000,9 +1003,9 @@ get_data <- function(
 
   details <-
     if (length(selectors) == 1) {
-      sprintf("{.field %s}", names(selectors))
+      sprintf("{cli::col_blue('%s')}", names(selectors))
     } else {
-      sprintf("{.field %s} (%s)", names(selectors), n_rows)
+      sprintf("{cli::col_blue('%s')} (%s)", names(selectors), n_rows)
     }
   details <- details |> purrr::map_chr(format_inline)
 

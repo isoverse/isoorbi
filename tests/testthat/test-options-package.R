@@ -20,5 +20,7 @@ test_that("options works", {
   )
 
   # all default settings
-  expect_snapshot(orbi_get_options())
+  test_that_cli("orbi_get_options()", configs = c("plain", "fancy"), {
+    expect_snapshot(orbi_get_options())
+  })
 })
