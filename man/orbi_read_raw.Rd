@@ -30,7 +30,7 @@ orbi_read_raw(
 
 \item{cache_spectra}{whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as \code{cache}}
 
-\item{keep_chached_spectra}{whether to keep the spectra from a raw file that were previously cached whenever \code{include_spectra} changes and requires reading the file anew. Having this TRUE (the default) makes it faster to iterate on code that changes which spectra to read but leads to larger cache files.}
+\item{keep_cached_spectra}{whether to keep the spectra from a raw file that were previously cached whenever \code{include_spectra} changes and requires reading the file anew. Having this TRUE (the default) makes it faster to iterate on code that changes which spectra to read but leads to larger cache files.}
 }
 \value{
 a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically \code{file_info}, \code{scans}, \code{peaks}, and \code{spectra}). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use \code{\link[=orbi_aggregate_raw]{orbi_aggregate_raw()}} to extract safely across files.

@@ -8,9 +8,10 @@ orbi_check_isoraw(
   install_if_missing = TRUE,
   reinstall_if_outdated = TRUE,
   reinstall_always = FALSE,
-  min_version = "0.2.1",
+  min_version = "0.2.0",
   source = paste0("https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version),
+  accept_license = FALSE,
   ...
 )
 }
@@ -24,6 +25,8 @@ orbi_check_isoraw(
 \item{min_version}{the minimum version number required}
 
 \item{source}{the URL (or local path) where to find the raw file reader, by default this is the latests release of the executables on github}
+
+\item{accept_license}{explicitly accept Thermo's license agreement (if this is FALSE and the license has not previously been accepted, you will be asked about it)}
 
 \item{...}{passed on to \code{download.file} if (re-) installing the reader}
 }

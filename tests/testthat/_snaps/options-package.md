@@ -131,6 +131,13 @@
        > intensity = as.numeric(intensity)
     Output
       
+      $aggregators$test
+    Message
+      -------------------------------- Aggregator test -------------------------------
+      Dataset ds:
+       > col = as.character(col)
+    Output
+      
       
       $debug
       [1] FALSE
@@ -270,6 +277,13 @@
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m
        → [32mintensity[39m = [3mas.numeric(intensity)[23m
+    Output
+      
+      $aggregators$test
+    Message
+      ──────────────────────────────── [1mAggregator [3mtest[23m[22m ───────────────────────────────
+      [1mDataset[22m [34mds[39m:
+       → [32mcol[39m = [3mas.character(col)[23m
     Output
       
       

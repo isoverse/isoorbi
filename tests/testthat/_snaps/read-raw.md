@@ -170,7 +170,7 @@
       > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
       peakResolution, isRefPeak, isLockPeak
       > spectra (0): uidx, scan.no, mz, intensity
-      > problems: has a total of no issues
+      > problems: has no issues
 
 ---
 
@@ -208,7 +208,7 @@
       > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
       peakResolution, isRefPeak, isLockPeak
       > spectra (675): uidx, scan.no, mz, intensity
-      > problems: has a total of no issues
+      > problems: has no issues
 
 ---
 
@@ -247,7 +247,7 @@
       > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
       peakResolution, isRefPeak, isLockPeak
       > spectra (675): uidx, scan.no, mz, intensity
-      > problems: has a total of no issues
+      > problems: has no issues
 
 # orbi_aggregate_raw() [fancy]
 
@@ -285,7 +285,7 @@
       → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
       [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
       → [34mspectra[39m (0): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
-      → [34mproblems[39m: has a total of [32mno issues[39m
+      → [34mproblems[39m: has [32mno issues[39m
 
 ---
 
@@ -323,7 +323,7 @@
       → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
       [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
-      → [34mproblems[39m: has a total of [32mno issues[39m
+      → [34mproblems[39m: has [32mno issues[39m
 
 ---
 
@@ -362,7 +362,7 @@
       → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
       [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
-      → [34mproblems[39m: has a total of [32mno issues[39m
+      → [34mproblems[39m: has [32mno issues[39m
 
 # orbi_get_data() [plain]
 

@@ -78,7 +78,7 @@ orbi_check_isoraw <- function(
           file.copy(file.path(source, basename(get_isoraw_path())), tmpfile)
         } else {
           # download to temp file
-          download.file(
+          utils::download.file(
             file.path(source, basename(get_isoraw_path())),
             destfile = tmpfile,
             mode = "wb",
@@ -391,7 +391,7 @@ cache_isoraw_output <- function(
 read_cached_isoraw_output <- function(
   zip_path,
   subfile,
-  zip_info = unzip(zip_path, list = TRUE)
+  zip_info = utils::unzip(zip_path, list = TRUE)
 ) {
   stopifnot(subfile %in% zip_info$Name)
   file_size <- zip_info$Length[zip_info$Name == subfile]
@@ -485,7 +485,7 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
 #' @param read_cache whether to read the file from cached .parquet files (if they exist) or anew
 #' @param cache whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)
 #' @param cache_spectra whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as `cache`
-#' @param keep_chached_spectra whether to keep the spectra from a raw file that were previously cached whenever `include_spectra` changes and requires reading the file anew. Having this TRUE (the default) makes it faster to iterate on code that changes which spectra to read but leads to larger cache files.
+#' @param keep_cached_spectra whether to keep the spectra from a raw file that were previously cached whenever `include_spectra` changes and requires reading the file anew. Having this TRUE (the default) makes it faster to iterate on code that changes which spectra to read but leads to larger cache files.
 #' @return a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically `file_info`, `scans`, `peaks`, and `spectra`). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use [orbi_aggregate_raw()] to extract safely across files.
 #' @export
 orbi_read_raw <- function(
@@ -749,13 +749,13 @@ print.orbi_raw_files <- function(x, ...) {
   x |>
     dplyr::mutate(
       idx = dplyr::row_number(),
-      idx_spacers = max(n_digits(idx)) - n_digits(idx),
-      filename_spacers = max(nchar(basename(filepath))) -
-        nchar(basename(filepath)),
+      idx_spacers = max(n_digits(.data$idx)) - n_digits(.data$idx),
+      filename_spacers = max(nchar(basename(.data$filepath))) -
+        nchar(basename(.data$filepath)),
       n_scans = purrr::map_int(.data$scans, nrow),
-      scans_spacers = max(n_digits(n_scans)) - n_digits(n_scans),
+      scans_spacers = max(n_digits(.data$n_scans)) - n_digits(.data$n_scans),
       n_peaks = purrr::map_int(.data$peaks, nrow),
-      peaks_spacers = max(n_digits(n_peaks)) - n_digits(n_peaks),
+      peaks_spacers = max(n_digits(.data$n_peaks)) - n_digits(.data$n_peaks),
       n_spectral_data = purrr::map_int(.data$spectra, nrow),
       n_spectra = purrr::map_int(.data$spectra, ~ length(unique(.x$scan.no))),
       n_problems = purrr::map_int(.data$problems, nrow),
@@ -770,19 +770,19 @@ print.orbi_raw_files <- function(x, ...) {
       .by = "idx",
       # format_inline needs a single line
       label = paste0(
-        strrep("\u00a0", idx_spacers),
+        strrep("\u00a0", .data$idx_spacers),
         format_inline("{idx}. {cli::col_blue(basename(filepath))} "),
-        strrep("\u00a0", filename_spacers),
+        strrep("\u00a0", .data$filename_spacers),
         if_else(
           .data$n_problems > 0,
           format_inline("encountered {problems_text}; has "),
           "has "
         ),
-        strrep("\u00a0", scans_spacers),
+        strrep("\u00a0", .data$scans_spacers),
         format_inline(
           "{n_scans} {.field scans} with "
         ),
-        strrep("\u00a0", peaks_spacers),
+        strrep("\u00a0", .data$peaks_spacers),
         format_inline(
           "{n_peaks} {.field peak{?s}}; ",
           if_else(
@@ -863,7 +863,7 @@ read_cached_raw_file <- function(
   }
 
   # check if cached files exist
-  zip_info <- unzip(file_path_info$cache_path, list = TRUE)
+  zip_info <- utils::unzip(file_path_info$cache_path, list = TRUE)
   cache_path_subpaths <- file.path(
     basename(file_path_info$output_path),
     c(
@@ -1003,7 +1003,7 @@ read_cached_raw_file <- function(
 
         # unzip the cache file
         unlink(file_path_info$output_path, recursive = TRUE)
-        unzip(
+        utils::unzip(
           file_path_info$cache_path,
           exdir = dirname(file_path_info$output_path)
         )
