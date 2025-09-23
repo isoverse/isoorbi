@@ -48,10 +48,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: rcmdcheck
-
-      - name: Install pre-compiled isoraw reader
-        run: Rscript -e 'isoorbi::orbi_check_isoraw(accept_license = TRUE)'
-
+      
       - uses: r-lib/actions/check-r-package@v2
 
       - name: Show testthat output
