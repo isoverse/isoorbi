@@ -11,15 +11,65 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 ```{r, include=FALSE}
 # default chunk options
 knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
 ```
 
+# Read raw files
 
 ```{r}
-raw_file |> orbi_aggregate_raw("minimal") -> x
-raw_file |> orbi_aggregate_raw("standard") -> x
-raw_file |> orbi_aggregate_raw("extended") -> x
+#| label: read files
+
+# library
+library(isoorbi)
+
+# raw files directory
+raw_folder <- system.file(package = "isoorbi", "extdata")
+
+# read files
+raw_files <-
+  raw_folder |> 
+  orbi_find_raw() |> 
+  orbi_read_raw(include_spectra = c(1, 10, 100)) |>
+  suppressMessages()
+
+# show summary for the read files
+raw_files
+```
+
+# Combine (aggregate) data
+
+```{r}
+# aggregate raw data
+agg_data <- raw_files |> orbi_aggregate_raw()
+agg_data
+```
+
+## Optional: use a different aggregator
+
+The `minimal` aggregator contains a smaller set of columns to aggregate. The `extended` aggregator is more elaborate, providing access to additional columns from the raw data files.
+
+```{r}
+# example: minimal vs. extended aggregator
+orbi_get_aggregator("minimal")
+orbi_get_aggregator("extended")
+
+# using the extended aggregator instead of the default (standard)
+raw_files |> orbi_aggregate_raw(aggregator = "extended")
+```
+
+## Optional: check for problems
+
+There were no problems reading and/or aggregating the raw data so these are empty.
+
+```{r}
+raw_files |> orbi_get_problems()
+agg_data |> orbi_get_problems()
+```
+
+# Retrieve (get) data
+
+```{r}
+agg_data |> orbi_get_data(peaks = everything())
 ```
