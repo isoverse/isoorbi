@@ -965,11 +965,11 @@ get_data <- function(
         cli_abort(
           c(
             paste(
-              "encountered issue when joining {.emph {names(selectors)[i]}}",
-              "with {.emph {names(selectors)[1:(i-1)]}} by {.var {join_by}}",
+              "encountered issue when joining {cli::col_blue(names(selectors)[i])}",
+              "with {cli::col_blue(names(selectors)[1:(i-1)])} by {.field {join_by}}",
               "with relationship \"{relationship}\""
             ),
-            "i" = "are you sure the by column{?s} ({.var {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
+            "i" = "are you sure the by column{?s} ({.field {join_by}}) {?is/are} sufficient and this operation is really what is intended?"
           ),
           parent = cnd,
           call = .env

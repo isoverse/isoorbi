@@ -84,20 +84,30 @@ test_that("orbi_read_raw() works", {
     {
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw() |>
+        # read without spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE)
-      x |>
-        select(-"file_path")
+      x |> as_tibble() |> select(-"filepath")
     }
   )
+  test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
+    expect_snapshot(x)
+  })
 
   # plus aggregate and get
-  expect_snapshot(y <- orbi_aggregate_raw(x, show_progress = FALSE))
+  expect_snapshot({
+    y <- orbi_aggregate_raw(x)
+    y |> as_list()
+  })
+  test_that_cli("orbi_aggregate_raw()", configs = c("plain", "fancy"), {
+    expect_snapshot(y)
+  })
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
-  expect_snapshot(y)
-  expect_snapshot(
-    y |> orbi_get_data(scans = everything(), spectra = everything())
-  )
+  test_that_cli("orbi_get_data()", configs = c("plain", "fancy"), {
+    expect_snapshot(
+      out <- y |> orbi_get_data(scans = everything(), spectra = everything())
+    )
+  })
 
   # succesful read with spectra
   expect_snapshot(
@@ -105,16 +115,27 @@ test_that("orbi_read_raw() works", {
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw() |>
         orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
-      x |>
-        select(-"file_path")
+      x |> as_tibble() |> select(-"filepath")
     }
   )
+  test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
+    expect_snapshot(x)
+  })
 
   # plus aggregate and get
-  expect_snapshot(y <- orbi_aggregate_raw(x, show_progress = FALSE))
+  test_that_cli("orbi_aggregate_raw()", configs = c("plain", "fancy"), {
+    y <- orbi_aggregate_raw(x, aggregator = "extended")
+    expect_snapshot(y)
+    y <- orbi_aggregate_raw(x, aggregator = "minimal")
+    expect_snapshot(y)
+  })
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
-  expect_snapshot(y)
+  test_that_cli("orbi_get_data()", configs = c("plain", "fancy"), {
+    expect_snapshot(
+      out <- y |> orbi_get_data(scans = everything(), spectra = everything())
+    )
+  })
   expect_snapshot(
     y |> orbi_get_data(scans = everything(), spectra = everything())
   )

@@ -119,7 +119,7 @@ test_that("get_data()", {
     b = "dist",
     by = "speed"
   ) |>
-    expect_error("unclear how to join")
+    expect_error("encountered issue when joining")
   get_data(
     list(a = cars, b = cars),
     a = everything(),

@@ -1248,7 +1248,7 @@ read_raw_file <- function(
   # combine
   out <-
     tibble(
-      file_path = file_path_info$file_path,
+      filepath = file_path_info$file_path,
       file_info = list(file_info$result),
       scans = list(scans$result),
       peaks = list(peaks$result),

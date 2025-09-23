@@ -697,7 +697,7 @@ test_that("test orbi_segment_block()", {
 
   expect_message(
     res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0),
-    "2.3 segments"
+    "2\\.3 segments"
   ) |>
     suppressMessages()
   expect_equal(
