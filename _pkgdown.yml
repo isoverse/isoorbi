@@ -36,6 +36,7 @@ reference:
   contents:
   - orbi_find_raw
   - orbi_read_raw
+  - orbi_check_isoraw
   - orbi_aggregate_raw
   - orbi_start_aggregator
   - orbi_add_to_aggregator
@@ -56,6 +57,7 @@ reference:
   desc: >
     These core functions are essential to process the data read from RAW or ISOX files
   contents:
+  - orbi_identify_isotopocules
   - orbi_define_basepeak
   - orbi_summarize_results
   - orbi_calculate_summarized_ratio
