@@ -7,9 +7,12 @@
 orbi_identify_isotopocules(aggregated_data, isotopocules)
 }
 \arguments{
-\item{aggregated_data}{datasets aggregated from \code{\link[=orbi_aggregate_raw]{orbi_aggregate_raw()}}}
+\item{aggregated_data}{either data aggregated from \code{\link[=orbi_aggregate_raw]{orbi_aggregate_raw()}} or a straight-up tibble data frame of the peaks (e.g. retrieved via \code{orbi_get_data(peaks = everything())}).}
 
-\item{isotopocules}{list of isotopocules to map, can be a data frame/tibble or name of a file (.csv/.tsv/.xlsx are all supported).}
+\item{isotopocules}{list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).}
+}
+\value{
+same object as provided in \code{aggregated_data} with an added column \code{isotopocule}
 }
 \description{
 Map the mass spectral peaks to specific isotopocules based on their mass.
