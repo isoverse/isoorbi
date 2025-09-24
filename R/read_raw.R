@@ -793,7 +793,7 @@ print.orbi_raw_files <- function(x, ...) {
         )
       )
     ) |>
-    dplyr::pull(label) |>
+    dplyr::pull(.data$label) |>
     cli_bullets_raw() |>
     cli()
 }
