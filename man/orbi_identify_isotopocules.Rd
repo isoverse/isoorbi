@@ -9,10 +9,10 @@ orbi_identify_isotopocules(aggregated_data, isotopocules)
 \arguments{
 \item{aggregated_data}{either data aggregated from \code{\link[=orbi_aggregate_raw]{orbi_aggregate_raw()}} or a straight-up tibble data frame of the peaks (e.g. retrieved via \code{orbi_get_data(peaks = everything())}).}
 
-\item{isotopocules}{list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).}
+\item{isotopocules}{list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported). Required columns are \code{isotopocule/isotopolog}, \code{mz/mass}, \code{tolerance/tolerance [mmu]/tolerance [mDa]}, and \code{charge/z} (these alternative names for the columns, including uppercase versions, are recognized automatically)}
 }
 \value{
-same object as provided in \code{aggregated_data} with an added column \code{isotopocule}
+same object as provided in \code{aggregated_data} with added columns \code{isotopocule}, \code{mzNominal} and \code{charge} as well as any other additional information columns provided in \code{isotopocules} (\code{compound} is a common one that other downstream functions understand)
 }
 \description{
 Map the mass spectral peaks to specific isotopocules based on their mass.

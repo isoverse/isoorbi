@@ -704,7 +704,8 @@ test_that("test orbi_segment_block()", {
         dplyr::relocate(data_group, .before = "block")
     )
   })
-})
+}) |>
+  withr::with_options(new = list(show_exec_times = FALSE))
 
 test_that("test orbi_get_blocks_info()", {
   # type checks
