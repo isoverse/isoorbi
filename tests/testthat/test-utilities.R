@@ -108,25 +108,19 @@ test_that("orbi_flag_satellite_peaks()", {
   )
 
   # failure
-  expect_error(orbi_flag_satellite_peaks(), "need a `dataset` data frame")
+  expect_error(
+    orbi_flag_satellite_peaks(),
+    "must be.*aggregated raw files.*or.*data frame"
+  )
 
   expect_error(
     orbi_flag_satellite_peaks(dataset = T),
-    "need a `dataset` data frame"
+    "must be.*aggregated raw files.*or.*data frame"
   )
 
   expect_error(
     orbi_flag_satellite_peaks(dataset = df[, 1:5]),
-    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
-    fixed = TRUE
-  )
-
-  df2 <- df |> mutate(dummy = 1) |> select(-"scan.no")
-
-  expect_error(
-    orbi_flag_satellite_peaks(dataset = df2),
-    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`",
-    fixed = TRUE
+    "columns.*are missing"
   )
 })
 

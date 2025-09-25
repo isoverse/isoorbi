@@ -92,9 +92,17 @@ dynamic_y_scale <- function(
 # decides whether to wrap by filename, compound or both filename and compound
 # depending on if either has more than 1 value
 dynamic_wrap <- function(plot, scales = "free_x") {
-  dataset <- plot$data |> factorize_dataset(c("filename", "compound"))
-  n_files <- length(levels(dataset$filename))
-  n_compounds <- length(levels(dataset$compound))
+  dataset <- plot$data
+  n_files <- 1
+  if ("filename" %in% names(dataset)) {
+    dataset <- dataset |> factorize_dataset("filename") |> suppressMessages()
+    n_files <- length(levels(dataset$filename))
+  }
+  n_compounds <- 1L
+  if ("compound" %in% names(dataset)) {
+    dataset <- dataset |> factorize_dataset("compound") |> suppressMessages()
+    n_compounds <- length(levels(dataset$compound))
+  }
   if (n_files > 1L && n_compounds > 1L) {
     plot <- plot +
       ggplot2::facet_wrap(~ .data$filename + .data$compound, scales = scales)
@@ -219,7 +227,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 # @param auto_focus whether to find the isotopocules to focus on automatically. Use `mz_foci` to fine-tune what is shown. Basically searches for the next heighest peaks after the base peak and shows their nearby mass window (including neighboring peaks with similar nominal mass) in additional panels. If there are multiple files (or scans) with different peak distributions, uses foci that are most pronounced across all or most files.
 # @param max_cols how many panel columns to show at most (i.e. main window + mz_foci). Use `mz_focus` to specify which ones to show if the `auto_focus` does not do the trick.
 # @param max_rows how many panel rows to show at most (i.e. however many scans and files are in the dataset). Will issue a warning
-# @param label_peaks whether to label isotopocules with their name and m/z. Is ignored if isotopocules have not yet been identified in the dataaset.
+# @param label_peaks whether to label isotopocules with their name and m/z. Is ignored if isotopocules have not yet been identified in the dataset.
 # @param label_unknown_peaks whether to also label unknown peaks (i.e. those without isotopocule identification) with their m/z
 # @param spectra will be automatically extracted from `aggregated_data` but can be supplied here independently for greater control
 # @param peaks will be automatically extracted from `aggregated_data` but can be supplied here independently for greater control
@@ -257,9 +265,10 @@ orbi_plot_spectra <- function(
 #'
 #' Call this function any time after flagging the satellite peaks to see where they are. Use the `isotopocules` argument to focus on the specific isotopocules of interest.
 #'
-#' @param dataset isox dataset with satellite peaks identified (`orbi_flag_satellite_peaks()`)
+#' @param dataset a data frame or aggregated dataset with satellite peaks already identified (i.e. after [orbi_flag_satellite_peaks()])
 #' @param isotopocules which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)
-#' @param x x-axis column for the plot, either "time.min" or "scan.no"
+#' @param x x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"
+#' @param y y-axis column for the plot, typially either "ions.incremental" or "intensity", default is "ions.incremental" (falls back to "intensity" if "ions.incremental" has not been calculated yet for the provided dataset)
 #' @param x_breaks what breaks to use for the x axis, change to make more specifid tickmarks
 #' @param y_scale what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "linear" scale, or "raw" (if you want to add a y scale to the plot manually instead)
 #' @param y_scale_sci_labels whether to render numbers with scientific exponential notation
@@ -271,6 +280,7 @@ orbi_plot_satellite_peaks <- function(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
+  y = c("ions.incremental", "intensity"),
   x_breaks = scales::breaks_pretty(5),
   y_scale = c("log", "pseudo-log", "linear", "raw"),
   y_scale_sci_labels = TRUE,
@@ -287,48 +297,58 @@ orbi_plot_satellite_peaks <- function(
   color_scale = scale_color_manual(values = colors)
 ) {
   # safety checks
-  ## dataset
-  check_tibble(
+  check_arg(
     dataset,
-    req_cols = c(
-      "filename",
-      "compound",
-      "scan.no",
-      "time.min",
-      "isotopocule",
-      "ions.incremental"
-    )
+    !missing(dataset) &&
+      (is(dataset, "orbi_aggregated_data") ||
+        is.data.frame(dataset)),
+    "must be a set of aggregated raw files or a data frame of peaks"
   )
-
-  ## isotopocules
   check_arg(
     isotopocules,
     missing(isotopocules) || is_character(isotopocules),
     "must be a character vector"
   )
 
-  ## satelite peak
-  if (!"is_satellite_peak" %in% names(dataset)) {
+  # keep track for later
+  peaks <- if (is(dataset, "orbi_aggregated_data")) {
+    orbi_get_data(dataset, peaks = everything()) |> suppressMessages()
+  } else {
+    dataset
+  }
+
+  # check columns
+  check_tibble(
+    peaks,
+    c(paste(x, collapse = "|"), "isotopocule", paste(y, collapse = "|")),
+    regexps = TRUE
+  )
+
+  # check satelite peak
+  if (!"is_satellite_peak" %in% names(peaks)) {
     cli_abort(
-      "{.field dataset} requires column {.field is_satellite_peak} - make sure to run {.fn orbi_flag_satellite_peaks} first"
+      "{.field dataset} requires column {.field is_satellite_peak} - make sure to run {.strong orbi_flag_satellite_peaks()} first"
     )
   }
 
-  ## x_column / y_scale
-  x_column <- arg_match(x)
+  # x_column / y_column y_scale
+  x_column <- names(tidyselect::eval_select(any_of(x), peaks))[1]
+  y_column <- names(tidyselect::eval_select(any_of(y), peaks))[1]
   y_scale <- arg_match(y_scale)
 
   # prepare dataset
-  plot_df <- dataset |>
-    factorize_dataset(c("filename", "compound", "isotopocule")) |>
-    filter_isotopocules(isotopocules)
+  plot_df <- peaks |>
+    factorize_dataset("isotopocule") |>
+    suppressMessages() |>
+    filter_isotopocules(isotopocules) |>
+    dplyr::filter(!is.na(!!sym(y_column)))
 
   # make plot
   plot <- plot_df |>
     ggplot2::ggplot() +
     ggplot2::aes(
       x = !!sym(x_column),
-      y = .data$ions.incremental,
+      y = !!sym(y_column),
       color = .data$isotopocule
     ) +
     ggplot2::geom_line(

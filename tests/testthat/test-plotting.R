@@ -81,7 +81,10 @@ test_that("orbi_get_isotopocule_coverage() tests", {
 
 test_that("orbi_plot_satellite_peaks() tests", {
   # failure
-  expect_error(orbi_plot_satellite_peaks(), "must be a data frame")
+  expect_error(
+    orbi_plot_satellite_peaks(),
+    "must be.*aggregated.*or.*data frame"
+  )
 
   df <- orbi_read_isox(system.file(
     "extdata",
