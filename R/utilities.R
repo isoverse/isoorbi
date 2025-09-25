@@ -1,10 +1,10 @@
 # Internal utility functions =============
 
 # internal function to ensure dataset columns are factors (if they exist)
-# will warn the user about the transformation
+# will notify the user about the transformation
 factorize_dataset <- function(dataset, cols = c()) {
   factor_cols <- names(dataset)[purrr::map_lgl(dataset, is.factor)]
-  factorize_cols <- setdiff(cols, factor_cols)
+  factorize_cols <- setdiff(cols, factor_cols) |> intersect(names(dataset))
   if (length(factorize_cols) > 0) {
     for (col in factorize_cols) {
       dataset[[col]] <- factor_in_order(dataset[[col]])
