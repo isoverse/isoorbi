@@ -3,7 +3,7 @@
 # make both interactive test runs and auto_testing possible with a dynamic base path to the testthat folder
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
-test_that("orbi_find_raw() works", {
+test_that("orbi_find_raw()", {
   # safety checks
   expect_error(orbi_find_raw(), "folder.*must point to an existing directory")
   expect_error(orbi_find_raw(42), "folder.*must point to an existing directory")
@@ -71,7 +71,7 @@ test_that("orbi_find_raw() works", {
   unlink(test_path, recursive = TRUE, force = TRUE)
 })
 
-test_that("orbi_read_raw() works", {
+test_that("orbi_read_raw()", {
   # safety checks
   expect_error(orbi_read_raw(), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(42), "file_paths.*must be at least one")
@@ -122,7 +122,7 @@ test_that("orbi_read_raw() works", {
     expect_snapshot(x)
   })
 
-  # plus aggregate and get
+  # test aggregate
   test_that_cli("orbi_aggregate_raw()", configs = c("plain", "fancy"), {
     y <- orbi_aggregate_raw(x, aggregator = "extended")
     expect_snapshot(y)
@@ -131,6 +131,22 @@ test_that("orbi_read_raw() works", {
   })
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
+
+  # test mapping
+  isotopologs <- tibble(
+    compound = "nitrate",
+    isotopolog = c("M0", "15N", "17O", "18O"),
+    mass = c(61.9878, 62.9850, 62.9922, 63.9922),
+    tolerance = 1,
+    charge = 1
+  )
+  test_that_cli("orbi_identify_isotopocules()", configs = c("plain", "fancy"), {
+    expect_snapshot(z <- orbi_identify_isotopocules(y, isotopologs))
+    expect_equal(z$peaks, orbi_identify_isotopocules(y$peak, isotopologs)) |>
+      suppressMessages()
+  })
+
+  # test get
   test_that_cli("orbi_get_data()", configs = c("plain", "fancy"), {
     expect_snapshot(
       out <- y |> orbi_get_data(scans = everything(), spectra = everything())

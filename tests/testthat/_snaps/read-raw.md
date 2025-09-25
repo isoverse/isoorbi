@@ -1,4 +1,4 @@
-# orbi_read_raw() works
+# orbi_read_raw()
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
@@ -441,4 +441,20 @@
       #   intensCompFactor <dbl>, agc <chr>, agcTarget <int>, microscans <int>,
       #   numberLockmassesFound <int>, analyzerTemperature <dbl>, mz <dbl>,
       #   intensity <dbl>
+
+# orbi_identify_isotopocules() [plain]
+
+    Code
+      z <- orbi_identify_isotopocules(y, isotopologs)
+    Message
+      v orbi_identify_isotopocules() identified 44/138 peaks (32%) as isotopcules M0,
+      15N, 17O, and 18O
+
+# orbi_identify_isotopocules() [fancy]
+
+    Code
+      z <- orbi_identify_isotopocules(y, isotopologs)
+    Message
+      [32m✔[39m [1morbi_identify_isotopocules()[22m identified 44/138 peaks (32%) as isotopcules [32mM0[39m,
+      [32m15N[39m, [32m17O[39m, and [32m18O[39m
 
