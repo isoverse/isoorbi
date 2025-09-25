@@ -49,6 +49,7 @@ check_arg <- function(
 check_tibble <- function(
   df,
   req_cols = c(),
+  regexps = FALSE,
   .arg = caller_arg(df),
   .env = caller_env()
 ) {
@@ -59,7 +60,25 @@ check_tibble <- function(
     .arg = .arg,
     .env = .env
   )
-  if (length(missing <- setdiff(req_cols, names(df))) > 0) {
+
+  # missing
+  if (regexps) {
+    fits <- purrr::map_lgl(
+      req_cols,
+      ~ {
+        grepl(
+          paste0("^(", .x, ")$"),
+          names(df)
+        ) |>
+          any()
+      }
+    )
+    missing <- req_cols[!fits]
+  } else {
+    missing <- setdiff(req_cols, names(df))
+  }
+
+  if (length(missing) > 0) {
     cli_abort(
       c(
         "{qty(missing)} column{?s} {.field {missing}} {?is/are} missing from {.field {(.arg)}}",
