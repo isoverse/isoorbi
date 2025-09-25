@@ -136,85 +136,112 @@ orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
 #'
 #' Calculate which stretches of the data have data for which isotopocules. This function is usually used indicrectly by `orbi_plot_isotopocule_coverage()` but can be called directly to investigate isotopocule coverage.
 #'
-#' @param dataset A data frame or tibble produced from IsoX data
+#' @param dataset A data frame or aggregated dataset (i.e. works both right after [orbi_identify_isotopocules()] or later downstream after [orbi_get_isotopocules()] or when reading from an IsoX file)
 #' @return summary data frame
 #' @export
 orbi_get_isotopocule_coverage <- function(dataset) {
   # safety checks
-  cols <- c(
-    "filename",
-    "compound",
-    "scan.no",
-    "time.min",
-    "isotopocule",
-    "ions.incremental"
-  )
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`" = all(
-      cols %in% names(dataset)
-    )
+  check_arg(
+    dataset,
+    !missing(dataset) &&
+      (is(dataset, "orbi_aggregated_data") ||
+        is.data.frame(dataset)),
+    "must be a set of aggregated raw files or a data frame of peaks"
   )
 
-  # prep dataset
-  dataset <- dataset |>
-    factorize_dataset(c("filename", "compound", "isotopocule"))
-  isotopocule_levels <- levels(dataset$isotopocule)
+  # get peaks tibble
+  peaks <- if (is(dataset, "orbi_aggregated_data")) dataset$peaks else dataset
 
-  # make sure a weak isotopocule column is included
-  if (!"is_weak_isotopocule" %in% names(dataset)) {
-    dataset <- dataset |> dplyr::mutate(is_weak_isotopocule = NA)
-  }
+  # check columns
+  check_tibble(
+    peaks,
+    c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
+    regexps = TRUE
+  )
 
-  # make sure a data group column is included
-  if (!"data_group" %in% names(dataset)) {
-    dataset <- dataset |> dplyr::mutate(data_group = NA_integer_)
-  }
+  # y column (only used for filtering)
+  y_col <- names(tidyselect::eval_select(
+    any_of(c("ions.incremental", "intensity")),
+    peaks
+  ))[1]
 
-  # nesting requires global defs
-  scan_no <- time.min <- data_group <- NULL
+  # prep peaks
+  peaks <- peaks |>
+    # filter out missing and unidentified
+    dplyr::filter(!is.na(.data$isotopocule), !is.na(!!sym(y_col))) |>
+    # will only factorize if they exist
+    factorize_dataset(c("filename", "compound", "isotopocule")) |>
+    suppressMessages()
+  isotopocule_levels <- levels(peaks$isotopocule)
 
-  # calculate coverage
-  dataset |>
-    # complete dataset (need isotopocule as char otherwise will always complete for all levels)
-    dplyr::select(
+  # grouping colums
+  by_cols <- tidyselect::eval_select(
+    any_of(c(
+      "uidx",
       "filename",
       "compound",
       "isotopocule",
-      "scan.no",
-      "time.min",
-      "ions.incremental",
+      # make sure a data group column is included if it exists
       "data_group",
+      # make sure a weak isotopocule column is included if it exists
       "is_weak_isotopocule"
-    ) |>
+    )),
+    peaks
+  ) |>
+    names()
+
+  # arrange colums
+  arrange_cols <- tidyselect::eval_select(
+    any_of(c(
+      "filename",
+      "uidx",
+      "compound",
+      "isotopocule"
+    )),
+    peaks
+  ) |>
+    names()
+
+  # calculate coverage
+  output <-
+    peaks |>
+    # need isotopocule as char otherwise will always complete for all levels
     dplyr::mutate(isotopocule = as.character(.data$isotopocule)) |>
     # find data stretches
-    dplyr::arrange(
-      .data$filename,
-      .data$compound,
-      .data$isotopocule,
-      .data$scan.no
-    ) |>
+    dplyr::arrange(!!!map(c(arrange_cols, "scan.no"), sym)) |>
     dplyr::mutate(
+      .by = dplyr::all_of(by_cols),
+      # re introduce factor
       isotopocule = factor(.data$isotopocule, levels = isotopocule_levels),
-      data_stretch = c(0, cumsum(diff(.data$scan.no) > 1L)),
-      .by = c("filename", "compound", "isotopocule")
+      data_stretch = c(0L, cumsum(diff(.data$scan.no) > 1L)) + 1L,
     ) |>
     # summarize
-    tidyr::nest(data = c("scan.no", time.min, "ions.incremental")) |>
-    dplyr::mutate(
-      n_points = map_int(.data$data, nrow),
-      start_scan.no = map_dbl(.data$data, ~ .x$scan.no[1]),
-      end_scan.no = map_dbl(.data$data, ~ tail(.x$scan.no, 1)),
-      start_time.min = map_dbl(.data$data, ~ .x$time.min[1]),
-      end_time.min = map_dbl(.data$data, ~ tail(.x$time.min, 1))
+    dplyr::summarize(
+      .by = dplyr::all_of(c(by_cols, "data_stretch")),
+      n_points = dplyr::n(),
+      start_scan.no = .data$scan.no[1],
+      end_scan.no = tail(.data$scan.no, 1),
+      start_time.min = if ("time.min" %in% names(peaks)) {
+        .data$time.min[1]
+      } else {
+        list(NULL)
+      },
+      end_time.min = if ("time.min" %in% names(peaks)) {
+        tail(.data$time.min[1])
+      } else {
+        list(NULL)
+      }
     ) |>
     dplyr::arrange(
-      .data$filename,
-      .data$compound,
-      .data$isotopocule,
-      .data$data_group
+      !!!map(
+        c(arrange_cols, if ("data_group" %in% names(peaks)) "data_group"),
+        sym
+      )
     )
+  if (!"time.min" %in% names(peaks)) {
+    output <- output |> dplyr::select(-"start_time.min", -"end_time.min")
+  }
+  return(output)
 }
 
 # plot functions ==========
@@ -557,6 +584,7 @@ orbi_plot_raw_data <- function(
   return(plot)
 }
 
+# FIXME: continue HERE!!
 #' Plot isotopocule coverage
 #'
 #' Weak isotopocules (if previously defined by `orbi_flag_weak_isotopocules()`) are highlighted in the `weak_isotopocules_color`.
