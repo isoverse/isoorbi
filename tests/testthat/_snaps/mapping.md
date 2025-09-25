@@ -20,7 +20,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzNominal", "charge"]
+          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzExact", "charge"]
         },
         "row.names": {
           "type": "integer",
@@ -99,7 +99,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzNominal", "charge"]
+          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzExact", "charge"]
         },
         "row.names": {
           "type": "integer",
