@@ -73,9 +73,27 @@ test_that("orbi_identify_isotopocules()", {
   })
 
   # test with file based isotopologs
-  write.csv(isotopologs, file = test_csv)
-  write.table(isotopologs, file = test_tsv, sep = "\t")
+  write.csv(isotopologs, file = test_csv, row.names = FALSE)
+  write.table(isotopologs, file = test_tsv, sep = "\t", row.names = FALSE)
   openxlsx::write.xlsx(isotopologs, file = test_xlsx)
+
+  expect_equal(
+    orbi_identify_isotopocules(peaks, isotopologs),
+    orbi_identify_isotopocules(peaks, test_csv)
+  ) |>
+    suppressMessages()
+
+  expect_equal(
+    orbi_identify_isotopocules(peaks, isotopologs),
+    orbi_identify_isotopocules(peaks, test_tsv)
+  ) |>
+    suppressMessages()
+
+  expect_equal(
+    orbi_identify_isotopocules(peaks, isotopologs),
+    orbi_identify_isotopocules(peaks, test_xlsx)
+  ) |>
+    suppressMessages()
 
   # cleanup
   unlink(test_xlsx)
