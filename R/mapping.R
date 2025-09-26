@@ -363,20 +363,27 @@ orbi_filter_isotopocules <- function(
   # info
   info <- c()
   if (n_missing > 0) {
-    info <- "missing isotopocules ({format_number(n_missing)})"
+    info <- "{cli::col_yellow('missing')} isotopocules ({format_number(n_missing)})"
   }
   if (n_unidentified > 0) {
-    info <- c(info, "unidentified peaks ({format_number(n_unidentified)})")
+    info <- c(
+      info,
+      "{cli::col_yellow('unidentified')} peaks ({format_number(n_unidentified)})"
+    )
   }
   if (n_nonspecific > 0) {
     info <- c(
       info,
-      "{qty(isotopocules)}not {?the/one of the} selected isotopocule{?s} {.field {isotopocules}} ({format_number(n_nonspecific)})"
+      "{qty(isotopocules)}{cli::col_yellow('not')} {?the/one of the} {cli::col_yellow('selected')} isotopocule{?s} {.field {isotopocules}} ({format_number(n_nonspecific)})"
     )
   }
   finish_info(
     "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({round(100 * (n_peaks - nrow(peaks))/n_peaks)}%) because they were ",
     glue::glue_collapse(info, sep = ", ", last = ", or "),
+    ". ",
+    if (n_nonspecific == 0) {
+      "Remaining isotopocules: {.field {unique(peaks$isotopocule)}}."
+    },
     start = start
   )
 

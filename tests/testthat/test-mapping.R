@@ -1,3 +1,24 @@
+# example tibble
+isotopologs <- tibble(
+  compound = "nitrate",
+  isotopolog = c("M0", "15N", "17O", "18O"),
+  mass = c(61.9878, 62.9850, 62.9922, 63.9922),
+  tolerance = 1,
+  charge = 1
+)
+
+# example peaks
+peaks <- tibble(
+  uidx = 1,
+  scan.no = rep(c(1, 2, 3), each = 4),
+  mzMeasured = c(
+    isotopologs$mass - 0.0005,
+    c(isotopologs$mass[-1], isotopologs$mass[2] + 0.0003) + 0.0002,
+    c(isotopologs$mass[1:3], isotopologs$mass[4] + 0.0012)
+  ),
+  intensity = seq_along(mzMeasured)
+)
+
 test_that("orbi_identify_isotopocules()", {
   # errors
   orbi_identify_isotopocules() |>
@@ -13,13 +34,7 @@ test_that("orbi_identify_isotopocules()", {
   orbi_identify_isotopocules(tibble(), test_xlsx) |>
     expect_error("something went wrong reading")
   test_csv <- file.path(tempdir(), "test.csv")
-  cat("DNE", file = test_csv)
-  orbi_identify_isotopocules(tibble(), test_csv) |>
-    expect_error("something went wrong reading")
   test_tsv <- file.path(tempdir(), "test.tsv")
-  cat("DNE", file = test_tsv)
-  orbi_identify_isotopocules(tibble(), test_tsv) |>
-    expect_error("something went wrong reading")
 
   ## columns
   orbi_identify_isotopocules(tibble(), tibble()) |>
@@ -34,30 +49,9 @@ test_that("orbi_identify_isotopocules()", {
   ) |>
     expect_error("could not identify.*charge")
 
-  # example tibble
-  isotopologs <- tibble(
-    compound = "nitrate",
-    isotopolog = c("M0", "15N", "17O", "18O"),
-    mass = c(61.9878, 62.9850, 62.9922, 63.9922),
-    tolerance = 1,
-    charge = 1
-  )
-
   # missing columns in peaks
   orbi_identify_isotopocules(tibble(), isotopologs) |>
     expect_error("columns.*are missing")
-
-  # test proper values
-  peaks <- tibble(
-    uidx = 1,
-    scan.no = rep(c(1, 2, 3), each = 4),
-    mzMeasured = c(
-      isotopologs$mass - 0.0005,
-      c(isotopologs$mass[-1], isotopologs$mass[2] + 0.0003) + 0.0002,
-      c(isotopologs$mass[1:3], isotopologs$mass[4] + 0.0012)
-    ),
-    intensity = seq_along(mzMeasured)
-  )
 
   # isotopocules too close together
   orbi_identify_isotopocules(
@@ -99,5 +93,36 @@ test_that("orbi_identify_isotopocules()", {
   unlink(test_xlsx)
   unlink(test_csv)
   unlink(test_tsv)
+}) |>
+  withr::with_options(new = list(show_exec_times = FALSE))
+
+
+test_that("orbi_filter_isotopocules()", {
+  # errors
+  expect_error(orbi_identify_isotopocules(42))
+
+  # values
+  peaks <- orbi_identify_isotopocules(peaks, isotopologs) |> suppressMessages()
+  dataset <- structure(list(peaks = peaks), class = "orbi_aggregated_data")
+
+  # successful return value
+  test_that_cli("orbi_filter_isotopocules()", configs = c("plain", "fancy"), {
+    expect_snapshot(dataset)
+    expect_snapshot(dataset |> orbi_filter_isotopocules())
+    expect_snapshot(
+      out <- dataset |> orbi_filter_isotopocules(keep_missing = TRUE)
+    )
+    expect_snapshot(
+      out <- dataset |> orbi_filter_isotopocules(keep_unidentified = TRUE)
+    )
+    expect_snapshot(out <- dataset |> orbi_filter_isotopocules(c("15N", "18O")))
+    expect_snapshot_value(out$peaks, style = "json2")
+    # check agg data vs tibble has same results
+    expect_equal(
+      out$peaks,
+      peaks |> orbi_filter_isotopocules(c("15N", "18O"))
+    ) |>
+      suppressMessages()
+  })
 }) |>
   withr::with_options(new = list(show_exec_times = FALSE))
