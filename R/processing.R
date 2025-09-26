@@ -1,5 +1,23 @@
 # Internal utility functions =============
 
+# internal function to check dataset argument
+check_dataset_arg <- function(
+  dataset,
+  .arg = caller_arg(dataset),
+  .env = caller_env()
+) {
+  # safety checks
+  check_arg(
+    dataset,
+    !missing(dataset) &&
+      (is(dataset, "orbi_aggregated_data") ||
+        is.data.frame(dataset)),
+    "must be a set of aggregated raw files or a data frame with peaks",
+    .arg = .arg,
+    .env = .env
+  )
+}
+
 # internal function to ensure dataset columns are factors (if they exist)
 # will notify the user about the transformation
 factorize_dataset <- function(dataset, cols = c()) {
@@ -64,7 +82,7 @@ orbi_filter_satellite_peaks <- function(...) {
 #' However, if there are satelite peaks of high intensity or very many satellite peaks, it can indicate that the m/z and tolerance setting used for identifying isotopcules need to be revisited.
 #' Visualize the flagged satellite peaks with [orbi_plot_satellite_peaks()].
 #'
-#' @param dataset A data frame or aggregated dataset (i.e. works both right after [orbi_identify_isotopocules()] or later downstream after `orbi_get_isotopocules()` or when reading from an IsoX file)
+#' @param dataset An aggregated dataset or a data frame of peaks (i.e. works directly after [orbi_identify_isotopocules()] as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <-
@@ -76,13 +94,7 @@ orbi_filter_satellite_peaks <- function(...) {
 #' @export
 orbi_flag_satellite_peaks <- function(dataset) {
   # safety checks
-  check_arg(
-    dataset,
-    !missing(dataset) &&
-      (is(dataset, "orbi_aggregated_data") ||
-        is.data.frame(dataset)),
-    "must be a set of aggregated raw files or a data frame of peaks"
-  )
+  check_dataset_arg(dataset)
 
   # keep track for later
   is_agg <- is(dataset, "orbi_aggregated_data")
@@ -100,24 +112,22 @@ orbi_flag_satellite_peaks <- function(dataset) {
 
   # by columns
   by <- tidyselect::eval_select(
-    any_of(c("uidx", "filename", "scan.no", "isotopocule")),
+    any_of(c("uidx", "filename", "scan.no", "isotopocule", "compound")),
     peaks
   ) |>
     names()
 
   # y column
-  y <- tidyselect::eval_select(
+  y <- names(tidyselect::eval_select(
     any_of(c("ions.incremental", "intensity")),
     peaks
-  ) |>
-    names()
-  y <- y[1]
+  ))[1]
 
   # calculation
   out <-
     peaks |>
     dplyr::mutate(
-      .by = all_of(by),
+      .by = dplyr::all_of(by),
       is_satellite_peak = !is.na(.data$isotopocule) &
         !is.na(!!sym(y)) &
         !!expr(!!sym(y) < max(!!sym(y)))
@@ -286,6 +296,114 @@ orbi_flag_weak_isotopocules <-
     # return with restored groupings from original dataset
     return(dataset_out |> group_by_same_groups(dataset))
   }
+
+#' Isotopocule coverage
+#'
+#' The coverage of each isotopcule across scans/time is an important indicator for data completeness. These functions provide ways to summarize and visualize the isotopocule coverage in a dataset.
+#'
+#' @inheritParams orbi_flag_satellite_peaks
+#' @describeIn orbi_isotopocule_coverage calculates which stretches of the data have data for which isotopocules. This function is usually used indicrectly by [orbi_plot_isotopocule_coverage()] but can be called directly to investigate isotopocule coverage.
+#'
+#' @return summary data frame
+#' @export
+orbi_get_isotopocule_coverage <- function(dataset) {
+  # safety checks
+  check_dataset_arg(dataset)
+
+  # get peaks tibble
+  peaks <- if (is(dataset, "orbi_aggregated_data")) dataset$peaks else dataset
+
+  # check columns
+  check_tibble(
+    peaks,
+    c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
+    regexps = TRUE
+  )
+
+  # y column (only used for filtering)
+  y_col <- names(tidyselect::eval_select(
+    any_of(c("ions.incremental", "intensity")),
+    peaks
+  ))[1]
+
+  # prep peaks
+  peaks <- peaks |>
+    # filter out missing and unidentified
+    orbi_filter_isotopocules() |>
+    # will only factorize if they exist
+    factorize_dataset(c("filename", "compound", "isotopocule")) |>
+    suppressMessages()
+  isotopocule_levels <- levels(peaks$isotopocule)
+
+  # grouping colums
+  by_cols <- tidyselect::eval_select(
+    any_of(c(
+      "uidx",
+      "filename",
+      "compound",
+      "isotopocule",
+      # make sure a data group column is included if it exists
+      "data_group",
+      # make sure a weak isotopocule column is included if it exists
+      "is_weak_isotopocule"
+    )),
+    peaks
+  ) |>
+    names()
+
+  # arrange colums
+  arrange_cols <- tidyselect::eval_select(
+    any_of(c(
+      "filename",
+      "uidx",
+      "compound",
+      "isotopocule"
+    )),
+    peaks
+  ) |>
+    names()
+
+  # calculate coverage
+  output <-
+    peaks |>
+    # need isotopocule as char otherwise will always complete for all levels
+    dplyr::mutate(isotopocule = as.character(.data$isotopocule)) |>
+    # find data stretches
+    dplyr::arrange(!!!map(c(arrange_cols, "scan.no"), sym)) |>
+    dplyr::mutate(
+      .by = dplyr::all_of(by_cols),
+      # re introduce factor
+      isotopocule = factor(.data$isotopocule, levels = isotopocule_levels),
+      data_stretch = c(0L, cumsum(diff(.data$scan.no) > 1L)),
+    ) |>
+    # summarize
+    dplyr::summarize(
+      .by = dplyr::all_of(c(by_cols, "data_stretch")),
+      n_points = dplyr::n(),
+      start_scan.no = .data$scan.no[1],
+      end_scan.no = tail(.data$scan.no, 1),
+      start_time.min = if ("time.min" %in% names(peaks)) {
+        .data$time.min[1]
+      } else {
+        list(NULL)
+      },
+      end_time.min = if ("time.min" %in% names(peaks)) {
+        tail(.data$time.min[1])
+      } else {
+        list(NULL)
+      }
+    ) |>
+    dplyr::arrange(
+      !!!map(
+        c(arrange_cols, if ("data_group" %in% names(peaks)) "data_group"),
+        sym
+      )
+    )
+  if (!"time.min" %in% names(peaks)) {
+    output <- output |> dplyr::select(-"start_time.min", -"end_time.min")
+  }
+  return(output)
+}
 
 
 #' @title Function replaced by `orbi_flag_outliers()`
