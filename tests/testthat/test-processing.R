@@ -51,12 +51,6 @@ test_file <-
   suppressMessages() |>
   select(-"filepath")
 
-test_that("test", {
-  test_that_cli("orbi_flag_satellite_peaks()", configs = c("plain", "fancy"), {
-    expect_snapshot(cli)
-  })
-})
-
 test_that("orbi_filter_satellite_peaks()", {
   # DEPRECATED
   orbi_filter_satellite_peaks(peaks) |>

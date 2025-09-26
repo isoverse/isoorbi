@@ -1,26 +1,6 @@
 # orbi_flag_satellite_peaks() [plain]
 
     Code
-      cli
-    Output
-      function (expr) 
-      {
-          cond <- cli__message_create("meta", cli__rec(expr))
-          record <- getOption("cli.record")
-          if (is.null(record)) {
-              cli__message_emit(cond)
-          }
-          else {
-              cli_recorded[[record]] <- c(cli_recorded[[record]], list(cond))
-          }
-          invisible()
-      }
-      <bytecode: 0x117c62dc8>
-      <environment: namespace:cli>
-
----
-
-    Code
       agg_out <- orbi_flag_satellite_peaks(agg_data)
     Message
       v orbi_flag_satellite_peaks() flagged 1/14 peaks in 1 isotopocule (15N) as
@@ -153,26 +133,6 @@
       v orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 
 # orbi_flag_satellite_peaks() [fancy]
-
-    Code
-      cli
-    Output
-      function (expr) 
-      {
-          cond <- cli__message_create("meta", cli__rec(expr))
-          record <- getOption("cli.record")
-          if (is.null(record)) {
-              cli__message_emit(cond)
-          }
-          else {
-              cli_recorded[[record]] <- c(cli_recorded[[record]], list(cond))
-          }
-          invisible()
-      }
-      <bytecode: 0x117c62dc8>
-      <environment: namespace:cli>
-
----
 
     Code
       agg_out <- orbi_flag_satellite_peaks(agg_data)
