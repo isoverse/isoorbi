@@ -8,7 +8,7 @@
 #' @param isotopocules list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).
 #' Required columns are `isotopocule/isotopolog`, `mz/mass`, `tolerance/tolerance [mmu]/tolerance [mDa]`, and `charge/z` (these alternative names for the columns, including uppercase versions, are recognized automatically).
 #' Optional column: `#compound/compound` as well as any other columns that don't match these others.
-#' @return same object as provided in `aggregated_data` with added columns `compound` (if provided), `isotopocule`, `mzExact` and `charge` as well as any other additional information columns provided in `isotopocules`. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
+#' @return same object as provided in `aggregated_data` with added columns `compound` (if provided), `itc_uidx` (introduced unique isotopocule index), `isotopocule`, `mzExact` and `charge` as well as any other additional information columns provided in `isotopocules`. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
 #' @export
 orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   # current env
@@ -109,8 +109,10 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   # prepare isotopocules
   isotopocules <- isotopocules |>
     dplyr::rename(!!!map_cols) |>
+    dplyr::filter(!is.na(.data$isotopocule)) |>
+    # add unique isotopocule id
+    dplyr::mutate(itc_uidx = dplyr::row_number(), .before = "isotopocule") |>
     dplyr::mutate(
-      ..iso_idx = dplyr::row_number(),
       # if tolerance is > 0.1, then it must be in mDa (otherwise it would be a 100 mDa tolerance which is meaningless)
       tolerance = if (median(.data$tolerance) > 0.1) {
         0.001 * .data$tolerance
@@ -166,7 +168,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   found_peaks <- found_peaks |>
     # tag multi-matches (one isotopolog matches multiples peaks) -> satellite peaks
     dplyr::mutate(
-      .by = c("uidx", "scan.no", "..iso_idx"),
+      .by = c("uidx", "scan.no", "itc_uidx"),
       ..n_matches = dplyr::n(),
       ..multimatch = .data$..n_matches > 1
     )
@@ -177,11 +179,11 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
 
   # missing
   missing_peaks <- isotopocules |>
-    dplyr::filter(.data$..iso_idx %in% unique(found_peaks$..iso_idx)) |>
+    dplyr::filter(.data$itc_uidx %in% unique(found_peaks$itc_uidx)) |>
     dplyr::cross_join(
       peaks |> dplyr::select("uidx", "scan.no") |> dplyr::distinct()
     ) |>
-    dplyr::anti_join(found_peaks, by = c("..iso_idx", "uidx", "scan.no"))
+    dplyr::anti_join(found_peaks, by = c("itc_uidx", "uidx", "scan.no"))
 
   # complete
   all_peaks <- found_peaks |>
@@ -206,7 +208,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   n_identified <- found_peaks$..peak_idx |> unique() |> length()
   n_multimatched <- found_peaks |>
     dplyr::filter(.data$..multimatch) |>
-    dplyr::select("..iso_idx", "uidx", "scan.no") |>
+    dplyr::select("itc_uidx", "uidx", "scan.no") |>
     dplyr::distinct() |>
     nrow()
   multimatched_isos <- found_peaks$isotopocule[found_peaks$..multimatch] |>
@@ -378,10 +380,14 @@ orbi_filter_isotopocules <- function(
     )
   }
   finish_info(
-    "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({round(100 * (n_peaks - nrow(peaks))/n_peaks)}%) because they were ",
+    if (n_peaks == nrow(peaks)) {
+      "kept all peaks because none fit the criteria for removal"
+    } else {
+      "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({round(100 * (n_peaks - nrow(peaks))/n_peaks)}%) because they were "
+    },
     glue::glue_collapse(info, sep = ", ", last = ", or "),
     ". ",
-    if (n_nonspecific == 0) {
+    if (n_peaks != nrow(peaks) && n_nonspecific == 0) {
       "Remaining isotopocules: {.field {unique(peaks$isotopocule)}}."
     },
     start = start

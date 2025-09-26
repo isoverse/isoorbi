@@ -20,7 +20,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzExact", "charge"]
+          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge"]
         },
         "row.names": {
           "type": "integer",
@@ -58,6 +58,11 @@
           "type": "character",
           "attributes": {},
           "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", null]
+        },
+        {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3, 4, 1, 2, 2, 3, 4, 1, 2, 3, 4, "NA"]
         },
         {
           "type": "character",
@@ -99,7 +104,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzExact", "charge"]
+          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge"]
         },
         "row.names": {
           "type": "integer",
@@ -139,6 +144,11 @@
           "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", null]
         },
         {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3, 4, 1, 2, 2, 3, 4, 1, 2, 3, 4, "NA"]
+        },
+        {
           "type": "character",
           "attributes": {},
           "value": ["M0", "15N", "17O", "18O", "M0", "15N", "15N", "17O", "18O", "M0", "15N", "17O", "18O", null]
@@ -163,7 +173,7 @@
     Message
       -------- aggregated data from  raw files - retrieve with orbi_get_data() -------
       > peaks (14): uidx, scan.no, mzMeasured (2 NA), intensity (2 NA), compound (1
-      NA), isotopocule (1 NA), mzExact (1 NA), charge (1 NA)
+      NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact (1 NA), charge (1 NA)
 
 ---
 
@@ -174,8 +184,8 @@
       missing isotopocules (2), or unidentified peaks (1). Remaining isotopocules:
       M0, 15N, 17O, and 18O.
       -------- aggregated data from  raw files - retrieve with orbi_get_data() -------
-      > peaks (11): uidx, scan.no, mzMeasured, intensity, compound, isotopocule,
-      mzExact, charge
+      > peaks (11): uidx, scan.no, mzMeasured, intensity, compound, itc_uidx,
+      isotopocule, mzExact, charge
 
 ---
 
@@ -210,7 +220,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzExact", "charge"]
+          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge"]
         },
         "row.names": {
           "type": "integer",
@@ -250,6 +260,11 @@
           "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate"]
         },
         {
+          "type": "integer",
+          "attributes": {},
+          "value": [2, 4, 2, 2, 4, 2]
+        },
+        {
           "type": "character",
           "attributes": {},
           "value": ["15N", "18O", "15N", "15N", "18O", "15N"]
@@ -274,7 +289,7 @@
     Message
       ──────── [1maggregated data from  raw files - retrieve with orbi_get_data()[22m ───────
       → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m ([33m2 NA[39m), [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1[39m
-      [33mNA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m)
+      [33mNA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m)
 
 ---
 
@@ -285,8 +300,8 @@
       [33mmissing[39m isotopocules (2), or [33munidentified[39m peaks (1). Remaining isotopocules:
       [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m.
       ──────── [1maggregated data from  raw files - retrieve with orbi_get_data()[22m ───────
-      → [34mpeaks[39m (11): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mcompound[39m, [32misotopocule[39m,
-      [32mmzExact[39m, [32mcharge[39m
+      → [34mpeaks[39m (11): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mcompound[39m, [32mitc_uidx[39m,
+      [32misotopocule[39m, [32mmzExact[39m, [32mcharge[39m
 
 ---
 
@@ -321,7 +336,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "isotopocule", "mzExact", "charge"]
+          "value": ["uidx", "scan.no", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge"]
         },
         "row.names": {
           "type": "integer",
@@ -359,6 +374,11 @@
           "type": "character",
           "attributes": {},
           "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate"]
+        },
+        {
+          "type": "integer",
+          "attributes": {},
+          "value": [2, 4, 2, 2, 4, 2]
         },
         {
           "type": "character",
