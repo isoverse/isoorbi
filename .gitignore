@@ -51,8 +51,8 @@ docs/
 *.parquet
 *.zip
 *.log
-./*.csv
-./*.tsv
+*.csv
+*.tsv
 
 # Pkgdown
 pkgdown/**
