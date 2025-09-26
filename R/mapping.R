@@ -5,8 +5,10 @@
 #' Map the mass spectral peaks to specific isotopocules based on their mass.
 #'
 #' @param aggregated_data either data aggregated from [orbi_aggregate_raw()] or a straight-up tibble data frame of the peaks (e.g. retrieved via `orbi_get_data(peaks = everything())`).
-#' @param isotopocules list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported). Required columns are `isotopocule/isotopolog`, `mz/mass`, `tolerance/tolerance [mmu]/tolerance [mDa]`, and `charge/z` (these alternative names for the columns, including uppercase versions, are recognized automatically)
-#' @return same object as provided in `aggregated_data` with added columns `isotopocule`, `mzNominal` and `charge` as well as any other additional information columns provided in `isotopocules` (`compound` is a common one that other downstream functions understand)
+#' @param isotopocules list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).
+#' Required columns are `isotopocule/isotopolog`, `mz/mass`, `tolerance/tolerance [mmu]/tolerance [mDa]`, and `charge/z` (these alternative names for the columns, including uppercase versions, are recognized automatically).
+#' Optional column: `#compound/compound` as well as any other columns that don't match these others.
+#' @return same object as provided in `aggregated_data` with added columns `compound` (if provided), `isotopocule`, `mzExact` and `charge` as well as any other additional information columns provided in `isotopocules`. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
 #' @export
 orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   # current env
@@ -34,9 +36,11 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   if (is_scalar_character(isotopocules)) {
     out <-
       if (grepl("csv$", isotopocules)) {
-        read.csv(isotopocules) |> try_catch_cnds()
+        readr::read_csv(isotopocules, show_col_types = FALSE) |>
+          try_catch_cnds()
       } else if (grepl("tsv$", isotopocules)) {
-        read.delim(isotopocules) |> try_catch_cnds()
+        readr::read_tsv(isotopocules, show_col_types = FALSE) |>
+          try_catch_cnds()
       } else if (grepl("xlsx$", isotopocules)) {
         readxl::read_excel(isotopocules) |> try_catch_cnds()
       }
@@ -53,8 +57,9 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   # check isotopologs tibble for the needed columns
   map_cols_all <- names(isotopocules)
   map_cols_reqs <- c(
+    "compound" = "\\#compound|compound", # optional
     "isotopocule" = "isotopolog|isotopocule|isotopologue",
-    "mzNominal" = "mass|m/z|mz",
+    "mzExact" = "mass|m/z|mz",
     "tolerance" = "tolerance|tolerance \\[mmu\\]|tolerance \\[mda\\]",
     "charge" = "charge|z"
   )
@@ -75,7 +80,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
         ),
         call = root_env
       )
-    } else if (length(fits) == 0) {
+    } else if (length(fits) == 0 && col != "compound") {
       cli_abort(
         c(
           "could not identify {.field {col}} column in the provided {cli::col_blue('isotopocules')}",
@@ -113,7 +118,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
         .data$tolerance
       }
     ) |>
-    dplyr::filter(!is.na(.data$mzNominal), !is.na(.data$tolerance))
+    dplyr::filter(!is.na(.data$mzExact), !is.na(.data$tolerance))
 
   # prerepare peaks (remove previous fitting attempts)
   peaks <- peaks |>
@@ -127,7 +132,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   found_peaks <- peaks |>
     dplyr::cross_join(isotopocules) |>
     # filter for matches
-    dplyr::filter(abs(.data$mzNominal - .data$mzMeasured) <= .data$tolerance) |>
+    dplyr::filter(abs(.data$mzExact - .data$mzMeasured) <= .data$tolerance) |>
     # tag multimatches (one peak matches multiple isotopocules) -> tolerances too large?
     dplyr::mutate(
       .by = "..peak_idx",
@@ -138,13 +143,13 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   if (any(found_peaks$..n_isotopocules > 1)) {
     overlaps <- found_peaks |>
       dplyr::filter(.data$..n_isotopocules > 1) |>
-      dplyr::select("isotopocule", "mzNominal", "tolerance") |>
+      dplyr::select("isotopocule", "mzExact", "tolerance") |>
       dplyr::distinct() |>
       dplyr::mutate(
         label = sprintf(
           "{.field %s} (%s \u00B1 %s)",
           .data$isotopocule,
-          .data$mzNominal,
+          .data$mzExact,
           .data$tolerance
         )
       ) |>
@@ -193,7 +198,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     dplyr::arrange(
       .data$uidx,
       .data$scan.no,
-      if_else(!is.na(.data$mzMeasured), .data$mzMeasured, .data$mzNominal)
+      if_else(!is.na(.data$mzMeasured), .data$mzMeasured, .data$mzExact)
     )
 
   # info
@@ -246,9 +251,142 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   if (is_agg) {
     # got aggregated data to begin with --> return aggregated data
     aggregated_data$peaks <- all_peaks
+    # remove unused columns info at this stage
+    for (name in names(aggregated_data)) {
+      attr(aggregated_data[[name]], "unused_columns") <- NULL
+    }
     return(aggregated_data)
   } else {
     # got a plain peaks tibble
     return(all_peaks)
+  }
+}
+
+
+#' Filter isotopocules
+#'
+#' This function helps filter out missing isotopcules, unidentified peaks, or select for specific isotopocule.
+#' It can be called any time after [orbi_identify_isotopocules()] or after reading from an isox file.
+#' By default (i.e. if run without setting any parameters), it removes unidentified peaks and missing isotopcules and keeps all others.
+#'
+#' @inheritParams orbi_flag_satellite_peaks
+#' @param isotopocules if provided, only these isotopocules will be kept
+#' @param keep_missing whether to keep missing isotopocules in the peaks list (i.e. those that should be there but are not), default is not to keep them
+#' @param keep_unidentified whether to keep unidentified isotopocules in the peaks list (i.e. peaks that have not been identified as a specificic isotopocule), default is not to keep them
+#' @export
+#' @return the `dataset` but filtered for these isotopocules
+orbi_filter_isotopocules <- function(
+  dataset,
+  isotopocules = c(),
+  keep_missing = FALSE,
+  keep_unidentified = FALSE
+) {
+  # safety checks
+  check_dataset_arg(dataset)
+
+  # get peaks
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  peaks <- if (is_agg) dataset$peaks else dataset
+
+  # check columns
+  check_tibble(peaks, "isotopocule")
+
+  # info
+  start <- start_info()
+  n_peaks <- nrow(peaks)
+  n_unidentified <- 0
+  n_missing <- 0
+  n_nonspecific <- 0
+
+  # filter out unidentified?
+  if (!keep_unidentified) {
+    peaks <- peaks |>
+      dplyr::filter(!is.na(.data$isotopocule)) |>
+      droplevels()
+    n_unidentified <- n_peaks - nrow(peaks)
+  }
+
+  # filter out missing?
+  if (!keep_missing) {
+    check_tibble(peaks, "ions.incremental|intensity", regexps = TRUE)
+    y <- names(tidyselect::eval_select(
+      any_of(c("ions.incremental", "intensity")),
+      peaks
+    ))[1]
+    peaks <- peaks |> dplyr::filter(!is.na(!!sym(y))) |> droplevels()
+    n_missing <- n_peaks - nrow(peaks) - n_unidentified
+  }
+
+  # search for specific isotopocules
+  if (!is_empty(isotopocules)) {
+    check_arg(
+      isotopocules,
+      is_character(isotopocules),
+      "must be a character vector of isotopocules"
+    )
+    available_isotopocules <- if (is.factor(peaks$isotopocule)) {
+      levels(peaks$isotopocule)
+    } else {
+      unique(peaks$isotopocule)
+    }
+
+    missing_isotopocules <- !isotopocules %in% available_isotopocules
+
+    if (sum(!missing_isotopocules) == 0) {
+      cli_abort(
+        c(
+          "none of the provided {.field isotopocules} are in the dataset",
+          "i" = "provided: {.val {isotopocules}}",
+          "i" = "available: {.val {available_isotopocules}}"
+        )
+      )
+    }
+
+    if (sum(missing_isotopocules) > 0L) {
+      cli_bullets(
+        c(
+          "!" = "not all requested {.field isotopocules} are in the dataset",
+          "i" = "missing (will be ignored): {cli::col_yellow(isotopocules[missing_isotopocules])}",
+          "i" = "available: {.field {available_isotopocules}}"
+        )
+      )
+    }
+    isotopocules <- isotopocules[!missing_isotopocules]
+
+    # filter for the specific isotopcules
+    peaks <- peaks |>
+      dplyr::filter(.data$isotopocule %in% !!isotopocules) |>
+      droplevels()
+    n_nonspecific <- n_peaks - nrow(peaks) - n_unidentified - n_missing
+  }
+
+  # info
+  info <- c()
+  if (n_missing > 0) {
+    info <- "missing isotopocules ({format_number(n_missing)})"
+  }
+  if (n_unidentified > 0) {
+    info <- c(info, "unidentified peaks ({format_number(n_unidentified)})")
+  }
+  if (n_nonspecific > 0) {
+    info <- c(
+      info,
+      "{qty(isotopocules)}not {?the/one of the} selected isotopocule{?s} {.field {isotopocules}} ({format_number(n_nonspecific)})"
+    )
+  }
+  finish_info(
+    "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({round(100 * (n_peaks - nrow(peaks))/n_peaks)}%) because they were ",
+    glue::glue_collapse(info, sep = ", ", last = ", or "),
+    start = start
+  )
+
+  # return
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$peaks <- peaks
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(peaks)
   }
 }
