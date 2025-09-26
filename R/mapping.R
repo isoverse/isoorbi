@@ -8,6 +8,8 @@
 #' @param isotopocules list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).
 #' Required columns are `isotopocule/isotopolog`, `mz/mass`, `tolerance/tolerance [mmu]/tolerance [mDa]`, and `charge/z` (these alternative names for the columns, including uppercase versions, are recognized automatically).
 #' Optional column: `#compound/compound` as well as any other columns that don't match these others.
+#' Character columns in the `isotopocules` table (including `isotopocule` and `compound`) are turned into factors with levels that preserve the order of isotopocules.
+#' That means that to change the order of isotopocules in downstream plotting functions, make sure to list them in the order you'd like them presented in.
 #' @return same object as provided in `aggregated_data` with added columns `compound` (if provided), `itc_uidx` (introduced unique isotopocule index), `isotopocule`, `mzExact` and `charge` as well as any other additional information columns provided in `isotopocules`. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
 #' @export
 orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
@@ -52,6 +54,14 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
       summary_format = "{message}. Encountered {issues}:"
     )
     isotopocules <- out$result
+  }
+
+  # turn characters into vectors
+  chars <- purrr::map_lgl(isotopocules, is.character)
+  if (any(chars)) {
+    isotopocules <- isotopocules |>
+      factorize_dataset(names(isotopocules)[chars]) |>
+      suppressMessages()
   }
 
   # check isotopologs tibble for the needed columns

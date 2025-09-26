@@ -55,9 +55,20 @@
           "value": [1, 2, 3, 4, "NA", 5, 8, 6, 7, 9, 10, 11, "NA", 12]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", null]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["nitrate"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
         },
         {
           "type": "integer",
@@ -65,9 +76,20 @@
           "value": [1, 2, 3, 4, 1, 2, 2, 3, 4, 1, 2, 3, 4, "NA"]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["M0", "15N", "17O", "18O", "M0", "15N", "15N", "17O", "18O", "M0", "15N", "17O", "18O", null]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["M0", "15N", "17O", "18O"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 2, 3, 4, 1, 2, 2, 3, 4, 1, 2, 3, 4, "NA"]
         },
         {
           "type": "double",
@@ -139,9 +161,20 @@
           "value": [1, 2, 3, 4, "NA", 5, 8, 6, 7, 9, 10, 11, "NA", 12]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate", null]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["nitrate"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
         },
         {
           "type": "integer",
@@ -149,9 +182,20 @@
           "value": [1, 2, 3, 4, 1, 2, 2, 3, 4, 1, 2, 3, 4, "NA"]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["M0", "15N", "17O", "18O", "M0", "15N", "15N", "17O", "18O", "M0", "15N", "17O", "18O", null]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["M0", "15N", "17O", "18O"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 2, 3, 4, 1, 2, 2, 3, 4, 1, 2, 3, 4, "NA"]
         },
         {
           "type": "double",
@@ -255,9 +299,20 @@
           "value": [2, 4, 5, 8, 7, 10]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate"]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["nitrate"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 1, 1, 1, 1, 1]
         },
         {
           "type": "integer",
@@ -265,9 +320,20 @@
           "value": [2, 4, 2, 2, 4, 2]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["15N", "18O", "15N", "15N", "18O", "15N"]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["15N", "18O"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 2, 1, 1, 2, 1]
         },
         {
           "type": "double",
@@ -371,9 +437,20 @@
           "value": [2, 4, 5, 8, 7, 10]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["nitrate", "nitrate", "nitrate", "nitrate", "nitrate", "nitrate"]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["nitrate"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 1, 1, 1, 1, 1]
         },
         {
           "type": "integer",
@@ -381,9 +458,20 @@
           "value": [2, 4, 2, 2, 4, 2]
         },
         {
-          "type": "character",
-          "attributes": {},
-          "value": ["15N", "18O", "15N", "15N", "18O", "15N"]
+          "type": "integer",
+          "attributes": {
+            "levels": {
+              "type": "character",
+              "attributes": {},
+              "value": ["15N", "18O"]
+            },
+            "class": {
+              "type": "character",
+              "attributes": {},
+              "value": ["factor"]
+            }
+          },
+          "value": [1, 2, 1, 1, 2, 1]
         },
         {
           "type": "double",
