@@ -2,7 +2,7 @@
 base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 
 # example tibble
-isotopocules <- tibble(
+isotopologs <- tibble(
   compound = "nitrate",
   isotopolog = c("M0", "15N", "17O", "18O"),
   mass = c(61.9878, 62.9850, 62.9922, 63.9922),
@@ -23,7 +23,7 @@ peaks <- tibble(
   ),
   intensity = seq_along(mzMeasured)
 ) |>
-  orbi_identify_isotopocules(isotopocules) |>
+  orbi_identify_isotopocules(isotopologs) |>
   suppressMessages()
 
 # eample agg data
@@ -50,6 +50,12 @@ test_file <-
   orbi_simplify_isox() |>
   suppressMessages() |>
   select(-"filepath")
+
+test_that("test", {
+  test_that_cli("orbi_flag_satellite_peaks()", configs = c("plain", "fancy"), {
+    expect_snapshot(cli)
+  })
+})
 
 test_that("orbi_filter_satellite_peaks()", {
   # DEPRECATED
@@ -84,8 +90,9 @@ test_that("orbi_flag_satellite_peaks()", {
       suppressMessages()
 
     # test real file
-    expect_snapshot(orbi_flag_satellite_peaks(test_file))
-  })
+    expect_snapshot(out <- orbi_flag_satellite_peaks(test_file))
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
 })
 
 test_that("orbi_filter_weak_isotopocules()", {
@@ -125,8 +132,8 @@ test_that("orbi_flag_weak_isotopocules()", {
         suppressMessages()
 
       # test real file
-      expect_snapshot(orbi_flag_weak_isotopocules(test_file, 90))
-      expect_snapshot(orbi_flag_weak_isotopocules(test_file, 99.999))
+      expect_snapshot(out <- orbi_flag_weak_isotopocules(test_file, 90))
+      expect_snapshot(out <- orbi_flag_weak_isotopocules(test_file, 99.999))
 
       # FIXME: add tests with segmentation
     }
@@ -188,8 +195,10 @@ test_that("orbi_flag_outliers()", {
     )
 
     # real file test
-    expect_snapshot(out <- df |> orbi_flag_outliers(agc_window = c(10, 90)))
-    expect_snapshot(out <- df |> orbi_flag_outliers(agc_fold_cutoff = 2))
+    expect_snapshot(
+      out <- test_file |> orbi_flag_outliers(agc_window = c(10, 90))
+    )
+    expect_snapshot(out <- test_file |> orbi_flag_outliers(agc_fold_cutoff = 2))
 
     # FIXME: add tests with blocks
   }) |>
