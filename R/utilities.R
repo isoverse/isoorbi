@@ -38,10 +38,10 @@ factorize_dataset <- function(dataset, cols = c()) {
 
 # group if exists
 group_if_exists <- function(dataset, cols, add = TRUE) {
-  for (col in cols) {
-    if (col %in% names(dataset)) {
-      dataset <- dataset |> group_by(!!sym(col), .add = add)
-    }
+  stopifnot(is.data.frame(dataset), is_character(cols))
+  by_cols <- tidyselect::eval_select(any_of(cols), dataset) |> names()
+  if (length(by_cols) > 0) {
+    dataset <- dataset |> group_by(!!!purrr::map(by_cols, sym), .add = add)
   }
   return(dataset)
 }
@@ -54,7 +54,7 @@ group_by_same_groups <- function(target_dataset, source_dataset) {
 # count distinct column respecting existing grouping
 count_grouped_distinct <- function(dataset, column) {
   dataset |>
-    dplyr::select(!!!c(dplyr::groups(dataset), column)) |>
+    dplyr::select(dplyr::all_of(c(dplyr::group_vars(dataset), column))) |>
     dplyr::distinct() |>
     dplyr::count(!!sym(column)) |>
     dplyr::pull(.data$n) |>

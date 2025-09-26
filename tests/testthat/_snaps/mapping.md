@@ -236,7 +236,7 @@
     Code
       out <- orbi_filter_isotopocules(dataset, keep_missing = TRUE)
     Message
-      v orbi_filter_isotopocules() removed 1 / 14 peaks (7%) because they were
+      v orbi_filter_isotopocules() removed 1 / 14 peaks (7.1%) because they were
       unidentified peaks (1). Remaining isotopocules: M0, 15N, 17O, and 18O.
 
 ---
@@ -374,7 +374,7 @@
     Code
       out <- orbi_filter_isotopocules(dataset, keep_missing = TRUE)
     Message
-      [32m✔[39m [1morbi_filter_isotopocules()[22m removed 1 / 14 peaks (7%) because they were
+      [32m✔[39m [1morbi_filter_isotopocules()[22m removed 1 / 14 peaks (7.1%) because they were
       [33munidentified[39m peaks (1). Remaining isotopocules: [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m.
 
 ---

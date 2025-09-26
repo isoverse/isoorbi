@@ -26,11 +26,11 @@ test_that("group_if_exists()", {
   # failure
   expect_error(
     group_if_exists(),
-    "argument \"cols\" is missing, with no default"
+    "argument \"dataset\" is missing, with no default"
   )
 
   expect_error(
-    group_if_exists(42),
+    group_if_exists(tibble()),
     "argument \"cols\" is missing, with no default"
   )
 })

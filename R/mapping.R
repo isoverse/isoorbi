@@ -393,7 +393,7 @@ orbi_filter_isotopocules <- function(
     if (n_peaks == nrow(peaks)) {
       "kept all peaks because none fit the criteria for removal"
     } else {
-      "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({round(100 * (n_peaks - nrow(peaks))/n_peaks)}%) because they were "
+      "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({signif(100 * (n_peaks - nrow(peaks))/n_peaks, 2)}%) because they were "
     },
     glue::glue_collapse(info, sep = ", ", last = ", or "),
     ". ",

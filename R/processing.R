@@ -47,15 +47,8 @@ orbi_flag_satellite_peaks <- function(dataset) {
   # info
   start <- start_info("is running")
 
-  # by columns
-  by <- tidyselect::eval_select(
-    any_of(c("uidx", "filename", "scan.no", "isotopocule", "compound")),
-    peaks
-  ) |>
-    names()
-
   # y column
-  y <- names(tidyselect::eval_select(
+  y_col <- names(tidyselect::eval_select(
     any_of(c("ions.incremental", "intensity")),
     peaks
   ))[1]
@@ -64,10 +57,13 @@ orbi_flag_satellite_peaks <- function(dataset) {
   out <-
     peaks |>
     dplyr::mutate(
-      .by = dplyr::all_of(by),
+      .by = dplyr::any_of(
+        c("uidx", "filename", "scan.no", "itc_uidx", "isotopocule", "compound")
+      ),
+      # ignore missing and unidentified for this
       is_satellite_peak = !is.na(.data$isotopocule) &
-        !is.na(!!sym(y)) &
-        !!expr(!!sym(y) < max(!!sym(y)))
+        !is.na(!!sym(y_col)) &
+        !!expr(!!sym(y_col) < max(!!sym(y_col)))
     ) |>
     try_catch_cnds()
 
@@ -90,14 +86,14 @@ orbi_flag_satellite_peaks <- function(dataset) {
 
   if (sat_peaks > 0) {
     finish_info(
-      "flagged {sat_peaks}/{nrow(peaks)} peaks ",
+      "flagged {format_number(sat_peaks)}/{format_number(nrow(peaks))} peaks ",
       "in {length(isotopocules)} isotopocule{?s} ({.field {isotopocules}}) ",
-      "as satellite peaks ({round(100 * sat_peaks / nrow(peaks))}%)",
+      "as {cli::col_yellow('satellite')} peaks ({signif(100 * sat_peaks / nrow(peaks), 2)}%)",
       start = start
     )
   } else {
     finish_info(
-      "confirmed there are no satellite peaks",
+      "confirmed there are no {cli::col_yellow('satellite')} peaks",
       start = start
     )
   }
@@ -126,113 +122,127 @@ orbi_filter_weak_isotopocules <- function(...) {
     orbi_filter_flagged_data()
 }
 
-#' @title Flag weak isotopocules
-#' @description The function `orbi_filter_weak_isotopocules()` flags isotopocules that are not detected in a minimum of `min_percent` of scans. This function evaluates weak isotopocules within each "filename", "block", "segment" and "injection" (if these columns exist), in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data frame.
+#' Flag weak isotopocules
+#'
+#' This function flags isotopocules that are not detected in a minimum of `min_percent` of scans that then can be easily visualized with [orbi_plot_coverage()].
+#' It evaluates weak isotopocules within each "uidx", "filename", "block", "segment" and "injection" (for those of the columns that exist),
+#' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data.
 #'
 #' @param dataset A simplified IsoX data frame to be processed
-#' @param min_percent A number between 0 and 90. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)
+#' @param min_percent A number between 0 and 100. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
 #'       orbi_simplify_isox() |>
-#'       orbi_flag_weak_isotopocules(min_percent = 2)
+#'       orbi_flag_weak_isotopocules(min_percent = 90)
 #'
-#' @details The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
-#'
-#' @return A data frame with new column `is_weak_isotopocule` that flags weak isotopocules.
+#' @return same object as provided in `dataset` with new column `is_weak_isotopocule` that flags weak isotopocules.
 #' @export
-orbi_flag_weak_isotopocules <-
-  function(dataset, min_percent) {
-    # safety checks
-    cols <- c(
-      "filepath",
-      "filename",
-      "compound",
-      "scan.no",
-      "time.min",
-      "isotopocule",
-      "ions.incremental",
-      "tic",
-      "it.ms"
+orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
+  # safety checks
+  check_dataset_arg(dataset)
+  check_arg(
+    min_percent,
+    !missing(min_percent) &&
+      is.numeric(min_percent) &&
+      length(min_percent) == 1L &&
+      min_percent > 0 &&
+      min_percent < 100,
+    "must be a single number between 0 and 100"
+  )
+
+  # keep track for later
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  peaks <- if (is_agg) dataset$peaks else dataset
+
+  # check columns
+  check_tibble(
+    peaks,
+    c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
+    regexps = TRUE
+  )
+
+  # info
+  start <- start_info("is running")
+
+  # y column
+  y_col <- names(tidyselect::eval_select(
+    any_of(c("ions.incremental", "intensity")),
+    peaks
+  ))[1]
+
+  # add groupings if they exist
+  peaks_out <- peaks |>
+    group_if_exists(
+      c("uidx", "filename", "compound", "block", "segment", "injection"),
+      add = TRUE
     )
-    stopifnot(
-      "need a `dataset` data frame" = !missing(dataset) &&
-        is.data.frame(dataset),
-      "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `time.min`, `isotopocule`, `ions.incremental`, `tic` and `it.ms`" = all(
-        cols %in% names(dataset)
-      ),
-      "`min_percent` needs to be a single number" = !missing(min_percent) &&
-        is.numeric(min_percent) &&
-        length(min_percent) == 1L,
-      "`min_percent` needs to be between 0 and 90" = min_percent >= 0 &&
-        min_percent <= 90
+
+  # info
+  starting_isotopocules <- peaks_out |> count_grouped_distinct("isotopocule")
+
+  # flag weak isotopocules
+  out <-
+    peaks_out |>
+    dplyr::mutate(max.scans = length(unique(.data$scan.no))) |>
+    dplyr::group_by(.data$isotopocule, .add = TRUE) |>
+    dplyr::mutate(
+      obs.scans = length(unique(.data$scan.no[
+        !is.na(.data$isotopocule) &
+          !is.na(!!sym(y_col))
+      ])),
+      is_weak_isotopocule = !is.na(.data$isotopocule) &
+        .data$obs.scans < min_percent / 100 * .data$max.scans
+    ) |>
+    #dplyr::select(-"obs.scans", -"max.scans") |>
+    try_catch_cnds()
+
+  # stop if there are errors
+  abort_cnds(
+    out$conditions,
+    message = "something went wrong flagging weak isotopocules:"
+  )
+  peaks_out <- out$result
+
+  # info
+  removed_isotopocules <- peaks_out |>
+    dplyr::filter(.data$is_weak_isotopocule) |>
+    count_grouped_distinct("isotopocule")
+  n_groups <- dplyr::n_groups(peaks_out)
+  if (removed_isotopocules > 0) {
+    finish_info(
+      "flagged {removed_isotopocules} of {starting_isotopocules} isotopocules as {cli::col_yellow('weak')} ",
+      "because they were NOT present in at least {min_percent}% of scans ",
+      if (n_groups > 0) {
+        "in each of the {n_groups} data groups (based on {.field {dplyr::group_vars(peaks_out)}}) "
+      },
+      "{cli::symbol$arrow_right} use {.strong orbi_plot_isotopocule_coverage()} to visualize them",
+      start = start
     )
-
-    # ensure factors
-    dataset <- dataset |> factorize_dataset("isotopocule")
-
-    # groupings if they exist
-    dataset_out <- dataset |>
-      group_if_exists(
-        c("filename", "compound", "block", "segment", "injection"),
-        add = TRUE
-      )
-
-    # info
-    start <- start_info("is running")
-    starting_isotopocules <- dataset_out |>
-      count_grouped_distinct("isotopocule")
-
-    # minor peak removal
-    out <-
-      dataset_out |>
-      dplyr::mutate(max.scans = length(unique(.data$scan.no))) |>
-      dplyr::group_by(.data$isotopocule, .add = TRUE) |>
-      dplyr::mutate(obs.scans = length(unique(.data$scan.no))) |>
-      dplyr::mutate(
-        is_weak_isotopocule = .data$obs.scans <
-          min_percent / 100 * .data$max.scans
-      ) |>
-      dplyr::select(-"obs.scans", -"max.scans") |>
-      try_catch_cnds()
-
-    # stop if there are errors
-    abort_cnds(
-      out$conditions,
-      message = "something went wrong flagging weak isotopocules:"
+  } else {
+    finish_info(
+      "confirmed there are no {cli::col_yellow('weak')} isotopocules: ",
+      "all are detected in at least {min_percent}% of scans ",
+      if (n_groups > 0) {
+        "in each of the {n_groups} data groups (based on {.field {dplyr::group_vars(peaks_out)}})"
+      },
+      start = start
     )
-    dataset_out <- out$result
-
-    # info
-    removed_isotopocules <- dataset_out |>
-      dplyr::filter(.data$is_weak_isotopocule) |>
-      count_grouped_distinct("isotopocule")
-    n_groups <- dplyr::n_groups(dataset_out)
-    if (removed_isotopocules > 0) {
-      finish_info(
-        "flagged {removed_isotopocules} of {starting_isotopocules} isotopocules as weak ",
-        "because they were NOT present in at least {min_percent}% of scans ",
-        if (n_groups > 0) {
-          "in each of the {dplyr::n_groups(dataset_out)} data groups (based on {.field {dplyr::group_vars(dataset_out)}}) "
-        },
-        "{cli::symbol$arrow_right} use {.strong orbi_plot_isotopocule_coverage()} to visualize them",
-        start = start
-      )
-    } else {
-      finish_info(
-        "confirmed there are no weak isotopocules: ",
-        "all are detected in at least {min_percent}% of scans ",
-        if (n_groups > 0) {
-          "in each of the {dplyr::n_groups(dataset_out)} data groups (based on {.field {dplyr::group_vars(dataset_out)}})"
-        },
-        start = start
-      )
-    }
-
-    # return with restored groupings from original dataset
-    return(dataset_out |> group_by_same_groups(dataset))
   }
+
+  # restore groupings from original dataset
+  peaks_out <- peaks_out |> group_by_same_groups(peaks)
+
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$peaks <- peaks_out
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(peaks_out)
+  }
+}
 
 #' Isotopocule coverage
 #'
@@ -368,15 +378,17 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 }
 
 
-#' @title Flag outlier scans
-#' @description The function `orbi_flag_outliers()` flags outliers using one of the different methods provided by the parameters (to use multiple, please call this function several times sequentially). Note that this function evaluates outliers within each "filename", "block", "segment" and "injection" (if these columns exist), in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data frame.
+#' Flag outlier scans
 #'
+#' This function flags outliers using one of the different methods provided by the parameters (to use multiple, please call this function several times sequentially).
+#' Note that this function evaluates outliers within each "uidx", "filename", and "injection" (for those of the columns that exist),
+#' and additionally within each "block" and "segment" if `by_block = TRUE`.
+#' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned datasert.
+#'
+#' @inheritParams orib_flat_satellite_peaks
 #' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #' @param agc_fold_cutoff flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, `agc_fold_cutoff = 2` flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
-#' @param dataset Simplified IsoX dataset to have outliers flagged
-#' @details Function is intended to flag scans that are outliers.
-#'
-#' The input `dataset` is expected to have at least these 8 columns: `filename`, `scan.no`, `time.min`, `compound`, `isotopocule`, `ions.incremental`, `tic`, `it.ms`.
+#' @param by_block if the `dataset` has block and segment definitions, should the outlier flag be evaluated within each block+segment or globally? default is within each block+segment, switch to globally by turning `by_block = FALSE`
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
@@ -385,20 +397,17 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 #'   orbi_simplify_isox() |>
 #'   orbi_flag_outliers(agc_window = c(1,99))
 #'
-#' @return A data frame with new columns `is_outlier` and `outlier_type` (if they don't already exist) that flags outliers identified by the method and provides the type of outlier (e.g. "2 fold agc cutoff"), respectively.
+#' @return same object as provided in `dataset` with new columns `is_outlier` and `outlier_type` (if they don't already exist) that flags outliers identified by the method and provides the type of outlier (e.g. "2 fold agc cutoff"), respectively.
 #' @export
 orbi_flag_outliers <- function(
   dataset,
   agc_fold_cutoff = NA_real_,
-  agc_window = c()
+  agc_window = c(),
+  by_block = TRUE
 ) {
   # safety checks
-  cols <- c("filename", "compound", "scan.no", "tic", "it.ms")
+  check_dataset_arg(dataset)
   stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound`, `scan.no`, `tic` and `it.ms`" = all(
-      cols %in% names(dataset)
-    ),
     "if provided, `agc_fold_cutoff` needs to be a single number" = (length(
       agc_fold_cutoff
     ) ==
@@ -412,6 +421,17 @@ orbi_flag_outliers <- function(
       (is.numeric(agc_window) &&
         length(agc_window) == 2L &&
         agc_window[1] < agc_window[2])
+  )
+
+  # keep track for later
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  scans <- if (is_agg) dataset$scans else dataset
+
+  # check columns
+  check_tibble(
+    scans,
+    c("uidx|filename", "scan.no", "tic", "it.ms"),
+    regexps = TRUE
   )
 
   # check filter to apply
@@ -453,18 +473,38 @@ orbi_flag_outliers <- function(
     method_type <- sprintf("%s fold AGC cutoff", agc_fold_cutoff)
   }
 
-  # optional groupings
-  dataset_out <- dataset |>
-    group_if_exists(c("filename", "block", "segment", "injection"), add = TRUE)
-
   # info
   start <- start_info("is running")
-  n_scans <- dataset_out |> count_grouped_distinct("scan.no")
+
+  # simplify scans down to single scans (already the case if we're in agg_data but this works universally)
+  # note that the orignal scans' groupings are not changed so don't need to be re-recreated later on
+  single_scans <- scans |>
+    group_if_exists(
+      c(
+        "uidx",
+        "filename",
+        "injection",
+        if (by_block) "block",
+        if (by_block) "segment"
+      ),
+      add = TRUE
+    )
+  single_scans <- single_scans |>
+    dplyr::select(dplyr::all_of(c(
+      dplyr::group_vars(single_scans),
+      "scan.no",
+      "tic",
+      "it.ms"
+    ))) |>
+    # filtering out missing data here (don't need to considert it again later)
+    dplyr::filter(!is.na(.data$tic), !is.na(.data$it.ms)) |>
+    dplyr::distinct()
+  n_scans <- nrow(single_scans)
 
   # calculation
   out <- try_catch_cnds(
     if (method == "agc_window") {
-      dataset_out |>
+      single_scans |>
         dplyr::mutate(
           TICxIT = .data$tic * .data$it.ms,
           is_new_outlier = .data$TICxIT <
@@ -473,7 +513,7 @@ orbi_flag_outliers <- function(
         ) |>
         dplyr::select(-"TICxIT")
     } else if (method == "agc_fold_cutoff") {
-      dataset_out |>
+      single_scans |>
         dplyr::mutate(
           TICxIT = .data$tic * .data$it.ms,
           TICxIT_mean = mean(.data$TICxIT),
@@ -490,16 +530,30 @@ orbi_flag_outliers <- function(
     out$conditions,
     message = "something went wrong flagging outliers:"
   )
-  dataset_out <- out$result
+  single_scans <- out$result
 
-  # dataset outlier and type update
-  if (!"is_outlier" %in% names(dataset_out)) {
-    dataset_out$is_outlier <- FALSE
-    dataset_out$outlier_type <- NA_character_
+  # outlier and type update
+  if (!"is_outlier" %in% names(scans)) {
+    scans$is_outlier <- FALSE
+    scans$outlier_type <- ""
   }
-  dataset_out <- dataset_out |>
+  scans <- scans |>
+    # merge single scans back in
+    dplyr::left_join(
+      single_scans |>
+        dplyr::select(dplyr::any_of(c(
+          dplyr::group_vars(single_scans),
+          "scan.no",
+          "is_new_outlier"
+        ))),
+      by = c(dplyr::group_vars(single_scans), "scan.no")
+    ) |>
     dplyr::mutate(
-      is_outlier = ifelse(.data$is_new_outlier, TRUE, .data$is_outlier),
+      is_outlier = ifelse(
+        !is.na(.data$is_new_outlier) & .data$is_new_outlier,
+        TRUE,
+        .data$is_outlier
+      ),
       outlier_type = ifelse(
         .data$is_new_outlier,
         method_type,
@@ -509,33 +563,39 @@ orbi_flag_outliers <- function(
     dplyr::select(-"is_new_outlier")
 
   # info
-  n_scans_removed <- dataset_out |>
-    dplyr::filter(.data$is_outlier) |>
-    count_grouped_distinct("scan.no")
-  n_groups <- dplyr::n_groups(dataset_out)
-  if (n_scans_removed > 0) {
+  n_scans_flagged <- single_scans |>
+    dplyr::filter(.data$is_new_outlier) |>
+    nrow()
+  n_groups <- dplyr::n_groups(single_scans)
+  if (n_scans_flagged > 0) {
     finish_info(
-      "flagged {n_scans_removed}/{n_scans} scans ({round(n_scans_removed / n_scans * 100, 1)}%) as outliers ",
+      "flagged {n_scans_flagged}/{n_scans} scans ({signif(n_scans_flagged / n_scans * 100, 2)}%) as {cli::col_yellow('outliers')} ",
       "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
       if (n_groups > 1) {
-        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(dataset_out)}}) "
+        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(scans_out)}}) "
       },
       " {cli::symbol$arrow_right} use {.strong orbi_plot_raw_data(y = tic * it.ms)} to visualize them",
       start = start
     )
   } else {
     finish_info(
-      "confirmed that none of the {n_scans} scans are outliers ",
+      "confirmed that none of the {n_scans} scans are {cli::col_yellow('outliers')} ",
       "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
       if (n_groups > 1) {
-        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(dataset_out)}}) "
+        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(scans_out)}}) "
       },
       start = start
     )
   }
 
-  # return with restored groupings from original dataset
-  return(dataset_out |> group_by_same_groups(dataset))
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$scans <- scans
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(scans)
+  }
 }
 
 # filter flagged data (fast internal function)
