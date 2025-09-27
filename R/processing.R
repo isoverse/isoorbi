@@ -130,17 +130,21 @@ orbi_filter_weak_isotopocules <- function(...) {
 #' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data.
 #'
 #' @param dataset A simplified IsoX data frame to be processed
-#' @param min_percent A number between 0 and 100. Isotopocule must be observed in at least this percentage of scans (please note: the percentage is defined relative to the most commonly observed isotopocule of each compound)
+#' @param min_percent A number between 0 and 100 (inclusive). Isotopocule must be observed in at least this percentage of scans (please note: the percentage
+#' is defined relative to the most commonly observed isotopocule of each compound). The default is 100, the most stringent condition to ensure reliable
+#' isotpocule coverage and ratio calculations across data blocks. If you lower the default, be mindful of potential misinterprations from using isotopotcules
+#' that are very close to their detection limit within a datablock. For continuous flow operations it may be necessary to make data blocks smaller using
+#' [orbi_define_block_for_flow_injection()] and [orbi_adjust_block()].
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 #' df <- orbi_read_isox(file = fpath) |>
 #'       orbi_simplify_isox() |>
-#'       orbi_flag_weak_isotopocules(min_percent = 90)
+#'       orbi_flag_weak_isotopocules(min_percent = 100)
 #'
 #' @return same object as provided in `dataset` with new column `is_weak_isotopocule` that flags weak isotopocules.
 #' @export
-orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
+orbi_flag_weak_isotopocules <- function(dataset, min_percent = 100) {
   # safety checks
   check_dataset_arg(dataset)
   check_arg(
@@ -149,8 +153,8 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
       is.numeric(min_percent) &&
       length(min_percent) == 1L &&
       min_percent > 0 &&
-      min_percent < 100,
-    "must be a single number between 0 and 100"
+      min_percent <= 100,
+    "must be a single number between 0 and 100 (inclusive)"
   )
 
   # keep track for later
