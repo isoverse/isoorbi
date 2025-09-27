@@ -155,7 +155,21 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
 
   # keep track for later
   is_agg <- is(dataset, "orbi_aggregated_data")
-  peaks <- if (is_agg) dataset$peaks else dataset
+  added_scan_cols <- c("block", "segment")
+  peaks <- if (is_agg) {
+    dataset$peaks |>
+      dplyr::left_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            dplyr::any_of(added_scan_cols)
+          ),
+        by = c("uidx", "scan.no")
+      )
+  } else {
+    dataset
+  }
 
   # check columns
   check_tibble(
@@ -197,7 +211,7 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
       is_weak_isotopocule = !is.na(.data$isotopocule) &
         .data$obs.scans < min_percent / 100 * .data$max.scans
     ) |>
-    #dplyr::select(-"obs.scans", -"max.scans") |>
+    dplyr::select(-"obs.scans", -"max.scans") |>
     try_catch_cnds()
 
   # stop if there are errors
@@ -238,7 +252,8 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
 
   if (is_agg) {
     # got aggregated data to begin with --> return aggregated data
-    dataset$peaks <- peaks_out
+    dataset$peaks <- peaks_out |>
+      dplyr::select(-dplyr::any_of(added_scan_cols))
     return(dataset)
   } else {
     # got a plain peaks tibble
@@ -601,7 +616,7 @@ orbi_flag_outliers <- function(
       "flagged {n_scans_flagged}/{n_scans} scans ({signif(n_scans_flagged / n_scans * 100, 2)}%) as {cli::col_yellow('outliers')} ",
       "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
       if (n_groups > 1) {
-        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(scans_out)}}) "
+        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(single_scans)}}) "
       },
       " {cli::symbol$arrow_right} use {.strong orbi_plot_raw_data(y = tic * it.ms)} to visualize them",
       start = start
@@ -611,7 +626,7 @@ orbi_flag_outliers <- function(
       "confirmed that none of the {n_scans} scans are {cli::col_yellow('outliers')} ",
       "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
       if (n_groups > 1) {
-        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(scans_out)}}) "
+        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(single_scans)}}) "
       },
       start = start
     )
