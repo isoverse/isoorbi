@@ -1110,15 +1110,22 @@ orbi_add_blocks_to_plot <- function(
     blocks |>
       dplyr::filter(!is.na(.data$block)) |>
       dplyr::mutate(
+        .by = dplyr::any_of(c("uidx", "filename")),
         xmin = if (!!x_column == "time.min") {
-          .data$start_time.min
+          .data$start_time.min -
+            0.5 *
+              (max(.data$time.min) - min(.data$time.min)) /
+              (max(.data$scan.no) - min(.data$scan.no))
         } else {
-          .data$start_scan.no
+          .data$start_scan.no - 0.5
         },
         xmax = if (!!x_column == "time.min") {
-          .data$end_time.min
+          .data$end_time.min +
+            0.5 *
+              (max(.data$time.min) - min(.data$time.min)) /
+              (max(.data$scan.no) - min(.data$scan.no))
         } else {
-          .data$end_scan.no
+          .data$end_scan.no + 0.5
         }
       )
   }

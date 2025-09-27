@@ -439,6 +439,11 @@ orbi_plot_isotopocule_coverage <- function(
   check_dataset_arg(dataset)
   x_column <- arg_match(x)
 
+  # filter for isotopocules
+  dataset <- dataset |>
+    orbi_filter_isotopocules(isotopocules) |>
+    suppressMessages()
+
   # get peaks df
   peaks <- if (is(dataset, "orbi_aggregated_data")) {
     dataset$peaks |>
@@ -479,9 +484,6 @@ orbi_plot_isotopocule_coverage <- function(
     # factorize isotopocules
     factorize_dataset(c("filename", "isotopocule")) |>
     suppressMessages() |>
-    # filter for isotopocules
-    orbi_filter_isotopocules(isotopocules) |>
-    suppressMessages() |>
     # filter out satellite peaks
     filter_flagged_data(
       filter_satellite_peaks = TRUE,
@@ -497,19 +499,6 @@ orbi_plot_isotopocule_coverage <- function(
     by_cols_w_compound <- c(by_cols, "compound")
   }
 
-  # delta x
-  files_delta_x <-
-    peaks |>
-    dplyr::summarize(
-      .by = dplyr::all_of(by_cols),
-      delta_x = if (x_column == "time.min") {
-        (max(.data$time.min) - min(.data$time.min)) /
-          (max(.data$scan.no) - min(.data$scan.no))
-      } else {
-        1
-      }
-    )
-
   # weak isotopocules and data groups
   has_weak_col <- "is_weak_isotopocule" %in% names(peaks)
   has_data_groups <- "data_group" %in% names(peaks)
@@ -519,19 +508,25 @@ orbi_plot_isotopocule_coverage <- function(
     dataset |>
     orbi_get_isotopocule_coverage() |>
     dplyr::mutate(
+      .by = dplyr::any_of(c("uidx", "filename")),
       y = as.integer(.data$isotopocule),
       xmin = if (x_column == "time.min") {
-        .data$start_time.min
+        .data$start_time.min -
+          0.5 *
+            (max(.data$time.min) - min(.data$time.min)) /
+            (max(.data$scan.no) - min(.data$scan.no))
       } else {
-        .data$start_scan.no
+        .data$start_scan.no - 0.5
       },
       xmax = if (x_column == "time.min") {
-        .data$end_time.min
+        .data$end_time.min +
+          0.5 *
+            (max(.data$time.min) - min(.data$time.min)) /
+            (max(.data$scan.no) - min(.data$scan.no))
       } else {
-        .data$end_scan.no
+        .data$end_scan.no + 0.5
       },
-    ) |>
-    dplyr::left_join(files_delta_x, by = by_cols)
+    )
   if (!"data_group" %in% names(isotopocule_coverage)) {
     isotopocule_coverage$data_group <- NA_integer_
   }
@@ -559,8 +554,7 @@ orbi_plot_isotopocule_coverage <- function(
       "xmax"
     ) |>
     dplyr::distinct() |>
-    dplyr::mutate(y = as.integer(.data$isotopocule)) |>
-    dplyr::left_join(files_delta_x, by = by_cols)
+    dplyr::mutate(y = as.integer(.data$isotopocule))
 
   # group outlines (for weak isotopocule backgrounds)
   if (has_weak_col) {
@@ -582,23 +576,29 @@ orbi_plot_isotopocule_coverage <- function(
         by = c(by_cols, "data_group")
       ) |>
       dplyr::mutate(
+        .by = dplyr::any_of(c("uidx", "filename")),
         is_weak_isotopocule = ifelse(
           !is.na(.data$xmin),
           .data$is_weak_isotopocule,
           TRUE
         ),
         xmin = if (x_column == "time.min") {
-          .data$start_time.min
+          .data$start_time.min -
+            0.5 *
+              (max(.data$time.min) - min(.data$time.min)) /
+              (max(.data$scan.no) - min(.data$scan.no))
         } else {
-          .data$start_scan.no
+          .data$start_scan.no - 0.5
         },
         xmax = if (x_column == "time.min") {
-          .data$end_time.min
+          .data$end_time.min +
+            +0.5 *
+              (max(.data$time.min) - min(.data$time.min)) /
+              (max(.data$scan.no) - min(.data$scan.no))
         } else {
-          .data$end_scan.no
+          .data$end_scan.no + 0.5
         }
-      ) |>
-      dplyr::left_join(files_delta_x, by = by_cols)
+      )
   }
 
   # make plot
@@ -607,8 +607,8 @@ orbi_plot_isotopocule_coverage <- function(
     ggplot2::ggplot() +
     ggplot2::aes(
       y = .data$y,
-      xmin = .data$xmin - .data$delta_x,
-      xmax = .data$xmax + .data$delta_x,
+      xmin = .data$xmin,
+      xmax = .data$xmax,
       ymin = .data$y - 0.4,
       ymax = .data$y + 0.4
     ) +
@@ -624,7 +624,11 @@ orbi_plot_isotopocule_coverage <- function(
     plot <- plot +
       ggplot2::geom_rect(
         data = group_outlines |> filter(.data$is_weak_isotopocule),
-        map = ggplot2::aes(fill = "was flagged as weak"),
+        map = ggplot2::aes(
+          fill = "was flagged as weak",
+          ymin = .data$y - 0.5,
+          ymax = .data$y + 0.5
+        ),
         color = NA_character_
       )
   }
