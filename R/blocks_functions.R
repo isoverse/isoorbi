@@ -251,7 +251,7 @@ orbi_define_block_for_flow_injection <- function(
 
 #' @title Binning raw data into blocks for dual inlet analyses
 #' @description This function sorts out (bins) data into indivual blocks of reference, sample, changeover time, and startup time.
-#' @param dataset A data frame or tibble produced from IsoX data by [orbi_simplify_isox()]
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param ref_block_time.min time where the signal is stable when reference is analyzed
 #' @param change_over_time.min time where the signal is unstable after switching from reference to sample or back
 #' @param sample_block_time.min time where the signal is stable when sample is analyzed
@@ -275,10 +275,9 @@ orbi_define_blocks_for_dual_inlet <- function(
   ref_block_name = orbi_get_option("di_ref_name"),
   sample_block_name = orbi_get_option("di_sample_name")
 ) {
-  # type checks
+  # safety checks
+  check_dataset_arg(dataset)
   stopifnot(
-    "`dataset` must be a data frame or tibble" = !missing(dataset) &&
-      is.data.frame(dataset),
     "`ref_block_time.min` must be a single positive number" = !missing(
       ref_block_time.min
     ) &&
@@ -305,21 +304,42 @@ orbi_define_blocks_for_dual_inlet <- function(
     )
   )
 
-  # dataset columns check
-  req_cols <- c("filename", "scan.no", "time.min")
-  if (length(missing <- setdiff(req_cols, names(dataset)))) {
-    sprintf(
-      "`dataset` is missing the column(s) '%s'",
-      paste(missing, collapse = "', '")
-    ) |>
-      rlang::abort()
+  # get scans
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  scans <- if (is_agg) {
+    dataset$scans |>
+      dplyr::left_join(
+        dataset$file_info |> dplyr::select("uidx", "filename"),
+        by = "uidx"
+      )
+  } else {
+    dataset
+  }
+
+  # check required columns
+  check_tibble(
+    scans,
+    req_cols = c("filename", "scan.no", "time.min"),
+    .arg = "dataset"
+  )
+
+  by_cols <- "filename"
+  if ("uidx" %in% names(scans)) {
+    by_cols <- c("uidx", by_cols)
   }
 
   # info message
   start <- start_info("is running")
 
+  # get single scans (for compatibility with tibble, technically redundant for aggregated data)
+  single_scans <- scans |>
+    dplyr::select(dplyr::all_of(by_cols), "scan.no", "time.min") |>
+    dplyr::distinct() |>
+    # make sure it's in the correct order (for data group identification later)
+    dplyr::arrange(.data$filename, .data$scan.no)
+
   # get blocks
-  blocks <- dataset |>
+  blocks <- single_scans |>
     find_blocks(
       ref_block_time.min = ref_block_time.min,
       sample_block_time.min = sample_block_time.min,
@@ -337,18 +357,11 @@ orbi_define_blocks_for_dual_inlet <- function(
     # don't really need the max time and idx
     dplyr::select(-"max_time.min", -"idx")
 
-  # get scans
-  scans <- dataset |>
-    dplyr::select("filename", "scan.no", "time.min") |>
-    dplyr::distinct() |>
-    # make sure it's in the correct order (for data group identification later)
-    dplyr::arrange(.data$filename, .data$scan.no)
-
   # add block information to scans
-  scans_with_blocks <-
-    scans |>
+  single_scans_with_blocks <-
+    single_scans |>
     # assign blocks (all time values should be covered)
-    dplyr::left_join(blocks, by = "filename", relationship = "many-to-many") |>
+    dplyr::left_join(blocks, by = by_cols, relationship = "many-to-many") |>
     # find right blocks for data
     dplyr::filter(
       .data$time.min >= .data$start &
@@ -386,12 +399,12 @@ orbi_define_blocks_for_dual_inlet <- function(
   )
 
   # combine with the whole dataset
-  dataset_with_blocks <-
-    dataset |>
+  scans <-
+    scans |>
     dplyr::left_join(
-      scans_with_blocks |>
+      single_scans_with_blocks |>
         dplyr::select(
-          "filename",
+          dplyr::all_of(by_cols),
           "scan.no",
           "data_group",
           "block",
@@ -399,11 +412,18 @@ orbi_define_blocks_for_dual_inlet <- function(
           "data_type",
           "segment"
         ),
-      by = c("filename", "scan.no")
+      by = c(by_cols, "scan.no")
     )
 
-  # return new dataset
-  return(dataset_with_blocks)
+  # return updated dataset
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$scans <- scans |> dplyr::select(-dplyr::any_of("filename"))
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(scans)
+  }
 }
 
 #' @title Manually adjust block delimiters
@@ -1290,9 +1310,13 @@ find_blocks <- function(
       dplyr::filter(.data$end > tmin)
   }
 
-  # find blocks by filename
+  # find blocks by uindx filename
+  by_cols <- "filename"
+  if ("uidx" %in% names(dataset)) {
+    by_cols <- c("uidx", by_cols)
+  }
   dataset |>
-    dplyr::group_by(.data$filename) |>
+    dplyr::group_by(!!!purrr::map(by_cols, sym)) |>
     dplyr::summarize(
       min_time.min = min(.data$time.min),
       max_time.min = max(.data$time.min),
