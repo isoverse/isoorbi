@@ -206,6 +206,7 @@ orbi_plot_satellite_peaks <- function(
     factorize_dataset("isotopocule") |>
     suppressMessages() |>
     orbi_filter_isotopocules(isotopocules) |>
+    suppressMessages() |>
     dplyr::filter(!is.na(!!sym(y_column)))
 
   # make plot
@@ -439,7 +440,25 @@ orbi_plot_isotopocule_coverage <- function(
   x_column <- arg_match(x)
 
   # get peaks df
-  peaks <- if (is(dataset, "orbi_aggregated_data")) dataset$peaks else dataset
+  peaks <- if (is(dataset, "orbi_aggregated_data")) {
+    dataset$peaks |>
+      dplyr::left_join(
+        dataset$file_info |> dplyr::select("uidx", "filename"),
+        by = "uidx"
+      ) |>
+      dplyr::left_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            "time.min",
+            dplyr::any_of(c("block", "data_group", "sample_name", "data_type"))
+          ),
+        by = c("uidx", "scan.no")
+      )
+  } else {
+    dataset
+  }
 
   # check columns
   check_tibble(
@@ -458,10 +477,11 @@ orbi_plot_isotopocule_coverage <- function(
   # prepare dataset
   peaks <- peaks |>
     # factorize isotopocules
-    factorize_dataset("isotopocule") |>
+    factorize_dataset(c("filename", "isotopocule")) |>
     suppressMessages() |>
     # filter for isotopocules
     orbi_filter_isotopocules(isotopocules) |>
+    suppressMessages() |>
     # filter out satellite peaks
     filter_flagged_data(
       filter_satellite_peaks = TRUE,
@@ -496,7 +516,7 @@ orbi_plot_isotopocule_coverage <- function(
 
   # calculate coverage
   isotopocule_coverage <-
-    peaks |>
+    dataset |>
     orbi_get_isotopocule_coverage() |>
     dplyr::mutate(
       y = as.integer(.data$isotopocule),
@@ -558,7 +578,7 @@ orbi_plot_isotopocule_coverage <- function(
       tidyr::complete(.data$y, .data$data_group) |>
       dplyr::ungroup() |>
       dplyr::left_join(
-        suppressWarnings(peaks |> orbi_get_blocks_info()),
+        peaks |> orbi_get_blocks_info() |> suppressMessages(),
         by = c(by_cols, "data_group")
       ) |>
       dplyr::mutate(

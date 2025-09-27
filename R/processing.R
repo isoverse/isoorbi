@@ -260,12 +260,37 @@ orbi_get_isotopocule_coverage <- function(dataset) {
   check_dataset_arg(dataset)
 
   # get peaks tibble
-  peaks <- if (is(dataset, "orbi_aggregated_data")) dataset$peaks else dataset
+  peaks <- if (is(dataset, "orbi_aggregated_data")) {
+    dataset$peaks |>
+      dplyr::left_join(
+        dataset$file_info |> dplyr::select("uidx", "filename"),
+        by = "uidx"
+      ) |>
+      dplyr::left_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            "time.min",
+            dplyr::any_of("data_group")
+          ),
+        by = c("uidx", "scan.no")
+      )
+  } else {
+    dataset
+  }
 
   # check columns
   check_tibble(
     peaks,
-    c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
+    c(
+      "uidx",
+      "filename",
+      "scan.no",
+      "time.min",
+      "isotopocule",
+      "ions.incremental|intensity"
+    ),
     regexps = TRUE,
     .arg = "dataset"
   )
@@ -338,7 +363,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
         list(NULL)
       },
       end_time.min = if ("time.min" %in% names(peaks)) {
-        tail(.data$time.min[1])
+        tail(.data$time.min, 1)
       } else {
         list(NULL)
       }

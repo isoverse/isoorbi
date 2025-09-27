@@ -17,7 +17,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   root_env <- current_env()
 
   # safety checks
-  check_dataset_arg(dataset)
+  check_dataset_arg(aggregated_data)
   check_arg(
     isotopocules,
     !missing(isotopocules) &&

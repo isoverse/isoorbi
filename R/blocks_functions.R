@@ -991,8 +991,8 @@ orbi_get_blocks_info <- function(
 
   # empty blocks
   empty <- scans |>
-    dplyr::group_by(.data$filename) |>
     dplyr::summarise(
+      .by = dplyr::any_of(c("uidx", "filename")),
       data_group = NA_integer_,
       block = NA_integer_,
       sample_name = NA_character_,
