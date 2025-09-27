@@ -2,9 +2,9 @@
 
 #' Aggregate data from raw files
 #'
-#' This function allows dynamic aggregation and validation of data read by `orbi_read_raw`. Like [orbi_read_raw()], it is designed to be fail save by safely catching errors and reporting back on them (see [orbi_get_problems()]). This function should work out of the box for most files without additional modification of the `aggregator`.
+#' This function allows dynamic aggregation and validation of data read by [orbi_read_raw()]. Like [orbi_read_raw()], it is designed to be fail save by safely catching errors and reporting back on them (see [orbi_get_problems()]). This function should work out of the box for most files without additional modification of the `aggregator`.
 #'
-#' @param files_data the files read in by orbi_read_raw
+#' @param files_data the files read in by [orbi_read_raw()]
 #' @param aggregator typically the name of a registered aggregator (see all with `orbi_get_option("aggregators")`),
 #' default is the "standard" aggregator included in the package (`orbi_get_aggregator("standard")`).
 #' Other options are "minimal" (`orbi_get_aggregator("minimal")`) and "extended" (`orbi_get_aggregator("extended")`).
@@ -73,16 +73,13 @@ print.orbi_aggregated_data <- function(x, ...) {
         }
 
         # all other fields
-        n_rows <- nrow(dataset) |>
-          prettyunits::pretty_num() |>
-          # take care of leading/trailing whitespaces
-          gsub(pattern = "(^ +| +$)", replacement = "")
+        n_rows <- nrow(dataset) |> format_number()
         n_na <- purrr::map_int(dataset, ~ sum(is.na(.x)))
         cols <- names(dataset) |>
           sprintf(fmt = "{.field %s}") |>
           paste0(if_else(
             n_na > 0,
-            sprintf(" ({col_yellow('%s NA')})", n_na),
+            sprintf(" ({col_yellow('%s NA')})", n_na |> format_number()),
             ""
           ))
         unused_cols <- sprintf(
@@ -287,7 +284,7 @@ orbi_add_to_aggregator <- function(
 }
 
 # register an aggregator
-#' @describeIn orbi_aggregator register an aggregator in the isoorbi options so it can be retrieved with `orbi_get_aggregator()`
+#' @describeIn orbi_aggregator register an aggregator in the isoorbi options so it can be retrieved with [orbi_get_aggregator()]
 #' @export
 orbi_register_aggregator <- function(
   aggregator,
@@ -310,7 +307,7 @@ orbi_register_aggregator <- function(
 }
 
 # retrieve a registered aggregator
-#' @describeIn orbi_aggregator retrieve a registered aggregator (get all aggregators with `orbi_get_option("aggregators")`
+#' @describeIn orbi_aggregator retrieve a registered aggregator (get all aggregators with `orbi_get_option("aggregators")`)
 #' @export
 orbi_get_aggregator <- function(name) {
   # safety checks
@@ -607,10 +604,7 @@ aggregate_files <- function(
     )
 
   # info
-  n_rows <- map_int(results, nrow) |>
-    prettyunits::pretty_num() |>
-    # take care of leading/trailing whitespaces
-    gsub(pattern = "(^ +| +$)", replacement = "")
+  n_rows <- map_int(results, nrow) |> format_number()
   details <- sprintf("{cli::col_blue('%s')} (%s)", names(results), n_rows) |>
     purrr::map_chr(format_inline)
   new_problems <- results$problems |>
@@ -997,11 +991,7 @@ get_data <- function(
   }
 
   # info
-  n_rows <-
-    purrr::map_int(.ds[names(selectors)], nrow) |>
-    prettyunits::pretty_num() |>
-    # take care of leading/trailing whitespaces
-    gsub(pattern = "(^ +| +$)", replacement = "")
+  n_rows <- purrr::map_int(.ds[names(selectors)], nrow) |> format_number()
 
   details <-
     if (length(selectors) == 1) {
@@ -1013,7 +1003,7 @@ get_data <- function(
 
   # info
   finish_info(
-    "retrieved {prettyunits::pretty_num(nrow(out))} records from ",
+    "retrieved {format_number(nrow(out))} records from ",
     if (length(selectors) > 1) "the combination of ",
     "{details}",
     if (length(selectors) > 1) " via {.field {unique(unlist(join_bys))}}",
