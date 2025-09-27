@@ -41,7 +41,8 @@ orbi_flag_satellite_peaks <- function(dataset) {
   check_tibble(
     peaks,
     c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
-    regexps = TRUE
+    regexps = TRUE,
+    .arg = "dataset"
   )
 
   # info
@@ -160,7 +161,8 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent) {
   check_tibble(
     peaks,
     c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
-    regexps = TRUE
+    regexps = TRUE,
+    .arg = "dataset"
   )
 
   # info
@@ -264,7 +266,8 @@ orbi_get_isotopocule_coverage <- function(dataset) {
   check_tibble(
     peaks,
     c("uidx|filename", "scan.no", "isotopocule", "ions.incremental|intensity"),
-    regexps = TRUE
+    regexps = TRUE,
+    .arg = "dataset"
   )
 
   # y column (only used for filtering)
@@ -431,7 +434,8 @@ orbi_flag_outliers <- function(
   check_tibble(
     scans,
     c("uidx|filename", "scan.no", "tic", "it.ms"),
-    regexps = TRUE
+    regexps = TRUE,
+    .arg = "dataset"
   )
 
   # check filter to apply

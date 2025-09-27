@@ -17,13 +17,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   root_env <- current_env()
 
   # safety checks
-  check_arg(
-    aggregated_data,
-    !missing(aggregated_data) &&
-      (is(aggregated_data, "orbi_aggregated_data") ||
-        is.data.frame(aggregated_data)),
-    "must be a set of aggregated raw files or a data frame of peaks"
-  )
+  check_dataset_arg(dataset)
   check_arg(
     isotopocules,
     !missing(isotopocules) &&
@@ -113,7 +107,8 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   peaks <- if (is_agg) aggregated_data$peaks else aggregated_data
   check_tibble(
     peaks,
-    req_cols = c("uidx", "scan.no", "mzMeasured", "intensity")
+    req_cols = c("uidx", "scan.no", "mzMeasured", "intensity"),
+    .arg = "dataset"
   )
 
   # prepare isotopocules
@@ -301,7 +296,7 @@ orbi_filter_isotopocules <- function(
   peaks <- if (is_agg) dataset$peaks else dataset
 
   # check columns
-  check_tibble(peaks, "isotopocule")
+  check_tibble(peaks, "isotopocule", .arg = "dataset")
 
   # info
   start <- start_info()
@@ -320,7 +315,12 @@ orbi_filter_isotopocules <- function(
 
   # filter out missing?
   if (!keep_missing) {
-    check_tibble(peaks, "ions.incremental|intensity", regexps = TRUE)
+    check_tibble(
+      peaks,
+      "ions.incremental|intensity",
+      regexps = TRUE,
+      .arg = "dataset"
+    )
     y <- names(tidyselect::eval_select(
       any_of(c("ions.incremental", "intensity")),
       peaks
