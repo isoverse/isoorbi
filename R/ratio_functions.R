@@ -1,3 +1,96 @@
+# Functions to calculate ions.incremental -------------
+
+#' Calculate ions from intensities
+#'
+#' This functions calculates ions (`ions.incremental`) from intensities based on the equation \deqn{N_{ions} = S/N \cdot{} C_N/z \cdot{} \sqrt{R_N/R} \cdot \sqrt{N_{MS}}}
+#' where S is the reported signal (`intensity`) of the isotopocule, N is the noise associated with the signal (`peakNoise`),
+#' measured at the resolution setting R (`resolution`), the noise factor \eqn{C_N} (`CN`) is the number of charges corresponding to the Orbitrap noise band
+#' at some reference resolution \eqn{R_N} (`RN`), \eqn{N_{MS}} is the number of microscans, and z is the charge per ion (`charge`) of the isotopocule.
+#' See Makarov and Denisov (2009) and Eiler et al. (2017) for details about this equation. The default values for `CN` and `RN` are from the
+#' Orbitrap Exploris Isotope Solutions Getting Started Guide (BRE0032999, Revision A, October 2022). Note that the exact values of these factors are
+#' only critical if the number of ions are interpreted outside of ratio calculations (in ratio calculations, these factors cancel).
+#'
+#' If using a dataset read from isox files you might have to add a `charge` column if it does not yet exist that indicates the charge of the isotopocule.
+#' If using data from raw files, use [orbi_identify_isotopocules()] to identify the isotopocules and set their charge values.
+#'
+#' @inheritParams orbi_flag_satellite_peaks
+#' @param CN noise factor
+#' @param RN reference resolution of the noise factor
+#' @return same object as provided in `dataset` with new column `ions.incremental`
+orbi_calculate_ions <- function(dataset, CN = 3.0, RN = 240000) {
+  #safety checks
+  check_dataset_arg(dataset)
+  check_arg(CN, is_scalar_double(CN), "must be a single number")
+  check_arg(RN, is_scalar_double(CN), "must be a single number")
+
+  # keep track for later
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  added_scan_cols <- c("resolution", "microscans")
+  peaks <- if (is_agg) {
+    dataset$peaks |>
+      dplyr::left_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            dplyr::any_of(added_scan_cols)
+          ),
+        by = c("uidx", "scan.no")
+      )
+  } else {
+    dataset
+  }
+
+  # check if isotopocules have been identified
+  if (!"isotopocule" %in% names(peaks)) {
+    cli_abort(
+      "this {.field dataset} does not yet have an {.field isotopocule} column, make sure to call {.strong orbi_identify_isotopocules()} first"
+    )
+  }
+
+  # check columns
+  check_tibble(
+    peaks,
+    req_cols = c(
+      "intensity",
+      "peakNoise",
+      "resolution",
+      "charge",
+      "microscans"
+    ),
+    .arg = "dataset"
+  )
+
+  start <- start_info()
+
+  # add ions.incremental
+  peaks <- peaks |>
+    dplyr::mutate(
+      ions.incremental = .data$intensity /
+        .data$peakNoise *
+        !!CN /
+          .data$charge *
+          sqrt(!!RN / .data$resolution) *
+          sqrt(.data$microscans),
+      .after = "intensity"
+    )
+
+  finish_info(
+    "calculated {.field ions.incremental} with noise factor {.field CN} = {.val {CN}} at reference resolution {.field RN} = {.val {RN}}",
+    start = start
+  )
+
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$peaks <- peaks |>
+      dplyr::select(-dplyr::any_of(added_scan_cols))
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(peaks)
+  }
+}
+
 # Functions to calculate direct ratios --------------
 
 #' @title Calculate direct isotopocule ratios
