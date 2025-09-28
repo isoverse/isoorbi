@@ -432,7 +432,7 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 #' and additionally within each "block" and "segment" if `by_block = TRUE`.
 #' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned datasert.
 #'
-#' @inheritParams orib_flat_satellite_peaks
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #' @param agc_fold_cutoff flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, `agc_fold_cutoff = 2` flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #' @param by_block if the `dataset` has block and segment definitions, should the outlier flag be evaluated within each block+segment or globally? default is within each block+segment, switch to globally by turning `by_block = FALSE`
@@ -729,7 +729,7 @@ orbi_filter_flagged_data <- function(dataset) {
 
 #' @title Define the denominator for ratio calculation
 #' @description `orbi_define_basepeak()` sets one isotopocule in the data frame as the base peak (ratio denominator) and calculates the instantaneous isotope ratios against it.
-#' @param dataset A tibble from a `IsoX` output. Needs to contain columns for `filename`, `compound`, `scan.no`, `isotopocule`, and `ions.incremental`.
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param basepeak_def The isotopocule that gets defined as base peak, i.e. the denominator to calculate ratios
 #'
 #' @examples
@@ -738,21 +738,34 @@ orbi_filter_flagged_data <- function(dataset) {
 #'   orbi_simplify_isox() |>
 #'   orbi_define_basepeak(basepeak_def = "M0")
 #'
-#' @returns Input data frame without the rows of the basepeak isotopocule and instead three new columns called `basepeak`, `basepeak_ions`, and `ratio` holding the basepeak information and the isotope ratios vs. the base peak
+#' @returns same object as provided in `dataset` without the rows of the basepeak isotopocule and instead three new columns called `basepeak`, `basepeak_ions`, and `ratio` holding the basepeak information and the isotope ratios vs. the base peak
 #' @export
 orbi_define_basepeak <- function(dataset, basepeak_def) {
   # safety checks
-  ## dataset
+  check_dataset_arg(dataset)
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  peaks <- if (is_agg) dataset$peaks else dataset
+
+  ## columns
   check_tibble(
-    dataset,
-    c(
-      "filename",
-      "compound",
-      "scan.no",
-      "isotopocule",
-      "ions.incremental"
-    )
+    peaks,
+    c("uidx|filename", "scan.no"),
+    regexps = TRUE,
+    .arg = "dataset"
   )
+  if (!"isotopocule" %in% names(peaks)) {
+    # more specialized error message
+    cli_abort(
+      "no {.field isotopocule} column, make sure to run {.strong orbi_identify_isotopocules()} first"
+    )
+  }
+  if (!"ions.incremental" %in% names(peaks)) {
+    # more specialized error message
+    cli_abort(
+      "no {.field ions.incremental} column, make sure to run {.strong orbi_calculate_ions()} first"
+    )
+  }
+
   ## basepeak_def
   check_arg(
     basepeak_def,
@@ -762,67 +775,64 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
       rlang::is_scalar_character(basepeak_def),
     "must be a single text value identifying the isotopocule to use as the basepeak"
   )
-  ## bsepeak_def in isotopocules
-  dataset <- dataset |> factorize_dataset(cols = "isotopocule")
+  ## basepeak_def in isotopocules
+  peaks <- peaks |> factorize_dataset(cols = "isotopocule")
   check_arg(
     basepeak_def,
-    basepeak_def %in%
-      levels(dataset$isotopocule),
+    basepeak_def %in% levels(peaks$isotopocule),
     format_inline(
-      "({.val {basepeak_def}}) is not an isotopocule in the dataset, available: {.val {levels(dataset$isotopocule)}}"
+      "is not an isotopocule in the dataset, available: {.field {levels(peaks$isotopocule)}}"
     ),
     include_type = FALSE
   )
 
-  # ensure factors
-  dataset <- dataset |> factorize_dataset("isotopocule")
-
   # info message
-  start <- start_info("is running")
+  start <- start_info()
 
   # identify `basepeak` for each scan
+  potential_bys <- c("uidx", "filename", "compound", "fragment", "scan.no")
   out <-
     tryCatch(
       {
-        df.out <- dataset |>
-          dplyr::mutate(basepeak = !!basepeak_def) |>
-          dplyr::group_by(.data$filename, .data$compound, .data$scan.no)
-        # add basepeak ions
-        if ("is_satellite_peak" %in% names(dataset)) {
-          # with satellite peak defined
-          df.out <- df.out |>
-            dplyr::mutate(
-              basepeak_ions = .data$ions.incremental[
-                .data$isotopocule == !!basepeak_def & !.data$is_satellite_peak
-              ]
-            )
-        } else {
-          # without satellite peak defined
-          df.out <- df.out |>
-            dplyr::mutate(
-              basepeak_ions = .data$ions.incremental[
-                .data$isotopocule == !!basepeak_def
-              ]
-            )
-        }
-        # return
-        df.out |>
-          dplyr::ungroup()
+        df.out <-
+          # add basepeak ions
+          if ("is_satellite_peak" %in% names(peaks)) {
+            # with satellite peak defined
+            peaks |>
+              dplyr::mutate(basepeak = !!basepeak_def) |>
+              dplyr::mutate(
+                .by = dplyr::any_of(potential_bys),
+                basepeak_ions = .data$ions.incremental[
+                  .data$isotopocule == !!basepeak_def & !.data$is_satellite_peak
+                ]
+              )
+          } else {
+            # without satellite peak defined
+            peaks |>
+              dplyr::mutate(basepeak = !!basepeak_def) |>
+              dplyr::mutate(
+                .by = dplyr::any_of(potential_bys),
+                basepeak_ions = .data$ions.incremental[
+                  .data$isotopocule == !!basepeak_def
+                ]
+              )
+          }
       },
       # error catching
       error = function(p) {
         # analyze scans (is slow so only done if error)
         df_summary <-
-          dataset |>
+          peaks |>
           dplyr::summarize(
             n_bp = sum(.data$isotopocule == !!basepeak_def),
-            .by = c("filename", "compound", "scan.no")
+            .by = dplyr::any_of(potential_bys)
           ) |>
           dplyr::summarize(
             n_scans = dplyr::n(),
             n_too_few = sum(.data$n_bp == 0L),
             n_too_many = sum(.data$n_bp > 1L),
-            .by = c("filename", "compound")
+            # minuse scan number
+            .by = dplyr::any_of(setdiff(potential_bys, "scan.no")),
           )
 
         # check abundances
@@ -831,9 +841,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
         too_few_bps <- df_summary |>
           dplyr::filter(.data$n_too_few > 0)
 
-        if (
-          nrow(too_many_bps) > 0 && !"is_satellite_peak" %in% names(dataset)
-        ) {
+        if (nrow(too_many_bps) > 0 && !"is_satellite_peak" %in% names(peaks)) {
           # too many base peaks
           cli_abort(
             "the {.field {basepeak_def}} isotopocule exists multiple times in some scans, make sure to run {.strong orbi_flag_satellite_peaks()} first",
@@ -857,7 +865,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
             paste(collapse = "\n - ")
           abort(
             format_inline(
-              "the {.field {basepeak_def}} isotopocule does not exist in some scans, consider using {.strong orbi_filter_isox()} to focus on specific file(s) and/or compound(s): \n - {info}"
+              "the {.field {basepeak_def}} isotopocule does not exist in some scans, consider using {.strong orbi_filter_files()} to focus on specific file(s) and/or compound(s): \n - {info}"
             ),
             parent = p,
             call = expr(mutate())
@@ -910,9 +918,11 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   # info message
   finish_info(
     "set {.field {basepeak_def}} as the ratio denominator ",
-    if (is.data.frame(df.out)) "and calculated {nrow(df.out)} ratios ",
+    if (is.data.frame(df.out)) {
+      "and calculated {format_number(nrow(df.out))} {.field ratio} values "
+    },
     if (is.data.frame(df.out) && "isotopocule" %in% names(df.out)) {
-      "for {length(levels(df.out$isotopocule))} isotopocules/base peak ({.field {levels(df.out$isotopocule)}})"
+      "for {length(levels(df.out$isotopocule))} isotopocules ({.field {levels(df.out$isotopocule)}})"
     },
     start = start,
     conditions = out$conditions,
@@ -921,5 +931,12 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   )
 
   # return
-  return(df.out)
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$peaks <- df.out
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(df.out)
+  }
 }
