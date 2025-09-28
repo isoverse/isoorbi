@@ -4,26 +4,47 @@
 #'
 #' @title Shot noise calculation
 #' @description This function computes the shot noise calculation.
-#' @param dataset a data frame output after running `orbi_define_basepeak()`
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param include_flagged_data whether to include flagged data in the shot noise calculation (FALSE by default)
 #' @return The processed data frame with new columns: `n_effective_ions`, `ratio`, `ratio_rel_se.permil`, `shot_noise.permil`
 #' @export
 orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
   # safety checks
+  check_dataset_arg(dataset)
+  dataset <- if (is(dataset, "orbi_aggregated_data")) {
+    # make sure we don't interpret unidentified and missing peaks
+    dataset <- orbi_filter_isotopocules(dataset) |> suppressMessages()
+    dataset$file_info |>
+      dplyr::select("uidx", "filename") |>
+      right_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            "time.min",
+            dplyr::any_of("is_outlier")
+          ),
+        by = "uidx"
+      ) |>
+      right_join(dataset$peaks, by = c("uidx", "scan.no"))
+  } else {
+    dataset
+  }
   check_arg(
     dataset,
-    !missing(dataset) && is.data.frame(dataset),
-    "must be a data frame or tibble"
+    "basepeak_ions" %in% names(dataset),
+    "requires defined basepeak (column {.field basepeak_ions}), make sure to run {.strong orbi_define_basepeak()} first"
   )
-  check_tibble(dataset, req_cols = c("filename", "compound", "isotopocule"))
-
-  stopifnot(
-    "need a `dataset` data frame" = !missing(dataset) && is.data.frame(dataset),
-    "`dataset` requires columns `filename`, `compound` and `isotopocule`" = all(
-      c("filename", "compound", "isotopocule") %in% names(dataset)
+  check_tibble(
+    dataset,
+    req_cols = c(
+      "uidx|filename",
+      "isotopocule",
+      "ions.incremental",
+      "basepeak_ions",
+      "ratio"
     ),
-    "`dataset` requires defined basepeak (column `basepeak_ions`), make sure to run `orbi_define_basepeak()` first" = "basepeak_ions" %in%
-      names(dataset)
+    regexps = TRUE
   )
 
   # filter flagged data
@@ -36,6 +57,19 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
 
   # info message
   start <- start_info("is running")
+  order_cols <- tidyselect::eval_select(
+    any_of(c(
+      "uidx",
+      "filename",
+      "itc_uidx",
+      "compound",
+      "fragment",
+      "isotopocule",
+      "scan.no"
+    )),
+    dataset
+  ) |>
+    names()
 
   # calculation
   out <-
@@ -43,15 +77,17 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
     # preserve original row order
     dplyr::mutate(..idx = dplyr::row_number()) |>
     # make sure order is compatible with cumsum based calculations
-    dplyr::arrange(
-      .data$filename,
-      .data$compound,
-      .data$isotopocule,
-      .data$scan.no
-    ) |>
+    dplyr::arrange(!!!purrr::map(order_cols, sym)) |>
     dplyr::mutate(
       # group by filename, compound, isotopocule.
-      .by = c("filename", "compound", "isotopocule"),
+      .by = dplyr::any_of(c(
+        "uidx",
+        "filename",
+        "itc_uidx",
+        "compound",
+        "fragment",
+        "isotopocule"
+      )),
       # cumulative ions
       n_isotopocule_ions = cumsum(.data$ions.incremental),
       n_basepeak_ions = cumsum(.data$basepeak_ions),
@@ -94,11 +130,11 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
 
   # info
   finish_info(
-    "analyzed the shot noise for {if (include_flagged_data) n_all else n_after} peaks (",
+    "analyzed the shot noise for {if (include_flagged_data) format_number(n_all) else format_number(n_after)} {.field ratios} (",
     if (n_all == n_after) {
       "there are no flagged peaks)"
     } else {
-      "{if (include_flagged_data) 'including' else 'excluding'} {n_all - n_after} flagged peaks)"
+      "{if (include_flagged_data) 'including' else 'excluding'} {format_number(n_all - n_after)} flagged peaks)"
     },
     start = start
   )
