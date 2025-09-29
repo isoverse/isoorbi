@@ -373,14 +373,14 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       .by = dplyr::all_of(c(by_cols, "data_stretch")),
       n_points = dplyr::n(),
       start_scan.no = .data$scan.no[1],
-      end_scan.no = tail(.data$scan.no, 1),
+      end_scan.no = utils::tail(.data$scan.no, 1),
       start_time.min = if ("time.min" %in% names(peaks)) {
         .data$time.min[1]
       } else {
         list(NULL)
       },
       end_time.min = if ("time.min" %in% names(peaks)) {
-        tail(.data$time.min, 1)
+        utils::tail(.data$time.min, 1)
       } else {
         list(NULL)
       }

@@ -119,7 +119,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     dplyr::mutate(itc_uidx = dplyr::row_number(), .before = "isotopocule") |>
     dplyr::mutate(
       # if tolerance is > 0.1, then it must be in mDa (otherwise it would be a 100 mDa tolerance which is meaningless)
-      tolerance = if (median(.data$tolerance) > 0.1) {
+      tolerance = if (stats::median(.data$tolerance) > 0.1) {
         0.001 * .data$tolerance
       } else {
         .data$tolerance
