@@ -125,7 +125,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 
 #' Flag weak isotopocules
 #'
-#' This function flags isotopocules that are not detected in a minimum of `min_percent` of scans that then can be easily visualized with [orbi_plot_coverage()].
+#' This function flags isotopocules that are not detected in a minimum of `min_percent` of scans that then can be easily visualized with [orbi_plot_isotopocule_coverage()].
 #' It evaluates weak isotopocules within each "uidx", "filename", "block", "segment" and "injection" (for those of the columns that exist),
 #' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data.
 #'
