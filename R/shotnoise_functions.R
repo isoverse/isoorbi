@@ -11,25 +11,31 @@
 orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
   # safety checks
   check_dataset_arg(dataset)
-  dataset <- if (is(dataset, "orbi_aggregated_data")) {
-    # make sure we don't interpret unidentified and missing peaks
+
+  # make sure we don't interpret unidentified and missing peaks
+  if (is(dataset, "orbi_aggregated_data")) {
     dataset <- orbi_filter_isotopocules(dataset) |> suppressMessages()
-    dataset$file_info |>
-      dplyr::select("uidx", "filename") |>
-      right_join(
-        dataset$scans |>
-          dplyr::select(
-            "uidx",
-            "scan.no",
-            "time.min",
-            dplyr::any_of("is_outlier")
-          ),
-        by = "uidx"
-      ) |>
-      right_join(dataset$peaks, by = c("uidx", "scan.no"))
-  } else {
-    dataset
   }
+
+  # pull datasets
+  dataset <-
+    if (is(dataset, "orbi_aggregated_data")) {
+      dataset$file_info |>
+        dplyr::select("uidx", "filename") |>
+        right_join(
+          dataset$scans |>
+            dplyr::select(
+              "uidx",
+              "scan.no",
+              "time.min",
+              dplyr::any_of("is_outlier")
+            ),
+          by = "uidx"
+        ) |>
+        right_join(dataset$peaks, by = c("uidx", "scan.no"))
+    } else {
+      dataset
+    }
   check_arg(
     dataset,
     "basepeak_ions" %in% names(dataset),
