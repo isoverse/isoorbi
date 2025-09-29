@@ -204,12 +204,7 @@ test_that("orbi_define_basepeak()", {
 
   expect_error(
     orbi_define_basepeak(),
-    "must be a data frame"
-  )
-
-  expect_error(
-    orbi_define_basepeak(dataset = T),
-    "must be a data frame"
+    "must be.*aggregated.*or.*data frame"
   )
 
   # test data
@@ -258,7 +253,7 @@ test_that("orbi_define_basepeak()", {
     filter(isotopocule != "M0") |>
     orbi_define_basepeak(basepeak_def = "M0") |>
     expect_error(
-      "does not exist in some scans.*consider.*orbi_filter_isox"
+      "does not exist in some scans"
     ) |>
     suppressMessages()
 

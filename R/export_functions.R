@@ -1,6 +1,7 @@
 #' @title Export data to excel
 #' @description This functions exports the `dataset` into an Excel file. If the `dataset` is aggregated data, use the `include` parameter to decide which part of the data to export.
 #' @inheritParams orbi_flag_satellite_peaks
+#' @inheritParams orbi_aggregate_raw
 #' @param file file path to export the file
 #' @param dbl_digits how many digits to show for dbls (all are exported)
 #' @param int_format the excel formatting style for integers
@@ -14,7 +15,8 @@ orbi_export_data_to_excel <- function(
   dbl_digits = 7,
   int_format = "0",
   dbl_format = sprintf(sprintf("%%.%sf", dbl_digits), 0),
-  include = c("file_info", "summary", "scans", "peaks", "problems")
+  include = c("file_info", "summary", "scans", "peaks", "problems"),
+  show_progress = rlang::is_interactive()
 ) {
   # check for availability
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
@@ -51,7 +53,14 @@ orbi_export_data_to_excel <- function(
     info <- c()
     for (sheet in sheets) {
       # progress
-      cli_progress_update(id = start$pb, inc = 0, status = sheet, force = TRUE)
+      if (show_progress) {
+        cli_progress_update(
+          id = start$pb,
+          inc = 0,
+          status = sheet,
+          force = TRUE
+        )
+      }
       # info
       info <- c(
         info,
@@ -95,7 +104,9 @@ orbi_export_data_to_excel <- function(
   }
 
   # save workbook
-  cli_progress_update(id = start$pb, inc = 0, status = "file", force = TRUE)
+  if (show_progress) {
+    cli_progress_update(id = start$pb, inc = 0, status = "file", force = TRUE)
+  }
   openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   # info

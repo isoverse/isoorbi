@@ -29,6 +29,7 @@
        > filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
       fixed = TRUE))
        > creation_date = as.POSIXct(CreationDate)
+       > in_aquisition = as.logical(InAquisition)
       Dataset scans:
        > scan.no = as.integer(scan.no)
        > time.min = as.numeric(StartTime)
@@ -57,6 +58,7 @@
        > filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
       fixed = TRUE))
        > creation_date = as.POSIXct(CreationDate)
+       > in_aquisition = as.logical(InAquisition)
        > (.*) = as.character(all_matches("(.*)"))
       Dataset scans:
        > scan.no = as.integer(scan.no)
@@ -97,6 +99,7 @@
        > filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
       fixed = TRUE))
        > creation_date = as.POSIXct(CreationDate)
+       > in_aquisition = as.logical(InAquisition)
        > (.*) = as.character(all_matches("(.*)"))
       Dataset scans:
        > scan.no = as.integer(scan.no)
@@ -177,6 +180,7 @@
        → [32mfilename[39m = [3mas.character(sub(FileName, pattern = ".raw", replacement = "",[23m
       [3mfixed = TRUE))[23m
        → [32mcreation_date[39m = [3mas.POSIXct(CreationDate)[23m
+       → [32min_aquisition[39m = [3mas.logical(InAquisition)[23m
       [1mDataset[22m [34mscans[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mtime.min[39m = [3mas.numeric(StartTime)[23m
@@ -205,6 +209,7 @@
        → [32mfilename[39m = [3mas.character(sub(FileName, pattern = ".raw", replacement = "",[23m
       [3mfixed = TRUE))[23m
        → [32mcreation_date[39m = [3mas.POSIXct(CreationDate)[23m
+       → [32min_aquisition[39m = [3mas.logical(InAquisition)[23m
        → [35m(.*)[39m = [3mas.character(all_matches("(.*)"))[23m
       [1mDataset[22m [34mscans[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
@@ -245,6 +250,7 @@
        → [32mfilename[39m = [3mas.character(sub(FileName, pattern = ".raw", replacement = "",[23m
       [3mfixed = TRUE))[23m
        → [32mcreation_date[39m = [3mas.POSIXct(CreationDate)[23m
+       → [32min_aquisition[39m = [3mas.logical(InAquisition)[23m
        → [35m(.*)[39m = [3mas.character(all_matches("(.*)"))[23m
       [1mDataset[22m [34mscans[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m

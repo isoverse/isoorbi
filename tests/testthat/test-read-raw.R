@@ -80,33 +80,26 @@ test_that("orbi_read_raw()", {
     suppressMessages()
 
   # succesful read without spectra (default)
-  expect_snapshot(
-    {
+  test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
+    expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw() |>
         # read without spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE)
-      x |> as_tibble() |> select(-"filepath")
-    }
-  )
-  test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
-    expect_snapshot(x)
+    )
+    expect_snaptho(x)
   })
 
   # plus aggregate and get
-  expect_snapshot({
-    y <- orbi_aggregate_raw(x)
-    y |> as_list()
-  })
   test_that_cli("orbi_aggregate_raw()", configs = c("plain", "fancy"), {
-    expect_snapshot(y)
-  })
-  y$file_info$file_path <- NULL # OS dependent
-  y$file_info$`Creation date` <- NULL # OS dependent
-  test_that_cli("orbi_get_data()", configs = c("plain", "fancy"), {
+    expect_snapshot(y <- orbi_aggregate_raw(x))
+    expect_snaptho(y)
+    y$file_info$file_path <- NULL # OS dependent
+    y$file_info$`Creation date` <- NULL # OS dependent
     expect_snapshot(
       out <- y |> orbi_get_data(scans = everything(), spectra = everything())
     )
+    expect_snapshot_value(out, style = "json2")
   })
 
   # succesful read with spectra
@@ -129,6 +122,7 @@ test_that("orbi_read_raw()", {
     y <- orbi_aggregate_raw(x, aggregator = "minimal")
     expect_snapshot(y)
   })
+  y <- orbi_aggregate_raw(x, aggregator = "minimal") |> suppressMessages()
   y$file_info$file_path <- NULL # OS dependent
   y$file_info$`Creation date` <- NULL # OS dependent
 

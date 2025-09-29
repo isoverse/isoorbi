@@ -1,9 +1,9 @@
-# filter_isotopocules
+# orbi_filter_isotopocules
 
-test_that("filter_isotopocules() tests", {
+test_that("orbi_filter_isotopocules() tests", {
   # failure
   expect_error(
-    filter_isotopocules(),
+    orbi_filter_isotopocules(),
     "argument \"dataset\" is missing, with no default",
     fixed = TRUE
   )
@@ -17,18 +17,18 @@ test_that("filter_isotopocules() tests", {
     suppressMessages()
 
   expect_error(
-    filter_isotopocules(df),
+    orbi_filter_isotopocules(df),
     "argument \"isotopocules\" is missing, with no default",
     fixed = TRUE
   )
 
   suppressWarnings(expect_error(
-    filter_isotopocules(df, isotopocules = "M0"),
+    orbi_filter_isotopocules(df, isotopocules = "M0"),
     "none of the provided.*isotopocules.*are in the dataset"
   ))
 
   # success
-  expect_true(is.tbl(filter_isotopocules(df, isotopocules = "17O")))
+  expect_true(is.tbl(orbi_filter_isotopocules(df, isotopocules = "17O")))
 })
 
 # dynamic_y_scale

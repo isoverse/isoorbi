@@ -39,7 +39,10 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
   check_arg(
     dataset,
     "basepeak_ions" %in% names(dataset),
-    "requires defined basepeak (column {.field basepeak_ions}), make sure to run {.strong orbi_define_basepeak()} first"
+    format_inline(
+      "requires defined basepeak (column {.field basepeak_ions}), make sure to run {.strong orbi_define_basepeak()} first"
+    ),
+    include_type = FALSE
   )
   check_tibble(
     dataset,
