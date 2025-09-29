@@ -18,7 +18,7 @@ orbi_check_isoraw <- function(
   install_if_missing = TRUE,
   reinstall_if_outdated = TRUE,
   reinstall_always = FALSE,
-  min_version = "0.2.0",
+  min_version = "0.2.2",
   source = paste0(
     "https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version
