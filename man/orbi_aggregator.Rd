@@ -58,8 +58,8 @@ These functions allow definition of custom data aggregators for processing data 
 
 \item \code{orbi_add_to_aggregator()}: add additional column to aggregate data for. Overwrites an existing aggregator entry for the same dataset and column if it already exists.
 
-\item \code{orbi_register_aggregator()}: register an aggregator in the isoorbi options so it can be retrieved with \code{orbi_get_aggregator()}
+\item \code{orbi_register_aggregator()}: register an aggregator in the isoorbi options so it can be retrieved with \code{\link[=orbi_get_aggregator]{orbi_get_aggregator()}}
 
-\item \code{orbi_get_aggregator()}: retrieve a registered aggregator (get all aggregators with \code{orbi_get_option("aggregators")}
+\item \code{orbi_get_aggregator()}: retrieve a registered aggregator (get all aggregators with \code{orbi_get_option("aggregators")})
 
 }}

@@ -48,6 +48,7 @@ vignettes/**/*.pdf
 # Auxiliary package files
 tmp/
 docs/
+plots/
 *.parquet
 *.zip
 *.log

@@ -2,45 +2,14 @@
 % Please edit documentation in R/read_isox.R
 \name{orbi_filter_isox}
 \alias{orbi_filter_isox}
-\title{Basic generic filter for IsoX data}
+\title{Filter isox files}
 \usage{
-orbi_filter_isox(
-  dataset,
-  filenames = NULL,
-  compounds = NULL,
-  isotopocules = NULL,
-  time_min = NULL,
-  time_max = NULL
-)
+orbi_filter_isox(...)
 }
 \arguments{
-\item{dataset}{The IsoX data to be filtered}
-
-\item{filenames}{Vector of file names to keep, keeps all if set to \code{NULL} (the default)}
-
-\item{compounds}{Vector of compounds to keep, keeps all if set to \code{NULL} (the default)}
-
-\item{isotopocules}{Vector of isotopocules to keep, keeps all if set to \code{NULL} (the default)}
-
-\item{time_min}{Minimum retention time in minutes (\code{time.min}), no minimum if set to \code{NULL} (the default)}
-
-\item{time_max}{Maximum retention time in minutes (\code{time.min}), no maximum if set to \code{NULL} (the default)}
-}
-\value{
-Filtered tibble
+\item{...}{arguments passed on to \code{\link[=orbi_filter_files]{orbi_filter_files()}}}
 }
 \description{
-A basic filter function \code{orbi_filter_isox()} for file names, isotopocules, compounds and time ranges. Default value for all parameters is NULL, i.e. no filter is applied.
-}
-\examples{
-fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-df <-
-  orbi_read_isox(file = fpath) |>
-  orbi_simplify_isox() |>
-  orbi_filter_isox(
-    filenames = c("s3744"),
-    compounds = "HSO4-",
-    isotopocules = c("M0", "34S", "18O")
-  )
-
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+\code{\link[=orbi_filter_isox]{orbi_filter_isox()}} was renamed \code{\link[=orbi_filter_files]{orbi_filter_files()}} to incorporate its wider scope for filtering both isox and raw files data.
 }

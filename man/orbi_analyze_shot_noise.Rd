@@ -7,7 +7,7 @@
 orbi_analyze_shot_noise(dataset, include_flagged_data = FALSE)
 }
 \arguments{
-\item{dataset}{a data frame output after running \code{orbi_define_basepeak()}}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{include_flagged_data}{whether to include flagged data in the shot noise calculation (FALSE by default)}
 }

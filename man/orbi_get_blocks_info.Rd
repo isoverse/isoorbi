@@ -6,12 +6,12 @@
 \usage{
 orbi_get_blocks_info(
   dataset,
-  .by = c("filename", "injection", "data_group", "block", "sample_name", "data_type",
-    "segment")
+  .by = c("uidx", "filename", "injection", "data_group", "block", "sample_name",
+    "data_type", "segment")
 )
 }
 \arguments{
-\item{dataset}{tibble produced by \code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}}}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{.by}{grouping columns for block info (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset.}
 }

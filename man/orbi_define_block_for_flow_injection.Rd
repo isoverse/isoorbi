@@ -14,7 +14,7 @@ orbi_define_block_for_flow_injection(
 )
 }
 \arguments{
-\item{dataset}{tibble with Orbitrap data}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{start_time.min}{set the start time of the block}
 

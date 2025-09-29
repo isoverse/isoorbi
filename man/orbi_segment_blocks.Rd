@@ -12,7 +12,7 @@ orbi_segment_blocks(
 )
 }
 \arguments{
-\item{dataset}{tibble produced by \code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}}}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{into_segments}{segment each data block into this many segments. The result will have exactly this number of segments for each data block except for if there are more segments requested than observations in a group (in which case each observation will be one segment)}
 

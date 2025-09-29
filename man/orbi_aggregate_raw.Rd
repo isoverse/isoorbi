@@ -12,7 +12,7 @@ orbi_aggregate_raw(
 )
 }
 \arguments{
-\item{files_data}{the files read in by orbi_read_raw}
+\item{files_data}{the files read in by \code{\link[=orbi_read_raw]{orbi_read_raw()}}}
 
 \item{aggregator}{typically the name of a registered aggregator (see all with \code{orbi_get_option("aggregators")}),
 default is the "standard" aggregator included in the package (\code{orbi_get_aggregator("standard")}).
@@ -28,5 +28,5 @@ and/or \code{\link[=orbi_add_to_aggregator]{orbi_add_to_aggregator()}}) that def
 a list of merged dataframes collected from the \code{files_data} based on the \code{aggregator} definitions
 }
 \description{
-This function allows dynamic aggregation and validation of data read by \code{orbi_read_raw}. Like \code{\link[=orbi_read_raw]{orbi_read_raw()}}, it is designed to be fail save by safely catching errors and reporting back on them (see \code{\link[=orbi_get_problems]{orbi_get_problems()}}). This function should work out of the box for most files without additional modification of the \code{aggregator}.
+This function allows dynamic aggregation and validation of data read by \code{\link[=orbi_read_raw]{orbi_read_raw()}}. Like \code{\link[=orbi_read_raw]{orbi_read_raw()}}, it is designed to be fail save by safely catching errors and reporting back on them (see \code{\link[=orbi_get_problems]{orbi_get_problems()}}). This function should work out of the box for most files without additional modification of the \code{aggregator}.
 }
