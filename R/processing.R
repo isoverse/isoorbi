@@ -306,7 +306,6 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       "uidx",
       "filename",
       "scan.no",
-      "time.min",
       "isotopocule",
       "ions.incremental|intensity"
     ),
