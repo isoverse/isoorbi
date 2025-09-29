@@ -16,6 +16,7 @@
 #' @inheritParams orbi_flag_satellite_peaks
 #' @param CN noise factor
 #' @param RN reference resolution of the noise factor
+#' @export
 #' @return same object as provided in `dataset` with new column `ions.incremental`
 orbi_calculate_ions <- function(dataset, CN = 3.0, RN = 240000) {
   #safety checks
