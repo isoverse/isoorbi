@@ -1,7 +1,7 @@
 ---
 title: "Dual Inlet"
 description: >
-  A minimal example for processing .isox data from a dual inlet experiments
+  A minimal example for processing .raw data files from a dual inlet experiment
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Dual Inlet}
@@ -10,6 +10,8 @@ vignette: >
 editor_options: 
   chunk_output_type: console
 ---
+
+> This is a minimal example for processing .raw data files from a dual inlet experiment
 
 ```{r, include=FALSE}
 # default chunk options
@@ -27,34 +29,7 @@ library(dplyr) # for mutating data frames
 library(ggplot2) # for data visualization
 ```
 
-# A basic data processing example
-
-## Using isox files (obsolete)
-
-This is how these files were used to be read. Now wer recommend reading raw files directly (see next section).
-
-```{r}
-#| eval: false
-# Read .isox test data
-df <- 
-  system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi") |>
-  # reads .isox test data
-  orbi_read_isox() |> 
-  # optionally: keeps only most important columns; equivalent to simplify check box in IsoX
-  orbi_simplify_isox() |> 
-  # check for issues
-  # removes minor signals that were reported by IsoX in the same tolerance window where the peak of interest is
-  orbi_flag_satellite_peaks() |> 
-  # removes signals of isotopocules that were not detected at least in min_percent scans
-  orbi_flag_weak_isotopocules(min_percent = 100) |> 
-  # removes outlying scans that have more than 2 times or less than 1/2 times the average
-  # number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)
-  orbi_flag_outliers(agc_fold_cutoff = 2) |>
-  # sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation
-  orbi_define_basepeak(basepeak_def = "M0") 
-```
-
-## Using raw files (recommended)
+# Load raw file(s)
 
 ```{r}
 # Read .raw file test data
@@ -78,8 +53,12 @@ data_all <- data_all |>
   orbi_filter_isotopocules() |>
   # calculate ions
   orbi_calculate_ions()
+```
 
-# Process data (this is the same as with an isox file)
+# Preprocess data
+
+```{r}
+# Preprocess data (this is exactly the same as with an isox file)
 df <- 
   data_all |>
   # check for issues
