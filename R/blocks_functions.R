@@ -977,13 +977,13 @@ orbi_segment_blocks <- function(
   )
 
   # combine with the whole dataset
-  updated_scans <-
+  scans <-
     scans |>
     dplyr::select(
       -"block",
       -"sample_name",
       -"data_type",
-      -dplyr::any_of(c("data_group", "segement"))
+      -dplyr::any_of(c("data_group", "segment"))
     ) |>
     dplyr::left_join(
       segmented_scans |>
@@ -998,8 +998,6 @@ orbi_segment_blocks <- function(
         ),
       by = c(by_cols, "scan.no")
     )
-
-  # return new dataset
 
   # return updated dataset
   if (is_agg) {
