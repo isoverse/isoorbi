@@ -303,8 +303,7 @@ orbi_get_isotopocule_coverage <- function(dataset) {
   check_tibble(
     peaks,
     c(
-      "uidx",
-      "filename",
+      "uidx|filename",
       "scan.no",
       "isotopocule",
       "ions.incremental|intensity"
