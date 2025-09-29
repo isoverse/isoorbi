@@ -286,27 +286,27 @@
       > scans (3): uidx, scan.no, tic, it.ms
       > peaks (14): uidx, scan.no, tic (2 NA), it.ms (2 NA), mzMeasured (2 NA),
       intensity (2 NA), compound (1 NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact
-      (1 NA), charge (1 NA), max.scans, obs.scans, is_weak_isotopocule
+      (1 NA), charge (1 NA), is_weak_isotopocule
 
 ---
 
     {
       "type": "list",
       "attributes": {
-        "class": {
+        "names": {
           "type": "character",
           "attributes": {},
-          "value": ["tbl_df", "tbl", "data.frame"]
+          "value": ["uidx", "scan.no", "tic", "it.ms", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge", "is_weak_isotopocule"]
         },
         "row.names": {
           "type": "integer",
           "attributes": {},
           "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
         },
-        "names": {
+        "class": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "tic", "it.ms", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge", "max.scans", "obs.scans", "is_weak_isotopocule"]
+          "value": ["tbl_df", "tbl", "data.frame"]
         }
       },
       "value": [
@@ -386,16 +386,6 @@
           "type": "double",
           "attributes": {},
           "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
-        },
-        {
-          "type": "integer",
-          "attributes": {},
-          "value": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1]
-        },
-        {
-          "type": "integer",
-          "attributes": {},
-          "value": [2, 3, 3, 2, 2, 3, 3, 3, 2, 2, 3, 3, 2, 0]
         },
         {
           "type": "logical",
@@ -444,27 +434,27 @@
       → [34mscans[39m (3): [32muidx[39m, [32mscan.no[39m, [32mtic[39m, [32mit.ms[39m
       → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mtic[39m ([33m2 NA[39m), [32mit.ms[39m ([33m2 NA[39m), [32mmzMeasured[39m ([33m2 NA[39m),
       [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1 NA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m
-      ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m), [32mmax.scans[39m, [32mobs.scans[39m, [32mis_weak_isotopocule[39m
+      ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m), [32mis_weak_isotopocule[39m
 
 ---
 
     {
       "type": "list",
       "attributes": {
-        "class": {
+        "names": {
           "type": "character",
           "attributes": {},
-          "value": ["tbl_df", "tbl", "data.frame"]
+          "value": ["uidx", "scan.no", "tic", "it.ms", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge", "is_weak_isotopocule"]
         },
         "row.names": {
           "type": "integer",
           "attributes": {},
           "value": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
         },
-        "names": {
+        "class": {
           "type": "character",
           "attributes": {},
-          "value": ["uidx", "scan.no", "tic", "it.ms", "mzMeasured", "intensity", "compound", "itc_uidx", "isotopocule", "mzExact", "charge", "max.scans", "obs.scans", "is_weak_isotopocule"]
+          "value": ["tbl_df", "tbl", "data.frame"]
         }
       },
       "value": [
@@ -544,16 +534,6 @@
           "type": "double",
           "attributes": {},
           "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
-        },
-        {
-          "type": "integer",
-          "attributes": {},
-          "value": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1]
-        },
-        {
-          "type": "integer",
-          "attributes": {},
-          "value": [2, 3, 3, 2, 2, 3, 3, 3, 2, 2, 3, 3, 2, 0]
         },
         {
           "type": "logical",
@@ -801,16 +781,16 @@
     Code
       out <- orbi_define_basepeak(dataset = df, basepeak_def = "M0")
     Message
-      v orbi_define_basepeak() set M0 as the ratio denominator and calculated 8
-      ratios for 4 isotopocules/base peak (17O, 18O, 33S, and 34S)
+      v orbi_define_basepeak() set M0 as the ratio denominator and calculated 8 ratio
+      values for 4 isotopocules (17O, 18O, 33S, and 34S)
 
 # orbi_define_basepeak() [fancy]
 
     Code
       out <- orbi_define_basepeak(dataset = df, basepeak_def = "M0")
     Message
-      [32m✔[39m [1morbi_define_basepeak()[22m set [32mM0[39m as the ratio denominator and calculated 8
-      ratios for 4 isotopocules/base peak ([32m17O[39m, [32m18O[39m, [32m33S[39m, and [32m34S[39m)
+      [32m✔[39m [1morbi_define_basepeak()[22m set [32mM0[39m as the ratio denominator and calculated 8 [32mratio[39m
+      values for 4 isotopocules ([32m17O[39m, [32m18O[39m, [32m33S[39m, and [32m34S[39m)
 
 ---
 
@@ -848,5 +828,5 @@
         "M0", "M0", "M0", "M0", "M0", "M0"), basepeak_ions = c(37803.21416102, 
         37803.21416102, 37803.21416102, 37803.21416102, 42345.74271468, 
         42345.74271468, 42345.74271468, 42345.74271468)), row.names = c(NA, 
-    -8L), class = c("tbl_df", "tbl", "data.frame"))
+    -8L), class = "data.frame")
 
