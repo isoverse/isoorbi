@@ -6,12 +6,13 @@
 \usage{
 orbi_get_data(
   aggregated_data,
-  file_info = NULL,
+  file_info = c("filename"),
   scans = NULL,
   peaks = NULL,
   spectra = NULL,
   problems = NULL,
-  by = c("uid", "scan")
+  summary = NULL,
+  by = c("uidx", "scan.no")
 )
 }
 \arguments{
@@ -27,7 +28,9 @@ orbi_get_data(
 
 \item{problems}{columns to get from the aggregated \code{problems}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
-\item{by}{which columns to look for when joining datasets together. Make sure to include the relevant \code{by} columns in the selections of the individual datasets so they are joined correctly.}
+\item{summary}{columns to get from the \code{summary} calculated via \code{\link[=orbi_summarize_results]{orbi_summarize_results()}}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported. Warning: it is not advisable to combine columns from \code{summary} with anything other than \code{file_info} as it will lead to duplicated datasets given that \code{summary} integrates across multiple scans.}
+
+\item{by}{which columns to look for when joining datasets together. Make sure to include the relevant \code{by} columns in the selections of the individual datasets so they are joined correctly. The default is usually sufficient}
 }
 \value{
 a tibble

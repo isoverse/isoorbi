@@ -9,7 +9,7 @@ orbi_find_raw(folder, include_cache = TRUE, recursive = TRUE)
 \arguments{
 \item{folder}{path to a folder with raw files}
 
-\item{include_cache}{whether to include .raw.cache folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files}
+\item{include_cache}{whether to include .raw.cache.zip folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files}
 
 \item{recursive}{whether to find files recursively}
 }

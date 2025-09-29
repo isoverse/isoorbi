@@ -21,7 +21,6 @@ test_that("orbi_get_problems()", {
   expect_equal(
     orbi_get_problems(test),
     tibble(
-      uid = factor(NA_character_),
       type = c("warning", "error"),
       call = NA_character_,
       message = NA_character_,
@@ -41,7 +40,6 @@ test_that("orbi_get_problems()", {
   expect_equal(
     orbi_get_problems(test),
     tibble(
-      uid = factor(NA_character_),
       type = c("warning", "error"),
       call = NA_character_,
       message = NA_character_,
@@ -54,7 +52,6 @@ test_that("orbi_get_problems()", {
   expect_equal(
     orbi_get_problems(test),
     tibble(
-      uid = factor(NA_character_),
       type = c("warning", "error", NA),
       call = NA_character_,
       message = c(NA, NA, "other"),

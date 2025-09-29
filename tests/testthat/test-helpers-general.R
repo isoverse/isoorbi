@@ -43,10 +43,13 @@ test_that("check_arg()", {
 test_that("check_tibble()", {
   # errors
   test <- function(my_df) check_tibble(my_df, c("dne"))
-  expect_error(test(), "my_df.*must be a data frame.*not missing")
-  expect_error(test(42), "my_df.*must be a data frame.*not a number")
-  test <- function(my_df) check_tibble(my_df, c("dne", "dne2"))
-  expect_error(test(mtcars), "dne2.*are missing")
+  test() |> expect_error("my_df.*must be a data frame.*not missing")
+  test(42) |> expect_error("my_df.*must be a data frame.*not a number")
+  check_tibble(mtcars, c("dne", "dne2")) |> expect_error("dne2.*are missing")
+  check_tibble(mtcars, c("mpg", "disp")) |> expect_silent()
+  check_tibble(mtcars, c("mpg", "dne|disp")) |>
+    expect_error("dne\\|disp.*missing")
+  check_tibble(mtcars, c("mpg", "dne|disp"), regexps = TRUE) |> expect_silent()
 })
 
 # start_info() / finish_info() ================

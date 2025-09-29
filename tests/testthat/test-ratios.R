@@ -358,7 +358,8 @@ test_that("orbi_summarize_results()", {
     suppressMessages()
 
   # errors
-  orbi_summarize_results() |> expect_error("must be a data frame")
+  orbi_summarize_results() |>
+    expect_error("must be.*aggregated.*or.*data frame")
   orbi_summarize_results(df) |> expect_error("must be a valid method")
   orbi_summarize_results(df, "foo") |>
     expect_error(

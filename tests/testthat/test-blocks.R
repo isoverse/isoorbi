@@ -2,11 +2,7 @@ test_that("test orbi_define_block_for_flow_injection()", {
   # type checks
   expect_error(
     orbi_define_block_for_flow_injection(),
-    "`dataset` must be a data frame or tibble"
-  )
-  expect_error(
-    orbi_define_block_for_flow_injection(42),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
 
   df <- orbi_read_isox(system.file(
@@ -15,31 +11,11 @@ test_that("test orbi_define_block_for_flow_injection()", {
     package = "isoorbi"
   )) |>
     suppressMessages()
-  df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
   expect_error(
-    orbi_define_block_for_flow_injection(df2),
-    "`dataset` requires columns",
-    fixed = TRUE
+    orbi_define_block_for_flow_injection(df),
+    "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`"
   )
-
-  expect_error(
-    orbi_define_block_for_flow_injection(df, start_time.min = "a"),
-    "if set, `start_time.min` must be a single number"
-  )
-  expect_error(
-    orbi_define_block_for_flow_injection(df, end_time.min = "a"),
-    "if set, `end_time.min` must be a single number"
-  )
-  expect_error(
-    orbi_define_block_for_flow_injection(df, start_scan.no = "a"),
-    "if set, `start_scan.no` must be a single integer"
-  )
-  expect_error(
-    orbi_define_block_for_flow_injection(df, end_scan.no = "a"),
-    "if set, `end_scan.no` must be a single integer"
-  )
-
   expect_error(
     orbi_define_block_for_flow_injection(
       df,
@@ -48,6 +24,24 @@ test_that("test orbi_define_block_for_flow_injection()", {
     ),
     "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`"
   )
+
+  expect_error(
+    orbi_define_block_for_flow_injection(df, start_time.min = "a"),
+    "start_time.min.*must be a single number"
+  )
+  expect_error(
+    orbi_define_block_for_flow_injection(df, end_time.min = "a"),
+    "end_time.min.*must be a single number"
+  )
+  expect_error(
+    orbi_define_block_for_flow_injection(df, start_scan.no = "a"),
+    "start_scan.no.*must be a single integer"
+  )
+  expect_error(
+    orbi_define_block_for_flow_injection(df, end_scan.no = "a"),
+    "end_scan.no.*must be a single integer"
+  )
+
   expect_error(
     orbi_define_block_for_flow_injection(
       df,
@@ -65,13 +59,10 @@ test_that("test orbi_define_block_for_flow_injection()", {
     scan.no = 1:10,
     time.min = scan.no / 10
   )
-  expect_message(
-    orbi_define_block_for_flow_injection(
-      test_data,
-      start_time.min = 0.1,
-      end_time.min = 0.9
-    ),
-    "column.*filename.*was turned into a factor"
+  orbi_define_block_for_flow_injection(
+    test_data,
+    start_time.min = 0.1,
+    end_time.min = 0.9
   ) |>
     expect_message("added a new block")
 })
@@ -230,11 +221,11 @@ test_that("test orbi_define_blocks_for_dual_inlet()", {
   # type checks
   expect_error(
     orbi_define_blocks_for_dual_inlet(),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(
     orbi_define_blocks_for_dual_inlet(42),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(
     orbi_define_blocks_for_dual_inlet(tibble()),
@@ -325,7 +316,7 @@ test_that("test orbi_define_blocks_for_dual_inlet()", {
   )
   expect_error(
     orbi_define_blocks_for_dual_inlet(tibble(), 1, 1),
-    "`dataset` is missing the column"
+    "columns.*are missing"
   )
 
   # results checks
@@ -400,10 +391,13 @@ test_that("test orbi_define_blocks_for_dual_inlet()", {
 
 test_that("test orbi_adjust_block()", {
   # type checks
-  expect_error(orbi_adjust_block(), "`dataset` must be a data frame or tibble")
+  expect_error(
+    orbi_adjust_block(),
+    "dataset.*must be.*aggregated.*or.*data frame"
+  )
   expect_error(
     orbi_adjust_block(42),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(orbi_adjust_block(tibble()), "`block` must be a single integer")
   expect_error(
@@ -472,19 +466,19 @@ test_that("test orbi_adjust_block()", {
   )
   expect_error(
     orbi_adjust_block(tibble(), 1),
-    "`dataset` is missing the column"
+    "does not seem to have any block definitions yet"
   )
   expect_error(
     orbi_adjust_block(test_data, 1),
-    "`dataset` has data from more than 1 file"
+    "has data from more than 1 file"
   )
   expect_error(
     orbi_adjust_block(test_data, 1, "dne"),
-    "`filename` is not in this `dataset`"
+    "filename.*is not in this.*dataset"
   )
   expect_error(
     orbi_adjust_block(test_data, 3, "test1"),
-    "`block` is not in this `dataset`"
+    "block.*is not in this.*dataset"
   )
   expect_error(
     orbi_adjust_block(
@@ -532,7 +526,7 @@ test_that("test orbi_adjust_block()", {
 
   expect_message(
     result1 <- orbi_adjust_block(test_data, 2, "test1", set_start_time.min = 0),
-    "made the following block adjustments"
+    "made the following.*block.*adjustments"
   ) |>
     suppressMessages()
   expect_equal(result1$block, rep(2, 6))
@@ -540,58 +534,66 @@ test_that("test orbi_adjust_block()", {
   expect_equal(result1$data_type, test_data$data_type)
   expect_equal(result1$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
-  expect_message(
-    result2 <- orbi_adjust_block(
-      test_data,
-      1,
-      "test1",
-      shift_start_scan.no = 1
-    ),
-    "moved block 1 start from scan 1.*to 2"
-  ) |>
-    suppressMessages()
-  expect_equal(result2$block, rep(c(1, 2), c(3, 3)))
-  expect_equal(result2$data_group, rep(c(1, 2, 3), c(1, 2, 3)))
-  expect_equal(result2$data_type, rep(c("unused", "data"), c(1, 5)))
-  expect_equal(result2$segment, rep(c(NA_integer_, 1L), c(5, 1)))
+  # capture success messages and results
+  test_that_cli("orbi_adjust_block", configs = c("plain", "fancy"), {
+    expect_snapshot({
+      result2 <- orbi_adjust_block(
+        test_data,
+        1,
+        "test1",
+        shift_start_scan.no = 1
+      )
+    })
 
-  expect_message(
-    result3 <- orbi_adjust_block(
-      test_data,
-      2,
-      "test1",
-      shift_start_time.min = -1
-    ),
-    "moved block 1 end to the new start of block 2"
-  ) |>
-    suppressMessages()
-  expect_equal(result3$block, rep(2, 6))
-  expect_equal(result3$data_group, rep(c(1, 3), c(5, 1)))
-  expect_equal(result3$data_type, test_data$data_type)
-  expect_equal(result3$segment, rep(c(NA_integer_, 1L), c(5, 1)))
+    expect_equal(result2$block, rep(c(1, 2), c(3, 3)))
+    expect_equal(result2$data_group, rep(c(1, 2, 3), c(1, 2, 3)))
+    expect_equal(result2$data_type, rep(c("unused", "data"), c(1, 5)))
+    expect_equal(result2$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
-  expect_message(
-    result4 <- orbi_adjust_block(test_data, 1, "test1", shift_end_scan.no = 1),
-    "moved block 1 end from scan 3.*to 4"
-  ) |>
-    suppressMessages()
+    expect_snapshot(
+      result3 <- orbi_adjust_block(
+        test_data,
+        2,
+        "test1",
+        shift_start_time.min = -1
+      )
+    )
+    expect_equal(result3$block, rep(2, 6))
+    expect_equal(result3$data_group, rep(c(1, 3), c(5, 1)))
+    expect_equal(result3$data_type, test_data$data_type)
+    expect_equal(result3$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
-  expect_message(
-    result5 <- orbi_adjust_block(test_data, 1, "test1", shift_end_time.min = 1),
-    "moved block 2 start to the new end of block 1"
-  ) |>
-    suppressMessages()
+    expect_snapshot(
+      result4 <- orbi_adjust_block(
+        test_data,
+        1,
+        "test1",
+        shift_end_scan.no = 1
+      ),
+      "moved block 1 end from scan 3.*to 4"
+    )
+    expect_snapshot(
+      result5 <- orbi_adjust_block(
+        test_data,
+        1,
+        "test1",
+        shift_end_time.min = 1
+      ),
+      "moved block 2 start to the new end of block 1"
+    )
+  }) |>
+    withr::with_options(new = list(show_exec_times = FALSE))
 })
 
 test_that("test orbi_segment_block()", {
   # type checks
   expect_error(
     orbi_segment_blocks(),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(
     orbi_segment_blocks(42),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(
     orbi_segment_blocks(tibble(), into_segments = "42"),
@@ -637,7 +639,10 @@ test_that("test orbi_segment_block()", {
     orbi_segment_blocks(tibble(), by_time_interval = c(42, 42)),
     "`by_time_interval` must be a single positive number"
   )
-  expect_error(orbi_segment_blocks(tibble()), "`dataset` is missing the column")
+  expect_error(
+    orbi_segment_blocks(tibble()),
+    "does not seem to have any block definitions yet"
+  )
   empty_data <- tibble(
     filename = character(),
     scan.no = integer(),
@@ -665,61 +670,57 @@ test_that("test orbi_segment_block()", {
     data_type = rep(c("unused", "data"), c(2, 8))
   )
 
-  expect_message(
-    res1 <- test_data |> orbi_segment_blocks(into_segments = 2),
-    "segmented.*3 data blocks"
-  ) |>
-    suppressMessages()
-  expect_equal(
-    res1,
-    test_data |>
-      dplyr::mutate(
-        data_group = c(1L, 1:5, 1L, 1L, 2L, 2L),
-        segment = c(NA, NA, 1:2, 1:2, 1L, 1L, 2L, 2L)
-      ) |>
-      dplyr::relocate(data_group, .before = "block")
-  )
+  # check messages and data
+  test_that_cli("orbi_segment_block()", configs = c("plain", "fancy"), {
+    # approach 1
+    expect_snapshot(res1 <- test_data |> orbi_segment_blocks(into_segments = 2))
+    expect_equal(
+      res1,
+      test_data |>
+        dplyr::mutate(
+          data_group = c(1L, 1:5, 1L, 1L, 2L, 2L),
+          segment = c(NA, NA, 1:2, 1:2, 1L, 1L, 2L, 2L)
+        ) |>
+        dplyr::relocate(data_group, .before = "block")
+    )
+    # approach 2
+    expect_snapshot(res2 <- test_data |> orbi_segment_blocks(by_scans = 2))
+    expect_equal(
+      res2,
+      test_data |>
+        dplyr::mutate(
+          data_group = rep(c(1:3, 1:2), each = 2),
+          segment = rep(c(NA, 1L, 2L), c(2, 6, 2)),
+        ) |>
+        dplyr::relocate(data_group, .before = "block")
+    )
 
-  expect_message(
-    res2 <- test_data |> orbi_segment_blocks(by_scans = 2),
-    "2 scans"
-  ) |>
-    suppressMessages()
-  expect_equal(
-    res2,
-    test_data |>
-      dplyr::mutate(
-        data_group = rep(c(1:3, 1:2), each = 2),
-        segment = rep(c(NA, 1L, 2L), c(2, 6, 2)),
-      ) |>
-      dplyr::relocate(data_group, .before = "block")
-  )
-
-  expect_message(
-    res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0),
-    "2.3 segments"
-  ) |>
-    suppressMessages()
-  expect_equal(
-    res3,
-    test_data |>
-      dplyr::mutate(
-        data_group = c(1L, 1L, 2L, 2L, 3L, 4L, 1:4),
-        segment = c(NA, NA, 1L, 1L, 1:2, 1:2, 4, 6),
-      ) |>
-      dplyr::relocate(data_group, .before = "block")
-  )
-})
+    # approach 3
+    expect_snapshot(
+      res3 <- test_data |> orbi_segment_blocks(by_time_interval = 1.0)
+    )
+    expect_equal(
+      res3,
+      test_data |>
+        dplyr::mutate(
+          data_group = c(1L, 1L, 2L, 2L, 3L, 4L, 1:4),
+          segment = c(NA, NA, 1L, 1L, 1:2, 1:2, 4, 6),
+        ) |>
+        dplyr::relocate(data_group, .before = "block")
+    )
+  })
+}) |>
+  withr::with_options(new = list(show_exec_times = FALSE))
 
 test_that("test orbi_get_blocks_info()", {
   # type checks
   expect_error(
     orbi_get_blocks_info(),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(
     orbi_get_blocks_info(42),
-    "`dataset` must be a data frame or tibble"
+    "dataset.*must be.*aggregated.*or.*data frame"
   )
 
   df <- orbi_read_isox(system.file(
@@ -732,13 +733,11 @@ test_that("test orbi_get_blocks_info()", {
 
   expect_error(
     orbi_get_blocks_info(df2),
-    "`dataset` requires columns",
-    fixed = TRUE
+    "column.*missing"
   )
-  expect_warning(
+  expect_message(
     orbi_get_blocks_info(df),
-    "`dataset` does not seem to have any block definitions yet (`block` column missing)",
-    fixed = TRUE
+    "does not seem to have any block definitions yet",
   )
 })
 

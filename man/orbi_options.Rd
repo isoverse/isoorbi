@@ -41,7 +41,7 @@ These options are best set via \code{\link[=orbi_options]{orbi_options()}} and q
 \item \code{data_type_startup}: the text used to flag raw data as being part of the startup
 \item \code{data_type_changeover}: the text used to flag raw data as being part of a changeover
 \item \code{data_type_unused}: the text used to flag raw data as being unused
-\item \code{raw_aggregator}: configuration for pulling data out of raw files
+\item \code{aggregators}: data aggregators for pulling data out of raw files. The list of available aggregators is accessible via \code{orbi_get_option("aggregators")}. Individiual aggregators are available via the shortcut helper function \code{orbi_get_aggregator("standard")}. Register new/overwrite existing aggregators via \code{orbi_register_aggregator()}.
 \item \code{debug}: turn on debug mode
 \item \code{auto_use_ansi}: whether to automatically enable correct rendering of stylized (ansi) output in HTML reports from notebooks that call \code{library(isoorbi)}. Can be turned off by calling \code{isoorbi::orbi_options(auto_use_ansi = FALSE)} \strong{before} call \code{library(isoorbi)}.
 }

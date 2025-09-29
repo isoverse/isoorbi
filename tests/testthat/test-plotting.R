@@ -1,11 +1,10 @@
-# filter_isotopocules
+# orbi_filter_isotopocules
 
-test_that("filter_isotopocules() tests", {
+test_that("orbi_filter_isotopocules() tests", {
   # failure
   expect_error(
-    filter_isotopocules(),
-    "argument \"dataset\" is missing, with no default",
-    fixed = TRUE
+    orbi_filter_isotopocules(),
+    "must be.*aggregated.*or.*data frame"
   )
 
   df <- orbi_read_isox(system.file(
@@ -16,19 +15,21 @@ test_that("filter_isotopocules() tests", {
     orbi_simplify_isox() |>
     suppressMessages()
 
-  expect_error(
-    filter_isotopocules(df),
-    "argument \"isotopocules\" is missing, with no default",
-    fixed = TRUE
+  expect_message(
+    orbi_filter_isotopocules(df),
+    "kept all"
   )
 
   suppressWarnings(expect_error(
-    filter_isotopocules(df, isotopocules = "M0"),
+    orbi_filter_isotopocules(df, isotopocules = "M0"),
     "none of the provided.*isotopocules.*are in the dataset"
   ))
 
   # success
-  expect_true(is.tbl(filter_isotopocules(df, isotopocules = "17O")))
+  expect_message(
+    orbi_filter_isotopocules(df, isotopocules = "17O"),
+    "remove.*because.*were.*not.*isotopocule.*17O"
+  )
 })
 
 # dynamic_y_scale
@@ -58,8 +59,7 @@ test_that("orbi_get_isotopocule_coverage() tests", {
   # failure
   expect_error(
     orbi_get_isotopocule_coverage(),
-    "need a `dataset` data frame",
-    fixed = TRUE
+    "must be.*aggregated.*or.*data frame"
   )
 
   # success
@@ -74,14 +74,17 @@ test_that("orbi_get_isotopocule_coverage() tests", {
 
   dataset <- df |> factorize_dataset(c("filename", "compound", "isotopocule"))
 
-  expect_true(is.tbl(orbi_get_isotopocule_coverage(dataset)))
+  expect_snapshot_value(orbi_get_isotopocule_coverage(dataset), style = "json2")
 })
 
 # orbi_plot_satellite_peaks
 
 test_that("orbi_plot_satellite_peaks() tests", {
   # failure
-  expect_error(orbi_plot_satellite_peaks(), "must be a data frame")
+  expect_error(
+    orbi_plot_satellite_peaks(),
+    "must be.*aggregated.*or.*data frame"
+  )
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -116,9 +119,7 @@ test_that("orbi_plot_satellite_peaks() tests", {
 
 test_that("orbi_plot_raw_data() tests", {
   # failure
-  expect_error(orbi_plot_raw_data(), "dataset.*must be a data frame")
-  expect_error(orbi_plot_raw_data(42), "dataset.*must be a data frame")
-  expect_error(orbi_plot_raw_data(mtcars), "columns.*missing")
+  expect_error(orbi_plot_raw_data(), "must be.*aggregated.*or.*data frame")
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -158,12 +159,6 @@ test_that("orbi_plot_raw_data() tests", {
     orbi_plot_raw_data(df2, y = ratio, isotopocules = "dne"),
     "none.*are in the dataset"
   )
-  expect_message(
-    orbi_plot_raw_data(df2, y = ratio, isotopocules = c("dne", "33S")),
-    "not all.*in the dataset"
-  ) |>
-    expect_message("missing.*dne") |>
-    expect_message("available")
 
   vdiffr::expect_doppelganger(
     "raw data ratio plot",
@@ -175,7 +170,10 @@ test_that("orbi_plot_raw_data() tests", {
 
 test_that("orbi_plot_isotopocule_coverage() tests", {
   # failure
-  expect_error(orbi_plot_isotopocule_coverage(), "must be a data frame")
+  expect_error(
+    orbi_plot_isotopocule_coverage(),
+    "must be.*aggregated.*or.*data frame"
+  )
 
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -187,7 +185,7 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
 
   expect_error(
     orbi_plot_isotopocule_coverage(df, isotopocules = 42),
-    "must be a character vector, not a number"
+    "must be a character vector"
   )
 
   # success

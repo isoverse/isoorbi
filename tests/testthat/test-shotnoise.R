@@ -6,9 +6,9 @@ base_dir <- if (interactive()) file.path("tests", "testthat") else "."
 # orbi_analyze_shot_noise
 test_that("orbi_analyze_shot_noise()", {
   # errors
-  orbi_analyze_shot_noise() |> expect_error("must be a data frame")
-  orbi_analyze_shot_noise(42) |> expect_error("must be a data frame")
-  orbi_analyze_shot_noise(mtcars) |> expect_error("columns.*are missing")
+  orbi_analyze_shot_noise() |>
+    expect_error("must be.*aggregated.*or.*data frame")
+  orbi_analyze_shot_noise(mtcars) |> expect_error("requires defined basepeak")
 
   # test data
   df <- orbi_read_isox(system.file(
@@ -23,12 +23,6 @@ test_that("orbi_analyze_shot_noise()", {
     # define base peak
     orbi_define_basepeak("15N") |>
     suppressMessages()
-
-  expect_error(
-    df_results |> select(-"basepeak_ions") |> orbi_calculate_ratios(),
-    "`dataset` requires defined basepeak (columns `basepeak` and `basepeak_ions`), make sure to run `orbi_define_basepeak()` first",
-    fixed = TRUE
-  )
 
   # success
   expect_message(

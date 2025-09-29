@@ -8,6 +8,7 @@ orbi_plot_satellite_peaks(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
+  y = c("ions.incremental", "intensity"),
   x_breaks = scales::breaks_pretty(5),
   y_scale = c("log", "pseudo-log", "linear", "raw"),
   y_scale_sci_labels = TRUE,
@@ -17,11 +18,13 @@ orbi_plot_satellite_peaks(
 )
 }
 \arguments{
-\item{dataset}{isox dataset with satellite peaks identified (\code{orbi_flag_satellite_peaks()})}
+\item{dataset}{a data frame or aggregated dataset with satellite peaks already identified (i.e. after \code{\link[=orbi_flag_satellite_peaks]{orbi_flag_satellite_peaks()}})}
 
 \item{isotopocules}{which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)}
 
-\item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
+\item{x}{x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"}
+
+\item{y}{y-axis column for the plot, typially either "ions.incremental" or "intensity", default is "ions.incremental" (falls back to "intensity" if "ions.incremental" has not been calculated yet for the provided dataset)}
 
 \item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
 

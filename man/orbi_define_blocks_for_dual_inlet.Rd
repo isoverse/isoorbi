@@ -15,7 +15,7 @@ orbi_define_blocks_for_dual_inlet(
 )
 }
 \arguments{
-\item{dataset}{A data frame or tibble produced from IsoX data by \code{\link[=orbi_simplify_isox]{orbi_simplify_isox()}}}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{ref_block_time.min}{time where the signal is stable when reference is analyzed}
 

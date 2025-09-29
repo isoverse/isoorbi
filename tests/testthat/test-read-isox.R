@@ -151,9 +151,9 @@ test_that("test orbi_simplify_isox()", {
   expect_equal(nrow(df), 5184L)
 })
 
-# orbi_filter_isox() ===========
+# orbi_filter_files() ===========
 
-test_that("test orbi_filter_isox()", {
+test_that("test orbi_filter_files()", {
   # success
   df <- orbi_read_isox(system.file(
     "extdata",
@@ -162,9 +162,9 @@ test_that("test orbi_filter_isox()", {
   )) |>
     suppressMessages()
 
-  expect_true(is.tbl(orbi_filter_isox(df))) |> suppressMessages()
+  expect_true(is.tbl(orbi_filter_files(df))) |> suppressMessages()
 
-  expect_true(is.tbl(orbi_filter_isox(
+  expect_true(is.tbl(orbi_filter_files(
     df,
     filenames = "20220125_01",
     compounds = "NO3-",
@@ -175,57 +175,51 @@ test_that("test orbi_filter_isox()", {
     suppressMessages()
 
   # failure
-  expect_error(orbi_filter_isox(), "need a `dataset` data frame", fixed = TRUE)
+  expect_error(orbi_filter_files(), "must be.*aggregated.*or.*data frame")
 
   expect_error(
-    orbi_filter_isox(dataset = as.matrix(df)),
-    "need a `dataset` data frame",
-    fixed = TRUE
+    orbi_filter_files(dataset = as.matrix(df)),
+    "must be.*aggregated.*or.*data frame"
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df[, 1:2]),
-    "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `tic` and `it.ms`"
-  )
-
-  expect_error(
-    orbi_filter_isox(dataset = df, time_min = "A"),
+    orbi_filter_files(dataset = df, time_min = "A"),
     "`time_min` must be a single number (or NULL)",
     fixed = TRUE
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df, time_max = "A"),
+    orbi_filter_files(dataset = df, time_max = "A"),
     "`time_max` must be a single number (or NULL)",
     fixed = TRUE
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df, time_min = c(0.1, 0.2)),
+    orbi_filter_files(dataset = df, time_min = c(0.1, 0.2)),
     "`time_min` must be a single number (or NULL)",
     fixed = TRUE
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df, time_max = c(0.1, 0.2)),
+    orbi_filter_files(dataset = df, time_max = c(0.1, 0.2)),
     "`time_max` must be a single number (or NULL)",
     fixed = TRUE
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df, filenames = as.matrix(c(1, 0))),
+    orbi_filter_files(dataset = df, filenames = as.matrix(c(1, 0))),
     "`filenames` must be a vector of filenames (or NULL)",
     fixed = TRUE
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df, isotopocules = as.matrix(c(1, 0))),
+    orbi_filter_files(dataset = df, isotopocules = as.matrix(c(1, 0))),
     "`isotopocules` must be a vector of isotopocules (or NULL)",
     fixed = TRUE
   )
 
   expect_error(
-    orbi_filter_isox(dataset = df, compounds = as.matrix(c(1, 0))),
+    orbi_filter_files(dataset = df, compounds = as.matrix(c(1, 0))),
     "`compounds` must be a vector of compounds (or NULL)",
     fixed = TRUE
   )

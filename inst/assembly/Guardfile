@@ -1,0 +1,38 @@
+# guard
+guard :shell do
+  watch(/.*\.cs$/) do
+     debounce() do
+        puts "\n\n *** detected changes, running after debounce ***"
+        # if compiling on platforms other than osx, this works directly and is much faster
+        # see https://github.com/fgcz/rawrr/issues/75
+        # system("rake runLocal")
+        # more complex version using the docker build (alwaqys works but slower):
+        Open3.popen2e("rake build") do |stdin, stdout_and_err, wait_thr|
+          stdout_and_err.each { |line| puts line }
+          exit_status = wait_thr.value
+          if exit_status.success?
+            puts "--- BUILT SUCCESFULLY, RUNNING ---"
+            system("rake run")
+          end
+        end
+      end
+  end
+end
+
+# debounce timer (default 500ms)
+require 'thread'
+$debounce_timer = nil
+$debounce_mutex = Mutex.new
+
+def debounce(delay = 0.5)
+  $debounce_mutex.synchronize do
+    if $debounce_timer
+      $debounce_timer.kill
+    end
+
+    $debounce_timer = Thread.new do
+      sleep delay
+      yield
+    end
+  end
+end

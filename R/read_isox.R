@@ -246,10 +246,31 @@ orbi_simplify_isox <- function(dataset, add = c()) {
   return(out$result)
 }
 
-#' @title Basic generic filter for IsoX data
-#' @description A basic filter function `orbi_filter_isox()` for file names, isotopocules, compounds and time ranges. Default value for all parameters is NULL, i.e. no filter is applied.
+#' Filter isox files
 #'
-#' @param dataset The IsoX data to be filtered
+#' `r lifecycle::badge("deprecated")`
+#' [orbi_filter_isox()] was renamed [orbi_filter_files()] to incorporate its wider scope for filtering both isox and raw files data.
+#'
+#' @param ... arguments passed on to [orbi_filter_files()]
+#' @export
+orbi_filter_isox <- function(...) {
+  lifecycle::deprecate_warn(
+    "1.5.0",
+    "orbi_filter_isox()",
+    "orbi_filter_files()",
+    details = "`isoorbi` can now work with isox and raw files and this function was renamed accordingly"
+  )
+  orbi_filter_files(...)
+}
+
+#' Basic generic data files filter
+#'
+#' This is a basic filter function for file names, compounds and time ranges.
+#' For filtering isotopocules, this function calls [orbi_filter_isotopocules()] internally (as of isoorbi version 1.5.0 [orbi_filter_isotopocules()] can also be used directly instead of via this function).
+#' Default value for all parameters is NULL, i.e. no filter is applied.
+#'
+#'
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param filenames Vector of file names to keep, keeps all if set to `NULL` (the default)
 #' @param compounds Vector of compounds to keep, keeps all if set to `NULL` (the default)
 #' @param isotopocules Vector of isotopocules to keep, keeps all if set to `NULL` (the default)
@@ -261,7 +282,7 @@ orbi_simplify_isox <- function(dataset, add = c()) {
 #' df <-
 #'   orbi_read_isox(file = fpath) |>
 #'   orbi_simplify_isox() |>
-#'   orbi_filter_isox(
+#'   orbi_filter_files(
 #'     filenames = c("s3744"),
 #'     compounds = "HSO4-",
 #'     isotopocules = c("M0", "34S", "18O")
@@ -269,7 +290,7 @@ orbi_simplify_isox <- function(dataset, add = c()) {
 #'
 #' @return Filtered tibble
 #' @export
-orbi_filter_isox <-
+orbi_filter_files <-
   function(
     dataset,
     filenames = NULL,
@@ -279,13 +300,8 @@ orbi_filter_isox <-
     time_max = NULL
   ) {
     # safety checks
-    cols <- c("filename", "compound", "isotopocule", "time.min")
+    check_dataset_arg(dataset)
     stopifnot(
-      "need a `dataset` data frame" = !missing(dataset) &&
-        is.data.frame(dataset),
-      "`dataset` requires columns `filepath`, `filename`, `compound`, `scan.no`, `tic` and `it.ms`" = all(
-        cols %in% names(dataset)
-      ),
       "`filenames` must be a vector of filenames (or NULL)" = is.null(
         filenames
       ) ||
@@ -304,6 +320,18 @@ orbi_filter_isox <-
         is_scalar_double(time_max)
     )
 
+    # column checks
+    is_agg <- is(dataset, "orbi_aggregated_data")
+    if (is_agg) {
+      check_tibble(dataset$file_info, c("uidx", "filename"))
+      check_tibble(dataset$scans, c("uidx", "scan.no"))
+      check_tibble(dataset$peaks, c("uidx", "scan.no"))
+      check_tibble(dataset$spectra, c("uidx", "scan.no"))
+      check_tibble(dataset$problems, "uidx")
+    } else {
+      check_tibble(dataset, "filename")
+    }
+
     # info
     filters <- c()
     if (!is.null(filenames)) {
@@ -313,6 +341,11 @@ orbi_filter_isox <-
       )
     }
     if (!is.null(compounds)) {
+      if (is_agg) {
+        check_tibble(dataset$peaks, "compound")
+      } else {
+        check_tibble(dataset, "compound")
+      }
       filters <- c(
         filters,
         sprintf("compounds (%s)", paste(compounds, collapse = ", "))
@@ -325,14 +358,24 @@ orbi_filter_isox <-
       )
     }
     if (!is.null(time_min)) {
+      if (is_agg) {
+        check_tibble(dataset$scans, "time.min")
+      } else {
+        check_tibble(dataset, "time.min")
+      }
       filters <- c(filters, sprintf("minimum time (%s minutes)", time_min))
     }
     if (!is.null(time_max)) {
+      if (is_agg) {
+        check_tibble(dataset$scans, "time.min")
+      } else {
+        check_tibble(dataset, "time.min")
+      }
       filters <- c(filters, sprintf("maximum time (%s minutes)", time_min))
     }
 
     # info
-    n_row_start <- nrow(dataset)
+    n_row_start <- if (is_agg) nrow(dataset$peaks) else nrow(dataset)
     start <- start_info("is running")
 
     # filtering
@@ -341,28 +384,73 @@ orbi_filter_isox <-
         {
           # file: filenames
           if (!is.null(filenames)) {
-            dataset <- dataset |> dplyr::filter(.data$filename %in% !!filenames)
+            if (is_agg) {
+              dataset$file_info <- dataset$file_info |>
+                dplyr::filter(.data$filename %in% !!filenames) |>
+                droplevels()
+              dataset$scans <- dataset$scans |>
+                dplyr::semi_join(dataset$file_info, by = "uidx")
+              dataset$peaks <- dataset$peaks |>
+                dplyr::semi_join(dataset$file_info, by = "uidx")
+              dataset$spectra <- dataset$spectra |>
+                dplyr::semi_join(dataset$file_info, by = "uidx")
+              dataset$problems <- dataset$problems |>
+                dplyr::semi_join(dataset$file_info, by = "uidx")
+            } else {
+              dataset <- dataset |>
+                dplyr::filter(.data$filename %in% !!filenames) |>
+                droplevels()
+            }
           }
 
           # filter: compounds
           if (!is.null(compounds)) {
-            dataset <- dataset |> dplyr::filter(.data$compound %in% !!compounds)
+            if (is_agg) {
+              dataset$peaks <- dataset$peaks |>
+                dplyr::filter(.data$compound %in% !!compounds) |>
+                droplevels()
+            } else {
+              dataset <- dataset |>
+                dplyr::filter(.data$compound %in% !!compounds) |>
+                droplevels()
+            }
           }
 
           # filter: isotopocules
           if (!is.null(isotopocules)) {
-            dataset <- dataset |>
-              dplyr::filter(.data$isotopocule %in% !!isotopocules)
+            # use orbi_filter_isotopocules now
+            dataset <- orbi_filter_isotopocules(
+              dataset,
+              isotopocules = isotopocules
+            )
           }
 
           # filter: time_min
           if (!is.null(time_min)) {
-            dataset <- dataset |> dplyr::filter(.data$time.min >= !!time_min)
+            if (is_agg) {
+              dataset$scans <- dataset$scans |>
+                dplyr::filter(.data$time.min >= !!time_min)
+              dataset$peaks <- dataset$peaks |>
+                dplyr::semi_join(dataset$scans, by = c("uidx", "scan.no"))
+              dataset$spectra <- dataset$spectra |>
+                dplyr::semi_join(dataset$scans, by = c("uidx", "scan.no"))
+            } else {
+              dataset <- dataset |> dplyr::filter(.data$time.min >= !!time_min)
+            }
           }
 
           # filter: time_max
           if (!is.null(time_max)) {
-            dataset <- dataset |> dplyr::filter(.data$time.min <= !!time_max)
+            if (is_agg) {
+              dataset$scans <- dataset$scans |>
+                dplyr::filter(.data$time.min <= !!time_max)
+              dataset$peaks <- dataset$peaks |>
+                dplyr::semi_join(dataset$scans, by = c("uidx", "scan.no"))
+              dataset$spectra <- dataset$spectra |>
+                dplyr::semi_join(dataset$scans, by = c("uidx", "scan.no"))
+            } else {
+              dataset <- dataset |> dplyr::filter(.data$time.min <= !!time_max)
+            }
           }
 
           # return
@@ -378,14 +466,14 @@ orbi_filter_isox <-
     dataset <- out$result
 
     # info
-    sprintf(
-      "filtered the dataset by {.field {filters}} and removed a total of %d/%d rows (%.1f%%)",
-      n_row_start - nrow(dataset),
-      n_row_start,
-      (n_row_start - nrow(dataset)) / n_row_start * 100
-    ) |>
-      finish_info(start = start)
+    n_row_end <- if (is_agg) nrow(dataset$peaks) else nrow(dataset)
+    finish_info(
+      "filtered the dataset by {.field {filters}} and removed ",
+      "a total of {format_number(n_row_start - n_row_end)}/{format_number(n_row_start)} ",
+      "peaks ({signif(100 * (n_row_start - n_row_end)/n_row_start, 2)}%)",
+      start = start
+    )
 
     # return
-    return(dataset |> droplevels())
+    return(dataset)
   }

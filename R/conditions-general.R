@@ -114,6 +114,7 @@ try_catch_cnds <- function(
 # @param include_call whether to include the call from which the summarize_cnds was called
 # @param call_format how to format the call
 # @param summary_format how to format the overall summary
+# @param indent whether to wrap with a specific indent in mind
 # @return safely cli-formatted single line of text, best printed with cli_bullets
 summarize_cnds <- function(
   conditions,
@@ -122,6 +123,7 @@ summarize_cnds <- function(
   include_call = TRUE,
   call_format = "in {.strong {call}()}: ",
   summary_format = "{issues} {message}",
+  indent = 0,
   .call = caller_call()
 ) {
   # call
@@ -133,15 +135,17 @@ summarize_cnds <- function(
   # issues
   issues <- c()
   if (nrow(conditions) == 0) {
-    issues <- format_inline("{col_green('no issues')}")
+    issues <- format_inline("{cli::col_green('no issues')}")
   }
   if ((n <- sum(conditions$type == 'warning')) > 0) {
-    issues <- format_inline("{col_yellow(format_inline('{n} warning{?s}'))}")
+    issues <- format_inline(
+      "{cli::col_yellow(format_inline('{n} warning{?s}'))}"
+    )
   }
   if ((n <- sum(conditions$type == 'error')) > 0) {
     issues <- c(
       issues,
-      format_inline("{col_red(format_inline('{n} error{?s}'))}")
+      format_inline("{cli::col_red(format_inline('{n} error{?s}'))}")
     )
   }
 
@@ -165,11 +169,17 @@ summarize_cnds <- function(
 
   # takes care of line breaks and escapes {}
   # it seems cli_escape in format_bullets_raw does NOT properly escape < and >
-  # might be fixed if https://github.com/r-lib/cli/issues/789 is addressed
-  summary |>
-    gsub(pattern = "<", replacement = "<<", fixed = TRUE) |>
-    gsub(pattern = ">", replacement = ">>", fixed = TRUE) |>
-    format_bullets_raw()
+  # will be fixed in https://github.com/r-lib/cli/issues/789
+  # take care of proper line breaks (also covers escaping {})
+  summary <-
+    withr::with_options(
+      list(cli.width = console_width() - indent),
+      summary |>
+        gsub(pattern = "<", replacement = "<<", fixed = TRUE) |>
+        gsub(pattern = ">", replacement = ">>", fixed = TRUE) |>
+        format_bullets_raw()
+    )
+  return(summary)
 }
 
 # helper to cli format conditions into a bullet list
@@ -268,6 +278,7 @@ summarize_and_format_cnds <- function(
   include_summary = TRUE,
   include_call = include_summary,
   summary_format = "{message} encountered {issues}",
+  summary_indent = 0,
   message = NULL,
   # for format_cnds
   include_cnds = TRUE,
@@ -291,6 +302,7 @@ summarize_and_format_cnds <- function(
       include_symbol = include_symbol,
       include_call = include_call,
       summary_format = summary_format,
+      indent = summary_indent,
       .call = .call,
     )
   }
@@ -390,6 +402,7 @@ abort_cnds <- function(
   include_summary = TRUE,
   include_call = FALSE,
   summary_format = "{message} encountered {issues}",
+  summary_indent = 5, # seems to work best
   message = NULL,
   # for format_cnds
   include_cnds = TRUE,
@@ -408,6 +421,7 @@ abort_cnds <- function(
       include_summary = include_summary,
       include_call = include_call,
       summary_format = summary_format,
+      summary_indent = summary_indent,
       message = message,
       include_cnds = include_cnds,
       include_cnd_calls = include_cnd_calls,

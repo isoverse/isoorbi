@@ -1,9 +1,10 @@
+# Note: should this be implemented as S3 method?
 #' Retrieve parsing problems
 #'
 #' This function retrieves parsing problems encountered during the reading and processing of files.
 #'
 #' @rdname problems
-#' @param obj data object that holds problems information
+#' @param obj data object that also has problems information
 #' @param strip_ansi whether to remove ansi characters from the message, yes by default
 #' @examples
 #'
@@ -11,7 +12,7 @@
 #'   orbi_read_raw() |>
 #'   orbi_get_problems()
 #'
-#' @return tibble data frame with a list of problems encountered during
+#' @return tibble data frame with a list of problems encountered during processing
 #' @export
 orbi_get_problems <- function(obj, strip_ansi = TRUE) {
   # safety
@@ -22,32 +23,54 @@ orbi_get_problems <- function(obj, strip_ansi = TRUE) {
     "must be a list or data frame"
   )
 
-  # template
-  probs <- tibble(
-    uid = factor(),
-    type = character(),
-    call = character(),
-    message = character(),
-    condition = list()
-  )
+  # what type of data is it?
+  if (is(obj, "orbi_aggregated_data")) {
+    # aggregated data
+    probs <-
+      obj |>
+      orbi_get_data(
+        file_info = c("file" = "filepath"),
+        problems = everything()
+      ) |>
+      dplyr::mutate(file = basename(.data$file)) |>
+      suppressMessages()
+  } else if (is(obj, "orbi_raw_files")) {
+    # raw file data
+    probs <-
+      obj |>
+      dplyr::mutate(
+        uidx = dplyr::row_number(),
+        file = basename(.data$filepath)
+      ) |>
+      dplyr::select("uidx", "file", "problems") |>
+      tidyr::unnest("problems")
+  } else {
+    # everything else
+    probs <- tibble(
+      type = character(),
+      call = character(),
+      message = character(),
+      condition = list()
+    )
 
-  # check for elements (should this search recursively?)
-  if (any(c("problems", "conditions") %in% names(obj))) {
-    new_probs <- if ("problems" %in% names(obj)) {
-      obj$problems
-    } else {
-      obj$conditions
+    # check for elements (should this search recursively?)
+    if (any(c("problems", "conditions") %in% names(obj))) {
+      new_probs <- if ("problems" %in% names(obj)) {
+        obj$problems
+      } else {
+        obj$conditions
+      }
+      # convert if it's a list of dfs
+      if (!is.data.frame(probs) && is.list(probs)) {
+        new_probs <- dplyr::bind_rows(new_probs)
+      }
+      probs <- dplyr::bind_rows(probs, new_probs)
     }
-    # convert if it's a list of dfs
-    if (!is.data.frame(probs) && is.list(probs)) {
-      new_probs <- dplyr::bind_rows(new_probs)
-    }
-    probs <- dplyr::bind_rows(probs, new_probs)
-  }
 
-  # check for attributes
-  if (!is.null(attr(obj, "problems"))) {
-    probs <- dplyr::bind_rows(probs, attr(obj, "problems"))
+    # check for attributes
+    if (!is.null(attr(obj, "problems"))) {
+      probs <- dplyr::bind_rows(probs, attr(obj, "problems"))
+    }
   }
 
   # strip ansi?

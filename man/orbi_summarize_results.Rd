@@ -13,7 +13,7 @@ orbi_summarize_results(
 )
 }
 \arguments{
-\item{dataset}{A tibble from \code{IsoX} output (\code{\link[=orbi_read_isox]{orbi_read_isox()}}) and with a basepeak already defined (using \code{orbi_define_basepeak()}). Optionally, with block definitions (\code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}}) or even additional block segments (\code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}}).}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{ratio_method}{Method for computing the ratio. \strong{Please note well}: the formula used to calculate ion ratios matters! Do not simply use arithmetic mean. The best option may depend on the type of data you are processing (e.g., MS1 versus M+1 fragmentation). \code{ratio_method} can be one of the following:
 \itemize{
@@ -32,7 +32,7 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 \item{include_unused_data}{whether to include unused data in the calculations (FALSE by default), in addition to peaks actually flagged as orbi_get_option("data_type_data")}
 }
 \value{
-Returns a results summary table retaining the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns: \code{start_scan.no}, \code{end_scan.no}, \code{start_time.min}, \code{mean_time.min}, \code{end_time.min}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
+Returns a results summary table (as tibble if \code{dataset} is a tibble, as \code{dataset$tibble} if \code{dataset} is aggregated raw data) with the columns \code{filename}, \code{compound}, \code{isotopocule} and \code{basepeak} as well as the grouping columns from the \code{.by} parameter that are part of the input \code{dataset}. Additionally this function adds the following results columns: \code{start_scan.no}, \code{end_scan.no}, \code{start_time.min}, \code{mean_time.min}, \code{end_time.min}, \code{ratio}, \code{ratio_sem}, \code{ratio_relative_sem_permil}, \code{shot_noise_permil}, \code{No.of.Scans}, \code{minutes_to_1e6_ions}
 \itemize{
 \item \code{ratio}: The isotope ratio between the \code{isotopocule} and the \code{basepeak}, calculated using the \code{ratio_method}
 \item \code{ratio_sem}: Standard error of the mean for the ratio

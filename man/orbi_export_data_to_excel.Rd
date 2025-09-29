@@ -2,18 +2,20 @@
 % Please edit documentation in R/export_functions.R
 \name{orbi_export_data_to_excel}
 \alias{orbi_export_data_to_excel}
-\title{Export data frame to excel}
+\title{Export data to excel}
 \usage{
 orbi_export_data_to_excel(
   dataset,
   file,
   dbl_digits = 7,
   int_format = "0",
-  dbl_format = sprintf(sprintf("\%\%.\%sf", dbl_digits), 0)
+  dbl_format = sprintf(sprintf("\%\%.\%sf", dbl_digits), 0),
+  include = c("file_info", "summary", "scans", "peaks", "problems"),
+  show_progress = rlang::is_interactive()
 )
 }
 \arguments{
-\item{dataset}{data frame}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{file}{file path to export the file}
 
@@ -22,10 +24,14 @@ orbi_export_data_to_excel(
 \item{int_format}{the excel formatting style for integers}
 
 \item{dbl_format}{the excel formatting style for doubles (created automatically from the dbl_digits parameter)}
+
+\item{include}{which tibbles to include if \code{dataset} is aggregated data. By default includes all but spectra}
+
+\item{show_progress}{whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with \code{show_progress = FALSE}}
 }
 \value{
 returns dataset invisibly for use in pipes
 }
 \description{
-This functions exports the final \code{dataset} into an Excel file.
+This functions exports the \code{dataset} into an Excel file. If the \code{dataset} is aggregated data, use the \code{include} parameter to decide which part of the data to export.
 }

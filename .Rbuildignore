@@ -6,6 +6,7 @@
 ^Makefile$
 ^NEWS$
 ^tmp.*$
+^cache
 ^README-.*\.png$
 ^README\.Rmd$
 ^\.github$
@@ -21,5 +22,6 @@
 ^Meta$
 ^revdep$
 ^paper
+^inst/assembly
 ^[\.]?air\.toml$
 ^\.vscode$

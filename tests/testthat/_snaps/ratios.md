@@ -3,7 +3,7 @@
     Code
       res <- orbi_summarize_results(df, ratio_method = "sum")
     Message
-      v orbi_summarize_results() summarized ratios from 4320 peaks using the sum
+      v orbi_summarize_results() summarized ratios from 4.32k peak using the sum
       method and grouping the data by filename, compound, basepeak, and isotopocule
 
 # cli [fancy]
@@ -11,7 +11,7 @@
     Code
       res <- orbi_summarize_results(df, ratio_method = "sum")
     Message
-      [32m✔[39m [1morbi_summarize_results()[22m summarized ratios from 4320 peaks using the [1m[3msum[23m[22m
+      [32m✔[39m [1morbi_summarize_results()[22m summarized ratios from 4.32k peak using the [1m[3msum[23m[22m
       method and grouping the data by [32mfilename[39m, [32mcompound[39m, [32mbasepeak[39m, and [32misotopocule[39m
 
 ---

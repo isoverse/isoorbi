@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{orbi_plot_raw_data}
 \alias{orbi_plot_raw_data}
-\title{Visualize raw data}
+\title{Visualize data}
 \usage{
 orbi_plot_raw_data(
   dataset,
@@ -14,7 +14,7 @@ orbi_plot_raw_data(
   y_scale_sci_labels = TRUE,
   color = .data$isotopocule,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
-    "#666666"),
+    "#666666", "#BBBBBB"),
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
@@ -22,11 +22,11 @@ orbi_plot_raw_data(
 )
 }
 \arguments{
-\item{dataset}{isox dataset}
+\item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
 \item{isotopocules}{which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)}
 
-\item{x}{x-axis column for the plot, either "time.min" or "scan.no"}
+\item{x}{x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"}
 
 \item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
 
@@ -42,15 +42,17 @@ orbi_plot_raw_data(
 
 \item{color_scale}{use this parameter to replace the entire color scale rather than just the \code{colors}}
 
-\item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{orbi_add_blocks_to_plot()}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
+\item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 
-\item{add_all_blocks}{add highlight for all blocks, not just data blocks (equivalent to the \code{data_only = FALSE} argument in \code{orbi_add_blocks_to_plot()})}
+\item{add_all_blocks}{add highlight for all blocks, not just data blocks (equivalent to the \code{data_only = FALSE} argument in \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}})}
 
-\item{show_outliers}{whether to highlight data previously flagged as outliers by \code{orbi_flag_outliers()}}
+\item{show_outliers}{whether to highlight data previously flagged as outliers by \code{\link[=orbi_flag_outliers]{orbi_flag_outliers()}}}
 }
 \value{
 a ggplot object
 }
 \description{
-Call this function to visualize orbitrap data vs. time or scan number. The most common uses are \code{orbi_plot_raw_data(y = intensity)}, \code{orbi_plot_raw_data(y = ratio)}, and \code{orbi_plot_raw_data(y = tic * it.ms)}. By default includes all isotopcules that have not been previously identified by \code{orbi_flag_weak_isotopcules()} (if already called on dataset). To narrow down the isotopocules to show, use the \code{isotopocule} parameter.
+Call this function to visualize orbitrap data vs. time or scan number. The most common uses are \code{orbi_plot_raw_data(y = intensity)}, \code{orbi_plot_raw_data(y = ratio)}, and \code{orbi_plot_raw_data(y = tic * it.ms)}.
+If the selected \code{y} is peak-specific data (rather than scan-specific data like \code{tic * it.ms}), the \code{isotopocules} argument can be used to narrow down which isotopocules will be plotted.
+By default includes all isotopcules that have not been previously identified by \code{orbi_flag_weak_isotopcules()} (if already called on dataset).
 }

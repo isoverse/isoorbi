@@ -24,14 +24,15 @@ test_that("test add_excel_sheet()", {
 # orbi_export_data_to_excel
 test_that("test orbi_export_data_to_excel()", {
   # failure
-  orbi_export_data_to_excel() |> expect_error("dataset.*must be a data frame")
+  orbi_export_data_to_excel() |>
+    expect_error("dataset.*must be.*aggregated.*or.*data frame")
   orbi_export_data_to_excel(mtcars, 42) |>
     expect_error("file.*must be a filepath")
 
   # success
   tmp_file <- tempfile()
   orbi_export_data_to_excel(mtcars, tmp_file, 2, int_format = "0") |>
-    expect_message("exported.*dataset.*32 rows.*11 columns") |>
+    expect_message("exported the.*dataset.*32 rows.*11") |>
     suppressMessages()
   unlink(tmp_file)
 })

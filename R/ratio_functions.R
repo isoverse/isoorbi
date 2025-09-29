@@ -1,3 +1,96 @@
+# Functions to calculate ions.incremental -------------
+
+#' Calculate ions from intensities
+#'
+#' This functions calculates ions (`ions.incremental`) from intensities based on the equation \deqn{N_{ions} = S/N \cdot{} C_N/z \cdot{} \sqrt{R_N/R} \cdot \sqrt{N_{MS}}}
+#' where S is the reported signal (`intensity`) of the isotopocule, N is the noise associated with the signal (`peakNoise`),
+#' measured at the resolution setting R (`resolution`), the noise factor \eqn{C_N} (`CN`) is the number of charges corresponding to the Orbitrap noise band
+#' at some reference resolution \eqn{R_N} (`RN`), \eqn{N_{MS}} is the number of microscans, and z is the charge per ion (`charge`) of the isotopocule.
+#' See Makarov and Denisov (2009) and Eiler et al. (2017) for details about this equation. The default values for `CN` and `RN` are from the
+#' Orbitrap Exploris Isotope Solutions Getting Started Guide (BRE0032999, Revision A, October 2022). Note that the exact values of these factors are
+#' only critical if the number of ions are interpreted outside of ratio calculations (in ratio calculations, these factors cancel).
+#'
+#' If using a dataset read from isox files you might have to add a `charge` column if it does not yet exist that indicates the charge of the isotopocule.
+#' If using data from raw files, use [orbi_identify_isotopocules()] to identify the isotopocules and set their charge values.
+#'
+#' @inheritParams orbi_flag_satellite_peaks
+#' @param CN noise factor
+#' @param RN reference resolution of the noise factor
+#' @return same object as provided in `dataset` with new column `ions.incremental`
+orbi_calculate_ions <- function(dataset, CN = 3.0, RN = 240000) {
+  #safety checks
+  check_dataset_arg(dataset)
+  check_arg(CN, is_scalar_double(CN), "must be a single number")
+  check_arg(RN, is_scalar_double(CN), "must be a single number")
+
+  # keep track for later
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  added_scan_cols <- c("resolution", "microscans")
+  peaks <- if (is_agg) {
+    dataset$peaks |>
+      dplyr::left_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            dplyr::any_of(added_scan_cols)
+          ),
+        by = c("uidx", "scan.no")
+      )
+  } else {
+    dataset
+  }
+
+  # check if isotopocules have been identified
+  if (!"isotopocule" %in% names(peaks)) {
+    cli_abort(
+      "this {.field dataset} does not yet have an {.field isotopocule} column, make sure to call {.strong orbi_identify_isotopocules()} first"
+    )
+  }
+
+  # check columns
+  check_tibble(
+    peaks,
+    req_cols = c(
+      "intensity",
+      "peakNoise",
+      "resolution",
+      "charge",
+      "microscans"
+    ),
+    .arg = "dataset"
+  )
+
+  start <- start_info()
+
+  # add ions.incremental
+  peaks <- peaks |>
+    dplyr::mutate(
+      ions.incremental = .data$intensity /
+        .data$peakNoise *
+        !!CN /
+          .data$charge *
+          sqrt(!!RN / .data$resolution) *
+          sqrt(.data$microscans),
+      .after = "intensity"
+    )
+
+  finish_info(
+    "calculated {.field ions.incremental} with noise factor {.field CN} = {.val {CN}} at reference resolution {.field RN} = {.val {RN}}",
+    start = start
+  )
+
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$peaks <- peaks |>
+      dplyr::select(-dplyr::any_of(added_scan_cols))
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(peaks)
+  }
+}
+
 # Functions to calculate direct ratios --------------
 
 #' @title Calculate direct isotopocule ratios
@@ -373,7 +466,7 @@ orbi_calculate_summarized_ratio <- function(
 
 #' @title Generate the results table
 #' @description Contains the logic to generate the results table. It passes the  `ratio_method` parameter to the [orbi_calculate_summarized_ratio()] function for ratio calculations.
-#' @param dataset A tibble from `IsoX` output ([orbi_read_isox()]) and with a basepeak already defined (using `orbi_define_basepeak()`). Optionally, with block definitions ([orbi_define_blocks_for_dual_inlet()]) or even additional block segments ([orbi_segment_blocks()]).
+#' @inheritParams orbi_flag_satellite_peaks
 #' @inheritParams orbi_calculate_summarized_ratio
 #' @param .by additional grouping columns for the results summary (akin to dplyr's `.by` parameter e.g. in [dplyr::summarize()]). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.
 #' @param include_flagged_data whether to include flagged data in the calculations (FALSE by default)
@@ -385,7 +478,7 @@ orbi_calculate_summarized_ratio <- function(
 #'       orbi_define_basepeak("M0")  |>
 #'       orbi_summarize_results(ratio_method = "sum")
 #'
-#' @return Returns a results summary table retaining the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns: `start_scan.no`, `end_scan.no`, `start_time.min`, `mean_time.min`, `end_time.min`, `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
+#' @return Returns a results summary table (as tibble if `dataset` is a tibble, as `dataset$tibble` if `dataset` is aggregated raw data) with the columns `filename`, `compound`, `isotopocule` and `basepeak` as well as the grouping columns from the `.by` parameter that are part of the input `dataset`. Additionally this function adds the following results columns: `start_scan.no`, `end_scan.no`, `start_time.min`, `mean_time.min`, `end_time.min`, `ratio`, `ratio_sem`, `ratio_relative_sem_permil`, `shot_noise_permil`, `No.of.Scans`, `minutes_to_1e6_ions`
 #'
 #' * `ratio`: The isotope ratio between the `isotopocule` and the `basepeak`, calculated using the `ratio_method`
 #'
@@ -422,11 +515,7 @@ orbi_summarize_results <- function(
   include_unused_data = FALSE
 ) {
   # basic checks
-  check_arg(
-    dataset,
-    !missing(dataset) && is.data.frame(dataset),
-    "must be a data frame or tibble"
-  )
+  check_dataset_arg(dataset)
   check_arg(
     ratio_method,
     !missing(ratio_method) && is_scalar_character(ratio_method),
@@ -434,10 +523,36 @@ orbi_summarize_results <- function(
   )
   ratio_method <- arg_match(ratio_method)
 
+  # deal with aggregaged data
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  if (is_agg) {
+    dataset <- dataset |> orbi_filter_isotopocules() |> suppressMessages()
+    peaks <- dataset$peaks |>
+      dplyr::left_join(
+        dataset$file_info |> dplyr::select("uidx", "filename"),
+        by = "uidx"
+      ) |>
+      dplyr::left_join(
+        dataset$scans |>
+          dplyr::select(
+            "uidx",
+            "scan.no",
+            "time.min",
+            dplyr::any_of(c("is_outlier", .by))
+          ),
+        by = c("uidx", "scan.no")
+      )
+  } else {
+    peaks <- dataset
+  }
+
   # check that required data columns are present
   base_group_cols <- c("filename", "compound", "basepeak", "isotopocule")
+  if ("uidx" %in% names(peaks)) {
+    base_group_cols <- c("uidx", base_group_cols)
+  }
   check_tibble(
-    dataset,
+    peaks,
     c(
       base_group_cols,
       "time.min",
@@ -447,26 +562,26 @@ orbi_summarize_results <- function(
   )
 
   # filter flagged data
-  n_all <- nrow(dataset)
-  dataset_wo_flagged <- dataset |> filter_flagged_data()
-  n_flagged <- n_all - nrow(dataset_wo_flagged)
+  n_all <- nrow(peaks)
+  peaks_wo_flagged <- peaks |> filter_flagged_data()
+  n_flagged <- n_all - nrow(peaks_wo_flagged)
   if (!include_flagged_data) {
-    dataset <- dataset_wo_flagged
+    peaks <- peaks_wo_flagged
   }
 
   # filter unused data
   n_unused <- 0L
-  if ("data_type" %in% names(dataset)) {
-    dataset_wo_unused <- dataset |>
+  if ("data_type" %in% names(peaks)) {
+    peaks_wo_unused <- peaks |>
       dplyr::filter(.data$data_type == orbi_get_option("data_type_data"))
-    n_unused <- n_all - n_flagged - nrow(dataset_wo_unused)
+    n_unused <- n_all - n_flagged - nrow(peaks_wo_unused)
     if (!include_unused_data) {
-      dataset <- dataset_wo_unused
+      peaks <- peaks_wo_unused
     }
   }
 
   # set basic groupings (use .add so prior group_by groupings are also preserved)
-  df.group <- dataset |>
+  df.group <- peaks |>
     dplyr::group_by(!!!lapply(base_group_cols, rlang::sym), .add = TRUE)
 
   # add additional groupings
@@ -474,11 +589,11 @@ orbi_summarize_results <- function(
   if (!missing(.by)) {
     # user defined
     by_quo <- rlang::enquo(.by)
-    add_groups <- tidyselect::eval_select(expr = by_quo, data = dataset) |>
+    add_groups <- tidyselect::eval_select(expr = by_quo, data = peaks) |>
       names()
   } else {
     # default .by - only use the columns that actually exist in the data
-    add_groups <- intersect(.by, names(dataset))
+    add_groups <- intersect(.by, names(peaks))
   }
   if (length(add_groups) > 0) {
     df.group <- df.group |>
@@ -526,9 +641,13 @@ orbi_summarize_results <- function(
             (sum(.data$ions.incremental) * sum(.data$basepeak_ions))
         )),
 
-      ratio_sem = calculate_ratios_sem(
-        ratios = .data$ions.incremental / .data$basepeak_ions
-      ),
+      ratio_sem = if (dplyr::n() > 1) {
+        calculate_ratios_sem(
+          ratios = .data$ions.incremental / .data$basepeak_ions
+        )
+      } else {
+        NA_real_
+      },
 
       minutes_to_1e6_ions = (1E6 / sum(.data$ions.incremental)) *
         (max(.data$time.min) - min(.data$time.min)),
@@ -565,9 +684,9 @@ orbi_summarize_results <- function(
   info_flagged <- if (include_flagged_data) "including" else "excluding"
   info_unused <- if (include_unused_data) "including" else "excluding"
   finish_info(
-    "summarized ratios from {n_peaks} peak{?s} ",
+    "summarized ratios from {format_number(n_peaks)} peak{?s} ",
     if (n_flagged > 0 || n_unused > 0) {
-      "({.emph {info_flagged}} {n_flagged} flagged peaks; {.emph {info_unused}} {n_unused} unused peaks) "
+      "({.emph {info_flagged}} {format_number(n_flagged)} flagged peaks; {.emph {info_unused}} {format_number(n_unused)} unused peaks) "
     },
     "using the {.emph {.strong {ratio_method}}} method ",
     "and grouping the data by {.field {dplyr::group_vars(df.group)}}",
@@ -577,5 +696,10 @@ orbi_summarize_results <- function(
   )
 
   # return
-  return(out$result)
+  if (is_agg) {
+    dataset$summary <- out$result |> dplyr::select(-"filename")
+    return(dataset)
+  } else {
+    return(out$result)
+  }
 }
