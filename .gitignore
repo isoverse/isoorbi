@@ -49,6 +49,8 @@ vignettes/**/*.pdf
 tmp/
 docs/
 plots/
+*.isox
+*.raw
 *.parquet
 *.zip
 *.log
