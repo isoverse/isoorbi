@@ -31,8 +31,8 @@ To use the latest updates, you can install the development version of
     pak::pak("isoverse/isoorbi")
 
 > Important: as of isoorbi version 1.5.0, reading .raw files directly
-> using the isoraw reader built into this package (\[inst/assembly\]).
-> The first time you read a .raw file, you will be asked to agree to
+> using the [isoraw reader](inst/assembly) built into this package. The
+> first time you read a .raw file, you will be asked to agree to
 > [Thermo’s license
 > agreement](https://github.com/fgcz/rawrr/blob/devel/inst/rawrrassembly/RawFileReaderLicense.txt)
 > to proceed. Implementation of the isoraw reader, would not have been
