@@ -699,7 +699,7 @@ orbi_adjust_block <- function(
 
   if (change_start) {
     sprintf(
-      "{cli::symbol$arrow_right} moved {.field block %d} start from scan %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} start from {.field scan.no} %d (%.2f min) to %d (%.2f min)",
       block,
       old_start_scan,
       old_start_time,

@@ -1,3 +1,37 @@
+# orbi_adjust_block [plain]
+
+    Code
+      result2 <- orbi_adjust_block(test_data, 1, "test1", shift_start_scan.no = 1)
+    Message
+      v orbi_adjust_block() made the following block adjustments in file test1:
+        > moved block 1 start from scan.no 1 (0.10 min) to 2 (0.20 min)
+
+---
+
+    Code
+      result3 <- orbi_adjust_block(test_data, 2, "test1", shift_start_time.min = -1)
+    Message
+      v orbi_adjust_block() made the following block adjustments in file test1:
+        > moved block 2 start from scan.no 4 (0.40 min) to 1 (0.10 min)
+        > moved block 1 end to the new start of block 2
+
+# orbi_adjust_block [fancy]
+
+    Code
+      result2 <- orbi_adjust_block(test_data, 1, "test1", shift_start_scan.no = 1)
+    Message
+      [32m✔[39m [1morbi_adjust_block()[22m made the following [32mblock[39m adjustments in file [34mtest1[39m:
+        → moved [32mblock 1[39m start from [32mscan.no[39m 1 (0.10 min) to 2 (0.20 min)
+
+---
+
+    Code
+      result3 <- orbi_adjust_block(test_data, 2, "test1", shift_start_time.min = -1)
+    Message
+      [32m✔[39m [1morbi_adjust_block()[22m made the following [32mblock[39m adjustments in file [34mtest1[39m:
+        → moved [32mblock 2[39m start from [32mscan.no[39m 4 (0.40 min) to 1 (0.10 min)
+        → moved [32mblock 1[39m end to the new start of [32mblock 2[39m
+
 # orbi_segment_block() [plain]
 
     Code
