@@ -30,13 +30,18 @@ To use the latest updates, you can install the development version of
     if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
     pak::pak("isoverse/isoorbi")
 
-> Important: reading .raw files directly is made possible by the [rawrr
-> package](https://github.com/fgcz/rawrr), which wraps Thermo’s
-> [RawFileReader](https://github.com/thermofisherlsms/RawFileReader).
+> Important: as of isoorbi version 1.5.0, reading .raw files directly
+> using the isoraw reader built into this package (\[inst/assembly\]).
 > The first time you read a .raw file, you will be asked to agree to
 > [Thermo’s license
 > agreement](https://github.com/fgcz/rawrr/blob/devel/inst/rawrrassembly/RawFileReaderLicense.txt)
-> to proceed.
+> to proceed. Implementation of the isoraw reader, would not have been
+> possible without the example provided by Jim Shofstahl as part of
+> Thermo’s
+> [RawFileReader](https://github.com/thermofisherlsms/RawFileReader) and
+> the raw file reader developed by Witold Wolski, Christian Panse,
+> Christian Trachsel, and Tobias Kockmann as part of the [rawrr
+> package](https://github.com/fgcz/rawrr).
 
 ## Show me some code
 
