@@ -16,6 +16,12 @@
       source = "CreationDate",
       cast = "as.POSIXct"
     ) |>
+    orbi_add_to_aggregator(
+      "file_info",
+      "in_aquisition",
+      source = "InAquisition",
+      cast = "as.logical"
+    ) |>
     orbi_add_to_aggregator("scans", "scan.no", cast = "as.integer") |>
     orbi_add_to_aggregator(
       "scans",

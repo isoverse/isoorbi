@@ -101,7 +101,8 @@ namespace Isoorbi
             }
             if (rawFile.InAcquisition)
             {
-                throw new InvalidOperationException($"RAW file is still being aquired, reading this is not yet supported: {path}");
+                Console.WriteLine("Warning: RAW file is still being aquired, support for this has not been fully tested");
+                //throw new InvalidOperationException($"RAW file is still being aquired, reading this is not yet supported: {path}");
             }
 
             // get the first and last scan from the RAW file
@@ -250,9 +251,10 @@ namespace Isoorbi
                 data.Add(field.Name, value);
             }
 
-            // basice info
+            // basic info
             addInfo(new DataField<string>("FileName"), Path.GetFileName(rawFile.FileName));
             addInfo(new DataField<DateTime>("CreationDate"), rawFile.CreationDate);
+            addInfo(new DataField<bool>("InAquisition"), rawFile.InAcquisition);
 
             // headers / extended headers
             addInfo(new DataField<string>("Operator"), rawFile.FileHeader.WhoCreatedId);

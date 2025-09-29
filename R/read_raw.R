@@ -328,8 +328,28 @@ run_isoraw <- function(
       c(
         "encountered {length(errors)} error{?s} when running the isoraw raw file reader",
         # having the log file makes it possible for users to click on the link and see exactly what's going wrong
-        if (!is.null(logfile)) c("i" = "see {.file {logfile}} for details"),
+        # --> cache folders are not cleaned up if there are erorrs
+        if (!is.null(logfile)) {
+          c(
+            "i" = "see {.file {gsub(getwd(), '.', logfile, fixed = TRUE)}} for details"
+          )
+        },
         errors |> set_names("x")
+      )
+    )
+  }
+  warnings <- output[grepl("warning", output, ignore.case = TRUE)]
+  if (length(warnings) > 0) {
+    cli_warn(
+      c(
+        "encountered {length(warnings)} warnings{?s} when running the isoraw raw file reader",
+        if (!is.null(logfile)) {
+          c(
+            # --> cache folders ARE cleaned up if there are erorrs
+            "i" = "see {.file {gsub(getwd(), '.', logfile, fixed = TRUE)}} for details (you might have to unzip the cache.zip first)"
+          )
+        },
+        warnings |> set_names("!")
       )
     )
   }
@@ -1211,8 +1231,8 @@ read_raw_file <- function(
       dplyr::n() == 1L | !purrr::map_lgl(.data$condition, is_empty)
     )
 
-  # caching (only if at least the isoraw read had no issues)
-  cleanup <- nrow(out$conditions) == 0L
+  # caching (only if the isoraw read had no errors)
+  cleanup <- nrow(out$conditions[out$conditions$type == "error", ]) == 0L
   if (cache && cleanup) {
     # cache info
     arrow::write_parquet(
