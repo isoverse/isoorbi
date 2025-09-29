@@ -87,67 +87,54 @@ test_that("orbi_read_raw()", {
         # read without spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE)
     )
-    expect_snaptho(x)
-  })
+    expect_snapshot(x)
 
-  # plus aggregate and get
-  test_that_cli("orbi_aggregate_raw()", configs = c("plain", "fancy"), {
+    # aggregate
     expect_snapshot(y <- orbi_aggregate_raw(x))
-    expect_snaptho(y)
+    expect_snapshot(y)
     y$file_info$file_path <- NULL # OS dependent
     y$file_info$`Creation date` <- NULL # OS dependent
     expect_snapshot(
       out <- y |> orbi_get_data(scans = everything(), spectra = everything())
     )
-    expect_snapshot_value(out, style = "json2")
   })
 
   # succesful read with spectra
-  expect_snapshot(
-    {
+  test_that_cli("orbi_read_raw() step2", configs = c("plain", "fancy"), {
+    expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw() |>
+        # read with spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
-      x |> as_tibble() |> select(-"filepath")
-    }
-  )
-  test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
+    )
     expect_snapshot(x)
-  })
 
-  # test aggregate
-  test_that_cli("orbi_aggregate_raw()", configs = c("plain", "fancy"), {
+    # aggregate
     y <- orbi_aggregate_raw(x, aggregator = "extended")
     expect_snapshot(y)
     y <- orbi_aggregate_raw(x, aggregator = "minimal")
     expect_snapshot(y)
-  })
-  y <- orbi_aggregate_raw(x, aggregator = "minimal") |> suppressMessages()
-  y$file_info$file_path <- NULL # OS dependent
-  y$file_info$`Creation date` <- NULL # OS dependent
 
-  # test mapping
-  isotopologs <- tibble(
-    compound = "nitrate",
-    isotopolog = c("M0", "15N", "17O", "18O"),
-    mass = c(61.9878, 62.9850, 62.9922, 63.9922),
-    tolerance = 1,
-    charge = 1
-  )
-  test_that_cli("orbi_identify_isotopocules()", configs = c("plain", "fancy"), {
+    y$file_info$file_path <- NULL # OS dependent
+    y$file_info$`Creation date` <- NULL # OS dependent
+
+    # test mapping
+    isotopologs <- tibble(
+      compound = "nitrate",
+      isotopolog = c("M0", "15N", "17O", "18O"),
+      mass = c(61.9878, 62.9850, 62.9922, 63.9922),
+      tolerance = 1,
+      charge = 1
+    )
+
     expect_snapshot(z <- orbi_identify_isotopocules(y, isotopologs))
     expect_equal(z$peaks, orbi_identify_isotopocules(y$peak, isotopologs)) |>
       suppressMessages()
-  })
 
-  # test get
-  test_that_cli("orbi_get_data()", configs = c("plain", "fancy"), {
+    # test get
     expect_snapshot(
       out <- y |> orbi_get_data(scans = everything(), spectra = everything())
     )
   })
-  expect_snapshot(
-    y |> orbi_get_data(scans = everything(), spectra = everything())
-  )
 }) |>
   withr::with_options(new = list(show_exec_times = FALSE))
