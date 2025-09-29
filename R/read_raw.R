@@ -437,6 +437,7 @@ read_cached_isoraw_output <- function(
 #' Find raw files
 #' @description Finds all .raw files in a folder.
 #' @param folder path to a folder with raw files
+#' @param pattern provide a name pattern to find only specific raw files
 #' @param include_cache whether to include .raw.cache.zip folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files
 #' @param recursive whether to find files recursively
 #'
@@ -446,7 +447,12 @@ read_cached_isoraw_output <- function(
 #' orbi_find_raw(system.file("extdata", package = "isoorbi"))
 #'
 #' @export
-orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
+orbi_find_raw <- function(
+  folder,
+  pattern = NULL,
+  include_cache = TRUE,
+  recursive = TRUE
+) {
   # safety checks
   check_arg(
     folder,
@@ -460,6 +466,16 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
     include_type = FALSE,
     include_value = TRUE
   )
+  check_arg(
+    pattern,
+    is.null(pattern) || is_scalar_character(pattern),
+    "must be a single string if provided"
+  )
+  check_arg(
+    include_cache,
+    is_scalar_logical(include_cache),
+    "must be TRUE or FALSE"
+  )
   check_arg(recursive, is_scalar_logical(recursive), "must be TRUE or FALSE")
 
   # raw files
@@ -470,6 +486,9 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
     recursive = recursive
   ) |>
     unique()
+  if (!is.null(pattern)) {
+    files <- files[grepl(pattern, files)]
+  }
 
   # cached folders
   if (include_cache) {
@@ -480,6 +499,9 @@ orbi_find_raw <- function(folder, include_cache = TRUE, recursive = TRUE) {
       recursive = recursive
     ) |>
       unique()
+    if (!is.null(pattern)) {
+      cache_files <- cache_files[grepl(pattern, cache_files)]
+    }
     if (length(cache_files) > 0) {
       # include folders
       linked_files <- gsub("\\.raw\\.cache\\.zip$", ".raw", cache_files)

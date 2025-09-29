@@ -1,8 +1,8 @@
 # orbi_read_raw() [plain]
 
     Code
-      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-      cache = FALSE, read_cache = FALSE)
+      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
+      pattern = "nitrate"), cache = FALSE, read_cache = FALSE)
     Message
       v orbi_read_raw() read 'nitrate_test_10scans.raw' (124.68 kB)
       v orbi_read_raw() read 'nitrate_test_1scan.raw' (84.10 kB)
@@ -77,8 +77,8 @@
 # orbi_read_raw() [fancy]
 
     Code
-      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-      cache = FALSE, read_cache = FALSE)
+      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
+      pattern = "nitrate"), cache = FALSE, read_cache = FALSE)
     Message
       [32m✔[39m [1morbi_read_raw()[22m read [34mnitrate_test_10scans.raw[39m (124.68 kB)
       [32m✔[39m [1morbi_read_raw()[22m read [34mnitrate_test_1scan.raw[39m (84.10 kB)
@@ -153,8 +153,8 @@
 # orbi_read_raw() step2 [plain]
 
     Code
-      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-      cache = FALSE, read_cache = FALSE, include_spectra = 1)
+      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
+      pattern = "nitrate"), cache = FALSE, read_cache = FALSE, include_spectra = 1)
     Message
       v orbi_read_raw() read 'nitrate_test_10scans.raw' (124.68 kB), included the
       spectrum from 1 scan
@@ -270,8 +270,8 @@
 # orbi_read_raw() step2 [fancy]
 
     Code
-      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi")),
-      cache = FALSE, read_cache = FALSE, include_spectra = 1)
+      x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
+      pattern = "nitrate"), cache = FALSE, read_cache = FALSE, include_spectra = 1)
     Message
       [32m✔[39m [1morbi_read_raw()[22m read [34mnitrate_test_10scans.raw[39m (124.68 kB), included the
       [32mspectrum[39m from 1 [32mscan[39m

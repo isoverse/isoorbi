@@ -43,7 +43,7 @@ agg_data <- structure(
 test_file <-
   system.file(
     "extdata",
-    "testfile_dual_inlet_new.isox",
+    "testfile_dual_inlet.isox",
     package = "isoorbi"
   ) |>
   orbi_read_isox() |>

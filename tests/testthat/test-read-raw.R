@@ -14,7 +14,11 @@ test_that("orbi_find_raw()", {
 
   # files included in package
   expect_equal(
-    orbi_find_raw(system.file("extdata", package = "isoorbi")) |> basename(),
+    orbi_find_raw(
+      system.file("extdata", package = "isoorbi"),
+      pattern = "nitrate"
+    ) |>
+      basename(),
     c("nitrate_test_10scans.raw", "nitrate_test_1scan.raw")
   )
 
@@ -83,7 +87,7 @@ test_that("orbi_read_raw()", {
   test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
     expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
-        orbi_find_raw() |>
+        orbi_find_raw(pattern = "nitrate") |>
         # read without spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE)
     )
@@ -103,7 +107,7 @@ test_that("orbi_read_raw()", {
   test_that_cli("orbi_read_raw() step2", configs = c("plain", "fancy"), {
     expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
-        orbi_find_raw() |>
+        orbi_find_raw(pattern = "nitrate") |>
         # read with spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
     )
