@@ -10,7 +10,8 @@ orbi_export_data_to_excel(
   dbl_digits = 7,
   int_format = "0",
   dbl_format = sprintf(sprintf("\%\%.\%sf", dbl_digits), 0),
-  include = c("file_info", "summary", "scans", "peaks", "problems")
+  include = c("file_info", "summary", "scans", "peaks", "problems"),
+  show_progress = rlang::is_interactive()
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ orbi_export_data_to_excel(
 \item{dbl_format}{the excel formatting style for doubles (created automatically from the dbl_digits parameter)}
 
 \item{include}{which tibbles to include if \code{dataset} is aggregated data. By default includes all but spectra}
+
+\item{show_progress}{whether to show a progress bar, by default always enabled when running interactively e.g. inside RStudio (and disabled in a notebook), turn off with \code{show_progress = FALSE}}
 }
 \value{
 returns dataset invisibly for use in pipes
