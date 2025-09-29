@@ -244,7 +244,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
 
   # finish info
   finish_info(
-    "identified {n_identified}/{n_peaks} peaks ({round(100 * n_identified/n_peaks)}%) ",
+    "identified {format_number(n_identified)}/{format_number(n_peaks)} peaks ({signif(100 * n_identified/n_peaks, 2)}%) ",
     "as isotopcules {.field {unique(found_peaks$isotopocule)}}",
     conditions = dplyr::bind_rows(
       multimatch_check$conditions,

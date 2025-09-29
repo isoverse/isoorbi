@@ -832,7 +832,7 @@ orbi_adjust_block <- function(
 
 #' @title Segment data blocks
 #' @description This step is optional and is intended to make it easy to explore the data within a sample or ref data block. Note that any raw data not identified with `data_type` set to "data" (`orbi_get_option("data_type_data")`) will stay unsegmented. This includes raw data flagged as "startup", "changeover", and "unused".
-#' @inheritParams orbi_adjust_block
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param into_segments segment each data block into this many segments. The result will have exactly this number of segments for each data block except for if there are more segments requested than observations in a group (in which case each observation will be one segment)
 #' @param by_scans segment each data block into segments spanning this number of scans. The result will be approximately the requested number of scans per segment, depending on what is the most sensible distribution of the data. For example, in a hypothetical data block with 31 scans, if by_scans = 10, this function will create 3 segments with 11, 10 and 10 scans each (most evenly distributed), instead of 4 segments with 10, 10, 10, 1 (less evenly distributed).
 #' @param by_time_interval segment each data block into segments spanning this time interval. The result will have the requested time interval for all segments except usually the last one which is almost always shorter than the requested interval.
@@ -843,10 +843,9 @@ orbi_segment_blocks <- function(
   by_scans = NULL,
   by_time_interval = NULL
 ) {
-  # type checks
+  # safety checks
+  check_dataset_arg(dataset)
   stopifnot(
-    "`dataset` must be a data frame or tibble" = !missing(dataset) &&
-      is.data.frame(dataset),
     "if set, `into_segments` must be a single positive integer" = is.null(
       into_segments
     ) ||
@@ -863,7 +862,25 @@ orbi_segment_blocks <- function(
   into_segments <- as.integer(into_segments)
   by_scans <- as.integer(by_scans)
 
+  # get scans
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  scans <- if (is_agg) {
+    dataset$scans |>
+      dplyr::left_join(
+        dataset$file_info |> dplyr::select("uidx", "filename"),
+        by = "uidx"
+      )
+  } else {
+    dataset
+  }
+
   # dataset columns check
+  if (!"block" %in% names(scans)) {
+    cli_abort(
+      "the {.field dataset} does not seem to have any block definitions yet, make sure to run {.strong orbi_define_block_for_dual_inlet()} or {.strong orbi_define_block_for_flow_injection()} first"
+    )
+  }
+
   req_cols <- c(
     "filename",
     "scan.no",
@@ -872,13 +889,10 @@ orbi_segment_blocks <- function(
     "sample_name",
     "data_type"
   )
-  if (length(missing <- setdiff(req_cols, names(dataset)))) {
-    sprintf(
-      "`dataset` is missing the column(s) '%s'",
-      paste(missing, collapse = "', '")
-    ) |>
-      rlang::abort()
+  if ("uidx" %in% names(scans)) {
+    req_cols <- c("uidx", req_cols)
   }
+  check_tibble(scans, req_cols = req_cols, .arg = "dataset")
 
   # provide exactly one argument on how to segment
   set_args <- sum(
@@ -897,22 +911,25 @@ orbi_segment_blocks <- function(
   }
 
   # info
-  dataset <- dataset |> factorize_dataset("filename")
   start <- start_info("is running")
+  by_cols <- "filename"
+  if ("uidx" %in% names(scans)) {
+    by_cols <- c("uidx", by_cols)
+  }
 
-  # get scans
-  scans <- dataset |>
-    dplyr::select(!!!req_cols) |>
+  # get single scans (for compatibility with tibble, technically redundant for aggregated data)
+  single_scans <- scans |>
+    dplyr::select(dplyr::all_of(req_cols)) |>
     dplyr::distinct() |>
     # make sure it's in the correct order (for data group identification later)
-    dplyr::arrange(.data$filename, .data$scan.no)
+    dplyr::arrange(!!!purrr::map(by_cols, sym), .data$scan.no)
 
   # calculate segments
   segmented_scans <-
-    scans |>
+    single_scans |>
     # segment
-    dplyr::group_by(.data$filename, .data$block, .data$data_type) |>
     dplyr::mutate(
+      .by = dplyr::all_of(c(by_cols, "block", "data_type")),
       segment = if (.data$data_type[1] == orbi_get_option("data_type_data")) {
         # data type is 'data'
         if (!is_empty(!!into_segments)) {
@@ -926,7 +943,6 @@ orbi_segment_blocks <- function(
         NA_integer_
       }
     ) |>
-    dplyr::ungroup() |>
     # determine data groups
     determine_data_groups()
 
@@ -936,24 +952,23 @@ orbi_segment_blocks <- function(
       .data$block > 0,
       .data$data_type == orbi_get_option("data_type_data")
     ) |>
-    dplyr::select("filename", "block", "segment", "scan.no") |>
+    dplyr::select(dplyr::all_of(c(by_cols, "block", "segment", "scan.no"))) |>
     dplyr::distinct() |>
-    dplyr::count(.data$filename, .data$block, .data$segment) |>
-    dplyr::group_by(.data$filename, .data$block) |>
+    dplyr::count(!!!purrr::map(by_cols, sym), .data$block, .data$segment) |>
     dplyr::summarise(
+      .by = dplyr::all_of(c(by_cols, "block")),
       n_segments = n(),
-      n_scans_avg = mean(n),
-      .groups = "drop"
+      n_scans_avg = mean(n)
     )
 
-  n_blocks <- dataset |>
+  n_blocks <- scans |>
     dplyr::filter(.data$block > 0) |>
     dplyr::select("filename", "block") |>
     dplyr::distinct() |>
     nrow()
   finish_info(
     "segmented {.field {n_blocks} data block{?s}} ",
-    "in {.file {length(levels(dataset$filename))} file{?s}} ",
+    "in {.file {length(unique(scans$filename))} file{?s}} ",
     "creating {info_sum$n_segments |> mean() |> signif(2)} ",
     "segments per block (on average) with ",
     "{info_sum$n_scans_avg |> mean() |> signif(2)} ",
@@ -962,19 +977,18 @@ orbi_segment_blocks <- function(
   )
 
   # combine with the whole dataset
-  updated_dataset <-
-    dataset |>
+  updated_scans <-
+    scans |>
     dplyr::select(
       -"block",
       -"sample_name",
       -"data_type",
-      -dplyr::any_of("data_group"),
-      -dplyr::any_of("segment")
+      -dplyr::any_of(c("data_group", "segement"))
     ) |>
     dplyr::left_join(
       segmented_scans |>
         dplyr::select(
-          "filename",
+          dplyr::all_of(by_cols),
           "scan.no",
           "data_group",
           "block",
@@ -982,11 +996,20 @@ orbi_segment_blocks <- function(
           "data_type",
           "segment"
         ),
-      by = c("filename", "scan.no")
+      by = c(by_cols, "scan.no")
     )
 
   # return new dataset
-  return(updated_dataset)
+
+  # return updated dataset
+  if (is_agg) {
+    # got aggregated data to begin with --> return aggregated data
+    dataset$scans <- scans |> dplyr::select(-dplyr::any_of("filename"))
+    return(dataset)
+  } else {
+    # got a plain peaks tibble
+    return(scans)
+  }
 }
 
 #' @title Summarize blocks info
