@@ -548,6 +548,9 @@ orbi_summarize_results <- function(
 
   # check that required data columns are present
   base_group_cols <- c("filename", "compound", "basepeak", "isotopocule")
+  if ("uidx" %in% names(peaks)) {
+    base_group_cols <- c("uidx", base_group_cols)
+  }
   check_tibble(
     peaks,
     c(
@@ -694,7 +697,7 @@ orbi_summarize_results <- function(
 
   # return
   if (is_agg) {
-    dataset$summary <- out$result
+    dataset$summary <- out$result |> dplyr::select(-"filename")
     return(dataset)
   } else {
     return(out$result)

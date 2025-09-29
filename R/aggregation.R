@@ -112,7 +112,8 @@ knit_print.orbi_aggregated_data <- function(x, ...) {
 #' @param peaks columns to get from the aggregated `peaks`, all [dplyr::select()] syntax is supported
 #' @param spectra columns to get from the aggregated `spectra`, all [dplyr::select()] syntax is supported
 #' @param problems columns to get from the aggregated `problems`, all [dplyr::select()] syntax is supported
-#' @param by which columns to look for when joining datasets together. Make sure to include the relevant `by` columns in the selections of the individual datasets so they are joined correctly.
+#' @param summary columns to get from the `summary` calculated via [orbi_summarize_results()], all [dplyr::select()] syntax is supported. Warning: it is not advisable to combine columns from `summary` with anything other than `file_info` as it will lead to duplicated datasets given that `summary` integrates across multiple scans.
+#' @param by which columns to look for when joining datasets together. Make sure to include the relevant `by` columns in the selections of the individual datasets so they are joined correctly. The default is usually sufficient
 #' @return a tibble
 #' @export
 orbi_get_data <- function(
@@ -122,6 +123,7 @@ orbi_get_data <- function(
   peaks = NULL,
   spectra = NULL,
   problems = NULL,
+  summary = NULL,
   by = c("uidx", "scan.no")
 ) {
   spectra_quo <- enquo(spectra)
@@ -133,6 +135,7 @@ orbi_get_data <- function(
     peaks = {{ peaks }},
     spectra = !!spectra_quo,
     problems = {{ problems }},
+    summary = {{ summary }},
     by = by
   )
   # warn about missing spectra

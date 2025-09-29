@@ -1,10 +1,11 @@
-#' @title Export data frame to excel
-#' @description This functions exports the final `dataset` into an Excel file.
-#' @param dataset data frame
+#' @title Export data to excel
+#' @description This functions exports the `dataset` into an Excel file. If the `dataset` is aggregated data, use the `include` parameter to decide which part of the data to export.
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param file file path to export the file
 #' @param dbl_digits how many digits to show for dbls (all are exported)
 #' @param int_format the excel formatting style for integers
 #' @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
+#' @param include which tibbles to include if `dataset` is aggregated data. By default includes all but spectra
 #' @export
 #' @return returns dataset invisibly for use in pipes
 orbi_export_data_to_excel <- function(
@@ -12,7 +13,8 @@ orbi_export_data_to_excel <- function(
   file,
   dbl_digits = 7,
   int_format = "0",
-  dbl_format = sprintf(sprintf("%%.%sf", dbl_digits), 0)
+  dbl_format = sprintf(sprintf("%%.%sf", dbl_digits), 0),
+  include = c("file_info", "summary", "scans", "peaks", "problems")
 ) {
   # check for availability
   if (!requireNamespace("openxlsx", quietly = TRUE)) {
@@ -23,39 +25,82 @@ orbi_export_data_to_excel <- function(
   }
 
   # safety checks
-  check_arg(
-    dataset,
-    !missing(dataset) && is.data.frame(dataset),
-    "must be a data frame or tibble"
-  )
+  check_dataset_arg(dataset)
   check_arg(
     file,
     !missing(file) && is_scalar_character(file),
     "must be a filepath"
   )
+  check_arg(include, is_character(include), "must be a character vector")
 
   # info
-  start <- start_info("is running")
+  start <- start_info("is writing {.field {pb_status}} | {pb_elapsed}")
 
   # make excel workbook
   wb <- openxlsx::createWorkbook()
 
   # add excel sheet
-  add_excel_sheet(
-    wb,
-    sheet_name = "dataset",
-    dataset = dataset,
-    dbl_digits = dbl_digits,
-    int_format = int_format,
-    dbl_format = dbl_format
-  )
+  if (is(dataset, "orbi_aggregated_data")) {
+    # aggregated dataset
+    sheets <- intersect(include, names(dataset))
+    if (length(sheets) == 0) {
+      cli_abort(
+        "none of the requested tables ({.field {include}}) are available in the {.field dataset}"
+      )
+    }
+    info <- c()
+    for (sheet in sheets) {
+      # progress
+      cli_progress_update(id = start$pb, inc = 0, status = sheet, force = TRUE)
+      # info
+      info <- c(
+        info,
+        format_inline(
+          "{format_number(nrow(dataset[[sheet]]))}{qty(nrow(dataset[[sheet]]))} row{?s} of {.field {sheet}}"
+        )
+      )
+      # export
+      add_excel_sheet(
+        wb,
+        sheet_name = sheet,
+        # always include filename
+        dataset = if (!"filename" %in% names(dataset[[sheet]])) {
+          dataset[[sheet]] |>
+            dplyr::left_join(
+              dataset$file_info[c("uidx", "filename")],
+              by = "uidx"
+            ) |>
+            dplyr::relocate("filename", .after = "uidx")
+        } else {
+          dataset[[sheet]]
+        },
+        dbl_digits = dbl_digits,
+        int_format = int_format,
+        dbl_format = dbl_format
+      )
+    }
+  } else {
+    # single data
+    info <- format_inline(
+      "{format_number(nrow(dataset))}{qty(nrow(dataset))} row{?s}, {ncol(dataset)} column{?s}"
+    )
+    add_excel_sheet(
+      wb,
+      sheet_name = "dataset",
+      dataset = dataset,
+      dbl_digits = dbl_digits,
+      int_format = int_format,
+      dbl_format = dbl_format
+    )
+  }
 
   # save workbook
+  cli_progress_update(id = start$pb, inc = 0, status = "file", force = TRUE)
   openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   # info
   finish_info(
-    "exported {.field dataset} ({nrow(dataset)} row{?s}, {ncol(dataset)} column{?s}) to {.file {file}}",
+    "exported the {.field dataset} ({info}) to {.file {file}}",
     start = start
   )
 
