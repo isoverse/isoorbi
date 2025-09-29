@@ -246,11 +246,13 @@ orbi_plot_satellite_peaks <- function(
     dynamic_wrap()
 }
 
-#' Visualize raw data
+#' Visualize data
 #'
-#' Call this function to visualize orbitrap data vs. time or scan number. The most common uses are `orbi_plot_raw_data(y = intensity)`, `orbi_plot_raw_data(y = ratio)`, and `orbi_plot_raw_data(y = tic * it.ms)`. By default includes all isotopcules that have not been previously identified by `orbi_flag_weak_isotopcules()` (if already called on dataset). To narrow down the isotopocules to show, use the `isotopocule` parameter.
+#' Call this function to visualize orbitrap data vs. time or scan number. The most common uses are `orbi_plot_raw_data(y = intensity)`, `orbi_plot_raw_data(y = ratio)`, and `orbi_plot_raw_data(y = tic * it.ms)`.
+#' If the selected `y` is peak-specific data (rather than scan-specific data like `tic * it.ms`), the `isotopocules` argument can be used to narrow down which isotopocules will be plotted.
+#' By default includes all isotopcules that have not been previously identified by `orbi_flag_weak_isotopcules()` (if already called on dataset).
 #'
-#' @param dataset isox dataset
+#' @inheritParams orbi_flag_satellite_peaks
 #' @param y expression for what to plot on the y-axis, e.g. `intensity`, `tic * it.ms` (pick one `isotopocules` as this is identical for different istopocules), `ratio`. Depending on the variable, you may want to adjust the `y_scale` and potentially `y_scale_sci_labels` argument.
 #' @param color expression for what to use for the color aesthetic, default is isotopocule
 #' @param add_data_blocks add highlight for data blocks if there are any block definitions in the dataset (uses [orbi_add_blocks_to_plot()]). To add blocks manually, set `add_data_blocks = FALSE` and manually call the `orbi_add_blocks_to_plot()` function afterwards.
@@ -276,7 +278,8 @@ orbi_plot_raw_data <- function(
     "#66A61E",
     "#E6AB02",
     "#A6761D",
-    "#666666"
+    "#666666",
+    "#BBBBBB"
   ),
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
@@ -285,16 +288,14 @@ orbi_plot_raw_data <- function(
 ) {
   # safety checks
   ## dataset
-  check_tibble(
-    dataset,
-    req_cols = c("filename", "compound", "scan.no", "time.min", "isotopocule")
-  )
+  check_dataset_arg(dataset)
+
   ## y
   check_arg(
     y,
     !missing(y),
     format_inline(
-      "can be any expression valid in the data frame, common examples include {.field y = intensity}, {.field y = ratio}, or {.field y = tic * it.ms}"
+      "can be any expression valid for scans or isotopocules plotting, common examples include {.field y = intensity}, {.field y = ratio}, or {.field y = tic * it.ms}"
     ),
     include_type = FALSE
   )
@@ -309,16 +310,88 @@ orbi_plot_raw_data <- function(
   x_column <- arg_match(x)
   y_scale <- arg_match(y_scale)
 
-  # prepare dataset
-  plot_df <- dataset |>
+  # prepare plot_df with y value
+  yquo <- enquo(y)
+  colorquo <- enquo(color)
+  if (is(dataset, "orbi_aggregated_data")) {
+    scans <- dataset$scans |>
+      dplyr::left_join(
+        # make sure to include only file info columns that don't overlap with the scans
+        dataset$file_info[
+          setdiff(
+            names(dataset$file_info),
+            names(dataset$scans)
+          ) |>
+            c("uidx")
+        ],
+        by = "uidx"
+      )
+    # see if expression can be evaluated for scans
+    out <- try_catch_cnds(scans |> dplyr::mutate(y = !!yquo))
+    if (nrow(out$conditions) > 0) {
+      # didn't work --> try peaks
+      dataset <- dataset |>
+        orbi_filter_isotopocules(isotopocules) |>
+        suppressMessages()
+      plot_df <- dataset$peaks |>
+        dplyr::left_join(
+          # make sure to include only scan columns that don't overlap with the scans
+          scans[
+            setdiff(
+              names(scans),
+              names(dataset$peaks)
+            ) |>
+              c("uidx", "scan.no")
+          ],
+          by = c("uidx", "scan.no")
+        )
+      # safetey check
+      out <- try_catch_cnds(plot_df[1, ] |> dplyr::mutate(y = !!yquo))
+      abort_cnds(
+        out$conditions,
+        message = "something went wrong generating the {.field y} variable with {.field {as_label(yquo)}}"
+      )
+    } else {
+      # can evaluate y with scans! use it
+      plot_df <- scans
+      # check on color too
+      out <- try_catch_cnds(plot_df[1, ] |> dplyr::mutate(color = !!colorquo))
+      if (nrow(out$conditions) > 0) {
+        # --> don't use color quo
+        colorquo <- quo(NULL)
+      }
+    }
+  } else {
+    # direct dataset
+    plot_df <- dataset |>
+      orbi_filter_isotopocules(isotopocules) |>
+      suppressMessages()
+    # safety check
+    out <- try_catch_cnds(plot_df[1, ] |> dplyr::mutate(y = !!yquo))
+    abort_cnds(
+      out$conditions,
+      message = "something went wrong generating the {.field y} variable with {.field {as_label(yquo)}}"
+    )
+  }
+
+  # check plot df
+  check_tibble(
+    plot_df,
+    req_cols = c("filename", "scan.no", "time.min"),
+    .arg = "dataset"
+  )
+
+  # continue plot_df prep
+  plot_df <- plot_df |>
     factorize_dataset(c("filename", "compound", "isotopocule")) |>
-    orbi_filter_isotopocules(isotopocules) |>
+    suppressMessages() |>
     # filter out satellite peaks and weak isotopocules (if isotopocules = c())
     filter_flagged_data(
       filter_satellite_peaks = TRUE,
       filter_weak_isotopocules = length(isotopocules) == 0L,
       filter_outliers = FALSE
-    )
+    ) |>
+    droplevels()
 
   # make sure a data group column is included
   if (!"data_group" %in% names(plot_df)) {
@@ -341,16 +414,8 @@ orbi_plot_raw_data <- function(
   }
   show_outliers <- show_outliers && any(plot_df$is_outlier)
 
-  # generate y value and color to check if they work
-  yquo <- enquo(y)
-  colorquo <- enquo(color)
-  out <- try_catch_cnds(plot_df |> dplyr::mutate(y = !!yquo))
-  abort_cnds(
-    out$conditions,
-    message = "something went wrong generating the {.field y} variable with {.field {as_label(yquo)}}"
-  )
-
-  out <- try_catch_cnds(plot_df |> dplyr::mutate(color = !!colorquo))
+  # generate color column
+  out <- try_catch_cnds(plot_df[1, ] |> dplyr::mutate(color = !!colorquo))
   abort_cnds(
     out$conditions,
     message = "something went wrong generating the {.field color} variable with {.field {as_label(colorquo)}}"
@@ -359,18 +424,22 @@ orbi_plot_raw_data <- function(
   # make plot
   plot <- plot_df |>
     ggplot2::ggplot() +
-    ggplot2::aes(x = !!sym(x_column), y = {{ y }}, color = {{ color }}) +
-    # data
+    ggplot2::aes(x = !!sym(x_column), y = {{ y }})
+  if (!quo_is_null(colorquo)) {
+    plot <- plot + ggplot2::aes(color = {{ color }})
+  }
+
+  # data
+  plot <- plot +
     ggplot2::geom_line(
       data = function(df) dplyr::filter(df, !.data$is_outlier),
       alpha = if (show_outliers) 0.5 else 1.0,
       map = ggplot2::aes(
         group = paste(
           .data$filename,
-          .data$compound,
-          .data$isotopocule,
           .data$data_group,
-          .data$isotopocule
+          if ("compound" %in% names(plot_df)) .data$compound,
+          if ("isotopocule" %in% names(plot_df)) .data$isotopocule
         )
       )
     ) +
@@ -388,9 +457,9 @@ orbi_plot_raw_data <- function(
     dynamic_wrap()
 
   # blocks
-  if (add_all_blocks && has_blocks(dataset)) {
+  if (add_all_blocks && has_blocks(plot_df)) {
     plot <- plot |> orbi_add_blocks_to_plot(x = x_column)
-  } else if (add_data_blocks && has_blocks(dataset)) {
+  } else if (add_data_blocks && has_blocks(plot_df)) {
     plot <- plot |>
       orbi_add_blocks_to_plot(
         x = x_column,
