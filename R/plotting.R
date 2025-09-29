@@ -476,7 +476,8 @@ orbi_plot_isotopocule_coverage <- function(
       "ions.incremental|intensity"
     ) |>
       unique(),
-    regexps = TRUE
+    regexps = TRUE,
+    .arg = "dataset"
   )
 
   # prepare dataset
@@ -513,16 +514,16 @@ orbi_plot_isotopocule_coverage <- function(
       xmin = if (x_column == "time.min") {
         .data$start_time.min -
           0.5 *
-            (max(.data$time.min) - min(.data$time.min)) /
-            (max(.data$scan.no) - min(.data$scan.no))
+            (max(.data$end_time.min) - min(.data$start_time.min)) /
+            (max(.data$end_scan.no) - min(.data$start_scan.no))
       } else {
         .data$start_scan.no - 0.5
       },
       xmax = if (x_column == "time.min") {
         .data$end_time.min +
           0.5 *
-            (max(.data$time.min) - min(.data$time.min)) /
-            (max(.data$scan.no) - min(.data$scan.no))
+            (max(.data$end_time.min) - min(.data$start_time.min)) /
+            (max(.data$end_scan.no) - min(.data$start_scan.no))
       } else {
         .data$end_scan.no + 0.5
       },
@@ -585,16 +586,16 @@ orbi_plot_isotopocule_coverage <- function(
         xmin = if (x_column == "time.min") {
           .data$start_time.min -
             0.5 *
-              (max(.data$time.min) - min(.data$time.min)) /
-              (max(.data$scan.no) - min(.data$scan.no))
+              (max(.data$end_time.min) - min(.data$start_time.min)) /
+              (max(.data$end_scan.no) - min(.data$start_scan.no))
         } else {
           .data$start_scan.no - 0.5
         },
         xmax = if (x_column == "time.min") {
           .data$end_time.min +
-            +0.5 *
-              (max(.data$time.min) - min(.data$time.min)) /
-              (max(.data$scan.no) - min(.data$scan.no))
+            0.5 *
+              (max(.data$end_time.min) - min(.data$start_time.min)) /
+              (max(.data$end_scan.no) - min(.data$start_scan.no))
         } else {
           .data$end_scan.no + 0.5
         }
