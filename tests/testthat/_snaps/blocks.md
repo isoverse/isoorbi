@@ -15,6 +15,24 @@
         > moved block 2 start from scan.no 4 (0.40 min) to 1 (0.10 min)
         > moved block 1 end to the new start of block 2
 
+---
+
+    Code
+      result4 <- orbi_adjust_block(test_data, 1, "test1", shift_end_scan.no = 1)
+    Message
+      v orbi_adjust_block() made the following block adjustments in file test1:
+        > moved block 1 end from scan 3 (0.30 min) to 4 (0.40 min)
+        > moved block 2 start to the new end of block 1
+
+---
+
+    Code
+      result5 <- orbi_adjust_block(test_data, 1, "test1", shift_end_time.min = 1)
+    Message
+      v orbi_adjust_block() made the following block adjustments in file test1:
+        > moved block 1 end from scan 3 (0.30 min) to 5 (0.50 min)
+        > moved block 2 start to the new end of block 1
+
 # orbi_adjust_block [fancy]
 
     Code
@@ -31,6 +49,24 @@
       [32m✔[39m [1morbi_adjust_block()[22m made the following [32mblock[39m adjustments in file [34mtest1[39m:
         → moved [32mblock 2[39m start from [32mscan.no[39m 4 (0.40 min) to 1 (0.10 min)
         → moved [32mblock 1[39m end to the new start of [32mblock 2[39m
+
+---
+
+    Code
+      result4 <- orbi_adjust_block(test_data, 1, "test1", shift_end_scan.no = 1)
+    Message
+      [32m✔[39m [1morbi_adjust_block()[22m made the following [32mblock[39m adjustments in file [34mtest1[39m:
+        → moved [32mblock 1[39m end from scan 3 (0.30 min) to 4 (0.40 min)
+        → moved [32mblock 2[39m start to the new end of [32mblock 1[39m
+
+---
+
+    Code
+      result5 <- orbi_adjust_block(test_data, 1, "test1", shift_end_time.min = 1)
+    Message
+      [32m✔[39m [1morbi_adjust_block()[22m made the following [32mblock[39m adjustments in file [34mtest1[39m:
+        → moved [32mblock 1[39m end from scan 3 (0.30 min) to 5 (0.50 min)
+        → moved [32mblock 2[39m start to the new end of [32mblock 1[39m
 
 # orbi_segment_block() [plain]
 

@@ -569,8 +569,7 @@ test_that("test orbi_adjust_block()", {
         1,
         "test1",
         shift_end_scan.no = 1
-      ),
-      "moved block 1 end from scan 3.*to 4"
+      )
     )
     expect_snapshot(
       result5 <- orbi_adjust_block(
@@ -578,8 +577,7 @@ test_that("test orbi_adjust_block()", {
         1,
         "test1",
         shift_end_time.min = 1
-      ),
-      "moved block 2 start to the new end of block 1"
+      )
     )
   }) |>
     withr::with_options(new = list(show_exec_times = FALSE))
