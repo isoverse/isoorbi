@@ -116,7 +116,7 @@ orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
 #' To avoid showing unidentified/missing peaks, run [orbi_filter_isotopocules()] first.
 #' @param show_filenames whether to show the filename in the first panel of reach row (usually the full spectrum panel)
 #' @param show_ref_and_lock_peaks whether to show reference and lock mass peaks in the spectrum
-#' @param show_focus_background whether to highlight the M+x panels with specific background colors that match them with the mass bands highlighted in the first panel
+#' @param show_focus_backgrounds whether to highlight the M+x panels with specific background colors that match them with the mass bands highlighted in the first panel
 #' @param background_colors the colors to use for the background highlighting
 #' @export
 orbi_plot_spectra <- function(
