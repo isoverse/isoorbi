@@ -126,6 +126,11 @@ orbi_get_data <- function(
   summary = NULL,
   by = c("uidx", "scan.no")
 ) {
+  check_arg(
+    aggregated_data,
+    !missing(aggregated_data) && is(aggregated_data, "orbi_aggregated_data"),
+    "must be a set of aggregated raw files"
+  )
   spectra_quo <- enquo(spectra)
   # get data
   out <- get_data(
