@@ -58,6 +58,7 @@ reference:
     These core functions are essential to process the data read from RAW or ISOX files
   contents:
   - orbi_identify_isotopocules
+  - orbi_calculate_ions
   - orbi_define_basepeak
   - orbi_summarize_results
   - orbi_calculate_summarized_ratio
@@ -76,7 +77,8 @@ reference:
   desc: >
     These functions handle data selection and flagging outliers.
   contents:
-  - orbi_filter_isox
+  - orbi_filter_isotopocules
+  - orbi_filter_files
   - orbi_flag_outliers
   - orbi_flag_satellite_peaks
   - orbi_flag_weak_isotopocules
@@ -120,6 +122,7 @@ reference:
   - orbi_filter_scan_intensity
   - orbi_filter_weak_isotopocules
   - orbi_filter_flagged_data
+  - orbi_filter_isox
   - orbi_calculate_ratios
   - orbi_get_settings
   - orbi_set_settings
