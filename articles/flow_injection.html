@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,19 +87,17 @@
 <span>  <span class="fu"><a href="../reference/orbi_define_block_for_flow_injection.html">orbi_define_block_for_flow_injection</a></span><span class="op">(</span>start_time.min <span class="op">=</span> <span class="fl">0.1</span>, end_time.min <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># flag extreme TICxIT values</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[158ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6449 peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[170ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6449 peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5
 isotopocules (<span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>) from <span style="color: #0000BB;">testfile_flow.isox</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[223ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> read <span style="color: #0000BB;">.isox</span> data from 1 file
-</code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[5ms]</span> <span style="font-weight: bold;">orbi_simplify_isox()</span> kept columns <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">scan.no</span>,
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[6ms]</span> <span style="font-weight: bold;">orbi_simplify_isox()</span> kept columns <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">scan.no</span>,
 <span style="color: #00BB00;">time.min</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">ions.incremental</span>, <span style="color: #00BB00;">tic</span>, and <span style="color: #00BB00;">it.ms</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[158ms]</span> <span style="font-weight: bold;">orbi_define_block_for_flow_injection()</span> added a new block (0.1 to 0.9
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[38ms]</span> <span style="font-weight: bold;">orbi_define_block_for_flow_injection()</span> added a new block (0.1 to 0.9
 min) to 3 files
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[68ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> confirmed that none of the 1290 scans are
-outliers based on <span style="color: #00BB00;">2 fold AGC cutoff</span>, i.e. based on <span style="font-style: italic;">scans below 1/2 and above 2</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[25ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> confirmed that none of the 1290 scans are
+<span style="color: #BBBB00;">outliers</span> based on <span style="color: #00BB00;">2 fold AGC cutoff</span>, i.e. based on <span style="font-style: italic;">scans below 1/2 and above 2</span>
 <span style="font-style: italic;">times the average number of ions </span><span style="color: #00BB00; font-style: italic;">tic</span><span style="font-style: italic;"> * </span><span style="color: #00BB00; font-style: italic;">it.ms</span><span style="font-style: italic;"> in the Orbitrap analyzer</span>, in 6
 data groups (based on <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">block</span>, and <span style="color: #00BB00;">segment</span>)
 </code></pre>
@@ -116,18 +114,18 @@ data groups (based on <span style="color: #00BB00;">filename</span>, <span style
 <span><span class="va">data_w_basepeak</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[67ms]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated
-5159 ratios for 4 isotopocules/base peak (<span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>)
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[65ms]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated
+5.16k <span style="color: #00BB00;">ratio</span> values for 4 isotopocules (<span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>)
 </code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ratio summaries</span></span>
 <span><span class="va">data_summary</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data_w_basepeak</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[95ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 4139 peaks (<span style="font-style: italic;">excluding</span>
-0 flagged peaks; <span style="font-style: italic;">excluding</span> 1020 unused peaks) using the <span style="font-weight: bold; font-style: italic;">sum</span> method and grouping
-the data by <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">basepeak</span>, <span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">block</span>, <span style="color: #00BB00;">sample_name</span>,
-<span style="color: #00BB00;">segment</span>, <span style="color: #00BB00;">data_group</span>, and <span style="color: #00BB00;">data_type</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[99ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 4.14k peak (<span style="font-style: italic;">excluding</span>
+0 flagged peaks; <span style="font-style: italic;">excluding</span> 1.02k unused peaks) using the <span style="font-weight: bold; font-style: italic;">sum</span> method and
+grouping the data by <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">basepeak</span>, <span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">block</span>,
+<span style="color: #00BB00;">sample_name</span>, <span style="color: #00BB00;">segment</span>, <span style="color: #00BB00;">data_group</span>, and <span style="color: #00BB00;">data_type</span>
 </code></pre>
 </div>
 </div>

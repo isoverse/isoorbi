@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 <li><p><code>data_type_startup</code>: the text used to flag raw data as being part of the startup</p></li>
 <li><p><code>data_type_changeover</code>: the text used to flag raw data as being part of a changeover</p></li>
 <li><p><code>data_type_unused</code>: the text used to flag raw data as being unused</p></li>
-<li><p><code>raw_aggregator</code>: configuration for pulling data out of raw files</p></li>
+<li><p><code>aggregators</code>: data aggregators for pulling data out of raw files. The list of available aggregators is accessible via <code>orbi_get_option("aggregators")</code>. Individiual aggregators are available via the shortcut helper function <code>orbi_get_aggregator("standard")</code>. Register new/overwrite existing aggregators via <code><a href="orbi_aggregator.html">orbi_register_aggregator()</a></code>.</p></li>
 <li><p><code>debug</code>: turn on debug mode</p></li>
 <li><p><code>auto_use_ansi</code>: whether to automatically enable correct rendering of stylized (ansi) output in HTML reports from notebooks that call <code><a href="https://isoorbi.isoverse.org/">library(isoorbi)</a></code>. Can be turned off by calling <code>isoorbi::orbi_options(auto_use_ansi = FALSE)</code> <strong>before</strong> call <code><a href="https://isoorbi.isoverse.org/">library(isoorbi)</a></code>.</p></li>
 </ul></div>
@@ -107,21 +107,113 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $data_type_unused</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "unused"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $raw_aggregator</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 22 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    dataset   column              source     default regexp cast     func  args  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> file_info <span style="color: #949494;">"</span>uid<span style="color: #949494;">"</span>               <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.fact… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> file_info <span style="color: #949494;">"</span>\\1<span style="color: #949494;">"</span>               <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      TRUE   as.char… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> scans     <span style="color: #949494;">"</span>scan<span style="color: #949494;">"</span>              <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.inte… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> scans     <span style="color: #949494;">"</span>time.min<span style="color: #949494;">"</span>          <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> scans     <span style="color: #949494;">"</span>tic<span style="color: #949494;">"</span>               <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> scans     <span style="color: #949494;">"</span>it.ms<span style="color: #949494;">"</span>             <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> scans     <span style="color: #949494;">"</span>resolution<span style="color: #949494;">"</span>        <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> scans     <span style="color: #949494;">"</span>basePeakIntensity<span style="color: #949494;">"</span> <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… sapp… <span style="color: #949494;">&lt;list&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> scans     <span style="color: #949494;">"</span>rawOvFtT<span style="color: #949494;">"</span>          <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> scans     <span style="color: #949494;">"</span>intensCompFactor<span style="color: #949494;">"</span>  <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #BB0000;">NA</span>      FALSE  as.nume… <span style="color: #BB0000;">NA</span>    <span style="color: #949494;">&lt;NULL&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 12 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators$minimal</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">minimal</span> ──────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">fixed = TRUE))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">time.min</span> = <span style="font-style: italic;">as.numeric(StartTime)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">peaks</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mzMeasured</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators$standard</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">standard</span> ─────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">fixed = TRUE))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">time.min</span> = <span style="font-style: italic;">as.numeric(StartTime)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakMz</span> = <span style="font-style: italic;">as.numeric(BasePeakMass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakIntensity</span> = <span style="font-style: italic;">as.numeric(BasePeakIntensity)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">lowMass</span> = <span style="font-style: italic;">as.numeric(LowMass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">highMass</span> = <span style="font-style: italic;">as.numeric(HighMass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">rawOvFtT</span> = <span style="font-style: italic;">as.numeric(RawOvFtT)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensCompFactor</span> = <span style="font-style: italic;">as.numeric(`OT Intens Comp Factor`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agc</span> = <span style="font-style: italic;">as.character(AGC)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agcTarget</span> = <span style="font-style: italic;">as.integer(`AGC Target`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">numberLockmassesFound</span> = <span style="font-style: italic;">as.integer(`Number of LM Found`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">analyzerTemperature</span> = <span style="font-style: italic;">as.numeric(`Analyzer Temperature`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">peaks</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mzMeasured</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators$extended</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">extended</span> ─────────────────────────────</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">fixed = TRUE))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">time.min</span> = <span style="font-style: italic;">as.numeric(StartTime)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakMz</span> = <span style="font-style: italic;">as.numeric(BasePeakMass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakIntensity</span> = <span style="font-style: italic;">as.numeric(BasePeakIntensity)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">lowMass</span> = <span style="font-style: italic;">as.numeric(LowMass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">highMass</span> = <span style="font-style: italic;">as.numeric(HighMass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">rawOvFtT</span> = <span style="font-style: italic;">as.numeric(RawOvFtT)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensCompFactor</span> = <span style="font-style: italic;">as.numeric(`OT Intens Comp Factor`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agc</span> = <span style="font-style: italic;">as.character(AGC)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agcTarget</span> = <span style="font-style: italic;">as.integer(`AGC Target`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">numberLockmassesFound</span> = <span style="font-style: italic;">as.integer(`Number of LM Found`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">analyzerTemperature</span> = <span style="font-style: italic;">as.numeric(`Analyzer Temperature`)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">peaks</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mzMeasured</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $debug</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>

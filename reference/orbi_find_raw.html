@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_find_raw</span><span class="op">(</span><span class="va">folder</span>, include_cache <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_find_raw</span><span class="op">(</span><span class="va">folder</span>, pattern <span class="op">=</span> <span class="cn">NULL</span>, include_cache <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -51,8 +51,12 @@
 <dd><p>path to a folder with raw files</p></dd>
 
 
+<dt id="arg-pattern">pattern<a class="anchor" aria-label="anchor" href="#arg-pattern"></a></dt>
+<dd><p>provide a name pattern to find only specific raw files</p></dd>
+
+
 <dt id="arg-include-cache">include_cache<a class="anchor" aria-label="anchor" href="#arg-include-cache"></a></dt>
-<dd><p>whether to include .raw.cache folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files</p></dd>
+<dd><p>whether to include .raw.cache.zip folders in the absence of the corresponding .raw file so that copies of the cache are read even in the absence of the original raw files</p></dd>
 
 
 <dt id="arg-recursive">recursive<a class="anchor" aria-label="anchor" href="#arg-recursive"></a></dt>
@@ -65,8 +69,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># all .raw files provided with the isoorbi package</span></span></span>
 <span class="r-in"><span><span class="fu">orbi_find_raw</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/home/runner/work/_temp/Library/isoorbi/extdata/nitrate_test_10scans.raw"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/home/runner/work/_temp/Library/isoorbi/extdata/nitrate_test_1scan.raw"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/home/runner/work/_temp/Library/isoorbi/extdata/nitrate_test_10scans.raw"         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/home/runner/work/_temp/Library/isoorbi/extdata/nitrate_test_1scan.raw"           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "/home/runner/work/_temp/Library/isoorbi/extdata/testfile_dual_inlet.raw.cache.zip"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

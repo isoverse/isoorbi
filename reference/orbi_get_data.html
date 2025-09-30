@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,12 +42,13 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_get_data</span><span class="op">(</span></span>
 <span>  <span class="va">aggregated_data</span>,</span>
-<span>  file_info <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  file_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"filename"</span><span class="op">)</span>,</span>
 <span>  scans <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  peaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  spectra <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  problems <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uid"</span>, <span class="st">"scan"</span><span class="op">)</span></span>
+<span>  summary <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uidx"</span>, <span class="st">"scan.no"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,8 +80,12 @@
 <dd><p>columns to get from the aggregated <code>problems</code>, all <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> syntax is supported</p></dd>
 
 
+<dt id="arg-summary">summary<a class="anchor" aria-label="anchor" href="#arg-summary"></a></dt>
+<dd><p>columns to get from the <code>summary</code> calculated via <code><a href="orbi_summarize_results.html">orbi_summarize_results()</a></code>, all <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> syntax is supported. Warning: it is not advisable to combine columns from <code>summary</code> with anything other than <code>file_info</code> as it will lead to duplicated datasets given that <code>summary</code> integrates across multiple scans.</p></dd>
+
+
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
-<dd><p>which columns to look for when joining datasets together. Make sure to include the relevant <code>by</code> columns in the selections of the individual datasets so they are joined correctly.</p></dd>
+<dd><p>which columns to look for when joining datasets together. Make sure to include the relevant <code>by</code> columns in the selections of the individual datasets so they are joined correctly. The default is usually sufficient</p></dd>
 
 </dl></div>
     <div class="section level2">

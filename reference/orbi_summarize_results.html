@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 
 
 <dl><dt id="arg-dataset">dataset<a class="anchor" aria-label="anchor" href="#arg-dataset"></a></dt>
-<dd><p>A tibble from <code>IsoX</code> output (<code><a href="orbi_read_isox.html">orbi_read_isox()</a></code>) and with a basepeak already defined (using <code><a href="orbi_define_basepeak.html">orbi_define_basepeak()</a></code>). Optionally, with block definitions (<code><a href="orbi_define_blocks_for_dual_inlet.html">orbi_define_blocks_for_dual_inlet()</a></code>) or even additional block segments (<code><a href="orbi_segment_blocks.html">orbi_segment_blocks()</a></code>).</p></dd>
+<dd><p>An aggregated dataset or a data frame of peaks (i.e. works directly after <code><a href="orbi_identify_isotopocules.html">orbi_identify_isotopocules()</a></code> as well as with a tibble from <a href="orbi_get_data.html">orbi_get_data(peaks = everything())</a> or when reading from an IsoX file)</p></dd>
 
 
 <dt id="arg-ratio-method">ratio_method<a class="anchor" aria-label="anchor" href="#arg-ratio-method"></a></dt>
@@ -81,7 +81,7 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns a results summary table retaining the columns <code>filename</code>, <code>compound</code>, <code>isotopocule</code> and <code>basepeak</code> as well as the grouping columns from the <code>.by</code> parameter that are part of the input <code>dataset</code>. Additionally this function adds the following results columns: <code>start_scan.no</code>, <code>end_scan.no</code>, <code>start_time.min</code>, <code>mean_time.min</code>, <code>end_time.min</code>, <code>ratio</code>, <code>ratio_sem</code>, <code>ratio_relative_sem_permil</code>, <code>shot_noise_permil</code>, <code>No.of.Scans</code>, <code>minutes_to_1e6_ions</code></p><ul><li><p><code>ratio</code>: The isotope ratio between the <code>isotopocule</code> and the <code>basepeak</code>, calculated using the <code>ratio_method</code></p></li>
+    <p>Returns a results summary table (as tibble if <code>dataset</code> is a tibble, as <code>dataset$tibble</code> if <code>dataset</code> is aggregated raw data) with the columns <code>filename</code>, <code>compound</code>, <code>isotopocule</code> and <code>basepeak</code> as well as the grouping columns from the <code>.by</code> parameter that are part of the input <code>dataset</code>. Additionally this function adds the following results columns: <code>start_scan.no</code>, <code>end_scan.no</code>, <code>start_time.min</code>, <code>mean_time.min</code>, <code>end_time.min</code>, <code>ratio</code>, <code>ratio_sem</code>, <code>ratio_relative_sem_permil</code>, <code>shot_noise_permil</code>, <code>No.of.Scans</code>, <code>minutes_to_1e6_ions</code></p><ul><li><p><code>ratio</code>: The isotope ratio between the <code>isotopocule</code> and the <code>basepeak</code>, calculated using the <code>ratio_method</code></p></li>
 <li><p><code>ratio_sem</code>: Standard error of the mean for the ratio</p></li>
 <li><p><code>number_of_scans</code>: Number of scans used for the final ratio calculation</p></li>
 <li><p><code>minutes_to_1e6_ions</code>: Time in minutes it would take to observe 1 million ions of the <code>isotopocule</code> used as numerator of the ratio calculation.</p></li>
@@ -98,12 +98,11 @@ i.e. scans with more ions in the Orbitrap do not contribute disproportionately t
 <span class="r-in"><span>      <span class="fu">orbi_summarize_results</span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[20ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6449 peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> isotopocules (<span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>) from <span style="color: #0000BB;">testfile_flow.isox</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[57ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> read <span style="color: #0000BB;">.isox</span> data from 1 file</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[5ms]</span> <span style="font-weight: bold;">orbi_simplify_isox()</span> kept columns <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">scan.no</span>,</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">time.min</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">ions.incremental</span>, <span style="color: #00BB00;">tic</span>, and <span style="color: #00BB00;">it.ms</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[60ms]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 5159 ratios for 4 isotopocules/base peak (<span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[89ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 5159 peaks using the</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[63ms]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 5.16k <span style="color: #00BB00;">ratio</span> values for 4 isotopocules (<span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[88ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 5.16k peak using the</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold; font-style: italic;">sum</span> method and grouping the data by <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">basepeak</span>, and</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">isotopocule</span></span>
 <span class="r-in"><span></span></span>
