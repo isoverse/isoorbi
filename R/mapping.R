@@ -318,12 +318,12 @@ orbi_filter_isotopocules <- function(
   if (!keep_missing) {
     check_tibble(
       peaks,
-      "ions.incremental|intensity",
+      "intensity|ions.incremental",
       regexps = TRUE,
       .arg = "dataset"
     )
     y <- names(tidyselect::eval_select(
-      any_of(c("ions.incremental", "intensity")),
+      any_of(c("intensity", "ions.incremental")),
       peaks
     ))[1]
     peaks <- peaks |> dplyr::filter(!is.na(!!sym(y))) |> droplevels()
