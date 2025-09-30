@@ -45,9 +45,9 @@ To avoid showing unidentified/missing peaks, run \code{\link[=orbi_filter_isotop
 
 \item{show_ref_and_lock_peaks}{whether to show reference and lock mass peaks in the spectrum}
 
-\item{background_colors}{the colors to use for the background highlighting}
+\item{show_focus_backgrounds}{whether to highlight the M+x panels with specific background colors that match them with the mass bands highlighted in the first panel}
 
-\item{show_focus_background}{whether to highlight the M+x panels with specific background colors that match them with the mass bands highlighted in the first panel}
+\item{background_colors}{the colors to use for the background highlighting}
 }
 \description{
 This function visualizes mass spectra from aggregated raw file data.
