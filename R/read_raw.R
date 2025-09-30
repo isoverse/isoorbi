@@ -555,6 +555,16 @@ orbi_read_raw <- function(
     "must be at least one file path"
   )
 
+  # all directories?
+  if (all(dir.exists(file_paths))) {
+    cli_abort(
+      c(
+        "{?this/these} path{?s} ({.file {file_paths}}) {?is a/are} director{?y/ies}, not {?a /}raw file{?s}",
+        "i" = "did you mean to run {.strong orbi_find_raw()} instead?"
+      )
+    )
+  }
+
   # check what kind of spectra are requested
   if (identical(include_spectra, TRUE)) {
     # all
@@ -794,12 +804,28 @@ print.orbi_raw_files <- function(x, ...) {
       idx_spacers = max(n_digits(.data$idx)) - n_digits(.data$idx),
       filename_spacers = max(nchar(basename(.data$filepath))) -
         nchar(basename(.data$filepath)),
-      n_scans = purrr::map_int(.data$scans, nrow),
+      n_scans = if ("scans" %in% names(x)) {
+        purrr::map_int(.data$scans, nrow)
+      } else {
+        0L
+      },
       scans_spacers = max(n_digits(.data$n_scans)) - n_digits(.data$n_scans),
-      n_peaks = purrr::map_int(.data$peaks, nrow),
+      n_peaks = if ("peaks" %in% names(x)) {
+        purrr::map_int(.data$peaks, nrow)
+      } else {
+        0L
+      },
       peaks_spacers = max(n_digits(.data$n_peaks)) - n_digits(.data$n_peaks),
-      n_spectral_data = purrr::map_int(.data$spectra, nrow),
-      n_spectra = purrr::map_int(.data$spectra, ~ length(unique(.x$scan.no))),
+      n_spectral_data = if ("spectra" %in% names(x)) {
+        purrr::map_int(.data$spectra, nrow)
+      } else {
+        0L
+      },
+      n_spectra = if ("spectra" %in% names(x)) {
+        purrr::map_int(.data$spectra, ~ length(unique(.x$scan.no)))
+      } else {
+        0
+      },
       n_problems = purrr::map_int(.data$problems, nrow),
       problems_text = purrr::map_chr(
         .data$problems,
@@ -1162,6 +1188,13 @@ read_raw_file <- function(
   # safety checks
   if (!file_path_info$file_exists) {
     cli_abort("cannot find this .raw file")
+  } else if (dir.exists(file_path_info$file_path)) {
+    cli_abort(
+      c(
+        "this path ({cli::col_blue(file_path_info$file_path)}) is a directory, not a raw file",
+        "i" = "did you mean to run {.strong orbi_find_raw()} on this directory instead?"
+      )
+    )
   }
 
   # simplify progress updates
