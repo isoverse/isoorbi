@@ -95,46 +95,418 @@ orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
 
 # plot functions ==========
 
-# FIXME: implement
-# @param aggregated_data data aggregated by `orbi_aggregate_raw()` and, optionally, with isotopocules already identified by `orbi_identify_isotopocules()`
-# @param mz_min which mz to start the main plot window at. By default include all.
-# @param mz_max which mz to end the main plot window at. By default include all.
-# @param mz_foci which mz values to focus additiona panels on. Can be approximate (i.e. nominal masses). Typically only suppplied if auto_focus does not do the job.
-# @param auto_focus whether to find the isotopocules to focus on automatically. Use `mz_foci` to fine-tune what is shown. Basically searches for the next heighest peaks after the base peak and shows their nearby mass window (including neighboring peaks with similar nominal mass) in additional panels. If there are multiple files (or scans) with different peak distributions, uses foci that are most pronounced across all or most files.
-# @param max_cols how many panel columns to show at most (i.e. main window + mz_foci). Use `mz_focus` to specify which ones to show if the `auto_focus` does not do the trick.
-# @param max_rows how many panel rows to show at most (i.e. however many scans and files are in the dataset). Will issue a warning
-# @param label_peaks whether to label isotopocules with their name and m/z. Is ignored if isotopocules have not yet been identified in the dataset.
-# @param label_unknown_peaks whether to also label unknown peaks (i.e. those without isotopocule identification) with their m/z
-# @param spectra will be automatically extracted from `aggregated_data` but can be supplied here independently for greater control
-# @param peaks will be automatically extracted from `aggregated_data` but can be supplied here independently for greater control
+#' Plot mass spectra
+#'
+#' This function visualizes mass spectra from aggregated raw file data.
+#' The spectra have to be be previously read in with `include_spectra = c(1, 10, 100)` in [orbi_read_raw()].
+#' By default, this function tries to visualize different isotopcule ranges (monoisotopic peak, M+1, M+2, M+3).
+#' To focus only on isotopcules of interest, run [orbi_identify_isotopocules()] and [orbi_filter_isotopocules()] first.
+#'
+#' @param aggregated_data data aggregated by [orbi_aggregate_raw()] and, optionally, with isotopocules already identified by [orbi_identify_isotopocules()], and (also optionally), alreadty filtered with [orbi_filter_isotopocules()]
+#' @param mz_min which mz to start the main plot window at. By default include all.
+#' @param mz_max which mz to end the main plot window at. By default include all.
+#' @param mz_base_peak where is the base peak at (approximately)?. If not specified (the default), takes the largest peak in the `mz_min` to `mz_max` window.
+#' @param mz_focus_nominal_offsets which panels to visualize? 0 = whole spectrum, 1 = spectrum around monoisotopic peak + 1 mu (M+1), 2 = M+2, etc.
+#' By default includes the whole spectrum and up to +1, +2, +3, and +4 peaks (if they exist).
+#' To visualize only the whole spectrum, use `mz_focus_nominal_offsets = 0`.
+#' Likewise, to visualize only the area around the monoisotopic peak +1, provide `mz_focus_monimal_offsets = 1` (or `= c(1, 2)` for both +1 and +2 windows).
+#' @param max_scans spectra from how many scans to show at most. By default up to 6 (the number of available linetypes). To show only the spectrum from a single scan, set `max_scans = 1`. If more than 6 scan spectra are allowed (and there are more than 6 loaded in the `aggregated_data`), turns of the linetype aesthetic.
+#' @param max_files spectra from how many files to show at most. Each file is shown as an additional line of panels.
+#' @param label_peaks whether to label the peaks in the M+1/2/3 panels. If isotopcules are already identified from [orbi_identify_isotopocules()], uses the isotopcule names, otherwise the m/z values. Peaks that are missing (identified by [orbi_identify_isotopocules()]) in all spectra are highlighted in red.
+#' To avoid showing unidentified/missing peaks, run [orbi_filter_isotopocules()] first.
+#' @param show_filenames whether to show the filename in the first panel of reach row (usually the full spectrum panel)
+#' @param show_ref_and_lock_peaks whether to show reference and lock mass peaks in the spectrum
+#' @param show_focus_background whether to highlight the M+x panels with specific background colors that match them with the mass bands highlighted in the first panel
+#' @param background_colors the colors to use for the background highlighting
+#' @export
 orbi_plot_spectra <- function(
   aggregated_data,
   mz_min = 0,
   mz_max = Inf,
-  mz_foci = c(),
-  auto_focus = TRUE,
-  max_cols = 5,
-  max_rows = 5,
+  mz_base_peak = NULL,
+  mz_focus_nominal_offsets = 0:4,
+  max_scans = 6,
+  max_files = 4,
   label_peaks = TRUE,
-  label_unknown_peaks = TRUE,
-  spectra = orbi_get_data(
-    aggregated_data,
-    file_info = everything(),
-    scans = everything(),
-    spectra = everything()
-  ),
-  peaks = orbi_get_data(
-    aggregated_data,
-    file_info = everything(),
-    scans = everything(),
-    peaks = everything()
+  show_filenames = TRUE,
+  show_ref_and_lock_peaks = TRUE,
+  show_focus_backgrounds = TRUE,
+  background_colors = c(
+    "#1B9E77",
+    "#D95F02",
+    "#7570B3",
+    "#E7298A",
+    "#66A61E",
+    "#E6AB02",
+    "#A6761D",
+    "#666666",
+    "#BBBBBB"
   )
 ) {
   # safety checks
+  check_arg(
+    aggregated_data,
+    !missing(aggregated_data) && is(aggregated_data, "orbi_aggregated_data"),
+    "must be a set of aggregated raw files"
+  )
+  check_arg(mz_min, is_scalar_double(mz_min), "must be a single number")
+  check_arg(mz_max, is_scalar_double(mz_max), "must be a single number")
+  check_arg(
+    mz_base_peak,
+    is.null(mz_base_peak) || is_scalar_double(mz_base_peak),
+    "must be a single number if provided"
+  )
+  check_arg(
+    mz_focus_nominal_offsets,
+    is_integerish(mz_focus_nominal_offsets) &&
+      length(mz_focus_nominal_offsets) > 0 &&
+      all(mz_focus_nominal_offsets >= 0),
+    "must be a vector of positive integers c(0, 1, 2, etc.)"
+  )
+  check_arg(
+    max_scans,
+    is_scalar_integerish(max_scans) && max_scans > 0,
+    "must be a positive integer"
+  )
+  check_arg(
+    max_files,
+    is_scalar_integerish(max_files) && max_files > 0,
+    "must be a positive integer"
+  )
+  check_arg(
+    label_peaks,
+    is_scalar_logical(label_peaks),
+    "must be TRUE or FALSE"
+  )
+  check_arg(
+    show_filenames,
+    is_scalar_logical(show_filenames),
+    "must be TRUE or FALSE"
+  )
+  check_arg(
+    show_ref_and_lock_peaks,
+    is_scalar_logical(show_ref_and_lock_peaks),
+    "must be TRUE or FALSE"
+  )
+  check_arg(
+    show_focus_backgrounds,
+    is_scalar_logical(show_focus_backgrounds),
+    "must be TRUE or FALSE"
+  )
+  check_arg(
+    background_colors,
+    is_character(background_colors) &&
+      (!show_focus_backgrounds ||
+        length(background_colors) >= length(mz_focus_nominal_offsets - 1)),
+    format_inline(
+      "must be a character vector with at least {length(mz_focus_nominal_offsets - 1)} colors"
+    ),
+    include_type = FALSE
+  )
 
-  # FIXME: check the actual aggregated data class type once it's introduced!
-  # or actually probably only check spectra and peaks!
-  check_arg(aggregated_data, is.list(aggregated_data))
+  # any spectra
+  if (nrow(aggregated_data$spectra) == 0) {
+    cli_text(
+      "{cli::col_yellow('!')} {.strong Warning}: there are no {.field spectra} in the data, make sure to include them when reading the raw files e.g. with {.strong orbi_read_raw(include_spectra = c(1, 10, 100))}"
+    )
+  }
+
+  # which scans to consider? warn if there are too many scans
+  scans <- unique(aggregated_data$spectra$scan.no)
+  if (length(scans) > max_scans) {
+    cli_bullets(c(
+      "i" = "{cli::col_blue('Info')}: there are {length(scans)} {.field scan{?s}} in this dataset, only the first {if (max_scans > 1) max_scans} will be visualized. To change this, set the {.field max_scans} argument."
+    ))
+    scans <- scans[1:max_scans]
+  }
+
+  # what are the files? warn if there are too many files
+  files <- unique(aggregated_data$spectra$uidx)
+  if (length(files) > max_files) {
+    cli_bullets(c(
+      "i" = "{cli::col_blue('Info')}: there are {length(files)} {.field file{?s}} in this dataset, only the first {if (max_files > 1) max_files} will be visualized. To change this, set the {.field max_files} argument."
+    ))
+    files <- files[1:max_files]
+  }
+
+  spectra <- aggregated_data$spectra |>
+    dplyr::filter(.data$scan.no %in% !!scans, .data$uidx %in% !!files)
+
+  # add this so it's easier to process the peaks
+  if (!"isotopocule" %in% names(aggregated_data$peaks)) {
+    aggregated_data$peaks$mzExact <- NA_real_
+    aggregated_data$peaks$isotopocule <- NA_character_
+  }
+
+  # focus on peaks in the range of interest
+  peaks <- aggregated_data$peaks |>
+    dplyr::filter(.data$scan.no %in% !!scans, .data$uidx %in% !!files) |>
+    dplyr::mutate(
+      mzEffective = if_else(
+        !is.na(.data$mzMeasured),
+        .data$mzMeasured,
+        .data$mzExact
+      )
+    ) |>
+    dplyr::filter(.data$mzEffective >= !!mz_min, .data$mzEffective <= !!mz_max)
+
+  # add ref peaks / lock peaks to spectra
+  if (show_ref_and_lock_peaks) {
+    spectra <- spectra |>
+      dplyr::bind_rows(
+        peaks |>
+          dplyr::filter(
+            !is.na(.data$intensity) & .data$isRefPeak | .data$isLockPeak
+          ) |>
+          dplyr::select("uidx", "scan.no", "mz" = "mzMeasured", "intensity")
+      )
+  }
+
+  # find nominal offset
+  if (is.null(mz_base_peak)) {
+    # find largest
+    peaks_w_offset <- peaks |>
+      # find main peaks across the files and scans
+      dplyr::mutate(
+        .by = c("uidx", "scan.no"),
+        main_peak = !is.na(.data$intensity) &
+          .data$intensity == max(.data$intensity),
+        mz_main_peak = .data$mzEffective[.data$main_peak][1]
+      ) |>
+      # find global main peak (closest to median from all files and scans)
+      dplyr::mutate(
+        mz_median_diff = abs(
+          .data$mz_main_peak - stats::median(.data$mz_main_peak)
+        ),
+        mz_main_peak = .data$mz_main_peak[
+          .data$mz_median_diff == min(.data$mz_median_diff)
+        ][1],
+        mz_nominal_offset = round(.data$mzEffective - .data$mz_main_peak) |>
+          as.integer()
+      ) |>
+      dplyr::select(-"mz_main_peak", -"mz_median_diff")
+  } else {
+    # use the provided mz_base_peak as closest
+    peaks_w_offset <- peaks |>
+      dplyr::mutate(
+        mz_nominal_offset = round(.data$mzEffective - !!mz_base_peak) |>
+          as.integer()
+      )
+  }
+
+  # determine offset mass windows
+  mz_offset_windows <-
+    dplyr::bind_rows(
+      dplyr::tibble(
+        mz_nominal_offset = 0L,
+        mz_min = !!mz_min,
+        mz_max = !!mz_max
+      ),
+      if (any(peaks_w_offset$mz_nominal_offset > 0)) {
+        peaks_w_offset |>
+          dplyr::filter(.data$mz_nominal_offset > 0) |>
+          dplyr::summarize(
+            .by = "mz_nominal_offset",
+            # expand peak sizes by using the resolution
+            mz_min = min(.data$mzEffective) -
+              5 * max(.data$mzEffective / .data$peakResolution),
+            mz_max = max(.data$mzEffective) +
+              5 * max(.data$mzEffective / .data$peakResolution)
+          )
+      }
+    ) |>
+    dplyr::filter(
+      .data$mz_nominal_offset %in% as.integer(mz_focus_nominal_offsets)
+    )
+
+  if (nrow(mz_offset_windows) == 0) {
+    cli_abort(
+      "none of the requested {.field mz_focus_nominal_offsets} ({mz_focus_nominal_offsets}) exist in this dataset"
+    )
+  }
+
+  # create plot data frame
+  plot_df <- spectra |>
+    dplyr::cross_join(mz_offset_windows) |>
+    dplyr::filter(.data$mz >= .data$mz_min, .data$mz <= .data$mz_max)
+
+  # start plot
+  plot <- plot_df |>
+    ggplot2::ggplot() +
+    ggplot2::aes(x = .data$mz, y = .data$intensity)
+
+  # should we use scans as linetype aesthetic?
+  if (length(scans) > 1 && length(scans) <= 6) {
+    plot <- plot +
+      ggplot2::aes(linetype = factor(.data$scan.no)) +
+      ggplot2::labs(linetype = "scan")
+  } else {
+    plot <- plot + ggplot2::aes(group = factor(.data$scan.no))
+  }
+
+  # background coloration for the offset foci
+  if (
+    show_focus_backgrounds &&
+      nrow(mz_offset_windows) > 1 &&
+      0L %in% mz_offset_windows$mz_nominal_offset
+  ) {
+    highlights <- mz_offset_windows |>
+      dplyr::filter(.data$mz_nominal_offset > 0) |>
+      dplyr::mutate(
+        fill = background_colors[1:(nrow(mz_offset_windows) - 1)]
+      )
+
+    plot <- plot +
+      # backgrounds in the base peak window
+      ggplot2::geom_rect(
+        data = highlights |> dplyr::mutate(mz_nominal_offset = 0L),
+        mapping = ggplot2::aes(
+          xmin = .data$mz_min - 0.1,
+          xmax = .data$mz_max + 0.1,
+          ymin = -Inf,
+          ymax = +Inf,
+          fill = .data$fill
+        ),
+        alpha = 0.2,
+        inherit.aes = FALSE
+      ) +
+      # backgrounds in the +x panels
+      ggplot2::geom_rect(
+        data = highlights,
+        mapping = ggplot2::aes(
+          xmin = -Inf,
+          xmax = +Inf,
+          ymin = -Inf,
+          ymax = +Inf,
+          fill = .data$fill
+        ),
+        alpha = 0.2,
+        inherit.aes = FALSE
+      ) +
+      ggplot2::scale_fill_identity()
+  }
+
+  # main parts of plot
+  plot <- plot +
+    # spectral data
+    ggplot2::geom_line() +
+    # wrap by windows and file (one file per row)
+    ggplot2::facet_wrap(
+      ~ .data$uidx + .data$mz_nominal_offset,
+      ncol = nrow(mz_offset_windows),
+      scales = "free"
+    ) +
+    ggplot2::scale_y_continuous(
+      breaks = scales::pretty_breaks(
+        if (length(mz_focus_nominal_offsets) > 1) 3 else 5
+      ),
+      expand = ggplot2::expansion(mult = c(0, 0.15)),
+      labels = label_scientific_log()
+    )
+
+  # use fewer x-axis ticks if we have multiple panels
+  if (length(mz_focus_nominal_offsets) > 1) {
+    plot <- plot +
+      ggplot2::scale_x_continuous(
+        breaks = scales::pretty_breaks(3),
+        expand = c(0, 0.01)
+      )
+  }
+
+  plot <- plot +
+    # make the text size a bit smaller as there is a lot going on on these plots
+    orbi_default_theme(text_size = 12) +
+    ggplot2::theme(
+      strip.background = ggplot2::element_blank(),
+      strip.text = ggplot2::element_blank()
+    ) +
+    ggplot2::labs(x = "m/z")
+
+  # show file names?
+  if (show_filenames) {
+    plot <- plot +
+      ggplot2::geom_text(
+        data = aggregated_data$file_info |>
+          dplyr::filter(.data$uidx %in% !!files) |>
+          dplyr::mutate(
+            mz_nominal_offset = min(mz_offset_windows$mz_nominal_offset)
+          ),
+        map = ggplot2::aes(label = .data$filename),
+        x = -Inf,
+        y = Inf,
+        hjust = -0.03,
+        vjust = 1.5,
+        inherit.aes = FALSE
+      )
+  }
+
+  # label peaks
+  if (label_peaks && length(mz_focus_nominal_offsets) > 1) {
+    plot_peaks <- peaks |>
+      dplyr::cross_join(
+        mz_offset_windows |> dplyr::filter(.data$mz_nominal_offset > 0)
+      ) |>
+      dplyr::filter(
+        .data$mzEffective >= .data$mz_min,
+        .data$mzEffective <= .data$mz_max
+      ) |>
+      dplyr::mutate(
+        label = dplyr::if_else(
+          is.na(.data$isotopocule),
+          sprintf("%.4f", .data$mzMeasured),
+          .data$isotopocule
+        ),
+        is_missing = is.na(.data$intensity)
+      )
+    if (nrow(plot_peaks) > 0) {
+      plot_peaks <- plot_peaks |>
+        # get the scan with the highest intensities for y position labels
+        dplyr::mutate(
+          .by = c("uidx", "scan.no"),
+          scan_intensity = sum(.data$intensity, na.rm = TRUE)
+        ) |>
+        dplyr::arrange(dplyr::desc(.data$scan_intensity)) |>
+        dplyr::filter(
+          .by = "uidx",
+          .data$scan.no ==
+            .data$scan.no[
+              .data$scan_intensity == max(.data$scan_intensity)
+            ][1]
+        )
+    }
+
+    # non-missing
+    if (any(!plot_peaks$is_missing)) {
+      plot <- plot +
+        ggplot2::geom_label(
+          data = plot_peaks |> dplyr::filter(!.data$is_missing),
+          map = ggplot2::aes(
+            x = .data$mzEffective,
+            y = .data$intensity,
+            label = .data$label
+          ),
+          inherit.aes = FALSE,
+          vjust = -0.15
+        )
+    }
+    if (any(plot_peaks$is_missing)) {
+      plot <- plot +
+        ggplot2::geom_label(
+          data = plot_peaks |>
+            dplyr::filter(.data$is_missing),
+          map = ggplot2::aes(
+            x = .data$mzEffective,
+            y = 0,
+            label = paste0(.data$label, "?")
+          ),
+          inherit.aes = FALSE,
+          fill = "lightpink",
+          vjust = -0.15
+        )
+    }
+  }
+  # return
+  return(plot)
 }
 
 #' Visualize satellite peaks
@@ -168,7 +540,8 @@ orbi_plot_satellite_peaks <- function(
     "#66A61E",
     "#E6AB02",
     "#A6761D",
-    "#666666"
+    "#666666",
+    "#BBBBBB"
   ),
   color_scale = scale_color_manual(values = colors)
 ) {
