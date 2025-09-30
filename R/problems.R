@@ -6,12 +6,6 @@
 #' @rdname problems
 #' @param obj data object that also has problems information
 #' @param strip_ansi whether to remove ansi characters from the message, yes by default
-#' @examples
-#'
-#' orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
-#'   orbi_read_raw() |>
-#'   orbi_get_problems()
-#'
 #' @return tibble data frame with a list of problems encountered during processing
 #' @export
 orbi_get_problems <- function(obj, strip_ansi = TRUE) {
