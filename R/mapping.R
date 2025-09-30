@@ -265,6 +265,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     return(aggregated_data)
   } else {
     # got a plain peaks tibble
+    attr(all_peaks, "unused_columns") <- NULL
     return(all_peaks)
   }
 }

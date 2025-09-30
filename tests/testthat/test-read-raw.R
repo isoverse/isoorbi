@@ -132,7 +132,7 @@ test_that("orbi_read_raw()", {
     )
 
     expect_snapshot(z <- orbi_identify_isotopocules(y, isotopologs))
-    expect_equal(z$peaks, orbi_identify_isotopocules(y$peak, isotopologs)) |>
+    expect_equal(z$peaks, orbi_identify_isotopocules(y$peaks, isotopologs)) |>
       suppressMessages()
 
     # test get
