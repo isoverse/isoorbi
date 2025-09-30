@@ -70,20 +70,12 @@ This function prints out parsing problems encountered during the reading and pro
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="orbi_find_raw.html">orbi_find_raw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">orbi_get_problems</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">orbi_show_problems</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → Trying to install the new isoorbi raw file reader for your operating system</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">isoraw-linux-x64</span> (this requires an internet connection and may take a</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   moment)...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[555ms]</span> <span style="font-weight: bold;">orbi_check_isoraw()</span> successfully installed the isoorbi raw file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> reader version 0.2.2.0</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in orbi_check_isoraw():</span> Please run this code interactively the first time so you can answer the</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> prompt: Do you accept this license agreement for the use of the Thermo</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> RawFileReader (https://github.com/thermofisherlsms/RawFileReader)?</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="orbi_find_raw.html">orbi_find_raw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">orbi_show_problems</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[1.4s]</span> <span style="font-weight: bold;">orbi_check_isoraw()</span> successfully installed the isoorbi raw file reader</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> version 0.2.2.0</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in orbi_check_isoraw():</span> Please run this code interactively the first time so you can answer the</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> prompt: Do you accept this license agreement for the use of the Thermo</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> RawFileReader (https://github.com/thermofisherlsms/RawFileReader)?</span>
