@@ -26,7 +26,7 @@ library(dplyr) # for data wrangling
 
 # Model Peptide (MRFA)
 
-This is an example for shot-noise analysis from [Kantnerová et al. (2023)](https://github.com/isoverse/2023_kantnerova_et_al).
+This is an example for shot-noise analysis from [Kantnerová et al. (2024)](https://github.com/isoverse/2024_kantnerova_et_al).
 
 # Data
 

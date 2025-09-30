@@ -26,11 +26,6 @@ This function prints out parsing problems encountered during the reading and pro
 
 orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
   orbi_read_raw() |>
-  orbi_get_problems()
-
-
-orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
-  orbi_read_raw() |>
   orbi_show_problems()
 
 }
