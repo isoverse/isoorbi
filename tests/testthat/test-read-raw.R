@@ -114,9 +114,9 @@ test_that("orbi_read_raw()", {
     expect_snapshot(x)
 
     # aggregate
-    y <- orbi_aggregate_raw(x, aggregator = "extended")
+    expect_snapshot(y <- orbi_aggregate_raw(x, aggregator = "extended"))
     expect_snapshot(y)
-    y <- orbi_aggregate_raw(x, aggregator = "minimal")
+    expect_snapshot(y <- orbi_aggregate_raw(x, aggregator = "minimal"))
     expect_snapshot(y)
 
     y$file_info$file_path <- NULL # OS dependent

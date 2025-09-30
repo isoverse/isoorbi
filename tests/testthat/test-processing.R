@@ -270,5 +270,6 @@ test_that("orbi_define_basepeak()", {
   expect_snapshot_value(
     orbi_define_basepeak(dataset = df, basepeak_def = "M0"),
     style = "deparse" # json2 doesn't work because of loss of precision in the ratios
-  )
+  ) |>
+    suppressMessages()
 })

@@ -176,6 +176,14 @@
 ---
 
     Code
+      y <- orbi_aggregate_raw(x, aggregator = "extended")
+    Message
+      v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
+      spectra (675) from 2 files using the extended aggregator
+
+---
+
+    Code
       y
     Message
       ------- aggregated data from 2 raw files - retrieve with orbi_get_data() -------
@@ -211,6 +219,14 @@
       peakResolution, isRefPeak, isLockPeak
       > spectra (675): uidx, scan.no, mz, intensity
       > problems: has no issues
+
+---
+
+    Code
+      y <- orbi_aggregate_raw(x, aggregator = "minimal")
+    Message
+      v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
+      spectra (675) from 2 files using the minimal aggregator
 
 ---
 
@@ -293,6 +309,14 @@
 ---
 
     Code
+      y <- orbi_aggregate_raw(x, aggregator = "extended")
+    Message
+      [32m✔[39m [1maggregate_files()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [34mspectra[39m (675) from 2 files using the [1m[3mextended[23m[22m aggregator
+
+---
+
+    Code
       y
     Message
       ─────── [1maggregated data from 2 raw files - retrieve with orbi_get_data()[22m ───────
@@ -328,6 +352,14 @@
       [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
+
+---
+
+    Code
+      y <- orbi_aggregate_raw(x, aggregator = "minimal")
+    Message
+      [32m✔[39m [1maggregate_files()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [34mspectra[39m (675) from 2 files using the [1m[3mminimal[23m[22m aggregator
 
 ---
 
