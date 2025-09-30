@@ -21,8 +21,6 @@ navbar:
     href: articles/dual_inlet.html
   - text: Flow Injection
     href: articles/flow_injection.html
-  - text: IsoXL demo GUI
-    href: articles/isoxl_demo.html
   - text: Reference
     href: reference/index.html
   right:
@@ -88,6 +86,7 @@ reference:
   desc: >
     These functions help visualize what happens to the data during processing
   contents:
+  - orbi_plot_spectra
   - orbi_plot_satellite_peaks
   - orbi_plot_isotopocule_coverage
   - orbi_plot_raw_data

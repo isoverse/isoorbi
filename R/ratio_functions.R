@@ -547,18 +547,22 @@ orbi_summarize_results <- function(
   }
 
   # check that required data columns are present
-  base_group_cols <- c("filename", "compound", "basepeak", "isotopocule")
-  if ("uidx" %in% names(peaks)) {
-    base_group_cols <- c("uidx", base_group_cols)
-  }
+  base_group_cols <-
+    tidyselect::eval_select(
+      dplyr::any_of(c(
+        "uidx",
+        "filename",
+        "compound",
+        "fragment",
+        "basepeak",
+        "isotopocule"
+      )),
+      peaks
+    ) |>
+    names()
   check_tibble(
     peaks,
-    c(
-      base_group_cols,
-      "time.min",
-      "ions.incremental",
-      "basepeak_ions"
-    )
+    c(base_group_cols, "time.min", "ions.incremental", "basepeak_ions")
   )
 
   # filter flagged data

@@ -33,7 +33,9 @@ library(ggplot2) # for data visualization
 
 ```{r}
 # Read .raw file test data
-raw_file <- file.path(system.file("extdata", package = "isoorbi"), "testfile_dual_inlet.raw")
+raw_file <- system.file(package = "isoorbi", "extdata") |>
+  file.path("testfile_dual_inlet.raw")
+
 data_all <-
   raw_file |>
   orbi_read_raw(include_spectra = c(10, 100)) |>
@@ -53,6 +55,12 @@ data_all <- data_all |>
   orbi_filter_isotopocules() |>
   # calculate ions
   orbi_calculate_ions()
+```
+
+# Show spectrum
+
+```{r, fig.width=8, fig.height=3}
+data_all |> orbi_plot_spectra()
 ```
 
 # Preprocess data
