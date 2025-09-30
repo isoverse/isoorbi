@@ -112,11 +112,10 @@ orbi_calculate_ratios <- function(dataset) {
   )
 
   # deprecated
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.3.0",
     "orbi_calculate_ratios()",
-    details = "this function is obsolete as `orbi_define_basepeak()` already calculates the ratios automatically",
-    always = TRUE
+    details = "this function is obsolete as `orbi_define_basepeak()` already calculates the ratios automatically"
   )
 
   # info message

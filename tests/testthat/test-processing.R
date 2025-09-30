@@ -54,8 +54,8 @@ test_file <-
 test_that("orbi_filter_satellite_peaks()", {
   # DEPRECATED
   orbi_filter_satellite_peaks(peaks) |>
-    suppressMessages() |>
-    expect_warning("deprecated")
+    expect_warning("deprecated") |>
+    suppressMessages()
 })
 
 test_that("orbi_flag_satellite_peaks()", {

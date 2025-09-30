@@ -254,7 +254,7 @@ orbi_simplify_isox <- function(dataset, add = c()) {
 #' @param ... arguments passed on to [orbi_filter_files()]
 #' @export
 orbi_filter_isox <- function(...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.5.0",
     "orbi_filter_isox()",
     "orbi_filter_files()",
