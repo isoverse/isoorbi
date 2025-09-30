@@ -37,7 +37,6 @@
 <li class="nav-item"><a class="nav-link" href="articles/shot_noise.html">Shot Noise</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/dual_inlet.html">Dual Inlet</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/flow_injection.html">Flow Injection</a></li>
-<li class="nav-item"><a class="nav-link" href="articles/isoxl_demo.html">IsoXL demo GUI</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -77,14 +76,79 @@
 <div class="section level2">
 <h2 id="show-me-some-code">Show me some code<a class="anchor" aria-label="anchor" href="#show-me-some-code"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(isoorbi)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">system.file</span>(<span class="at">package =</span> <span class="st">"isoorbi"</span>, <span class="st">"extdata"</span>, <span class="st">"testfile_flow.isox"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">orbi_read_isox</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">orbi_flag_satellite_peaks</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="fu">orbi_define_basepeak</span>(<span class="at">basepeak_def =</span> <span class="st">"M0"</span>)<span class="sc">|&gt;</span> </span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="fu">orbi_summarize_results</span>(<span class="at">ratio_method =</span> <span class="st">"sum"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="fu">orbi_export_data_to_excel</span>(<span class="at">file =</span> <span class="st">"data_summary.xlsx"</span>)</span></code></pre></div>
+<div class="section level3">
+<h3 id="read-raw-data-file">Read raw data file<a class="anchor" aria-label="anchor" href="#read-raw-data-file"></a>
+</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># load library</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(isoorbi)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># path to a small test file bundled with the package</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>file_path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="at">package =</span> <span class="st">"isoorbi"</span>, <span class="st">"extdata"</span>, <span class="st">"nitrate_test_10scans.raw"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># read the raw file incluing 2 of the raw spectra</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>raw_files <span class="ot">&lt;-</span> file_path <span class="sc">|&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>    <span class="fu">orbi_read_raw</span>(<span class="at">include_spectra =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    <span class="fu">orbi_aggregate_raw</span>()</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># plot the spectra</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>raw_files <span class="sc">|&gt;</span> <span class="fu">orbi_plot_spectra</span>()</span></code></pre></div>
+<p><img src="reference/figures/README-read-raw-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="identify-isotopcules">Identify isotopcules<a class="anchor" aria-label="anchor" href="#identify-isotopcules"></a>
+</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># define isotopcules of interest (could also come from a tsv, csv, or excel file)</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>isotopocules <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">isotopocule =</span> <span class="fu">c</span>(<span class="st">"M0"</span>, <span class="st">"15N"</span>, <span class="st">"17O"</span>, <span class="st">"18O"</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">mass =</span> <span class="fu">c</span>(<span class="fl">61.9878</span>, <span class="fl">62.9850</span>, <span class="fl">62.9922</span>, <span class="fl">63.9922</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">tolerance =</span> <span class="dv">1</span>, <span class="at">charge =</span> <span class="dv">1</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co"># identify isotopcules</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>raw_files <span class="ot">&lt;-</span> raw_files <span class="sc">|&gt;</span> <span class="fu">orbi_identify_isotopocules</span>(isotopocules)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co"># plot again, now with the isotopocules identified</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>raw_files <span class="sc">|&gt;</span> <span class="fu">orbi_plot_spectra</span>(<span class="at">max_scans =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><img src="reference/figures/README-map-isotopocules-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="process-data">Process data<a class="anchor" aria-label="anchor" href="#process-data"></a>
+</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># process raw files data</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> raw_files <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="co"># filter out unidentified peaks</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="fu">orbi_filter_isotopocules</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="co"># calculate ions</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">orbi_calculate_ions</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="co"># check for satellite peaks</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="fu">orbi_flag_satellite_peaks</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="co"># define base peak</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="fu">orbi_define_basepeak</span>(<span class="at">basepeak_def =</span> <span class="st">"M0"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co"># plot the resulting isotopocule ratios</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>dataset <span class="sc">|&gt;</span> <span class="fu">orbi_plot_raw_data</span>(<span class="at">y =</span> ratio)</span></code></pre></div>
+<p><img src="reference/figures/README-process-data-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="summarize-results">Summarize results<a class="anchor" aria-label="anchor" href="#summarize-results"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># calculate ratios across scans</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>results <span class="ot">&lt;-</span> dataset <span class="sc">|&gt;</span> <span class="fu">orbi_summarize_results</span>(<span class="at">ratio_method =</span> <span class="st">"sum"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>   </span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># print results</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>results <span class="sc">|&gt;</span>  <span class="fu">orbi_get_data</span>(<span class="at">summary =</span> <span class="fu">c</span>(<span class="st">"isotopocule"</span>, <span class="st">"ratio"</span>, <span class="st">"ratio_sem"</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># export data &amp; results to excel</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>results <span class="sc">|&gt;</span> <span class="fu">orbi_export_data_to_excel</span>(<span class="at">file =</span> <span class="st">"data_summary.xlsx"</span>)</span></code></pre></div>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 3 × 5</span>
+   uidx filename             isotopocule   ratio ratio_sem
+  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>
+<span style="color: #BCBCBC;">1</span>     1 nitrate_test_10scans 15N         0.004<span style="text-decoration: underline;">22</span> 0.000<span style="text-decoration: underline;">098</span>0
+<span style="color: #BCBCBC;">2</span>     1 nitrate_test_10scans 17O         0.001<span style="text-decoration: underline;">32</span> 0.000<span style="text-decoration: underline;">055</span>4
+<span style="color: #BCBCBC;">3</span>     1 nitrate_test_10scans 18O         0.007<span style="text-decoration: underline;">75</span> 0.000<span style="text-decoration: underline;">162</span>
+</code></pre>
+<p>For additional functionality, please check out our vignettes, and peruse the full package structure below.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="package-structure">Package structure<a class="anchor" aria-label="anchor" href="#package-structure"></a>

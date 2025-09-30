@@ -39,7 +39,6 @@
 <li class="active nav-item"><a class="nav-link" href="../articles/shot_noise.html">Shot Noise</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/dual_inlet.html">Dual Inlet</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/flow_injection.html">Flow Injection</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/isoxl_demo.html">IsoXL demo GUI</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -94,19 +93,19 @@ al. (2024)</a>.</p>
 <span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">90</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># see if there are any AGC outliers</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[165ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 1931 peaks for 4 compounds (<span style="color: #00BB00;">Alanine</span>,
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[169ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 1931 peaks for 4 compounds (<span style="color: #00BB00;">Alanine</span>,
 <span style="color: #00BB00;">Arginine</span>, <span style="color: #00BB00;">Methionine</span>, and <span style="color: #00BB00;">Phenylalanine</span>) with 6 isotopocules (<span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">13C</span>, <span style="color: #00BB00;">2H</span>,
 <span style="color: #00BB00;">33S</span>, and <span style="color: #00BB00;">34S</span>) from <span style="color: #0000BB;">testfile_shotnoise.isox</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[40ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> flagged 33/1.93k peaks in 3 isotopocules
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[42ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> flagged 33/1.93k peaks in 3 isotopocules
 (<span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, and <span style="color: #00BB00;">13C</span>) as <span style="color: #BBBB00;">satellite</span> peaks (1.7%)
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[36ms]</span> <span style="font-weight: bold;">orbi_flag_weak_isotopocules()</span> flagged 3 of 18 isotopocules as <span style="color: #BBBB00;">weak</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[37ms]</span> <span style="font-weight: bold;">orbi_flag_weak_isotopocules()</span> flagged 3 of 18 isotopocules as <span style="color: #BBBB00;">weak</span>
 because they were NOT present in at least 90% of scans in each of the 18 data
 groups (based on <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">compound</span>, and <span style="color: #00BB00;">isotopocule</span>) → use
 <span style="font-weight: bold;">orbi_plot_isotopocule_coverage()</span> to visualize them
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[24ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> confirmed that none of the 114 scans are <span style="color: #BBBB00;">outliers</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[27ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> confirmed that none of the 114 scans are <span style="color: #BBBB00;">outliers</span>
 based on <span style="color: #00BB00;">2 fold AGC cutoff</span>, i.e. based on <span style="font-style: italic;">scans below 1/2 and above 2 times the</span>
 <span style="font-style: italic;">average number of ions </span><span style="color: #00BB00; font-style: italic;">tic</span><span style="font-style: italic;"> * </span><span style="color: #00BB00; font-style: italic;">it.ms</span><span style="font-style: italic;"> in the Orbitrap analyzer</span>
 </code></pre>
@@ -170,7 +169,7 @@ Isotopocule intensity for M0 ion
 <span><span class="va">data_w_bp</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span><span class="st">"M0"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[41ms]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[43ms]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated
 1.46k <span style="color: #00BB00;">ratio</span> values for 5 isotopocules (<span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">13C</span>, <span style="color: #00BB00;">2H</span>, <span style="color: #00BB00;">33S</span>, and <span style="color: #00BB00;">34S</span>)
 </code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -178,14 +177,14 @@ Isotopocule intensity for M0 ion
 <span><span class="va">shot_noise</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">data_w_bp</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_analyze_shot_noise.html">orbi_analyze_shot_noise</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[23ms]</span> <span style="font-weight: bold;">orbi_analyze_shot_noise()</span> analyzed the shot noise for 1.25k <span style="color: #00BB00;">ratios</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[20ms]</span> <span style="font-weight: bold;">orbi_analyze_shot_noise()</span> analyzed the shot noise for 1.25k <span style="color: #00BB00;">ratios</span>
 (excluding 204 flagged peaks)
 </code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># export shot noise to an Excel file</span></span>
 <span><span class="va">shot_noise</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel</a></span><span class="op">(</span><span class="st">"shot_noise.xlsx"</span><span class="op">)</span> </span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[312ms]</span> <span style="font-weight: bold;">orbi_export_data_to_excel()</span> exported the <span style="color: #00BB00;">dataset</span> (1.25k rows, 33
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[317ms]</span> <span style="font-weight: bold;">orbi_export_data_to_excel()</span> exported the <span style="color: #00BB00;">dataset</span> (1.25k rows, 33
 columns) to <span style="color: #0000BB;">shot_noise.xlsx</span>
 </code></pre>
 </div>
