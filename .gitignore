@@ -49,11 +49,14 @@ vignettes/**/*.pdf
 tmp/
 docs/
 plots/
+*.isox
+*.raw
 *.parquet
 *.zip
 *.log
 *.csv
 *.tsv
+*.xlsx
 
 # Pkgdown
 pkgdown/**

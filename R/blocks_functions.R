@@ -427,7 +427,7 @@ orbi_define_blocks_for_dual_inlet <- function(
 }
 
 #' @title Manually adjust block delimiters
-#' @description This function can be used to manually adjust where certain `block` starts or ends after it's been defined with [orbi_define_block_for_flow_injection()] or [orbi_define_block_for_dual_inlet()] using either time or scan number.
+#' @description This function can be used to manually adjust where certain `block` starts or ends after it's been defined with [orbi_define_block_for_flow_injection()] or [orbi_define_blocks_for_dual_inlet()] using either time or scan number.
 #' Note that adjusting blocks removes all block segmentation. Make sure to call [orbi_segment_blocks()] **after** adjusting block delimiters.
 #'
 #' @inheritParams orbi_flag_satellite_peaks

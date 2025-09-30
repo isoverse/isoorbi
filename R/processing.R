@@ -4,11 +4,10 @@
 #' @param ... parameters passed on to the new function [orbi_flag_satellite_peaks()].
 #' @export
 orbi_filter_satellite_peaks <- function(...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.2.0",
     "orbi_filter_satellite_peaks()",
-    "orbi_flag_satellite_peaks()",
-    always = TRUE
+    "orbi_flag_satellite_peaks()"
   )
   orbi_flag_satellite_peaks(...) |>
     orbi_filter_flagged_data()
@@ -113,11 +112,10 @@ orbi_flag_satellite_peaks <- function(dataset) {
 #' @param ... parameters passed on to the new function orbi_flag_weak_isotopocules().
 #' @export
 orbi_filter_weak_isotopocules <- function(...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.2.0",
     "orbi_filter_weak_isotopocules()",
-    "orbi_flag_weak_isotopocules()",
-    always = TRUE
+    "orbi_flag_weak_isotopocules()"
   )
   orbi_flag_weak_isotopocules(...) |>
     orbi_filter_flagged_data()
@@ -125,7 +123,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 
 #' Flag weak isotopocules
 #'
-#' This function flags isotopocules that are not detected in a minimum of `min_percent` of scans that then can be easily visualized with [orbi_plot_coverage()].
+#' This function flags isotopocules that are not detected in a minimum of `min_percent` of scans that then can be easily visualized with [orbi_plot_isotopocule_coverage()].
 #' It evaluates weak isotopocules within each "uidx", "filename", "block", "segment" and "injection" (for those of the columns that exist),
 #' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned data.
 #'
@@ -373,14 +371,14 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       .by = dplyr::all_of(c(by_cols, "data_stretch")),
       n_points = dplyr::n(),
       start_scan.no = .data$scan.no[1],
-      end_scan.no = tail(.data$scan.no, 1),
+      end_scan.no = utils::tail(.data$scan.no, 1),
       start_time.min = if ("time.min" %in% names(peaks)) {
         .data$time.min[1]
       } else {
         list(NULL)
       },
       end_time.min = if ("time.min" %in% names(peaks)) {
-        tail(.data$time.min, 1)
+        utils::tail(.data$time.min, 1)
       } else {
         list(NULL)
       }
@@ -403,17 +401,15 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 #' @param outlier_percent outlier_percent needs to be between 0 and 10, flags extreme scans based on TIC x injection time (i.e., ion intensity)
 #' @export
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.2.0",
     "orbi_filter_scan_intensity()",
-    "orbi_flag_outliers()",
-    always = TRUE
+    "orbi_flag_outliers()"
   )
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.2.0",
     "orbi_filter_scan_intensity(outlier_percent)",
-    details = "the argument `outlier_percent` has been superseded by `agc_window`",
-    always = TRUE
+    details = "the argument `outlier_percent` has been superseded by `agc_window`"
   )
   orbi_flag_outliers(
     ...,
@@ -675,11 +671,10 @@ orbi_filter_flagged_data <- function(dataset) {
   )
 
   # deprecation
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.3.0",
     "orbi_filter_flagged_data()",
-    details = "filtering flagged data is no longer necessary as orbi_summarize_results() and other functions take flagged data into consideration and treat it appropriately",
-    always = TRUE
+    details = "filtering flagged data is no longer necessary as orbi_summarize_results() and other functions take flagged data into consideration and treat it appropriately"
   )
 
   # original n

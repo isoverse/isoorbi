@@ -401,7 +401,7 @@
       out <- orbi_flag_weak_isotopocules(test_file, 90)
     Message
       v orbi_flag_weak_isotopocules() confirmed there are no weak isotopocules: all
-      are detected in at least 90% of scans in each of the 4 data groups (based on
+      are detected in at least 90% of scans in each of the 6 data groups (based on
       filename, compound, and isotopocule)
 
 ---
@@ -409,10 +409,9 @@
     Code
       out <- orbi_flag_weak_isotopocules(test_file, 99.999)
     Message
-      v orbi_flag_weak_isotopocules() flagged 1 of 4 isotopocules as weak because
-      they were NOT present in at least 99.999% of scans in each of the 4 data groups
-      (based on filename, compound, and isotopocule) > use
-      orbi_plot_isotopocule_coverage() to visualize them
+      v orbi_flag_weak_isotopocules() confirmed there are no weak isotopocules: all
+      are detected in at least 99.999% of scans in each of the 6 data groups (based
+      on filename, compound, and isotopocule)
 
 # orbi_flag_weak_isotopocules() [fancy]
 
@@ -549,7 +548,7 @@
       out <- orbi_flag_weak_isotopocules(test_file, 90)
     Message
       [32m✔[39m [1morbi_flag_weak_isotopocules()[22m confirmed there are no [33mweak[39m isotopocules: all
-      are detected in at least 90% of scans in each of the 4 data groups (based on
+      are detected in at least 90% of scans in each of the 6 data groups (based on
       [32mfilename[39m, [32mcompound[39m, and [32misotopocule[39m)
 
 ---
@@ -557,10 +556,9 @@
     Code
       out <- orbi_flag_weak_isotopocules(test_file, 99.999)
     Message
-      [32m✔[39m [1morbi_flag_weak_isotopocules()[22m flagged 1 of 4 isotopocules as [33mweak[39m because
-      they were NOT present in at least 99.999% of scans in each of the 4 data groups
-      (based on [32mfilename[39m, [32mcompound[39m, and [32misotopocule[39m) → use
-      [1morbi_plot_isotopocule_coverage()[22m to visualize them
+      [32m✔[39m [1morbi_flag_weak_isotopocules()[22m confirmed there are no [33mweak[39m isotopocules: all
+      are detected in at least 99.999% of scans in each of the 6 data groups (based
+      on [32mfilename[39m, [32mcompound[39m, and [32misotopocule[39m)
 
 # orbi_flag_outliers() [plain]
 
@@ -654,7 +652,7 @@
     Code
       out <- orbi_flag_outliers(test_file, agc_window = c(10, 90))
     Message
-      v orbi_flag_outliers() flagged 494/2467 scans (20%) as outliers based on AGC
+      v orbi_flag_outliers() flagged 174/864 scans (20%) as outliers based on AGC
       window (10% to 90%) cutoff, i.e. based on scans whose number of ions tic *
       it.ms in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)
       quantiles > use orbi_plot_raw_data(y = tic * it.ms) to visualize them
@@ -664,10 +662,9 @@
     Code
       out <- orbi_flag_outliers(test_file, agc_fold_cutoff = 2)
     Message
-      v orbi_flag_outliers() flagged 5/2467 scans (0.2%) as outliers based on 2 fold
-      AGC cutoff, i.e. based on scans below 1/2 and above 2 times the average number
-      of ions tic * it.ms in the Orbitrap analyzer > use orbi_plot_raw_data(y = tic *
-      it.ms) to visualize them
+      v orbi_flag_outliers() confirmed that none of the 864 scans are outliers based
+      on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
+      average number of ions tic * it.ms in the Orbitrap analyzer
 
 # orbi_flag_outliers() [fancy]
 
@@ -761,7 +758,7 @@
     Code
       out <- orbi_flag_outliers(test_file, agc_window = c(10, 90))
     Message
-      [32m✔[39m [1morbi_flag_outliers()[22m flagged 494/2467 scans (20%) as [33moutliers[39m based on [32mAGC[39m
+      [32m✔[39m [1morbi_flag_outliers()[22m flagged 174/864 scans (20%) as [33moutliers[39m based on [32mAGC[39m
       [32mwindow (10% to 90%) cutoff[39m, i.e. based on [3mscans whose number of ions [32mtic[39m *[23m
       [3m[32mit.ms[39m in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)[23m
       [3mquantiles[23m → use [1morbi_plot_raw_data(y = tic * it.ms)[22m to visualize them
@@ -771,10 +768,9 @@
     Code
       out <- orbi_flag_outliers(test_file, agc_fold_cutoff = 2)
     Message
-      [32m✔[39m [1morbi_flag_outliers()[22m flagged 5/2467 scans (0.2%) as [33moutliers[39m based on [32m2 fold[39m
-      [32mAGC cutoff[39m, i.e. based on [3mscans below 1/2 and above 2 times the average number[23m
-      [3mof ions [32mtic[39m * [32mit.ms[39m in the Orbitrap analyzer[23m → use [1morbi_plot_raw_data(y = tic *[22m
-      [1mit.ms)[22m to visualize them
+      [32m✔[39m [1morbi_flag_outliers()[22m confirmed that none of the 864 scans are [33moutliers[39m based
+      on [32m2 fold AGC cutoff[39m, i.e. based on [3mscans below 1/2 and above 2 times the[23m
+      [3maverage number of ions [32mtic[39m * [32mit.ms[39m in the Orbitrap analyzer[23m
 
 # orbi_define_basepeak() [plain]
 

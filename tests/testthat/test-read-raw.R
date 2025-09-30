@@ -14,7 +14,11 @@ test_that("orbi_find_raw()", {
 
   # files included in package
   expect_equal(
-    orbi_find_raw(system.file("extdata", package = "isoorbi")) |> basename(),
+    orbi_find_raw(
+      system.file("extdata", package = "isoorbi"),
+      pattern = "nitrate"
+    ) |>
+      basename(),
     c("nitrate_test_10scans.raw", "nitrate_test_1scan.raw")
   )
 
@@ -83,7 +87,7 @@ test_that("orbi_read_raw()", {
   test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
     expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
-        orbi_find_raw() |>
+        orbi_find_raw(pattern = "nitrate") |>
         # read without spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE)
     )
@@ -103,16 +107,16 @@ test_that("orbi_read_raw()", {
   test_that_cli("orbi_read_raw() step2", configs = c("plain", "fancy"), {
     expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
-        orbi_find_raw() |>
+        orbi_find_raw(pattern = "nitrate") |>
         # read with spectra
         orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
     )
     expect_snapshot(x)
 
     # aggregate
-    y <- orbi_aggregate_raw(x, aggregator = "extended")
+    expect_snapshot(y <- orbi_aggregate_raw(x, aggregator = "extended"))
     expect_snapshot(y)
-    y <- orbi_aggregate_raw(x, aggregator = "minimal")
+    expect_snapshot(y <- orbi_aggregate_raw(x, aggregator = "minimal"))
     expect_snapshot(y)
 
     y$file_info$file_path <- NULL # OS dependent
@@ -128,7 +132,7 @@ test_that("orbi_read_raw()", {
     )
 
     expect_snapshot(z <- orbi_identify_isotopocules(y, isotopologs))
-    expect_equal(z$peaks, orbi_identify_isotopocules(y$peak, isotopologs)) |>
+    expect_equal(z$peaks, orbi_identify_isotopocules(y$peaks, isotopologs)) |>
       suppressMessages()
 
     # test get

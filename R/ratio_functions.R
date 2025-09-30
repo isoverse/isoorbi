@@ -16,6 +16,7 @@
 #' @inheritParams orbi_flag_satellite_peaks
 #' @param CN noise factor
 #' @param RN reference resolution of the noise factor
+#' @export
 #' @return same object as provided in `dataset` with new column `ions.incremental`
 orbi_calculate_ions <- function(dataset, CN = 3.0, RN = 240000) {
   #safety checks
@@ -111,11 +112,10 @@ orbi_calculate_ratios <- function(dataset) {
   )
 
   # deprecated
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_soft(
     "1.3.0",
     "orbi_calculate_ratios()",
-    details = "this function is obsolete as `orbi_define_basepeak()` already calculates the ratios automatically",
-    always = TRUE
+    details = "this function is obsolete as `orbi_define_basepeak()` already calculates the ratios automatically"
   )
 
   # info message

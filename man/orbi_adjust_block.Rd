@@ -45,6 +45,6 @@ orbi_adjust_block(
 A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
 }
 \description{
-This function can be used to manually adjust where certain \code{block} starts or ends after it's been defined with \code{\link[=orbi_define_block_for_flow_injection]{orbi_define_block_for_flow_injection()}} or \code{\link[=orbi_define_block_for_dual_inlet]{orbi_define_block_for_dual_inlet()}} using either time or scan number.
+This function can be used to manually adjust where certain \code{block} starts or ends after it's been defined with \code{\link[=orbi_define_block_for_flow_injection]{orbi_define_block_for_flow_injection()}} or \code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}} using either time or scan number.
 Note that adjusting blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{after} adjusting block delimiters.
 }

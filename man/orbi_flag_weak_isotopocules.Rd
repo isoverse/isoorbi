@@ -19,7 +19,7 @@ that are very close to their detection limit within a datablock. For continuous 
 same object as provided in \code{dataset} with new column \code{is_weak_isotopocule} that flags weak isotopocules.
 }
 \description{
-This function flags isotopocules that are not detected in a minimum of \code{min_percent} of scans that then can be easily visualized with \code{\link[=orbi_plot_coverage]{orbi_plot_coverage()}}.
+This function flags isotopocules that are not detected in a minimum of \code{min_percent} of scans that then can be easily visualized with \code{\link[=orbi_plot_isotopocule_coverage]{orbi_plot_isotopocule_coverage()}}.
 It evaluates weak isotopocules within each "uidx", "filename", "block", "segment" and "injection" (for those of the columns that exist),
 in addition to any groupings already defined before calling this function using dplyr's \code{group_by()}. It restores the original groupings in the returned data.
 }

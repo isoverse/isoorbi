@@ -1,7 +1,7 @@
 ---
 title: "Dual Inlet"
 description: >
-  A minimal example for processing .isox data from a dual inlet experiments
+  A minimal example for processing .raw data files from a dual inlet experiment
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Dual Inlet}
@@ -11,10 +11,14 @@ editor_options:
   chunk_output_type: console
 ---
 
+> This is a minimal example for processing .raw data files from a dual inlet experiment
 
 ```{r, include=FALSE}
 # default chunk options
 knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
+
+# get isoraw reader (for compiling vignette on cran)
+isoorbi::orbi_check_isoraw(accept_license = TRUE)
 ```
 
 ```{r, message=FALSE}
@@ -25,25 +29,54 @@ library(dplyr) # for mutating data frames
 library(ggplot2) # for data visualization
 ```
 
-# A basic data processing example
+# Load raw file(s)
 
 ```{r}
-# Read .isox test data
+# Read .raw file test data
+raw_file <- file.path(system.file("extdata", package = "isoorbi"), "testfile_dual_inlet.raw")
+data_all <-
+  raw_file |>
+  orbi_read_raw(include_spectra = c(10, 100)) |>
+  orbi_aggregate_raw()
+
+# Identify nitrate isotopocules (could come from a tsv, csv, or xlsx spreadsheet instead)
+isotopocules <- tibble(
+  compound = "nitrate",
+  isotopocule = c("M0", "15N", "17O", "18O"),
+  mass = c(61.9878, 62.9850, 62.9922, 63.9922),
+  tolerance = 1,
+  charge = 1
+)
+data_all <- data_all |>
+  orbi_identify_isotopocules(isotopocules) |>
+  # disregard unidentified and missing isotopocules
+  orbi_filter_isotopocules() |>
+  # calculate ions
+  orbi_calculate_ions()
+```
+
+# Preprocess data
+
+```{r}
+# Preprocess data (this is exactly the same as with an isox file)
 df <- 
-  system.file("extdata", "testfile_dual_inlet_new.isox", package = "isoorbi") |>
-  orbi_read_isox() |> # reads .isox test data
-  orbi_simplify_isox() |> # optionally: keeps only most important columns; equivalent to simplify check box in IsoX
+  data_all |>
   # check for issues
-  orbi_flag_satellite_peaks() |> # removes minor signals that were reported by IsoX in the same tolerance window where the peak of interest is
-  orbi_flag_weak_isotopocules(min_percent = 10) |> # removes signals of isotopocules that were not detected at least in min_percent scans
-  orbi_flag_outliers(agc_fold_cutoff = 2) |> # removes outlying scans that have more than 2 times or less than 1/2 times the average number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)
-  orbi_define_basepeak(basepeak_def = "M0") # sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation
+  # removes minor signals that were reported by IsoX in the same tolerance window where the peak of interest is
+  orbi_flag_satellite_peaks() |> 
+  # removes signals of isotopocules that were not detected at least in min_percent scans
+  orbi_flag_weak_isotopocules(min_percent = 100) |> 
+  # removes outlying scans that have more than 2 times or less than 1/2 times the average
+  # number of ions in the Orbitrap analyzer; another method: agc_window (see function documentation for more details)
+  orbi_flag_outliers(agc_fold_cutoff = 2) |>
+  # sets one isotopocule in the dataset as the base peak (denominator) for ratio calculation
+  orbi_define_basepeak(basepeak_def = "M0") 
 ```
 
 No satellite peaks, no weak isotopocules, a few AGC fold outliers:
 
 ```{r, fig.width=8, fig.height=5}
-df |> orbi_plot_raw_data(isotopocule = "15N", y = tic * it.ms, y_scale = "log")
+df |> orbi_plot_raw_data(y = tic * it.ms, y_scale = "log")
 ```
 
 # Define dual inlet blocks
@@ -75,19 +108,11 @@ blocks_info |> knitr::kable()
 ## Plot 1: default block highlights + outliers
 
 ```{r, fig.width=8, fig.height=5}
-# ions
-df_w_blocks |> 
-  orbi_plot_raw_data(
-    isotopocules = "15N",
-    y = ions.incremental
-  )
+# total ions per scan
+df_w_blocks |> orbi_plot_raw_data(y = intensity)
 
-# ratios - you can see that even the AGC outliers still create decent ratios
-df_w_blocks |> 
-  orbi_plot_raw_data(
-    isotopocules = "15N",
-    y = ratio
-  )
+# isotopocule ratios - you can see that even the AGC outliers still create decent ratios
+df_w_blocks |>  orbi_plot_raw_data(y = ratio)
 ```
 
 
@@ -124,7 +149,7 @@ df_w_blocks |>
 
 ```{r}
 # calculate summary
-df_summary <- 
+df_w_summary <- 
   df_w_blocks |>
   # segment (optional)
   orbi_segment_blocks(into_segments = 3) |>
@@ -133,13 +158,22 @@ df_summary <-
     ratio_method = "sum",
     include_unused_data = TRUE
   )
+
+# export to excel
+df_w_summary |> orbi_export_data_to_excel(file = "output.xlsx")
+```
+
+```{r}
+#| include: false
+unlink("output.xlsx")
 ```
 
 ## Plot 1: ratios summary by block and segment
 
 ```{r, fig.width=8, fig.height=7}
-# plot all isotopocules using a ggplot from scratch
-df_summary |>
+# get out the summary and plot all isotopocules using a ggplot from scratch
+df_w_summary |>
+  orbi_get_data(summary = everything()) |>
   filter(data_type == "data") |>
   mutate(block_seg = sprintf("%s.%s", block, segment) |> fct_inorder()) |>
   # data
@@ -160,8 +194,10 @@ df_summary |>
 ## Plot 2: ratios with block backgrounds and raw data
 
 ```{r, fig.width=8, fig.height=6}
+#| warning: false
 # make a plot for 15N
 plot2 <- df_w_blocks |>
+  orbi_get_data(scans = everything(), peaks = everything()) |>
   filter(isotopocule == "15N") |>
   mutate(panel = "raw ratios") |>
   # raw data plot
@@ -174,7 +210,8 @@ plot2 <- df_w_blocks |>
    # ratio summary data
   geom_pointrange(
     data = function(df) {
-      df_summary |> 
+      df_w_summary |> 
+        orbi_get_data(summary = everything()) |>
         filter(as.character(isotopocule) == df$isotopocule[1]) |> 
         mutate(panel = "summary")
     },
@@ -193,9 +230,11 @@ plot2
 ```
 
 ```{r, fig.width=8, fig.height=6}
+#| warning: false
 # same but with 18O
 plot2 %+% 
-  (df_w_blocks |> filter(isotopocule == "18O") |> mutate(panel = "raw ratios")) +
+  (df_w_blocks |> orbi_get_data(scans = everything(), peaks = everything()) |>
+   filter(isotopocule == "18O") |> mutate(panel = "raw ratios")) +
   labs(title = "18O/M0")
 ```
 

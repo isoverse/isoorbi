@@ -43,7 +43,7 @@ agg_data <- structure(
 test_file <-
   system.file(
     "extdata",
-    "testfile_dual_inlet_new.isox",
+    "testfile_dual_inlet.isox",
     package = "isoorbi"
   ) |>
   orbi_read_isox() |>
@@ -54,8 +54,8 @@ test_file <-
 test_that("orbi_filter_satellite_peaks()", {
   # DEPRECATED
   orbi_filter_satellite_peaks(peaks) |>
-    suppressMessages() |>
-    expect_warning("deprecated")
+    expect_warning("deprecated") |>
+    suppressMessages()
 })
 
 test_that("orbi_flag_satellite_peaks()", {
@@ -270,5 +270,6 @@ test_that("orbi_define_basepeak()", {
   expect_snapshot_value(
     orbi_define_basepeak(dataset = df, basepeak_def = "M0"),
     style = "deparse" # json2 doesn't work because of loss of precision in the ratios
-  )
+  ) |>
+    suppressMessages()
 })

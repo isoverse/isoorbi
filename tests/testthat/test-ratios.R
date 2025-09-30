@@ -380,7 +380,8 @@ test_that("orbi_summarize_results()", {
   df |>
     orbi_summarize_results(ratio_method = "sum") |>
     select(-"filename") |>
-    expect_snapshot_value(style = "json2")
+    expect_snapshot_value(style = "json2") |>
+    suppressMessages()
 
   # capture success data with blocks and a different method
   df |>
@@ -391,5 +392,6 @@ test_that("orbi_summarize_results()", {
       sample_name = as.factor("sample_name4")
     ) |>
     orbi_summarize_results(ratio_method = "mean") |>
-    expect_snapshot_value(style = "json2")
+    expect_snapshot_value(style = "json2") |>
+    suppressMessages()
 })

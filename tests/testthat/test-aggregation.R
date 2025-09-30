@@ -162,6 +162,8 @@ test_that("get_data()", {
     withr::with_options(new = list(show_exec_times = FALSE))
 
   # data
-  expect_snapshot_value(test_run1(), style = "json2")
-  expect_snapshot_value(test_run2(), style = "json2")
+  expect_snapshot_value(test_run1(), style = "json2") |>
+    suppressMessages()
+  expect_snapshot_value(test_run2(), style = "json2") |>
+    suppressMessages()
 })
