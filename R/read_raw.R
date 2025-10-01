@@ -114,6 +114,7 @@ orbi_check_isoraw <- function(
   }
 
   # final check
+  isoraw_version <- get_isoraw_version()
   if (
     is.null(isoraw_version) || isoraw_version < numeric_version(min_version)
   ) {
