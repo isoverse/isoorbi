@@ -8,6 +8,7 @@ orbi_flag_outliers(
   dataset,
   agc_fold_cutoff = NA_real_,
   agc_window = c(),
+  agc_absolute_cutoff = c(),
   by_block = TRUE
 )
 }
@@ -17,6 +18,8 @@ orbi_flag_outliers(
 \item{agc_fold_cutoff}{flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, \code{agc_fold_cutoff = 2} flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.}
 
 \item{agc_window}{flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers \code{c(x,y)} flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.}
+
+\item{agc_absolute_cutoff}{flags scans with a number of ions in the Orbitrap analyzer outside of an absolute range. Provide a vector with 2 numbers \code{c(x,y)} flagging data below x and above y of the TIC multiplied by injection time (which serves as an estimate for the number of ions in the Orbitrap).}
 
 \item{by_block}{if the \code{dataset} has block and segment definitions, should the outlier flag be evaluated within each block+segment or globally? default is within each block+segment, switch to globally by turning \code{by_block = FALSE}}
 }
