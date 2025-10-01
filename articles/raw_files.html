@@ -40,6 +40,7 @@
 <li class="nav-item"><a class="nav-link" href="../articles/dual_inlet.html">Dual Inlet</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/flow_injection.html">Flow Injection</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.isoverse.org/2024_kantnerova_et_al/">Katnerova et al. 2024</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/isoverse/isoorbi"><span class="fa fa-github fa-lg"></span></a></li>
@@ -99,7 +100,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># aggregate raw data</span></span>
 <span><span class="va">agg_data</span> <span class="op">&lt;-</span> <span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[831ms]</span> <span style="font-weight: bold;">aggregate_files()</span> aggregated <span style="color: #0000BB;">file_info</span> (3), <span style="color: #0000BB;">scans</span> (12.35k), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[828ms]</span> <span style="font-weight: bold;">aggregate_files()</span> aggregated <span style="color: #0000BB;">file_info</span> (3), <span style="color: #0000BB;">scans</span> (12.35k), <span style="color: #0000BB;">peaks</span>
 (51.91k), and <span style="color: #0000BB;">spectra</span> (1.22k) from 3 files using the <span style="font-weight: bold; font-style: italic;">standard</span> aggregator
 </code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -293,7 +294,7 @@ these are empty.</p>
 </h2>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>peaks <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[10ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 51.91k records from the combination of
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[11ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 51.91k records from the combination of
 <span style="color: #0000BB;">file_info</span> (3) and <span style="color: #0000BB;">peaks</span> (51.91k) via <span style="color: #00BB00;">uidx</span>
 </code></pre>
 <pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 51,909 × 10</span>
