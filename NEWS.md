@@ -1,3 +1,27 @@
+# isoorbi 1.5.0
+
+## Breaking changes
+
+There are no breaking changes in this release (all changes and new features are backwards compatible).
+
+## New features
+
+* implemented an optimized and expanded raw file reader (isoraw) that is packaged  with isoorbi and is used in `orbi_read_raw()`
+* implemented versatile isotopocule mapping via `orbi_identifiy_isotopocule()` from csv, tsv, and excel inputs
+* implemented `orbi_calculate_ions()` to calculate ions from peak intensities and noise with flexible `CN` and `RN` parameters
+* implemented `orbi_plot_spectra()` to plot 
+
+## Enhancements
+
+* upgraded all data processing and plotting functions to be compatible with both isox and raw file datasets
+* improved default print outputs for S3 classes used in the package
+* improved package structure documentation
+
+## Bug fixes
+
+* fixed incompatibility with ggplot2 version 4.0.0 (#69)
+
+
 # isoorbi 1.4.0
 
 ## Breaking changes
@@ -6,7 +30,7 @@ There are no breaking changes in this release (all changes and new features are 
 
 ## New features
 
-* implemented direct reading and caching of orbitrap IRMS raw files (`orbi_read_read()`)
+* implemented direct reading and caching of orbitrap IRMS raw files (`orbi_read_read()`) via the rawrr package
 * use CLI for clearer and more informative info messages for all functions
 
 ## Enhancements

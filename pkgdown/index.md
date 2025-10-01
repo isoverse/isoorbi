@@ -16,7 +16,8 @@ coverage](https://codecov.io/gh/isoverse/isoorbi/graph/badge.svg)](https://app.c
 
 The goal of the isoorbi R package is to help you process isotopocule
 measurements from an **Orbitrap Isotope Solutions** mass spectrometer.
-It expects <code>.isox</code> files created by IsoX as input.
+It can read both the <code>.raw</code> files (recommended approach) as
+well as <code>.isox</code> output created by IsoX(legacy approach).
 
 ## Installation
 
@@ -52,7 +53,8 @@ To use the latest updates, you can install the development version of
     library(isoorbi)
 
     # path to a small test file bundled with the package
-    file_path <- system.file(package = "isoorbi", "extdata", "nitrate_test_10scans.raw")
+    file_path <- 
+      system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
 
     # read the raw file incluing 2 of the raw spectra
     raw_files <- file_path |>
@@ -66,7 +68,7 @@ To use the latest updates, you can install the development version of
 
 ### Identify isotopcules
 
-    # define isotopcules of interest (could also come from a tsv, csv, or excel file)
+    # define isotopcules of interest (could come from tsv, csv, or excel file)
     isotopocules <- data.frame(
       isotopocule = c("M0", "15N", "17O", "18O"),
       mass = c(61.9878, 62.9850, 62.9922, 63.9922),
@@ -77,7 +79,7 @@ To use the latest updates, you can install the development version of
     raw_files <- raw_files |> orbi_identify_isotopocules(isotopocules)
 
     # plot again, now with the isotopocules identified
-    raw_files |> orbi_plot_spectra(max_scans = 1)
+    raw_files |> orbi_plot_spectra()
 
 <img src="man/figures/README-map-isotopocules-1.png" width="100%" />
 
