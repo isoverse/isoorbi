@@ -2,7 +2,7 @@
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
-      pattern = "nitrate"), cache = FALSE, read_cache = FALSE)
+      pattern = "nitrate"), read_cache = on_cran(), cache = FALSE)
     Message
       v orbi_read_raw() read 'nitrate_test_10scans.raw' (124.68 kB)
       v orbi_read_raw() read 'nitrate_test_1scan.raw' (84.10 kB)
@@ -22,7 +22,7 @@
     Code
       y <- orbi_aggregate_raw(x)
     Message
-      v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
+      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (138), and
       spectra (0) from 2 files using the standard aggregator
 
 ---
@@ -78,7 +78,7 @@
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
-      pattern = "nitrate"), cache = FALSE, read_cache = FALSE)
+      pattern = "nitrate"), read_cache = on_cran(), cache = FALSE)
     Message
       [32m✔[39m [1morbi_read_raw()[22m read [34mnitrate_test_10scans.raw[39m (124.68 kB)
       [32m✔[39m [1morbi_read_raw()[22m read [34mnitrate_test_1scan.raw[39m (84.10 kB)
@@ -98,7 +98,7 @@
     Code
       y <- orbi_aggregate_raw(x)
     Message
-      [32m✔[39m [1maggregate_files()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
       [34mspectra[39m (0) from 2 files using the [1m[3mstandard[23m[22m aggregator
 
 ---
@@ -154,7 +154,7 @@
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
-      pattern = "nitrate"), cache = FALSE, read_cache = FALSE, include_spectra = 1)
+      pattern = "nitrate"), read_cache = on_cran(), cache = FALSE, include_spectra = 1)
     Message
       v orbi_read_raw() read 'nitrate_test_10scans.raw' (124.68 kB), included the
       spectrum from 1 scan
@@ -178,7 +178,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "extended")
     Message
-      v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
+      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (138), and
       spectra (675) from 2 files using the extended aggregator
 
 ---
@@ -225,7 +225,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "minimal")
     Message
-      v aggregate_files() aggregated file_info (2), scans (11), peaks (138), and
+      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (138), and
       spectra (675) from 2 files using the minimal aggregator
 
 ---
@@ -287,7 +287,7 @@
 
     Code
       x <- orbi_read_raw(orbi_find_raw(system.file("extdata", package = "isoorbi"),
-      pattern = "nitrate"), cache = FALSE, read_cache = FALSE, include_spectra = 1)
+      pattern = "nitrate"), read_cache = on_cran(), cache = FALSE, include_spectra = 1)
     Message
       [32m✔[39m [1morbi_read_raw()[22m read [34mnitrate_test_10scans.raw[39m (124.68 kB), included the
       [32mspectrum[39m from 1 [32mscan[39m
@@ -311,7 +311,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "extended")
     Message
-      [32m✔[39m [1maggregate_files()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
       [34mspectra[39m (675) from 2 files using the [1m[3mextended[23m[22m aggregator
 
 ---
@@ -358,7 +358,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "minimal")
     Message
-      [32m✔[39m [1maggregate_files()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
       [34mspectra[39m (675) from 2 files using the [1m[3mminimal[23m[22m aggregator
 
 ---

@@ -508,6 +508,7 @@ aggregate_files <- function(
     pb_total = nrow(files_data),
     pb_status = "",
     show_progress = show_progress,
+    .call = call,
     .env = root_env
   )
 
@@ -633,7 +634,8 @@ aggregate_files <- function(
     } else {
       "{cli::col_green(symbol$tick)} {msg}"
     },
-    start = start
+    start = start,
+    .call = call
   )
 
   # clean up problems
