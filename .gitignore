@@ -65,6 +65,7 @@ pkgdown/**
 CRAN-SUBMISSION
 /doc/
 /Meta/
+release
 
 # exclude paper
 paper/
