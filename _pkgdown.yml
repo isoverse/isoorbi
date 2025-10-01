@@ -17,14 +17,20 @@ navbar:
     href: articles/quick_start.html
   - text: Shot Noise
     href: articles/shot_noise.html
-  - text: Dual Inlet
-    href: articles/dual_inlet.html
   - text: Flow Injection
     href: articles/flow_injection.html
   - text: Reference
     href: reference/index.html
-  - text: Katnerova et al. 2024
-    href: https://www.isoverse.org/2024_kantnerova_et_al/
+  - text: Examples
+    menu:
+      - text: "Isoorbi package"
+      - text: "Dual inlet analysis"
+        href: articles/dual_inlet.html
+      - text: "Kantnerová et al. 2024"
+      - text: "Shot noise analysis"
+        href: https://www.isoverse.org/2024_kantnerova_et_al/shot_noise.html
+      - text: "Replicates analysis"
+        href: https://www.isoverse.org/2024_kantnerova_et_al/replicates.html
   right:
   - icon: fa-github fa-lg
     href: https://github.com/isoverse/isoorbi
