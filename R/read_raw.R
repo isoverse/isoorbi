@@ -15,8 +15,8 @@
 #' @param ... passed on to `download.file` if (re-) installing the reader
 #' @export
 orbi_check_isoraw <- function(
-  install_if_missing = TRUE,
-  reinstall_if_outdated = TRUE,
+  install_if_missing = !on_cran(),
+  reinstall_if_outdated = !on_cran(),
   reinstall_always = FALSE,
   min_version = "0.2.2",
   source = paste0(
@@ -193,6 +193,11 @@ check_license <- function(env = caller_env(), accept = FALSE) {
     "You have to accept the Thermo License agreement before using the RawFileReader.",
     call = env
   )
+}
+
+# check if we're on cran
+on_cran <- function() {
+  !interactive() && !isTRUE(as.logical(Sys.getenv("NOT_CRAN", "false")))
 }
 
 # interactions with isoraw =======
@@ -543,9 +548,6 @@ orbi_read_raw <- function(
   # keep track of current env to anchor progress bars
   root_env <- current_env()
 
-  # check for raw file reader
-  orbi_check_isoraw()
-
   # safety checks
   check_arg(
     file_paths,
@@ -715,6 +717,9 @@ orbi_read_raw <- function(
 
   # any files to read?
   if (nrow(read_files) > 0) {
+    # check first for raw file reader
+    orbi_check_isoraw()
+
     read_files <- read_files |>
       dplyr::mutate(
         # progress bar info
@@ -1077,6 +1082,7 @@ read_cached_raw_file <- function(
         )
 
         # run isoraw only for the spectra
+        orbi_check_isoraw()
         out <- try_catch_cnds(
           run_isoraw(
             file_path_info$file_path,
@@ -1217,6 +1223,7 @@ read_raw_file <- function(
 
   # run isoraw
   update_progress("running isoraw")
+  orbi_check_isoraw()
   out <- try_catch_cnds(
     run_isoraw(
       file_path_info$file_path,

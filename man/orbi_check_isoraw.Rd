@@ -5,8 +5,8 @@
 \title{Check for the isoorbi raw file reader}
 \usage{
 orbi_check_isoraw(
-  install_if_missing = TRUE,
-  reinstall_if_outdated = TRUE,
+  install_if_missing = !on_cran(),
+  reinstall_if_outdated = !on_cran(),
   reinstall_always = FALSE,
   min_version = "0.2.2",
   source = paste0("https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
