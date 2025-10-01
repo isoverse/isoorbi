@@ -82,12 +82,6 @@ orbi_get_problems <- function(obj, strip_ansi = TRUE) {
 #'
 #' @rdname problems
 #' @param obj data object that holds problems information
-#' @examples
-#'
-#' orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
-#'   orbi_read_raw() |>
-#'   orbi_show_problems()
-#'
 #' @export
 orbi_show_problems <- function(obj) {
   orbi_get_problems(obj, strip_ansi = FALSE) |> show_cnds()

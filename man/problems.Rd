@@ -22,10 +22,3 @@ This function retrieves parsing problems encountered during the reading and proc
 
 This function prints out parsing problems encountered during the reading and processing of files.
 }
-\examples{
-
-orbi_find_raw(system.file("extdata", package = "isoorbi"))[1] |>
-  orbi_read_raw() |>
-  orbi_show_problems()
-
-}
