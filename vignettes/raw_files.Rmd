@@ -14,26 +14,27 @@ editor_options:
 ```{r, include=FALSE}
 # default chunk options
 knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
-
-# get isoraw reader (for compiling vignette on cran)
-isoorbi::orbi_check_isoraw(accept_license = TRUE)
 ```
+
+
+```{r, message=FALSE}
+# libraries
+library(isoorbi) #load isoorbi R package
+library(dplyr) # for mutating data frames
+```
+
 
 # Read raw files
 
 ```{r}
 #| label: read files
-
-# library
-library(isoorbi)
-
 # raw files directory
 raw_folder <- system.file(package = "isoorbi", "extdata")
 
 # read files
 raw_files <-
   raw_folder |> 
-  orbi_find_raw() |> 
+  orbi_find_raw(pattern = "nitrate") |> 
   orbi_read_raw(include_spectra = c(1, 10, 100)) |>
   suppressMessages()
 
@@ -69,6 +70,39 @@ There were no problems reading and/or aggregating the raw data so these are empt
 ```{r}
 raw_files |> orbi_get_problems()
 agg_data |> orbi_get_problems()
+```
+
+# Identify isotopocules
+
+```{r}
+# list of isotopocules (can alternatively be in a tsv/csv/xlsx file)
+isotopocules <- tibble(
+    compound = "nitrate",
+    isotopolog = c("M0", "15N", "17O", "18O"),
+    mass = c(61.9878, 62.9850, 62.9922, 63.9922),
+    tolerance = 1,
+    charge = 1
+  )
+
+# identify
+data <- agg_data |> orbi_identify_isotopocules(isotopocules)
+```
+
+# Check satellite peaks
+
+```{r}
+#| warning: false
+# this can happen here or later on in the workflow
+# in the case of these files there are no satellite peaks
+data |> orbi_flag_satellite_peaks() |> orbi_plot_satellite_peaks()
+```
+
+# Check coverage
+
+```{r}
+# this can happen here or later on in the workflow
+data |> orbi_get_isotopocule_coverage()
+data |> orbi_plot_isotopocule_coverage()
 ```
 
 # Retrieve (get) data
