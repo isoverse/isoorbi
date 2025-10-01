@@ -4,7 +4,7 @@ description: >
   A detailed guide to isoorbi functionality.
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Raw Files}
+  %\VignetteIndexEntry{Functionality Guide}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
