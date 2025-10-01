@@ -33,6 +33,31 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.5.0" id="isoorbi-150">isoorbi 1.5.0<a class="anchor" aria-label="anchor" href="#isoorbi-150"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-1-5-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-5-0"></a></h3>
+<p>There are no breaking changes in this release (all changes and new features are backwards compatible).</p>
+</div>
+<div class="section level3">
+<h3 id="new-features-1-5-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-5-0"></a></h3>
+<ul><li>implemented an optimized and expanded raw file reader (isoraw) that is packaged with isoorbi and is used in <code><a href="../reference/orbi_read_raw.html">orbi_read_raw()</a></code>
+</li>
+<li>implemented versatile isotopocule mapping via <code>orbi_identifiy_isotopocule()</code> from csv, tsv, and excel inputs</li>
+<li>implemented <code><a href="../reference/orbi_calculate_ions.html">orbi_calculate_ions()</a></code> to calculate ions from peak intensities and noise with flexible <code>CN</code> and <code>RN</code> parameters</li>
+<li>implemented <code><a href="../reference/orbi_plot_spectra.html">orbi_plot_spectra()</a></code> to plot</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-1-5-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-5-0"></a></h3>
+<ul><li>upgraded all data processing and plotting functions to be compatible with both isox and raw file datasets</li>
+<li>improved default print outputs for S3 classes used in the package</li>
+<li>improved package structure documentation</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-5-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-5-0"></a></h3>
+<ul><li>fixed incompatibility with ggplot2 version 4.0.0 (<a href="https://github.com/isoverse/isoorbi/issues/69" class="external-link">#69</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.0" id="isoorbi-140">isoorbi 1.4.0<a class="anchor" aria-label="anchor" href="#isoorbi-140"></a></h2>
 <div class="section level3">
 <h3 id="breaking-changes-1-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-4-0"></a></h3>
@@ -40,7 +65,7 @@
 </div>
 <div class="section level3">
 <h3 id="new-features-1-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-4-0"></a></h3>
-<ul><li>implemented direct reading and caching of orbitrap IRMS raw files (<code>orbi_read_read()</code>)</li>
+<ul><li>implemented direct reading and caching of orbitrap IRMS raw files (<code>orbi_read_read()</code>) via the rawrr package</li>
 <li>use CLI for clearer and more informative info messages for all functions</li>
 </ul></div>
 <div class="section level3">
