@@ -149,7 +149,7 @@ test_that("orbi_flag_outliers()", {
 
   orbi_flag_outliers(peaks) |>
     expect_error(
-      "need to define at least one of these parameters for identifying outliers*agc_fold_cutoff.*agc_window.*ag_absolute_cutoff"
+      "need to define at least one of these parameters for identifying outliers.*agc_fold_cutoff.*agc_window.*agc_absolute_cutoff"
     )
 
   orbi_flag_outliers(peaks, agc_window = T) |>

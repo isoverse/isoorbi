@@ -560,6 +560,218 @@
       are detected in at least 99.999% of scans in each of the 6 data groups (based
       on [32mfilename[39m, [32mcompound[39m, and [32misotopocule[39m)
 
+# orbi_flag_outliers() [plain]
+
+    Code
+      agg_out <- orbi_flag_outliers(agg_data, agc_window = c(10, 90))
+    Message
+      v orbi_flag_outliers() flagged 2/3 scans (67%) as outliers based on AGC window
+      (10% to 90%) cutoff, i.e. based on scans whose number of ions tic * it.ms in
+      the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%) quantiles >
+      use orbi_plot_raw_data(y = tic * it.ms) to visualize them
+
+---
+
+    Code
+      agg_out
+    Message
+      -------- aggregated data from 1 raw file - retrieve with orbi_get_data() -------
+      > file_info (1): uidx, filename
+      > scans (3): uidx, scan.no, tic, it.ms, is_outlier, outlier_type
+      > peaks (14): uidx, scan.no, tic (2 NA), it.ms (2 NA), mzMeasured (2 NA),
+      intensity (2 NA), compound (1 NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact
+      (1 NA), charge (1 NA)
+
+---
+
+    {
+      "type": "list",
+      "attributes": {
+        "names": {
+          "type": "character",
+          "attributes": {},
+          "value": ["uidx", "scan.no", "tic", "it.ms", "is_outlier", "outlier_type"]
+        },
+        "row.names": {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["tbl_df", "tbl", "data.frame"]
+        }
+      },
+      "value": [
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 1, 1]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        {
+          "type": "logical",
+          "attributes": {},
+          "value": [true, false, true]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["AGC window (10% to 90%) cutoff", "", "AGC window (10% to 90%) cutoff"]
+        }
+      ]
+    }
+
+---
+
+    Code
+      agg_out <- orbi_flag_outliers(agg_data, agc_fold_cutoff = 2)
+    Message
+      v orbi_flag_outliers() flagged 1/3 scans (33%) as outliers based on 2 fold AGC
+      cutoff, i.e. based on scans below 1/2 and above 2 times the average number of
+      ions tic * it.ms in the Orbitrap analyzer > use orbi_plot_raw_data(y = tic *
+      it.ms) to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(test_file, agc_window = c(10, 90))
+    Message
+      v orbi_flag_outliers() flagged 174/864 scans (20%) as outliers based on AGC
+      window (10% to 90%) cutoff, i.e. based on scans whose number of ions tic *
+      it.ms in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)
+      quantiles > use orbi_plot_raw_data(y = tic * it.ms) to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(test_file, agc_fold_cutoff = 2)
+    Message
+      v orbi_flag_outliers() confirmed that none of the 864 scans are outliers based
+      on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
+      average number of ions tic * it.ms in the Orbitrap analyzer
+
+# orbi_flag_outliers() [fancy]
+
+    Code
+      agg_out <- orbi_flag_outliers(agg_data, agc_window = c(10, 90))
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m flagged 2/3 scans (67%) as [33moutliers[39m based on [32mAGC window[39m
+      [32m(10% to 90%) cutoff[39m, i.e. based on [3mscans whose number of ions [32mtic[39m * [32mit.ms[39m in[23m
+      [3mthe Orbitrap analyzer fall into the lowest (<10%) or highest (>90%) quantiles[23m →
+      use [1morbi_plot_raw_data(y = tic * it.ms)[22m to visualize them
+
+---
+
+    Code
+      agg_out
+    Message
+      ──────── [1maggregated data from 1 raw file - retrieve with orbi_get_data()[22m ───────
+      → [34mfile_info[39m (1): [32muidx[39m, [32mfilename[39m
+      → [34mscans[39m (3): [32muidx[39m, [32mscan.no[39m, [32mtic[39m, [32mit.ms[39m, [32mis_outlier[39m, [32moutlier_type[39m
+      → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mtic[39m ([33m2 NA[39m), [32mit.ms[39m ([33m2 NA[39m), [32mmzMeasured[39m ([33m2 NA[39m),
+      [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1 NA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m
+      ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m)
+
+---
+
+    {
+      "type": "list",
+      "attributes": {
+        "names": {
+          "type": "character",
+          "attributes": {},
+          "value": ["uidx", "scan.no", "tic", "it.ms", "is_outlier", "outlier_type"]
+        },
+        "row.names": {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["tbl_df", "tbl", "data.frame"]
+        }
+      },
+      "value": [
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 1, 1]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        {
+          "type": "double",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        {
+          "type": "logical",
+          "attributes": {},
+          "value": [true, false, true]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["AGC window (10% to 90%) cutoff", "", "AGC window (10% to 90%) cutoff"]
+        }
+      ]
+    }
+
+---
+
+    Code
+      agg_out <- orbi_flag_outliers(agg_data, agc_fold_cutoff = 2)
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m flagged 1/3 scans (33%) as [33moutliers[39m based on [32m2 fold AGC[39m
+      [32mcutoff[39m, i.e. based on [3mscans below 1/2 and above 2 times the average number of[23m
+      [3mions [32mtic[39m * [32mit.ms[39m in the Orbitrap analyzer[23m → use [1morbi_plot_raw_data(y = tic *[22m
+      [1mit.ms)[22m to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(test_file, agc_window = c(10, 90))
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m flagged 174/864 scans (20%) as [33moutliers[39m based on [32mAGC[39m
+      [32mwindow (10% to 90%) cutoff[39m, i.e. based on [3mscans whose number of ions [32mtic[39m *[23m
+      [3m[32mit.ms[39m in the Orbitrap analyzer fall into the lowest (<10%) or highest (>90%)[23m
+      [3mquantiles[23m → use [1morbi_plot_raw_data(y = tic * it.ms)[22m to visualize them
+
+---
+
+    Code
+      out <- orbi_flag_outliers(test_file, agc_fold_cutoff = 2)
+    Message
+      [32m✔[39m [1morbi_flag_outliers()[22m confirmed that none of the 864 scans are [33moutliers[39m based
+      on [32m2 fold AGC cutoff[39m, i.e. based on [3mscans below 1/2 and above 2 times the[23m
+      [3maverage number of ions [32mtic[39m * [32mit.ms[39m in the Orbitrap analyzer[23m
+
 # orbi_define_basepeak() [plain]
 
     Code
