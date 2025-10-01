@@ -89,7 +89,7 @@ test_that("orbi_read_raw()", {
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw(pattern = "nitrate") |>
         # read without spectra (on CRAN should read cache so we DONT download isoraw)
-        orbi_read_raw(read_cache = on_cran(), cache = FALSE)
+        orbi_read_raw(read_cache = TRUE, cache = FALSE)
     )
     expect_snapshot(x)
 
@@ -109,11 +109,7 @@ test_that("orbi_read_raw()", {
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw(pattern = "nitrate") |>
         # read with spectra (on CRAN should read cache so we DONT download isoraw)
-        orbi_read_raw(
-          read_cache = on_cran(),
-          cache = FALSE,
-          include_spectra = 1
-        )
+        orbi_read_raw(read_cache = TRUE, cache = FALSE, include_spectra = 1)
     )
     expect_snapshot(x)
 
