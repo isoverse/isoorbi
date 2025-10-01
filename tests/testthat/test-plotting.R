@@ -239,7 +239,7 @@ test_that("orbi_plot_spectra()", {
     orbi_plot_spectra(test_file, max_scans = 1) |> suppressMessages()
   )
   vdiffr::expect_doppelganger(
-    "spectra no peak labels, no file name, no backgrounds",
+    "spectra - defaults off",
     orbi_plot_spectra(
       test_file,
       show_focus_backgrounds = FALSE,

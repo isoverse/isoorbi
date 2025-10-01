@@ -121,6 +121,6 @@
 <line x1='677.33' y1='300.43' x2='691.15' y2='300.43' style='stroke-width: 1.07; stroke-dasharray: 2.85,2.85; stroke-linecap: butt;' />
 <text x='698.36' y='286.46' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='698.36' y='303.74' style='font-size: 9.60px; font-family: sans;' textLength='10.68px' lengthAdjust='spacingAndGlyphs'>10</text>
-<text x='49.37' y='15.39' style='font-size: 14.40px; font-family: sans;' textLength='341.06px' lengthAdjust='spacingAndGlyphs'>spectra no peak labels, no file name, no backgrounds</text>
+<text x='49.37' y='15.39' style='font-size: 14.40px; font-family: sans;' textLength='130.48px' lengthAdjust='spacingAndGlyphs'>spectra - defaults off</text>
 </g>
 </svg>
