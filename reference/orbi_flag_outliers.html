@@ -22,11 +22,17 @@ in addition to any groupings already defined before calling this function using 
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/quick_start.html">Quick Start</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/shot_noise.html">Shot Noise</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/dual_inlet.html">Dual Inlet</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/flow_injection.html">Flow Injection</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/functionality_guide.html">Functionality Guide</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.isoverse.org/2024_kantnerova_et_al/">Katnerova et al. 2024</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-examples"><li><h6 class="dropdown-header" data-toc-skip>Isoorbi package</h6></li>
+    <li><a class="dropdown-item" href="../articles/dual_inlet.html">Dual inlet analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/flow_injection.html">Flow injection analysis</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Kantnerová et al. 2024</h6></li>
+    <li><a class="external-link dropdown-item" href="https://www.isoverse.org/2024_kantnerova_et_al/shot_noise.html">Shot noise analysis</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.isoverse.org/2024_kantnerova_et_al/replicates.html">Replicates analysis</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/isoverse/isoorbi"><span class="fa fa-github fa-lg"></span></a></li>
       </ul></div>
 
@@ -53,6 +59,7 @@ in addition to any groupings already defined before calling this function using 
 <span>  <span class="va">dataset</span>,</span>
 <span>  agc_fold_cutoff <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  agc_window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  agc_absolute_cutoff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  by_block <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -71,6 +78,10 @@ in addition to any groupings already defined before calling this function using 
 
 <dt id="arg-agc-window">agc_window<a class="anchor" aria-label="anchor" href="#arg-agc-window"></a></dt>
 <dd><p>flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers <code>c(x,y)</code> flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.</p></dd>
+
+
+<dt id="arg-agc-absolute-cutoff">agc_absolute_cutoff<a class="anchor" aria-label="anchor" href="#arg-agc-absolute-cutoff"></a></dt>
+<dd><p>flags scans with a number of ions in the Orbitrap analyzer outside of an absolute range. Provide a vector with 2 numbers <code>c(x,y)</code> flagging data below x and above y of the TIC multiplied by injection time (which serves as an estimate for the number of ions in the Orbitrap).</p></dd>
 
 
 <dt id="arg-by-block">by_block<a class="anchor" aria-label="anchor" href="#arg-by-block"></a></dt>
