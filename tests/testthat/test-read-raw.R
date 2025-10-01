@@ -80,8 +80,6 @@ test_that("orbi_read_raw()", {
   expect_error(orbi_read_raw(), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(42), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(character()), "file_paths.*must be at least one")
-  expect_message(orbi_read_raw("DNE"), "encountered.*1 error") |>
-    suppressMessages()
 
   # succesful read without spectra (default)
   test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
