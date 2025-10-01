@@ -427,8 +427,9 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 #' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned datasert.
 #'
 #' @inheritParams orbi_flag_satellite_peaks
-#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #' @param agc_fold_cutoff flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, `agc_fold_cutoff = 2` flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' @param agc_absolute_cutoff flags scans with a number of ions in the Orbitrap analyzer outside of an absolute range. Provide a vector with 2 numbers `c(x,y)` flagging data below x percent and above y. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #' @param by_block if the `dataset` has block and segment definitions, should the outlier flag be evaluated within each block+segment or globally? default is within each block+segment, switch to globally by turning `by_block = FALSE`
 #'
 #' @examples
@@ -444,6 +445,7 @@ orbi_flag_outliers <- function(
   dataset,
   agc_fold_cutoff = NA_real_,
   agc_window = c(),
+  agc_absolute_cutoff = c(),
   by_block = TRUE
 ) {
   # safety checks
@@ -460,8 +462,15 @@ orbi_flag_outliers <- function(
     ) ==
       0L ||
       (is.numeric(agc_window) &&
-        length(agc_window) == 2L &&
-        agc_window[1] < agc_window[2])
+         length(agc_window) == 2L &&
+         agc_window[1] < agc_window[2]),
+    "if provided, `agc_absolute_cutoff` needs to be a vector of two numbers (low and high cutoffs)" = length(
+      agc_absolute_cutoff
+    ) ==
+      0L ||
+      (is.numeric(agc_absolute_cutoff) &&
+         length(agc_absolute_cutoff) == 2L &&
+         agc_absolute_cutoff[1] < agc_absolute_cutoff[2])
   )
 
   # keep track for later
@@ -478,8 +487,9 @@ orbi_flag_outliers <- function(
 
   # check filter to apply
   method <- c(
+    agc_fold_cutoff = !is.na(agc_fold_cutoff),
     agc_window = length(agc_window) == 2L,
-    agc_fold_cutoff = !is.na(agc_fold_cutoff)
+    agc_absolute_cutoff = length(agc_absolute_cutoff) == 2L
   )
   if (sum(method) > 1L) {
     sprintf(
@@ -513,6 +523,17 @@ orbi_flag_outliers <- function(
       "scans below 1/{agc_fold_cutoff} and above {agc_fold_cutoff} times the average number of ions {.field tic} * {.field it.ms} in the Orbitrap analyzer"
     )
     method_type <- sprintf("%s fold AGC cutoff", agc_fold_cutoff)
+  }else if (method == "agc_absolute_cutoff") {
+        method_msg <- sprintf(
+            "scans below %s and above %s the number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
+            agc_absolute_cutoff[1],
+            agc_absolute_cutoff[2]
+          )
+        method_type <- sprintf(
+            "AGC cutoff (%s to %s)",
+            agc_absolute_cutoff[1],
+            agc_absolute_cutoff[2]
+          )
   }
 
   # info
@@ -564,7 +585,15 @@ orbi_flag_outliers <- function(
             .data$TICxIT > agc_fold_cutoff * .data$TICxIT_mean
         ) |>
         dplyr::select(-"TICxIT", -"TICxIT_mean")
-    }
+    } else if (method == "agc_absolute_cutoff") {
+      single_scans |>
+        dplyr::mutate(
+          TICxIT = .data$tic * .data$it.ms,
+          is_new_outlier = .data$TICxIT < agc_absolute_cutoff[1] |
+            .data$TICxIT > agc_absolute_cutoff[2]
+          ) |>
+        dplyr::select(-"TICxIT")
+      }
   )
 
   # stop if error
