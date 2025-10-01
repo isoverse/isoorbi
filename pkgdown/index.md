@@ -52,12 +52,18 @@ To use the latest updates, you can install the development version of
     # load library
     library(isoorbi)
 
-    # path to a small test file bundled with the package
-    file_path <- 
-      system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
+    # provide the path to your data folder here:
+    my_data_folder <- file.path("project", "data")
+
+    # and search for raw files in that folder
+    file_paths <- orbi_find_raw(my_data_folder)
+
+    # for this example, we use a small test file bundled with the package
+    # instead (remove this line if working with your own data)
+    file_paths <- system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
 
     # read the raw file incluing 2 of the raw spectra
-    raw_files <- file_path |>
+    raw_files <- file_paths |>
         orbi_read_raw(include_spectra = c(1, 10)) |>
         orbi_aggregate_raw()
 
