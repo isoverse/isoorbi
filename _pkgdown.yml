@@ -23,6 +23,8 @@ navbar:
     href: articles/flow_injection.html
   - text: Reference
     href: reference/index.html
+  - text: Katnerova et al. 2024
+    href: https://www.isoverse.org/2024_kantnerova_et_al/
   right:
   - icon: fa-github fa-lg
     href: https://github.com/isoverse/isoorbi

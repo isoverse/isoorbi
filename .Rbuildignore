@@ -23,6 +23,7 @@
 ^revdep$
 ^paper
 ^inst/assembly
+^release
 ^[\.]?air\.toml$
 ^\.vscode$
 ^inst/extdata/testfile_dual_inlet.raw$
