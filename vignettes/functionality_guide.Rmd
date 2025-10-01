@@ -1,7 +1,7 @@
 ---
-title: "Raw Files"
+title: "Functionality Guide"
 description: >
-  An example for reading raw files.
+  A detailed guide to isoorbi functionality.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Raw Files}

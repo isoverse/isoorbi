@@ -15,10 +15,8 @@ navbar:
   left:
   - text: Quick Start
     href: articles/quick_start.html
-  - text: Shot Noise
-    href: articles/shot_noise.html
-  - text: Flow Injection
-    href: articles/flow_injection.html
+  - text: Functionality Guide
+    href: articles/functionality_guide.html
   - text: Reference
     href: reference/index.html
   - text: Examples
@@ -26,6 +24,8 @@ navbar:
       - text: "Isoorbi package"
       - text: "Dual inlet analysis"
         href: articles/dual_inlet.html
+      - text: "Flow injection analysis"
+        href: articles/flow_injection.html
       - text: "Kantnerová et al. 2024"
       - text: "Shot noise analysis"
         href: https://www.isoverse.org/2024_kantnerova_et_al/shot_noise.html
