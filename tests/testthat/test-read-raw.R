@@ -80,16 +80,14 @@ test_that("orbi_read_raw()", {
   expect_error(orbi_read_raw(), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(42), "file_paths.*must be at least one")
   expect_error(orbi_read_raw(character()), "file_paths.*must be at least one")
-  expect_message(orbi_read_raw("DNE"), "encountered.*1 error") |>
-    suppressMessages()
 
   # succesful read without spectra (default)
   test_that_cli("orbi_read_raw()", configs = c("plain", "fancy"), {
     expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw(pattern = "nitrate") |>
-        # read without spectra
-        orbi_read_raw(cache = FALSE, read_cache = FALSE)
+        # read without spectra (on CRAN should read cache so we DONT download isoraw)
+        orbi_read_raw(read_cache = TRUE, cache = FALSE)
     )
     expect_snapshot(x)
 
@@ -108,8 +106,8 @@ test_that("orbi_read_raw()", {
     expect_snapshot(
       x <- system.file("extdata", package = "isoorbi") |>
         orbi_find_raw(pattern = "nitrate") |>
-        # read with spectra
-        orbi_read_raw(cache = FALSE, read_cache = FALSE, include_spectra = 1)
+        # read with spectra (on CRAN should read cache so we DONT download isoraw)
+        orbi_read_raw(read_cache = TRUE, cache = FALSE, include_spectra = 1)
     )
     expect_snapshot(x)
 

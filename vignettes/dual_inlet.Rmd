@@ -16,9 +16,6 @@ editor_options:
 ```{r, include=FALSE}
 # default chunk options
 knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
-
-# get isoraw reader (for compiling vignette on cran)
-isoorbi::orbi_check_isoraw(accept_license = TRUE)
 ```
 
 ```{r, message=FALSE}
@@ -33,7 +30,8 @@ library(ggplot2) # for data visualization
 
 ```{r}
 # Read .raw file test data
-raw_file <- system.file(package = "isoorbi", "extdata") |>
+raw_file <- 
+  system.file(package = "isoorbi", "extdata") |>
   file.path("testfile_dual_inlet.raw")
 
 data_all <-

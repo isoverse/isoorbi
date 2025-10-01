@@ -427,8 +427,9 @@ orbi_filter_scan_intensity <- function(..., outlier_percent) {
 #' in addition to any groupings already defined before calling this function using dplyr's `group_by()`. It restores the original groupings in the returned datasert.
 #'
 #' @inheritParams orbi_flag_satellite_peaks
-#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
 #' @param agc_fold_cutoff flags scans with a fold cutoff based on the average number of ions in the Orbitrap analyzer. For example, `agc_fold_cutoff = 2` flags scans that have more than 2 times, or less than 1/2 times the average. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' @param agc_window flags scans with a critically low or high number of ions in the Orbitrap analyzer. Provide a vector with 2 numbers `c(x,y)` flagging the lowest x percent and highest y percent. TIC multiplied by injection time serves as an estimate for the number of ions in the Orbitrap.
+#' @param agc_absolute_cutoff flags scans with a number of ions in the Orbitrap analyzer outside of an absolute range. Provide a vector with 2 numbers `c(x,y)` flagging data below x and above y of the TIC multiplied by injection time (which serves as an estimate for the number of ions in the Orbitrap).
 #' @param by_block if the `dataset` has block and segment definitions, should the outlier flag be evaluated within each block+segment or globally? default is within each block+segment, switch to globally by turning `by_block = FALSE`
 #'
 #' @examples
@@ -444,6 +445,7 @@ orbi_flag_outliers <- function(
   dataset,
   agc_fold_cutoff = NA_real_,
   agc_window = c(),
+  agc_absolute_cutoff = c(),
   by_block = TRUE
 ) {
   # safety checks
@@ -461,7 +463,14 @@ orbi_flag_outliers <- function(
       0L ||
       (is.numeric(agc_window) &&
         length(agc_window) == 2L &&
-        agc_window[1] < agc_window[2])
+        agc_window[1] < agc_window[2]),
+    "if provided, `agc_absolute_cutoff` needs to be a vector of two numbers (low and high cutoffs)" = length(
+      agc_absolute_cutoff
+    ) ==
+      0L ||
+      (is.numeric(agc_absolute_cutoff) &&
+        length(agc_absolute_cutoff) == 2L &&
+        agc_absolute_cutoff[1] < agc_absolute_cutoff[2])
   )
 
   # keep track for later
@@ -478,8 +487,9 @@ orbi_flag_outliers <- function(
 
   # check filter to apply
   method <- c(
+    agc_fold_cutoff = !is.na(agc_fold_cutoff),
     agc_window = length(agc_window) == 2L,
-    agc_fold_cutoff = !is.na(agc_fold_cutoff)
+    agc_absolute_cutoff = length(agc_absolute_cutoff) == 2L
   )
   if (sum(method) > 1L) {
     sprintf(
@@ -513,6 +523,17 @@ orbi_flag_outliers <- function(
       "scans below 1/{agc_fold_cutoff} and above {agc_fold_cutoff} times the average number of ions {.field tic} * {.field it.ms} in the Orbitrap analyzer"
     )
     method_type <- sprintf("%s fold AGC cutoff", agc_fold_cutoff)
+  } else if (method == "agc_absolute_cutoff") {
+    method_msg <- sprintf(
+      "scans below %s and above %s the number of ions (`tic` * `it.ms`) in the Orbitrap analyzer",
+      agc_absolute_cutoff[1],
+      agc_absolute_cutoff[2]
+    )
+    method_type <- sprintf(
+      "AGC cutoff (%s to %s)",
+      agc_absolute_cutoff[1],
+      agc_absolute_cutoff[2]
+    )
   }
 
   # info
@@ -564,6 +585,14 @@ orbi_flag_outliers <- function(
             .data$TICxIT > agc_fold_cutoff * .data$TICxIT_mean
         ) |>
         dplyr::select(-"TICxIT", -"TICxIT_mean")
+    } else if (method == "agc_absolute_cutoff") {
+      single_scans |>
+        dplyr::mutate(
+          TICxIT = .data$tic * .data$it.ms,
+          is_new_outlier = .data$TICxIT < agc_absolute_cutoff[1] |
+            .data$TICxIT > agc_absolute_cutoff[2]
+        ) |>
+        dplyr::select(-"TICxIT")
     }
   )
 
@@ -737,7 +766,15 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   # safety checks
   check_dataset_arg(dataset)
   is_agg <- is(dataset, "orbi_aggregated_data")
-  peaks <- if (is_agg) dataset$peaks else dataset
+  peaks <- if (is_agg) {
+    dataset$peaks |>
+      dplyr::left_join(
+        dataset$file_info |> dplyr::select("uidx", "filename"),
+        by = "uidx"
+      )
+  } else {
+    dataset
+  }
 
   ## columns
   check_tibble(
@@ -788,85 +825,57 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
     tryCatch(
       {
         df.out <-
-          # add basepeak ions
-          if ("is_satellite_peak" %in% names(peaks)) {
-            # with satellite peak defined
-            peaks |>
-              dplyr::mutate(basepeak = !!basepeak_def) |>
-              dplyr::mutate(
-                .by = dplyr::any_of(potential_bys),
-                basepeak_ions = .data$ions.incremental[
-                  .data$isotopocule == !!basepeak_def & !.data$is_satellite_peak
-                ]
-              )
-          } else {
-            # without satellite peak defined
-            peaks |>
-              dplyr::mutate(basepeak = !!basepeak_def) |>
-              dplyr::mutate(
-                .by = dplyr::any_of(potential_bys),
-                basepeak_ions = .data$ions.incremental[
-                  .data$isotopocule == !!basepeak_def
-                ]
-              )
-          }
-      },
-      # error catching
-      error = function(p) {
-        # analyze scans (is slow so only done if error)
-        df_summary <-
           peaks |>
-          dplyr::summarize(
-            n_bp = sum(.data$isotopocule == !!basepeak_def),
-            .by = dplyr::any_of(potential_bys)
-          ) |>
-          dplyr::summarize(
-            n_scans = dplyr::n(),
-            n_too_few = sum(.data$n_bp == 0L),
-            n_too_many = sum(.data$n_bp > 1L),
-            # minuse scan number
-            .by = dplyr::any_of(setdiff(potential_bys, "scan.no")),
+          dplyr::mutate(basepeak = !!basepeak_def) |>
+          dplyr::mutate(
+            .by = dplyr::any_of(potential_bys),
+            # flag the basepeak
+            ..is_bp = .data$isotopocule == .data$basepeak &
+              if ("is_satellite_peak" %in% names(peaks)) {
+                !.data$is_satellite_peak
+              } else {
+                TRUE
+              },
+            ..n_too_few = sum(.data$..is_bp) == 0L,
+            ..n_too_many = sum(.data$..is_bp) > 1L,
           )
 
-        # check abundances
-        too_many_bps <- df_summary |>
-          dplyr::filter(.data$n_too_many > 0)
-        too_few_bps <- df_summary |>
-          dplyr::filter(.data$n_too_few > 0)
-
-        if (nrow(too_many_bps) > 0 && !"is_satellite_peak" %in% names(peaks)) {
-          # too many base peaks
-          cli_abort(
-            "the {.field {basepeak_def}} isotopocule exists multiple times in some scans, make sure to run {.strong orbi_flag_satellite_peaks()} first",
-            parent = p,
-            call = expr(mutate())
+        # check if there are issues
+        if (any(df.out$..n_too_many)) {
+          # there are some scans with too many baepeaks!
+          if (!"is_satellite_peak" %in% names(peaks)) {
+            cli_abort(
+              "the {.field {basepeak_def}} isotopocule exists multiple times in some scans, make sure to run {.strong orbi_flag_satellite_peaks()} first",
+              call = expr(NULL)
+            )
+          } else {
+            cli_abort(
+              "the {.field {basepeak_def}} isotopocule exists multiple times in some scans despite satellite peaks already flagged - this should not be possible, please file a bug report and provide a dataset that reproduces this issue",
+              call = expr(NULL)
+            )
+          }
+        } else if (any(df.out$..n_too_few)) {
+          # base peak is missing in some groupings
+          df.info <- df.out |>
+            dplyr::select(dplyr::any_of(potential_bys), "..n_too_few") |>
+            dplyr::distinct()
+          groupings <- setdiff(names(df.info), c("uidx", "..n_too_few"))
+          cli_bullets(
+            c(
+              "!" = "{cli::col_yellow('Warning')}: {format_number(sum(df.info$..n_too_few))}/{format_number(nrow(df.info))} data groups ({.field {paste(groupings, collapse = ' + ')}}) cannot be used because the {.field {basepeak_def}} isotopocule is missing",
+              "i" = "To investigate, use {.strong orbi_flag_weak_isotopocules()} and {.strong orbi_plot_isotopocule_coverage()} or {.strong orbi_get_isotopocule_coverage()} {.emph before} defining the base peak"
+            )
           )
-        } else if (nrow(too_few_bps) > 0) {
-          info <-
-            too_few_bps |>
-            dplyr::mutate(
-              label = sprintf(
-                "basepeak '%s' is missing in %d scans (%.1f%%) of compound '%s' in file '%s'",
-                basepeak_def,
-                .data$n_too_few,
-                .data$n_too_few / .data$n_scans * 100,
-                .data$compound,
-                .data$filename
-              )
-            ) |>
-            dplyr::pull(.data$label) |>
-            paste(collapse = "\n - ")
-          abort(
-            format_inline(
-              "the {.field {basepeak_def}} isotopocule does not exist in some scans, consider using {.strong orbi_filter_files()} to focus on specific file(s) and/or compound(s): \n - {info}"
-            ),
-            parent = p,
-            call = expr(mutate())
-          )
-        } else {
-          # some other error
-          abort(parent = p, call = expr(mutate()))
+          df.out <- df.out |> dplyr::filter(!.data$..n_too_few)
         }
+
+        # return
+        df.out |>
+          dplyr::mutate(
+            .by = dplyr::any_of(potential_bys),
+            basepeak_ions = .data$ions.incremental[.data$..is_bp]
+          ) |>
+          dplyr::select(-"..is_bp", -"..n_too_few", -"..n_too_many")
       }
     ) |>
     try_catch_cnds()
@@ -926,7 +935,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   # return
   if (is_agg) {
     # got aggregated data to begin with --> return aggregated data
-    dataset$peaks <- df.out
+    dataset$peaks <- df.out |> dplyr::select(-dplyr::any_of("filename"))
     return(dataset)
   } else {
     # got a plain peaks tibble

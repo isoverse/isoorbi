@@ -227,7 +227,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     if (n_multimatched > 0) {
       # do it this way for proper alignment
       format_inline(
-        "{qty(multimatched_isos)} isotopocule{?s} {.field {multimatched_isos}} match{?es/} multiple peaks in some same scans ({n_multimatched} multi-matched peak{?s} in total) - make sure to run {.strong orbi_flag_satellite_peaks()} and {.strong orbi_plot_satellite_peak()}"
+        "{qty(multimatched_isos)} isotopocule{?s} {.field {multimatched_isos}} match{?es/} multiple peaks in some same scans ({format_number(n_multimatched)}{qty(n_multimatched)} multi-matched peak{?s} in total) - make sure to run {.strong orbi_flag_satellite_peaks()} and {.strong orbi_plot_satellite_peak()}"
       ) |>
         warn()
     }
@@ -236,7 +236,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     if (n_missing > 0) {
       # do it this way for proper alignment
       format_inline(
-        "{qty(missing_isos)}isotopocule{?s} {.field {missing_isos}} {?is/are} missing from some scans ({n_missing} missing peak{?s} in total) - make sure to evaluate coverage with e.g. {.strong orbi_plot_isotopocule_coverage()}"
+        "{qty(missing_isos)}isotopocule{?s} {.field {missing_isos}} {?is/are} missing from some scans ({format_number(n_missing)}{qty(n_missing)} missing peak{?s} in total) - make sure to evaluate coverage with e.g. {.strong orbi_plot_isotopocule_coverage()}"
       ) |>
         warn()
     }

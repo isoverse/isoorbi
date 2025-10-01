@@ -149,7 +149,7 @@ test_that("orbi_flag_outliers()", {
 
   orbi_flag_outliers(peaks) |>
     expect_error(
-      "need to define at least one of these parameters for identifying outliers:.*agc_window.*agc_fold_cutoff'"
+      "need to define at least one of these parameters for identifying outliers.*agc_fold_cutoff.*agc_window.*agc_absolute_cutoff"
     )
 
   orbi_flag_outliers(peaks, agc_window = T) |>
@@ -201,7 +201,6 @@ test_that("orbi_flag_outliers()", {
 
 test_that("orbi_define_basepeak()", {
   # failure
-
   expect_error(
     orbi_define_basepeak(),
     "must be.*aggregated.*or.*data frame"
@@ -250,10 +249,19 @@ test_that("orbi_define_basepeak()", {
     suppressMessages()
 
   df |>
-    filter(isotopocule != "M0") |>
+    mutate(
+      isotopocule = if_else(isotopocule == "17O", "M0", isotopocule),
+      is_satellite_peak = FALSE
+    ) |>
     orbi_define_basepeak(basepeak_def = "M0") |>
-    expect_error(
-      "does not exist in some scans"
+    expect_error("should not be possible.*please file.*bug report") |>
+    suppressMessages()
+
+  out <- df |>
+    filter(!(scan.no == 2 & isotopocule == "M0")) |>
+    orbi_define_basepeak(basepeak_def = "M0") |>
+    expect_message(
+      "1/2.*cannot be used"
     ) |>
     suppressMessages()
 

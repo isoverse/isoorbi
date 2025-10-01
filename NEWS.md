@@ -16,11 +16,11 @@ There are no breaking changes in this release (all changes and new features are 
 * upgraded all data processing and plotting functions to be compatible with both isox and raw file datasets
 * improved default print outputs for S3 classes used in the package
 * improved package structure documentation
+* expanded `orbi_flag_outliers()` functionality (contributed by Florian Rubach)
 
 ## Bug fixes
 
 * fixed incompatibility with ggplot2 version 4.0.0 (#69)
-
 
 # isoorbi 1.4.0
 

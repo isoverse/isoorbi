@@ -988,7 +988,7 @@ orbi_plot_isotopocule_coverage <- function(
       } else {
         max(.data$scan.no)
       },
-      .by = by_cols
+      .by = dplyr::any_of(by_cols)
     ) |>
     dplyr::select(
       dplyr::all_of(by_cols_w_compound),
