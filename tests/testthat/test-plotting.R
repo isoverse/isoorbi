@@ -195,3 +195,89 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
     orbi_plot_isotopocule_coverage(df)
   )
 })
+
+test_that("orbi_plot_spectra()", {
+  # test file
+  test_file <- system.file(
+    "extdata",
+    "nitrate_test_10scans.raw",
+    package = "isoorbi"
+  ) |>
+    orbi_read_raw(include_spectra = c(1, 10)) |>
+    orbi_aggregate_raw(aggregator = "minimal") |>
+    suppressMessages()
+
+  # errors
+  orbi_plot_spectra() |> expect_error("must be.*aggregated")
+  orbi_plot_spectra(test_file, mz_min = "test") |>
+    expect_error("must be a single number")
+  orbi_plot_spectra(test_file, mz_max = "test") |>
+    expect_error("must be a single number")
+  orbi_plot_spectra(test_file, mz_base_peak = "test") |>
+    expect_error("must be a single number")
+  orbi_plot_spectra(test_file, mz_base_peak = "test") |>
+    expect_error("must be a single number")
+  orbi_plot_spectra(test_file, mz_focus_nominal_offsets = integer()) |>
+    expect_error("vector of positive integers")
+  orbi_plot_spectra(test_file, max_scans = -1) |>
+    expect_error("positive integer")
+  orbi_plot_spectra(test_file, max_files = 0) |>
+    expect_error("positive integer")
+  orbi_plot_spectra(test_file, label_peaks = 42) |>
+    expect_error("TRUE or FALSE")
+  orbi_plot_spectra(test_file, show_filenames = 1) |>
+    expect_error("TRUE or FALSE")
+  orbi_plot_spectra(test_file, show_focus_backgrounds = 0) |>
+    expect_error("TRUE or FALSE")
+  orbi_plot_spectra(test_file, background_colors = c("blue")) |>
+    expect_error("character vector")
+
+  # success
+  vdiffr::expect_doppelganger("spectra 2 scans", orbi_plot_spectra(test_file))
+  vdiffr::expect_doppelganger(
+    "spectra 1 scan",
+    orbi_plot_spectra(test_file, max_scans = 1) |> suppressMessages()
+  )
+  vdiffr::expect_doppelganger(
+    "spectra - defaults off",
+    orbi_plot_spectra(
+      test_file,
+      show_focus_backgrounds = FALSE,
+      show_filenames = FALSE,
+      label_peaks = FALSE
+    )
+  )
+  vdiffr::expect_doppelganger(
+    "spectra - single spectrum only",
+    orbi_plot_spectra(test_file, mz_min = 62.5, mz_max = 63.5)
+  )
+  vdiffr::expect_doppelganger(
+    "spectra - base peak spectrum only",
+    orbi_plot_spectra(test_file, mz_focus_nominal_offsets = 0)
+  )
+
+  # get isotopcules
+  isotopocules <- tibble(
+    compound = "nitrate",
+    isotopocule = c("M0", "15N", "17O", "18O"),
+    mass = c(61.9878, 62.9850, 62.9922, 63.9922),
+    tolerance = 1,
+    charge = 1
+  )
+  test_file <- test_file |>
+    orbi_identify_isotopocules(isotopocules) |>
+    suppressMessages()
+
+  vdiffr::expect_doppelganger(
+    "spectra - M+1 and M+2 only",
+    orbi_plot_spectra(test_file, mz_focus_nominal_offsets = c(1, 2))
+  )
+
+  vdiffr::expect_doppelganger(
+    "spectra - all but without unknown peaks",
+    test_file |>
+      orbi_filter_isotopocules() |>
+      suppressMessages() |>
+      orbi_plot_spectra()
+  )
+})
