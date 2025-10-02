@@ -40,25 +40,25 @@
       InjectionVolume, DilutionFactor, IstdAmount, CalibrationLevel,
       InstrumentMethodFile, CalibrationFile, ProcessingMethodFile, UserText0,
       UserText1, UserText2, UserText3, UserText4
-      > scans (11): uidx, scan.no, time.min, tic, it.ms, resolution, basePeakMz,
-      basePeakIntensity, lowMass, highMass, rawOvFtT, intensCompFactor, agc,
-      agcTarget, microscans, numberLockmassesFound, analyzerTemperature; (not
-      aggregated: IsCentroidScan, ScanType, Scan Description, Multiple Injection,
-      Multi Inject Info, Scan Segment, Scan Event, Master Index, Master Scan Number,
-      Charge State, Monoisotopic M/Z, Error in isotopic envelope fit, Max. Ion Time
-      (ms), MS2 Isolation Width, MS2 Isolation Offset, HCD Energy, HCD Energy V, ===
-      Mass Calibration: ===, Conversion Parameter B, Conversion Parameter C,
-      Temperature Comp. (ppm), RF Comp. (ppm), Space Charge Comp. (ppm), Resolution
-      Comp. (ppm), Number of Lock Masses, Lock Mass #1 (m/z), Lock Mass #2 (m/z),
-      Lock Mass #3 (m/z), LM Search Window (ppm), LM Search Window (mmu), Last
-      Locking (sec), LM m/z-Correction (ppm), === Ion Optics Settings: ===, S-Lens RF
-      Level, ==== Diagnostic Data: ====, Application Mode, Mild Trapping Mode, APD,
-      Res. Dep. Intens, Q Trans Comp, PrOSA NumF, PrOSA Comp, PrOSA ScScr, Dynamic RT
-      Shift (min), Analytical OT usage (%), LC FWHM parameter, PS Inj. Time (ms), AGC
-      PS Mode, AGC PS Diag, AGC Target Adjust, AGC Diag 1, AGC Diag 2, HCD abs.
-      Offset, Source CID eV, AGC Fill, Injection t0, t0 FLP, Iso Para R, Inj Para R,
-      Access Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On,
-      FAIMS CV)
+      > scans (11): uidx, scan.no, time.min, tic, it.ms, resolution, microscans,
+      basePeakMz, basePeakIntensity, lowMass, highMass, rawOvFtT, intensCompFactor,
+      agc, agcTarget, numberLockmassesFound, analyzerTemperature; (not aggregated:
+      IsCentroidScan, ScanType, Scan Description, Multiple Injection, Multi Inject
+      Info, Scan Segment, Scan Event, Master Index, Master Scan Number, Charge State,
+      Monoisotopic M/Z, Error in isotopic envelope fit, Max. Ion Time (ms), MS2
+      Isolation Width, MS2 Isolation Offset, HCD Energy, HCD Energy V, === Mass
+      Calibration: ===, Conversion Parameter B, Conversion Parameter C, Temperature
+      Comp. (ppm), RF Comp. (ppm), Space Charge Comp. (ppm), Resolution Comp. (ppm),
+      Number of Lock Masses, Lock Mass #1 (m/z), Lock Mass #2 (m/z), Lock Mass #3
+      (m/z), LM Search Window (ppm), LM Search Window (mmu), Last Locking (sec), LM
+      m/z-Correction (ppm), === Ion Optics Settings: ===, S-Lens RF Level, ====
+      Diagnostic Data: ====, Application Mode, Mild Trapping Mode, APD, Res. Dep.
+      Intens, Q Trans Comp, PrOSA NumF, PrOSA Comp, PrOSA ScScr, Dynamic RT Shift
+      (min), Analytical OT usage (%), LC FWHM parameter, PS Inj. Time (ms), AGC PS
+      Mode, AGC PS Diag, AGC Target Adjust, AGC Diag 1, AGC Diag 2, HCD abs. Offset,
+      Source CID eV, AGC Fill, Injection t0, t0 FLP, Iso Para R, Inj Para R, Access
+      Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On, FAIMS
+      CV)
       > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
       peakResolution, isRefPeak, isLockPeak
       > spectra (0): uidx, scan.no, mz, intensity
@@ -116,25 +116,25 @@
       [32mInjectionVolume[39m, [32mDilutionFactor[39m, [32mIstdAmount[39m, [32mCalibrationLevel[39m,
       [32mInstrumentMethodFile[39m, [32mCalibrationFile[39m, [32mProcessingMethodFile[39m, [32mUserText0[39m,
       [32mUserText1[39m, [32mUserText2[39m, [32mUserText3[39m, [32mUserText4[39m
-      → [34mscans[39m (11): [32muidx[39m, [32mscan.no[39m, [32mtime.min[39m, [32mtic[39m, [32mit.ms[39m, [32mresolution[39m, [32mbasePeakMz[39m,
-      [32mbasePeakIntensity[39m, [32mlowMass[39m, [32mhighMass[39m, [32mrawOvFtT[39m, [32mintensCompFactor[39m, [32magc[39m,
-      [32magcTarget[39m, [32mmicroscans[39m, [32mnumberLockmassesFound[39m, [32manalyzerTemperature[39m; ([3mnot[23m
-      [3maggregated[23m: [3m[33mIsCentroidScan[39m[23m, [3m[33mScanType[39m[23m, [3m[33mScan Description[39m[23m, [3m[33mMultiple Injection[39m[23m,
-      [3m[33mMulti Inject Info[39m[23m, [3m[33mScan Segment[39m[23m, [3m[33mScan Event[39m[23m, [3m[33mMaster Index[39m[23m, [3m[33mMaster Scan Number[39m[23m,
-      [3m[33mCharge State[39m[23m, [3m[33mMonoisotopic M/Z[39m[23m, [3m[33mError in isotopic envelope fit[39m[23m, [3m[33mMax. Ion Time[39m[23m
-      [3m[33m(ms)[39m[23m, [3m[33mMS2 Isolation Width[39m[23m, [3m[33mMS2 Isolation Offset[39m[23m, [3m[33mHCD Energy[39m[23m, [3m[33mHCD Energy V[39m[23m, [3m[33m===[39m[23m
-      [3m[33mMass Calibration: ===[39m[23m, [3m[33mConversion Parameter B[39m[23m, [3m[33mConversion Parameter C[39m[23m,
-      [3m[33mTemperature Comp. (ppm)[39m[23m, [3m[33mRF Comp. (ppm)[39m[23m, [3m[33mSpace Charge Comp. (ppm)[39m[23m, [3m[33mResolution[39m[23m
-      [3m[33mComp. (ppm)[39m[23m, [3m[33mNumber of Lock Masses[39m[23m, [3m[33mLock Mass #1 (m/z)[39m[23m, [3m[33mLock Mass #2 (m/z)[39m[23m,
-      [3m[33mLock Mass #3 (m/z)[39m[23m, [3m[33mLM Search Window (ppm)[39m[23m, [3m[33mLM Search Window (mmu)[39m[23m, [3m[33mLast[39m[23m
-      [3m[33mLocking (sec)[39m[23m, [3m[33mLM m/z-Correction (ppm)[39m[23m, [3m[33m=== Ion Optics Settings: ===[39m[23m, [3m[33mS-Lens RF[39m[23m
-      [3m[33mLevel[39m[23m, [3m[33m==== Diagnostic Data: ====[39m[23m, [3m[33mApplication Mode[39m[23m, [3m[33mMild Trapping Mode[39m[23m, [3m[33mAPD[39m[23m,
-      [3m[33mRes. Dep. Intens[39m[23m, [3m[33mQ Trans Comp[39m[23m, [3m[33mPrOSA NumF[39m[23m, [3m[33mPrOSA Comp[39m[23m, [3m[33mPrOSA ScScr[39m[23m, [3m[33mDynamic RT[39m[23m
-      [3m[33mShift (min)[39m[23m, [3m[33mAnalytical OT usage (%)[39m[23m, [3m[33mLC FWHM parameter[39m[23m, [3m[33mPS Inj. Time (ms)[39m[23m, [3m[33mAGC[39m[23m
-      [3m[33mPS Mode[39m[23m, [3m[33mAGC PS Diag[39m[23m, [3m[33mAGC Target Adjust[39m[23m, [3m[33mAGC Diag 1[39m[23m, [3m[33mAGC Diag 2[39m[23m, [3m[33mHCD abs.[39m[23m
-      [3m[33mOffset[39m[23m, [3m[33mSource CID eV[39m[23m, [3m[33mAGC Fill[39m[23m, [3m[33mInjection t0[39m[23m, [3m[33mt0 FLP[39m[23m, [3m[33mIso Para R[39m[23m, [3m[33mInj Para R[39m[23m,
-      [3m[33mAccess Id[39m[23m, [3m[33mAnalog In A (V)[39m[23m, [3m[33mAnalog In B (V)[39m[23m, [3m[33mFAIMS Attached[39m[23m, [3m[33mFAIMS Voltage On[39m[23m,
-      [3m[33mFAIMS CV[39m[23m)
+      → [34mscans[39m (11): [32muidx[39m, [32mscan.no[39m, [32mtime.min[39m, [32mtic[39m, [32mit.ms[39m, [32mresolution[39m, [32mmicroscans[39m,
+      [32mbasePeakMz[39m, [32mbasePeakIntensity[39m, [32mlowMass[39m, [32mhighMass[39m, [32mrawOvFtT[39m, [32mintensCompFactor[39m,
+      [32magc[39m, [32magcTarget[39m, [32mnumberLockmassesFound[39m, [32manalyzerTemperature[39m; ([3mnot aggregated[23m:
+      [3m[33mIsCentroidScan[39m[23m, [3m[33mScanType[39m[23m, [3m[33mScan Description[39m[23m, [3m[33mMultiple Injection[39m[23m, [3m[33mMulti Inject[39m[23m
+      [3m[33mInfo[39m[23m, [3m[33mScan Segment[39m[23m, [3m[33mScan Event[39m[23m, [3m[33mMaster Index[39m[23m, [3m[33mMaster Scan Number[39m[23m, [3m[33mCharge State[39m[23m,
+      [3m[33mMonoisotopic M/Z[39m[23m, [3m[33mError in isotopic envelope fit[39m[23m, [3m[33mMax. Ion Time (ms)[39m[23m, [3m[33mMS2[39m[23m
+      [3m[33mIsolation Width[39m[23m, [3m[33mMS2 Isolation Offset[39m[23m, [3m[33mHCD Energy[39m[23m, [3m[33mHCD Energy V[39m[23m, [3m[33m=== Mass[39m[23m
+      [3m[33mCalibration: ===[39m[23m, [3m[33mConversion Parameter B[39m[23m, [3m[33mConversion Parameter C[39m[23m, [3m[33mTemperature[39m[23m
+      [3m[33mComp. (ppm)[39m[23m, [3m[33mRF Comp. (ppm)[39m[23m, [3m[33mSpace Charge Comp. (ppm)[39m[23m, [3m[33mResolution Comp. (ppm)[39m[23m,
+      [3m[33mNumber of Lock Masses[39m[23m, [3m[33mLock Mass #1 (m/z)[39m[23m, [3m[33mLock Mass #2 (m/z)[39m[23m, [3m[33mLock Mass #3[39m[23m
+      [3m[33m(m/z)[39m[23m, [3m[33mLM Search Window (ppm)[39m[23m, [3m[33mLM Search Window (mmu)[39m[23m, [3m[33mLast Locking (sec)[39m[23m, [3m[33mLM[39m[23m
+      [3m[33mm/z-Correction (ppm)[39m[23m, [3m[33m=== Ion Optics Settings: ===[39m[23m, [3m[33mS-Lens RF Level[39m[23m, [3m[33m====[39m[23m
+      [3m[33mDiagnostic Data: ====[39m[23m, [3m[33mApplication Mode[39m[23m, [3m[33mMild Trapping Mode[39m[23m, [3m[33mAPD[39m[23m, [3m[33mRes. Dep.[39m[23m
+      [3m[33mIntens[39m[23m, [3m[33mQ Trans Comp[39m[23m, [3m[33mPrOSA NumF[39m[23m, [3m[33mPrOSA Comp[39m[23m, [3m[33mPrOSA ScScr[39m[23m, [3m[33mDynamic RT Shift[39m[23m
+      [3m[33m(min)[39m[23m, [3m[33mAnalytical OT usage (%)[39m[23m, [3m[33mLC FWHM parameter[39m[23m, [3m[33mPS Inj. Time (ms)[39m[23m, [3m[33mAGC PS[39m[23m
+      [3m[33mMode[39m[23m, [3m[33mAGC PS Diag[39m[23m, [3m[33mAGC Target Adjust[39m[23m, [3m[33mAGC Diag 1[39m[23m, [3m[33mAGC Diag 2[39m[23m, [3m[33mHCD abs. Offset[39m[23m,
+      [3m[33mSource CID eV[39m[23m, [3m[33mAGC Fill[39m[23m, [3m[33mInjection t0[39m[23m, [3m[33mt0 FLP[39m[23m, [3m[33mIso Para R[39m[23m, [3m[33mInj Para R[39m[23m, [3m[33mAccess[39m[23m
+      [3m[33mId[39m[23m, [3m[33mAnalog In A (V)[39m[23m, [3m[33mAnalog In B (V)[39m[23m, [3m[33mFAIMS Attached[39m[23m, [3m[33mFAIMS Voltage On[39m[23m, [3m[33mFAIMS[39m[23m
+      [3m[33mCV[39m[23m)
       → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
       [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
       → [34mspectra[39m (0): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
@@ -196,11 +196,11 @@
       InjectionVolume, DilutionFactor, IstdAmount, CalibrationLevel,
       InstrumentMethodFile, CalibrationFile, ProcessingMethodFile, UserText0,
       UserText1, UserText2, UserText3, UserText4
-      > scans (11): uidx, scan.no, time.min, tic, it.ms, resolution, basePeakMz,
-      basePeakIntensity, lowMass, highMass, rawOvFtT, intensCompFactor, agc,
-      agcTarget, microscans, numberLockmassesFound, analyzerTemperature,
-      IsCentroidScan, ScanType, Scan Description, Multiple Injection, Multi Inject
-      Info, Scan Segment, Scan Event, Master Index, Master Scan Number, Charge State,
+      > scans (11): uidx, scan.no, time.min, tic, it.ms, resolution, microscans,
+      basePeakMz, basePeakIntensity, lowMass, highMass, rawOvFtT, intensCompFactor,
+      agc, agcTarget, numberLockmassesFound, analyzerTemperature, IsCentroidScan,
+      ScanType, Scan Description, Multiple Injection, Multi Inject Info, Scan
+      Segment, Scan Event, Master Index, Master Scan Number, Charge State,
       Monoisotopic M/Z, Error in isotopic envelope fit, Max. Ion Time (ms), MS2
       Isolation Width, MS2 Isolation Offset, HCD Energy, HCD Energy V, === Mass
       Calibration: ===, Conversion Parameter B, Conversion Parameter C, Temperature
@@ -243,10 +243,10 @@
       RowNumber, Vial, InjectionVolume, DilutionFactor, IstdAmount, CalibrationLevel,
       InstrumentMethodFile, CalibrationFile, ProcessingMethodFile, UserText0,
       UserText1, UserText2, UserText3, UserText4)
-      > scans (11): uidx, scan.no, time.min, tic, it.ms, resolution; (not aggregated:
-      BasePeakIntensity, BasePeakMass, HighMass, IsCentroidScan, LowMass, ScanType,
-      Scan Description, Multiple Injection, Multi Inject Info, AGC, Micro Scan Count,
-      Scan Segment, Scan Event, Master Index, Master Scan Number, Charge State,
+      > scans (11): uidx, scan.no, time.min, tic, it.ms, resolution, microscans; (not
+      aggregated: BasePeakIntensity, BasePeakMass, HighMass, IsCentroidScan, LowMass,
+      ScanType, Scan Description, Multiple Injection, Multi Inject Info, AGC, Scan
+      Segment, Scan Event, Master Index, Master Scan Number, Charge State,
       Monoisotopic M/Z, Error in isotopic envelope fit, Max. Ion Time (ms), MS2
       Isolation Width, MS2 Isolation Offset, AGC Target, HCD Energy, HCD Energy V,
       Analyzer Temperature, === Mass Calibration: ===, Conversion Parameter B,
@@ -272,8 +272,8 @@
     Code
       z <- orbi_identify_isotopocules(y, isotopologs)
     Message
-      v orbi_identify_isotopocules() identified 44/138 peaks (32%) as isotopcules M0,
-      15N, 17O, and 18O
+      v orbi_identify_isotopocules() identified 44/138 peaks (32%) representing 100%
+      of the total ion current (TIC) as isotopocules M0, 15N, 17O, and 18O
 
 ---
 
@@ -329,11 +329,11 @@
       [32mInjectionVolume[39m, [32mDilutionFactor[39m, [32mIstdAmount[39m, [32mCalibrationLevel[39m,
       [32mInstrumentMethodFile[39m, [32mCalibrationFile[39m, [32mProcessingMethodFile[39m, [32mUserText0[39m,
       [32mUserText1[39m, [32mUserText2[39m, [32mUserText3[39m, [32mUserText4[39m
-      → [34mscans[39m (11): [32muidx[39m, [32mscan.no[39m, [32mtime.min[39m, [32mtic[39m, [32mit.ms[39m, [32mresolution[39m, [32mbasePeakMz[39m,
-      [32mbasePeakIntensity[39m, [32mlowMass[39m, [32mhighMass[39m, [32mrawOvFtT[39m, [32mintensCompFactor[39m, [32magc[39m,
-      [32magcTarget[39m, [32mmicroscans[39m, [32mnumberLockmassesFound[39m, [32manalyzerTemperature[39m,
-      [32mIsCentroidScan[39m, [32mScanType[39m, [32mScan Description[39m, [32mMultiple Injection[39m, [32mMulti Inject[39m
-      [32mInfo[39m, [32mScan Segment[39m, [32mScan Event[39m, [32mMaster Index[39m, [32mMaster Scan Number[39m, [32mCharge State[39m,
+      → [34mscans[39m (11): [32muidx[39m, [32mscan.no[39m, [32mtime.min[39m, [32mtic[39m, [32mit.ms[39m, [32mresolution[39m, [32mmicroscans[39m,
+      [32mbasePeakMz[39m, [32mbasePeakIntensity[39m, [32mlowMass[39m, [32mhighMass[39m, [32mrawOvFtT[39m, [32mintensCompFactor[39m,
+      [32magc[39m, [32magcTarget[39m, [32mnumberLockmassesFound[39m, [32manalyzerTemperature[39m, [32mIsCentroidScan[39m,
+      [32mScanType[39m, [32mScan Description[39m, [32mMultiple Injection[39m, [32mMulti Inject Info[39m, [32mScan[39m
+      [32mSegment[39m, [32mScan Event[39m, [32mMaster Index[39m, [32mMaster Scan Number[39m, [32mCharge State[39m,
       [32mMonoisotopic M/Z[39m, [32mError in isotopic envelope fit[39m, [32mMax. Ion Time (ms)[39m, [32mMS2[39m
       [32mIsolation Width[39m, [32mMS2 Isolation Offset[39m, [32mHCD Energy[39m, [32mHCD Energy V[39m, [32m=== Mass[39m
       [32mCalibration: ===[39m, [32mConversion Parameter B[39m, [32mConversion Parameter C[39m, [32mTemperature[39m
@@ -376,10 +376,10 @@
       [3m[33mRowNumber[39m[23m, [3m[33mVial[39m[23m, [3m[33mInjectionVolume[39m[23m, [3m[33mDilutionFactor[39m[23m, [3m[33mIstdAmount[39m[23m, [3m[33mCalibrationLevel[39m[23m,
       [3m[33mInstrumentMethodFile[39m[23m, [3m[33mCalibrationFile[39m[23m, [3m[33mProcessingMethodFile[39m[23m, [3m[33mUserText0[39m[23m,
       [3m[33mUserText1[39m[23m, [3m[33mUserText2[39m[23m, [3m[33mUserText3[39m[23m, [3m[33mUserText4[39m[23m)
-      → [34mscans[39m (11): [32muidx[39m, [32mscan.no[39m, [32mtime.min[39m, [32mtic[39m, [32mit.ms[39m, [32mresolution[39m; ([3mnot aggregated[23m:
-      [3m[33mBasePeakIntensity[39m[23m, [3m[33mBasePeakMass[39m[23m, [3m[33mHighMass[39m[23m, [3m[33mIsCentroidScan[39m[23m, [3m[33mLowMass[39m[23m, [3m[33mScanType[39m[23m,
-      [3m[33mScan Description[39m[23m, [3m[33mMultiple Injection[39m[23m, [3m[33mMulti Inject Info[39m[23m, [3m[33mAGC[39m[23m, [3m[33mMicro Scan Count[39m[23m,
-      [3m[33mScan Segment[39m[23m, [3m[33mScan Event[39m[23m, [3m[33mMaster Index[39m[23m, [3m[33mMaster Scan Number[39m[23m, [3m[33mCharge State[39m[23m,
+      → [34mscans[39m (11): [32muidx[39m, [32mscan.no[39m, [32mtime.min[39m, [32mtic[39m, [32mit.ms[39m, [32mresolution[39m, [32mmicroscans[39m; ([3mnot[23m
+      [3maggregated[23m: [3m[33mBasePeakIntensity[39m[23m, [3m[33mBasePeakMass[39m[23m, [3m[33mHighMass[39m[23m, [3m[33mIsCentroidScan[39m[23m, [3m[33mLowMass[39m[23m,
+      [3m[33mScanType[39m[23m, [3m[33mScan Description[39m[23m, [3m[33mMultiple Injection[39m[23m, [3m[33mMulti Inject Info[39m[23m, [3m[33mAGC[39m[23m, [3m[33mScan[39m[23m
+      [3m[33mSegment[39m[23m, [3m[33mScan Event[39m[23m, [3m[33mMaster Index[39m[23m, [3m[33mMaster Scan Number[39m[23m, [3m[33mCharge State[39m[23m,
       [3m[33mMonoisotopic M/Z[39m[23m, [3m[33mError in isotopic envelope fit[39m[23m, [3m[33mMax. Ion Time (ms)[39m[23m, [3m[33mMS2[39m[23m
       [3m[33mIsolation Width[39m[23m, [3m[33mMS2 Isolation Offset[39m[23m, [3m[33mAGC Target[39m[23m, [3m[33mHCD Energy[39m[23m, [3m[33mHCD Energy V[39m[23m,
       [3m[33mAnalyzer Temperature[39m[23m, [3m[33m=== Mass Calibration: ===[39m[23m, [3m[33mConversion Parameter B[39m[23m,
@@ -405,8 +405,8 @@
     Code
       z <- orbi_identify_isotopocules(y, isotopologs)
     Message
-      [32m✔[39m [1morbi_identify_isotopocules()[22m identified 44/138 peaks (32%) as isotopcules [32mM0[39m,
-      [32m15N[39m, [32m17O[39m, and [32m18O[39m
+      [32m✔[39m [1morbi_identify_isotopocules()[22m identified 44/138 peaks (32%) representing 100%
+      of the total ion current (TIC) as isotopocules [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m
 
 ---
 

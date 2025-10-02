@@ -47,6 +47,12 @@
       source = c("FT Resolution", "Orbitrap Resolution"),
       cast = "as.numeric"
     ) |>
+    orbi_add_to_aggregator(
+      "scans",
+      "microscans",
+      source = "Micro Scan Count",
+      cast = "as.integer"
+    ) |>
     orbi_add_to_aggregator("peaks", "scan.no", cast = "as.integer") |>
     orbi_add_to_aggregator(
       "peaks",
@@ -134,12 +140,6 @@
       "scans",
       "agcTarget",
       source = "AGC Target",
-      cast = "as.integer"
-    ) |>
-    orbi_add_to_aggregator(
-      "scans",
-      "microscans",
-      source = "Micro Scan Count",
       cast = "as.integer"
     ) |>
     orbi_add_to_aggregator(
