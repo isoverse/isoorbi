@@ -17,7 +17,7 @@ orbi_export_data_to_excel(
 \arguments{
 \item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
-\item{file}{file path to export the file}
+\item{file}{file path to export the file - recursively creates the directory if non-existent}
 
 \item{dbl_digits}{how many digits to show for dbls (all are exported)}
 

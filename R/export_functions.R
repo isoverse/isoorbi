@@ -36,7 +36,7 @@ orbi_export_data_to_excel <- function(
   check_arg(include, is_character(include), "must be a character vector")
 
   # Check if output path exists
-  output_dir <- dirname(file.path(file))
+  output_dir <- dirname(file)
   if (!dir.exists(output_dir)) {
     dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
   }
