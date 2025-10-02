@@ -270,7 +270,7 @@ orbi_plot_spectra <- function(
       dplyr::mutate(
         .by = c("uidx", "scan.no"),
         main_peak = !is.na(.data$intensity) &
-          .data$intensity == max(.data$intensity),
+          .data$intensity == max(.data$intensity, na.rm = TRUE),
         mz_main_peak = .data$mzEffective[.data$main_peak][1]
       ) |>
       # find global main peak (closest to median from all files and scans)
