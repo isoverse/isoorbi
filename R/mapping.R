@@ -5,14 +5,25 @@
 #' Map the mass spectral peaks to specific isotopocules based on their mass.
 #'
 #' @param aggregated_data either data aggregated from [orbi_aggregate_raw()] or a straight-up tibble data frame of the peaks (e.g. retrieved via `orbi_get_data(peaks = everything())`).
-#' @param isotopocules list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).
-#' Required columns are `isotopocule/isotopolog`, `mz/mass`, `tolerance/tolerance [mmu]/tolerance [mDa]`, and `charge/z` (these alternative names for the columns, including uppercase versions, are recognized automatically).
-#' Optional column: `#compound/compound` as well as any other columns that don't match these others.
+#' @param isotopocules list of isotopocules to map, can be a data frame/tibble, a named vector such as `c("M0" = 61.9878, "15N" = 62.9850)`, or the name of a file to read from (.csv/.tsv/.xlsx are all supported).
+#' If provided as a tibble/file, the required columns are `isotopocule/isotopolog` and `mz/mass` (these alternative names for the columns, including uppercase versions, are recognized automatically).
+#' In addition, `tolerance/tolerance [mmu]/tolerance [mDa]`, `charge/z`, `#compound/compound`, and `fragment` are recognized, as well as any other (arbitrarily named) columns with additional information.
 #' Character columns in the `isotopocules` table (including `isotopocule` and `compound`) are turned into factors with levels that preserve the order of isotopocules.
 #' That means that to change the order of isotopocules in downstream plotting functions, make sure to list them in the order you'd like them presented in.
-#' @return same object as provided in `aggregated_data` with added columns `compound` (if provided), `itc_uidx` (introduced unique isotopocule index), `isotopocule`, `mzExact` and `charge` as well as any other additional information columns provided in `isotopocules`. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
+#' Note that if `tolerance/tolerance [mmu]/tolerance [mDa]` or `charge/z` are not provided, the values in the parameters `default_tolerance` and `default_charge` are used, respectively.
+#' @param default_tolerance tolerance (in mmu) to be used for isotopocule identification if a `tolerance/tolerance [mmu]/tolerance [mDa]` column is not included in `isotopocules`
+#' @param default_charge charge to be used for any unidentified peak, and if a `charge/z` column is not included in `isotopocules`
+#' @return same object as provided in `aggregated_data` with added columns `compound` (if provided), `itc_uidx` (introduced unique isotopocule index), `isotopocule`, `mzExact`, `charge`, and `ions.incremental` (via [orbi_calculate_ions()]), as as well as any other additional information columns provided in `isotopocules`.
+#' Note that if the default `CN` and `RN` values of [orbi_calculate_ions()] are not the ones that should be used, simply run [orbi_calculate_ions()] explicitly afterwards.
+#' Also note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
 #' @export
-orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
+orbi_identify_isotopocules <- function(
+  aggregated_data,
+  isotopocules,
+  default_tolerance = 1,
+  default_charge = 1,
+  calculate_ions = TRUE
+) {
   # current env
   root_env <- current_env()
 
@@ -24,8 +35,21 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
       ((is_scalar_character(isotopocules) &&
         grepl("\\.(csv|tsv|xlsx)$", isotopocules) &&
         file.exists(isotopocules)) ||
-        is.data.frame(isotopocules)),
-    "must be the path to a csv/tsv/xlsx file or a data frame of isotopocules"
+        is.data.frame(isotopocules) ||
+        (is_double(isotopocules) &&
+          length(isotopocules) > 0 &&
+          is_named(isotopocules))),
+    "must be the path to a csv/tsv/xlsx file, a data frame of isotopocules, or a named vector of isotopocule masses"
+  )
+  check_arg(
+    default_tolerance,
+    is_scalar_double(default_tolerance),
+    "must be a single number"
+  )
+  check_arg(
+    default_charge,
+    is_scalar_integerish(default_charge) && default_charge > 0,
+    "must be a single positive integer"
   )
 
   # read files
@@ -48,6 +72,12 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
       summary_format = "{message}. Encountered {issues}:"
     )
     isotopocules <- out$result
+  } else if (is_double(isotopocules)) {
+    # turn vector into tibble
+    isotopocules <- tibble::tibble(
+      isotopocule = names(isotopocules),
+      mz = as.numeric(isotopocules)
+    )
   }
 
   # turn characters into vectors
@@ -64,8 +94,8 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     "compound" = "\\#compound|compound", # optional
     "isotopocule" = "isotopolog|isotopocule|isotopologue",
     "mzExact" = "mass|m/z|mz",
-    "tolerance" = "tolerance|tolerance \\[mmu\\]|tolerance \\[mda\\]",
-    "charge" = "charge|z"
+    "tolerance" = "tolerance|tolerance \\[mmu\\]|tolerance \\[mda\\]", # optional
+    "charge" = "charge|z" # optional
   )
 
   find_col <- function(col, pattern) {
@@ -84,7 +114,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
         ),
         call = root_env
       )
-    } else if (length(fits) == 0 && col != "compound") {
+    } else if (length(fits) == 0 && col %in% c("isotopocule", "mzExact")) {
       cli_abort(
         c(
           "could not identify {.field {col}} column in the provided {cli::col_blue('isotopocules')}",
@@ -97,7 +127,22 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     return(map_cols_all[fits])
   }
   # note: mapply provides easier errors than map_chr
-  map_cols <- mapply(find_col, names(map_cols_reqs), map_cols_reqs)
+  map_cols <- mapply(
+    find_col,
+    names(map_cols_reqs),
+    map_cols_reqs,
+    SIMPLIFY = FALSE
+  )
+  use_default_tolerance <- is_empty(map_cols$tolerance)
+  if (use_default_tolerance) {
+    isotopocules$tolerance <- default_tolerance
+    map_cols$tolerance <- "tolerance"
+  }
+  use_default_charge <- is_empty(map_cols$charge)
+  if (use_default_charge) {
+    isotopocules$charge <- default_charge
+    map_cols$charge <- "charge"
+  }
 
   # start timer
   start <- start_info()
@@ -119,11 +164,14 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     dplyr::mutate(itc_uidx = dplyr::row_number(), .before = "isotopocule") |>
     dplyr::mutate(
       # if tolerance is > 0.1, then it must be in mDa (otherwise it would be a 100 mDa tolerance which is meaningless)
-      tolerance = if (stats::median(.data$tolerance) > 0.1) {
+      tolerance = if (
+        stats::median(.data$tolerance) > 0.1 || use_default_tolerance
+      ) {
         0.001 * .data$tolerance
       } else {
         .data$tolerance
-      }
+      },
+      charge = as.integer(.data$charge)
     ) |>
     dplyr::filter(!is.na(.data$mzExact), !is.na(.data$tolerance))
 
@@ -180,7 +228,8 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
 
   # unidentified
   unidentified_peaks <- peaks |>
-    dplyr::anti_join(found_peaks, by = "..peak_idx")
+    dplyr::anti_join(found_peaks, by = "..peak_idx") |>
+    dplyr::mutate(charge = as.integer(!!default_charge))
 
   # missing
   missing_peaks <- isotopocules |>
@@ -243,9 +292,15 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
   })
 
   # finish info
+  tic_identified <- sum(found_peaks$intensity, na.rm = TRUE)
+  tic_all <- sum(all_peaks$intensity, na.rm = TRUE)
   finish_info(
     "identified {format_number(n_identified)}/{format_number(n_peaks)} peaks ({signif(100 * n_identified/n_peaks, 2)}%) ",
-    "as isotopcules {.field {unique(found_peaks$isotopocule)}}",
+    "representing {signif(100*tic_identified/tic_all, 2)}% of the total ion current (TIC) ",
+    "as isotopocules {.field {unique(found_peaks$isotopocule)}}",
+    if (use_default_tolerance) {
+      " using the {.field default_tolerance} of {default_tolerance} mmu"
+    },
     conditions = dplyr::bind_rows(
       multimatch_check$conditions,
       missing_check$conditions
@@ -255,6 +310,7 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
 
   # cleanup
   all_peaks <- all_peaks |> dplyr::select(-"tolerance", -starts_with(".."))
+
   if (is_agg) {
     # got aggregated data to begin with --> return aggregated data
     aggregated_data$peaks <- all_peaks
@@ -262,6 +318,8 @@ orbi_identify_isotopocules <- function(aggregated_data, isotopocules) {
     for (name in names(aggregated_data)) {
       attr(aggregated_data[[name]], "unused_columns") <- NULL
     }
+    aggregated_data <- orbi_calculate_ions(aggregated_data) |>
+      suppressMessages()
     return(aggregated_data)
   } else {
     # got a plain peaks tibble

@@ -3,8 +3,9 @@
     Code
       out <- orbi_identify_isotopocules(peaks, isotopologs)
     Message
-      !  orbi_identify_isotopocules() identified 11/12 peaks (92%) as isotopcules M0,
-      15N, 17O, and 18O but encountered 2 warnings
+      !  orbi_identify_isotopocules() identified 11/12 peaks (92%) representing 85%
+      of the total ion current (TIC) as isotopocules M0, 15N, 17O, and 18O but
+      encountered 2 warnings
         > !  isotopocule 15N matches multiple peaks in some same scans (1
         multi-matched peak in total) - make sure to run orbi_flag_satellite_peaks()
         and orbi_plot_satellite_peak()
@@ -99,18 +100,35 @@
         {
           "type": "double",
           "attributes": {},
-          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         }
       ]
     }
+
+---
+
+    Code
+      out2 <- orbi_identify_isotopocules(peaks, tibble::deframe(select(isotopologs,
+        "isotopolog", "mass")), default_tolerance = 0.9, default_charge = 2)
+    Message
+      !  orbi_identify_isotopocules() identified 11/12 peaks (92%) representing 85%
+      of the total ion current (TIC) as isotopocules M0, 15N, 17O, and 18O using
+      the default_tolerance of 0.9 mmu but encountered 2 warnings
+        > !  isotopocule 15N matches multiple peaks in some same scans (1
+        multi-matched peak in total) - make sure to run orbi_flag_satellite_peaks()
+        and orbi_plot_satellite_peak()
+        > ! isotopocules M0 and 18O are missing from some scans (2 missing peaks in
+        total) - make sure to evaluate coverage with e.g.
+        orbi_plot_isotopocule_coverage()
 
 # orbi_identify_isotopocules() [fancy]
 
     Code
       out <- orbi_identify_isotopocules(peaks, isotopologs)
     Message
-      [33m![39m [1morbi_identify_isotopocules()[22m identified 11/12 peaks (92%) as isotopcules [32mM0[39m,
-      [32m15N[39m, [32m17O[39m, and [32m18O[39m but encountered [33m2 warnings[39m
+      [33m![39m [1morbi_identify_isotopocules()[22m identified 11/12 peaks (92%) representing 85%
+      of the total ion current (TIC) as isotopocules [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m but
+      encountered [33m2 warnings[39m
         → [33m![39m isotopocule [32m15N[39m matches multiple peaks in some same scans (1
         multi-matched peak in total) - make sure to run [1morbi_flag_satellite_peaks()[22m
         and [1morbi_plot_satellite_peak()[22m
@@ -205,10 +223,26 @@
         {
           "type": "double",
           "attributes": {},
-          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         }
       ]
     }
+
+---
+
+    Code
+      out2 <- orbi_identify_isotopocules(peaks, tibble::deframe(select(isotopologs,
+        "isotopolog", "mass")), default_tolerance = 0.9, default_charge = 2)
+    Message
+      [33m![39m [1morbi_identify_isotopocules()[22m identified 11/12 peaks (92%) representing 85%
+      of the total ion current (TIC) as isotopocules [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m using
+      the [32mdefault_tolerance[39m of 0.9 mmu but encountered [33m2 warnings[39m
+        → [33m![39m isotopocule [32m15N[39m matches multiple peaks in some same scans (1
+        multi-matched peak in total) - make sure to run [1morbi_flag_satellite_peaks()[22m
+        and [1morbi_plot_satellite_peak()[22m
+        → [33m![39m isotopocules [32mM0[39m and [32m18O[39m are missing from some scans (2 missing peaks in
+        total) - make sure to evaluate coverage with e.g.
+        [1morbi_plot_isotopocule_coverage()[22m
 
 # orbi_filter_isotopocules() [plain]
 
@@ -217,7 +251,7 @@
     Message
       -------- aggregated data from  raw files - retrieve with orbi_get_data() -------
       > peaks (14): uidx, scan.no, mzMeasured (2 NA), intensity (2 NA), compound (1
-      NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact (1 NA), charge (1 NA)
+      NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact (1 NA), charge
 
 ---
 
@@ -355,7 +389,7 @@
     Message
       ──────── [1maggregated data from  raw files - retrieve with orbi_get_data()[22m ───────
       → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m ([33m2 NA[39m), [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1[39m
-      [33mNA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m)
+      [33mNA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m ([33m1 NA[39m), [32mcharge[39m
 
 ---
 
