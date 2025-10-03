@@ -120,8 +120,11 @@ version](https://cran.r-project.org/) 4.4 or newer).
     # print results
     results |>  orbi_get_data(summary = c("isotopocule", "ratio", "ratio_sem"))
 
-    # export data & results to excel
-    results |> orbi_export_data_to_excel(file = "data_summary.xlsx")
+    # export results to excel
+    results |> orbi_export_data_to_excel(
+      file = "data_summary.xlsx",
+      include = c("file_info", "summary")
+    )
 
 <PRE class="fansi fansi-output"><CODE><span style='color: #949494;'># A tibble: 3 × 5</span>
    uidx filename             isotopocule   ratio ratio_sem

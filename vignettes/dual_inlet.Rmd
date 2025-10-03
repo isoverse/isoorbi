@@ -173,8 +173,11 @@ df_w_summary <-
     include_unused_data = TRUE
   )
 
-# export to excel
-df_w_summary |> orbi_export_data_to_excel(file = "output.xlsx")
+# export file info and summary to excel
+df_w_summary |> orbi_export_data_to_excel(
+  file = "output.xlsx",
+  include = c("file_info", "summary")
+)
 ```
 
 ```{r}
