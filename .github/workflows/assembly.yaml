@@ -4,6 +4,7 @@ name: isoraw test
 on:
   push:
     paths:
+      - .github/workflows/assembly.yaml
       - inst/assembly/src/*
 
 env:
