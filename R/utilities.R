@@ -143,10 +143,10 @@ orbi_get_example_files <- function(
         utils::download.file(destfile = dest_path, quiet = TRUE) |>
         try_catch_cnds()
       finish_info()
-      show_cnds(
+      abort_cnds(
         out$conditions,
         message = format_inline(
-          "there was a problem downloading {cli::col_blue(basename(dest_path))}, "
+          "{cli::col_blue(basename(dest_path))} is NOT an available example file, "
         )
       )
     }
