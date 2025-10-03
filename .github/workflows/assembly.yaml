@@ -38,8 +38,10 @@ jobs:
           name: isoraw
       - name: List result
         run: tree
+      - name: Make binary executable
+        run: chmod +x ./isoraw-linux-x64
       - name: Run test file
-        run: ./isoraw-linux-x64 --file ./inst/assembly/$EXAMPLE_RAW --spectra $EXAMPLE_SPECTRA
+        run: ./isoraw-linux-x64 --file ./inst/assembly/${{ env.EXAMPLE_RAW }} --spectra ${{ env.EXAMPLE_SPECTRA }}
   verify-windows:
     name: Verify on Windows
     runs-on: windows-latest
@@ -53,7 +55,7 @@ jobs:
       - name: List result
         run: dir
       - name: Run test file
-        run: .\isoraw-win-x64.exe --file .\inst\assembly\$EXAMPLE_RAW --spectra $EXAMPLE_SPECTRA
+        run: .\isoraw-win-x64.exe --file .\inst\assembly\${{ env.EXAMPLE_RAW }} --spectra ${{ env.EXAMPLE_SPECTRA }}
   verify-macos:
     name: Verify on MacOS
     runs-on: macos-latest
@@ -66,7 +68,9 @@ jobs:
           name: isoraw
       - name: List result
         run: ls -l
+      - name: Make binary executable
+        run: chmod +x ./isoraw-osx-x64
       - name: Run test file
-        run: ./isoraw-osx-x64 --file ./inst/assembly/$EXAMPLE_RAW --spectra $EXAMPLE_SPECTRA
+        run: ./isoraw-osx-x64 --file ./inst/assembly/${{ env.EXAMPLE_RAW }} --spectra ${{ env.EXAMPLE_SPECTRA }}
   
   # not uploading the artifacts for releases since not all new releases require new executables
