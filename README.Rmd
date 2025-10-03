@@ -128,8 +128,11 @@ results <- dataset |> orbi_summarize_results(ratio_method = "sum")
 # print results
 results |>  orbi_get_data(summary = c("isotopocule", "ratio", "ratio_sem"))
 
-# export data & results to excel
-results |> orbi_export_data_to_excel(file = "data_summary.xlsx")
+# export results to excel
+results |> orbi_export_data_to_excel(
+  file = "data_summary.xlsx",
+  include = c("file_info", "summary")
+)
 ```
 
 ```{r "summarize-code", echo = FALSE, messages = FALSE}
