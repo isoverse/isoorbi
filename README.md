@@ -119,8 +119,9 @@ To use the latest updates, you can install the development version of
     2     1 nitrate_test_10scans 17O         0.00132 0.0000554
     3     1 nitrate_test_10scans 18O         0.00775 0.000162 
 
-For additional functionality, please check out our vignettes, and peruse
-the full package structure below.
+For additional code, please check out our **Examples** in the main menu
+at [isoorbi.isoverse.org](https://isoorbi.isoverse.org/), and peruse the
+full package structure below.
 
 ## Package structure
 

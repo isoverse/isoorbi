@@ -14,7 +14,7 @@ navbar:
   type: default
   left:
   - text: Quick Start
-    href: articles/quick_start.html
+    href: index.html#show-me-some-code
   - text: Functionality Guide
     href: articles/functionality_guide.html
   - text: Reference
