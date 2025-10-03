@@ -454,7 +454,7 @@ orbi_plot_spectra <- function(
   plot <- plot +
     # make the text size a bit smaller as there is a lot going on on these plots
     orbi_default_theme(text_size = 12, facet_text_size = 16) +
-    ggplot2::labs(x = "m/z")
+    ggplot2::labs(x = "m/z", y = "intensity")
 
   # only showing the spectrum itself?
   if (identical(mz_focus_nominal_offsets, 0L)) {

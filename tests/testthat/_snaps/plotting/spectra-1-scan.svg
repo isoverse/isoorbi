@@ -166,7 +166,7 @@
 <polyline points='46.63,326.99 49.37,326.99 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='46.63,110.49 49.37,110.49 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='381.94' y='568.03' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='19.34px' lengthAdjust='spacingAndGlyphs'>m/z</text>
-<text transform='translate(13.74,295.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>y</text>
+<text transform='translate(13.74,295.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='44.03px' lengthAdjust='spacingAndGlyphs'>intensity</text>
 <text x='49.37' y='15.39' style='font-size: 14.40px; font-family: sans;' textLength='93.67px' lengthAdjust='spacingAndGlyphs'>spectra 1 scan</text>
 </g>
 </svg>

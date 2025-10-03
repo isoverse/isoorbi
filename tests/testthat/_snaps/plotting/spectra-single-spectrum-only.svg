@@ -65,7 +65,7 @@
 <polyline points='54.63,291.43 57.37,291.43 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='54.63,165.39 57.37,165.39 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='358.27' y='568.03' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='19.34px' lengthAdjust='spacingAndGlyphs'>m/z</text>
-<text transform='translate(13.74,295.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>y</text>
+<text transform='translate(13.74,295.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='44.03px' lengthAdjust='spacingAndGlyphs'>intensity</text>
 <text x='675.60' y='279.34' style='font-size: 12.00px; font-family: sans;' textLength='25.36px' lengthAdjust='spacingAndGlyphs'>scan</text>
 <line x1='677.33' y1='294.70' x2='691.15' y2='294.70' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <line x1='677.33' y1='311.98' x2='691.15' y2='311.98' style='stroke-width: 1.07; stroke-dasharray: 2.85,2.85; stroke-linecap: butt;' />
