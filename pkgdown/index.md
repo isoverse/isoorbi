@@ -26,10 +26,20 @@ You can install the current CRAN version of `isoorbi` with:
     install.packages("isoorbi")
 
 To use the latest updates, you can install the development version of
-`isoorbi` from [GitHub](https://github.com/) with:
+`isoorbi` from [GitHub](https://github.com/). If you are on Windows,
+make sure to install the equivalent version of
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) for your
+version of R (you can find out which version you have with
+`getRversion()` from an R console - note that isoorbi requires [R
+version](https://cran.r-project.org/) 4.4 or newer).
 
-    if(!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-    devtools::install_github("isoverse/isoorbi")
+    # checks that you are set up to build R packages from source
+    if(!requireNamespace("pkgbuild", quietly = TRUE)) install.packages("pkgbuild")
+    pkgbuild::check_build_tools()
+
+    # installs the latest isoorbi package from GitHub
+    if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
+    pak::pak("isoverse/isoorbi")
 
 > Important: as of isoorbi version 1.5.0, it is possible to read .raw
 > files directly using the [isoraw
