@@ -43,11 +43,7 @@ test_that("orbi_read_isox()", {
 
       # read single file
       expect_snapshot({
-        df <- orbi_read_isox(system.file(
-          "extdata",
-          "testfile_dual_inlet.isox",
-          package = "isoorbi"
-        ))
+        df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox"))
       })
 
       # check output
@@ -72,18 +68,15 @@ test_that("orbi_read_isox()", {
       # read multiple files
       expect_snapshot({
         df2 <-
-          orbi_read_isox(c(
-            system.file(
-              "extdata",
-              "testfile_dual_inlet.isox",
-              package = "isoorbi"
-            ),
-            system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-          ))
-
-        # check result
-        expect_equal(nrow(df2), 11633)
+          orbi_get_example_files(c(
+            "testfile_dual_inlet.isox",
+            "testfile_flow.isox"
+          )) |>
+          orbi_read_isox()
       })
+
+      # check result
+      expect_equal(nrow(df2), 11633)
     }
   ) |>
     withr::with_options(new = list(show_exec_times = FALSE))
@@ -93,11 +86,7 @@ test_that("orbi_read_isox()", {
 
 test_that("test orbi_simplify_isox()", {
   #  test file
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     suppressMessages()
 
   # safety checks
@@ -155,11 +144,7 @@ test_that("test orbi_simplify_isox()", {
 
 test_that("test orbi_filter_files()", {
   # success
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     suppressMessages()
 
   expect_true(is.tbl(orbi_filter_files(df))) |> suppressMessages()

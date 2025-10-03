@@ -7,11 +7,7 @@ test_that("orbi_filter_isotopocules() tests", {
     "must be.*aggregated.*or.*data frame"
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     suppressMessages()
 
@@ -42,11 +38,7 @@ test_that("dynamic_y_scale() tests", {
     fixed = TRUE
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     orbi_define_basepeak(basepeak_def = "15N") |>
     orbi_analyze_shot_noise() |>
@@ -64,11 +56,7 @@ test_that("orbi_get_isotopocule_coverage() tests", {
 
   # success
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     suppressMessages()
 
@@ -86,11 +74,7 @@ test_that("orbi_plot_satellite_peaks() tests", {
     "must be.*aggregated.*or.*data frame"
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     suppressMessages()
 
@@ -100,11 +84,7 @@ test_that("orbi_plot_satellite_peaks() tests", {
   )
 
   # success
-  df2 <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df2 <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     orbi_flag_satellite_peaks() |>
     suppressMessages()
@@ -121,11 +101,7 @@ test_that("orbi_plot_raw_data() tests", {
   # failure
   expect_error(orbi_plot_raw_data(), "must be.*aggregated.*or.*data frame")
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     orbi_flag_outliers(agc_fold_cutoff = 2) |>
     suppressMessages()
@@ -175,11 +151,7 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
     "must be.*aggregated.*or.*data frame"
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     suppressMessages()
 

@@ -10,11 +10,7 @@ test_that("factorize_dataset()", {
   )
 
   df <- suppressMessages(
-    orbi_read_isox(system.file(
-      "extdata",
-      "testfile_dual_inlet.isox",
-      package = "isoorbi"
-    ))
+    orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox"))
   )
 
   expect_silent(factorize_dataset(df))

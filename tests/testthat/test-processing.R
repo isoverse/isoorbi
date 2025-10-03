@@ -41,11 +41,7 @@ agg_data <- structure(
 
 # example test file
 test_file <-
-  system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  ) |>
+  orbi_get_example_files("testfile_dual_inlet.isox") |>
   orbi_read_isox() |>
   orbi_simplify_isox() |>
   suppressMessages() |>

@@ -5,11 +5,7 @@ test_that("test orbi_define_block_for_flow_injection()", {
     "dataset.*must be.*aggregated.*or.*data frame"
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     suppressMessages()
 
   expect_error(
@@ -721,11 +717,7 @@ test_that("test orbi_get_blocks_info()", {
     "dataset.*must be.*aggregated.*or.*data frame"
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     suppressMessages()
   df2 <- df |> mutate(dummy = 1) |> select(-scan.no)
 
@@ -750,11 +742,7 @@ test_that("test orbi_add_blocks_to_plot()", {
     "plot.*has to be a ggplot"
   )
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     orbi_define_blocks_for_dual_inlet(
       ref_block_time.min = 0.5,

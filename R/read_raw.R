@@ -506,6 +506,7 @@ orbi_find_raw <- function(
     folder,
     pattern = "\\.raw$",
     full.names = TRUE,
+    ignore.case = TRUE,
     recursive = recursive
   ) |>
     unique()
@@ -519,6 +520,7 @@ orbi_find_raw <- function(
       folder,
       pattern = "\\.raw\\.cache\\.zip$",
       full.names = TRUE,
+      ignore.case = TRUE,
       recursive = recursive
     ) |>
       unique()
@@ -527,7 +529,12 @@ orbi_find_raw <- function(
     }
     if (length(cache_files) > 0) {
       # include folders
-      linked_files <- gsub("\\.raw\\.cache\\.zip$", ".raw", cache_files)
+      linked_files <- gsub(
+        "(\\.raw)\\.cache\\.zip$",
+        "\\1",
+        cache_files,
+        ignore.case = TRUE
+      )
       cache_files <- cache_files[!linked_files %in% files]
       files <- c(files, cache_files) |> unique() |> sort()
     }

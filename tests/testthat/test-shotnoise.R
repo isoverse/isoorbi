@@ -11,11 +11,7 @@ test_that("orbi_analyze_shot_noise()", {
   orbi_analyze_shot_noise(mtcars) |> expect_error("requires defined basepeak")
 
   # test data
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     suppressMessages()
 
   df_results <-
@@ -39,11 +35,7 @@ test_that("orbi_plot_shot_noise()", {
 
   expect_error(orbi_plot_shot_noise(42), "shotnoise.* must be a data frame")
 
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     orbi_define_basepeak(basepeak_def = "15N") |>
     orbi_analyze_shot_noise() |>

@@ -14,7 +14,7 @@ navbar:
   type: default
   left:
   - text: Quick Start
-    href: articles/quick_start.html
+    href: index.html#show-me-some-code
   - text: Functionality Guide
     href: articles/functionality_guide.html
   - text: Reference
@@ -43,13 +43,19 @@ reference:
   - orbi_find_raw
   - orbi_read_raw
   - orbi_check_isoraw
+  - orbi_get_problems
+  - orbi_get_example_files
+
+- title: Aggregate RAW files data
+  desc: >
+    These functions extract data from raw files
+  contents:
   - orbi_aggregate_raw
   - orbi_start_aggregator
   - orbi_add_to_aggregator
   - orbi_register_aggregator
   - orbi_get_aggregator
   - orbi_get_data
-  - orbi_get_problems
 
 - title: Read ISOX files
   desc: >

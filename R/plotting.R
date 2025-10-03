@@ -113,7 +113,7 @@ orbi_default_theme <- function(text_size = 16, facet_text_size = 20) {
 #' @param max_scans spectra from how many scans to show at most. By default up to 6 (the number of available linetypes). To show only the spectrum from a single scan, set `max_scans = 1`. If more than 6 scan spectra are allowed (and there are more than 6 loaded in the `aggregated_data`), turns of the linetype aesthetic.
 #' @param max_files spectra from how many files to show at most. Each file is shown as an additional line of panels.
 #' @param label_peaks whether to label the peaks in the M+1/2/3 panels. If isotopcules are already identified from [orbi_identify_isotopocules()], uses the isotopcule names, otherwise the m/z values. Peaks that are missing (identified by [orbi_identify_isotopocules()]) in all spectra are highlighted in red.
-#' To avoid showing unidentified/missing peaks, run [orbi_filter_isotopocules()] first.
+#' To avoid labeling unidentified/missing peaks, run [orbi_filter_isotopocules()] first.
 #' @param show_filenames whether to show the filename in the first panel of reach row (usually the full spectrum panel)
 #' @param show_ref_and_lock_peaks whether to show reference and lock mass peaks in the spectrum
 #' @param show_focus_backgrounds whether to highlight the M+x panels with specific background colors that match them with the mass bands highlighted in the first panel
@@ -311,14 +311,23 @@ orbi_plot_spectra <- function(
             .by = "mz_nominal_offset",
             # expand peak sizes by using the resolution
             mz_min = min(.data$mzEffective) -
-              5 * max(.data$mzEffective / .data$peakResolution),
+              if (any(!is.na(.data$peakResolution))) {
+                5 * max(.data$mzEffective / .data$peakResolution, na.rm = TRUE)
+              } else {
+                0
+              },
             mz_max = max(.data$mzEffective) +
-              5 * max(.data$mzEffective / .data$peakResolution)
+              if (any(!is.na(.data$peakResolution))) {
+                5 * max(.data$mzEffective / .data$peakResolution, na.rm = TRUE)
+              } else {
+                0
+              }
           )
       }
     ) |>
     dplyr::filter(.data$mz_nominal_offset %in% !!mz_focus_nominal_offsets)
 
+  # safety check
   if (nrow(mz_offset_windows) == 0) {
     cli_abort(
       "none of the requested {.field mz_focus_nominal_offsets} ({mz_focus_nominal_offsets}) exist in this dataset"
@@ -1110,8 +1119,8 @@ orbi_plot_isotopocule_coverage <- function(
         data = group_outlines |> filter(.data$is_weak_isotopocule),
         map = ggplot2::aes(
           fill = "was flagged as weak",
-          ymin = .data$y - 0.5,
-          ymax = .data$y + 0.5
+          ymin = .data$y - 0.45,
+          ymax = .data$y + 0.45
         ),
         color = NA_character_
       )
@@ -1124,7 +1133,11 @@ orbi_plot_isotopocule_coverage <- function(
       data = isotopocule_coverage,
       map = ggplot2::aes(fill = "isotopocule detected")
     ) +
-    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
+    ggplot2::scale_x_continuous(
+      breaks = x_breaks,
+      expand = c(0, 0),
+      labels = format_number
+    ) +
     ggplot2::scale_y_reverse(
       breaks = seq_along(levels(isotopocule_coverage$isotopocule)),
       labels = levels(isotopocule_coverage$isotopocule),

@@ -14,8 +14,7 @@
 ---
 
     Code
-      df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox",
-        package = "isoorbi"))
+      df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox"))
     Message
       v orbi_read_isox() loaded 5184 peaks for 1 compound (NO3-) with 6 isotopocules
       (15N, 17O, 18O, 15N18O, 17O18O, and 18O18O) from 'testfile_dual_inlet.isox'
@@ -23,16 +22,14 @@
 ---
 
     Code
-      df2 <- orbi_read_isox(c(system.file("extdata", "testfile_dual_inlet.isox",
-        package = "isoorbi"), system.file("extdata", "testfile_flow.isox", package = "isoorbi")))
+      df2 <- orbi_read_isox(orbi_get_example_files(c("testfile_dual_inlet.isox",
+        "testfile_flow.isox")))
     Message
       v orbi_read_isox() loaded 5184 peaks for 1 compound (NO3-) with 6 isotopocules
       (15N, 17O, 18O, 15N18O, 17O18O, and 18O18O) from 'testfile_dual_inlet.isox'
       v orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5 isotopocules
       (M0, 33S, 17O, 34S, and 18O) from 'testfile_flow.isox'
       v orbi_read_isox() read '.isox' data from 2 files
-    Code
-      expect_equal(nrow(df2), 11633)
 
 # orbi_read_isox() [fancy]
 
@@ -50,8 +47,7 @@
 ---
 
     Code
-      df <- orbi_read_isox(system.file("extdata", "testfile_dual_inlet.isox",
-        package = "isoorbi"))
+      df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox"))
     Message
       [32m✔[39m [1morbi_read_isox()[22m loaded 5184 peaks for 1 compound ([32mNO3-[39m) with 6 isotopocules
       ([32m15N[39m, [32m17O[39m, [32m18O[39m, [32m15N18O[39m, [32m17O18O[39m, and [32m18O18O[39m) from [34mtestfile_dual_inlet.isox[39m
@@ -59,14 +55,12 @@
 ---
 
     Code
-      df2 <- orbi_read_isox(c(system.file("extdata", "testfile_dual_inlet.isox",
-        package = "isoorbi"), system.file("extdata", "testfile_flow.isox", package = "isoorbi")))
+      df2 <- orbi_read_isox(orbi_get_example_files(c("testfile_dual_inlet.isox",
+        "testfile_flow.isox")))
     Message
       [32m✔[39m [1morbi_read_isox()[22m loaded 5184 peaks for 1 compound ([32mNO3-[39m) with 6 isotopocules
       ([32m15N[39m, [32m17O[39m, [32m18O[39m, [32m15N18O[39m, [32m17O18O[39m, and [32m18O18O[39m) from [34mtestfile_dual_inlet.isox[39m
       [32m✔[39m [1morbi_read_isox()[22m loaded 6449 peaks for 1 compound ([32mHSO4-[39m) with 5 isotopocules
       ([32mM0[39m, [32m33S[39m, [32m17O[39m, [32m34S[39m, and [32m18O[39m) from [34mtestfile_flow.isox[39m
       [32m✔[39m [1morbi_read_isox()[22m read [34m.isox[39m data from 2 files
-    Code
-      expect_equal(nrow(df2), 11633)
 

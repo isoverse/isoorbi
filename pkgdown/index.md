@@ -58,9 +58,9 @@ To use the latest updates, you can install the development version of
     # and search for raw files in that folder
     file_paths <- orbi_find_raw(my_data_folder)
 
-    # for this example, we use a small test file bundled with the package
-    # instead (remove this line if working with your own data)
-    file_paths <- system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
+    # for this example, we use a small raw test file bundled with the
+    # package instead (remove this line if working with your own data)
+    file_paths <- orbi_get_example_files("nitrate_test_10scans.raw")
 
     # read the raw file incluing 2 of the raw spectra
     raw_files <- file_paths |>
@@ -120,8 +120,9 @@ To use the latest updates, you can install the development version of
 <span style='color: #BCBCBC;'>3</span>     1 nitrate_test_10scans 18O         0.007<span style='text-decoration: underline;'>75</span> 0.000<span style='text-decoration: underline;'>162</span> 
 </CODE></PRE>
 
-For additional functionality, please check out our vignettes, and peruse
-the full package structure below.
+For additional code, please check out our **Examples** in the main menu
+at [isoorbi.isoverse.org](https://isoorbi.isoverse.org/), and peruse the
+full package structure below.
 
 ## Package structure
 

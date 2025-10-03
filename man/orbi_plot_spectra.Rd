@@ -39,7 +39,7 @@ Likewise, to visualize only the area around the monoisotopic peak +1, provide \c
 \item{max_files}{spectra from how many files to show at most. Each file is shown as an additional line of panels.}
 
 \item{label_peaks}{whether to label the peaks in the M+1/2/3 panels. If isotopcules are already identified from \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}}, uses the isotopcule names, otherwise the m/z values. Peaks that are missing (identified by \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}}) in all spectra are highlighted in red.
-To avoid showing unidentified/missing peaks, run \code{\link[=orbi_filter_isotopocules]{orbi_filter_isotopocules()}} first.}
+To avoid labeling unidentified/missing peaks, run \code{\link[=orbi_filter_isotopocules]{orbi_filter_isotopocules()}} first.}
 
 \item{show_filenames}{whether to show the filename in the first panel of reach row (usually the full spectrum panel)}
 

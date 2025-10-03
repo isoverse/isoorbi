@@ -1,5 +1,20 @@
 # isoorbi 1.5.1
 
+This is a minor update to enhance usability.
+
+## Enhancements
+
+* show panel lables in spectral plots, i.e. M+1, M+2, etc. (#93)
+* align x-axes in spectral plots (#98)
+* introduce default_tolerance and default_charge parameters for `orbi_identify_isotopocules` (#95)
+* automatically calculate ions during `orbi_identify_isotopocules`
+* provide a stastic of ion counts identified when running `orbi_identify_isotopocules` (#94)
+* provide more informative error when `orbi_read_raw` fails because the raw file is still being acquired
+* provide `orbi_get_example_files` function as a one-point stop to get both system package test files as well as downloadable test files
+* `orbi_find_raw` now finds both .raw and .RAW extensions (i.e. no longer case-sensitive)
+
+# isoorbi 1.5.0
+
 ## Breaking changes
 
 There are no breaking changes in this release (all changes and new features are backwards compatible).
