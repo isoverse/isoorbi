@@ -530,8 +530,8 @@ orbi_find_raw <- function(
     if (length(cache_files) > 0) {
       # include folders
       linked_files <- gsub(
-        "\\.raw\\.cache\\.zip$",
-        ".raw",
+        "(\\.raw)\\.cache\\.zip$",
+        "\\1",
         cache_files,
         ignore.case = TRUE
       )
