@@ -22,7 +22,7 @@ Authors@R:
 URL: https://isoorbi.isoverse.org/, https://github.com/isoverse/isoorbi
 BugReports: https://github.com/isoverse/isoorbi/issues
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.4.0)
 Imports:
     utils (>= 4.1.0),
     stats (>= 4.1.0),
@@ -43,7 +43,7 @@ Imports:
     openxlsx,
     purrr,
     prettyunits (>= 1.2.0),
-    arrow (>= 20.0.0.0),
+    arrow (>= 21.0.0.0),
     knitr(>= 1.5.0)
 Suggests:
     devtools,
