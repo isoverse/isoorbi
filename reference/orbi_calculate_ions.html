@@ -19,7 +19,7 @@ only critical if the number of ions are interpreted outside of ratio calculation
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,7 +90,8 @@ only critical if the number of ions are interpreted outside of ratio calculation
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>If using a dataset read from isox files you might have to add a <code>charge</code> column if it does not yet exist that indicates the charge of the isotopocule.
-If using data from raw files, use <code><a href="orbi_identify_isotopocules.html">orbi_identify_isotopocules()</a></code> to identify the isotopocules and set their charge values.</p>
+If using data from raw files, <code><a href="orbi_identify_isotopocules.html">orbi_identify_isotopocules()</a></code> will automatically call this function with the default <code>CN</code> and <code>RN</code> so you don't need to
+call it explicitly unless you want to change these parameters.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,6 +127,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">peaks</span>:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mzMeasured</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
@@ -155,6 +156,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakMz</span> = <span style="font-style: italic;">as.numeric(BasePeakMass)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakIntensity</span> = <span style="font-style: italic;">as.numeric(BasePeakIntensity)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">lowMass</span> = <span style="font-style: italic;">as.numeric(LowMass)</span></span>
@@ -163,7 +165,6 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensCompFactor</span> = <span style="font-style: italic;">as.numeric(`OT Intens Comp Factor`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agc</span> = <span style="font-style: italic;">as.character(AGC)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agcTarget</span> = <span style="font-style: italic;">as.integer(`AGC Target`)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">numberLockmassesFound</span> = <span style="font-style: italic;">as.integer(`Number of LM Found`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">analyzerTemperature</span> = <span style="font-style: italic;">as.numeric(`Analyzer Temperature`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">peaks</span>:</span>
@@ -194,6 +195,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakMz</span> = <span style="font-style: italic;">as.numeric(BasePeakMass)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">basePeakIntensity</span> = <span style="font-style: italic;">as.numeric(BasePeakIntensity)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">lowMass</span> = <span style="font-style: italic;">as.numeric(LowMass)</span></span>
@@ -202,7 +204,6 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">intensCompFactor</span> = <span style="font-style: italic;">as.numeric(`OT Intens Comp Factor`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agc</span> = <span style="font-style: italic;">as.character(AGC)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">agcTarget</span> = <span style="font-style: italic;">as.integer(`AGC Target`)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">numberLockmassesFound</span> = <span style="font-style: italic;">as.integer(`Number of LM Found`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">analyzerTemperature</span> = <span style="font-style: italic;">as.numeric(`Analyzer Temperature`)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span></span>

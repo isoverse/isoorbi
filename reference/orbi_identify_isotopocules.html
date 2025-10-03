@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,12 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_identify_isotopocules</span><span class="op">(</span><span class="va">aggregated_data</span>, <span class="va">isotopocules</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orbi_identify_isotopocules</span><span class="op">(</span></span>
+<span>  <span class="va">aggregated_data</span>,</span>
+<span>  <span class="va">isotopocules</span>,</span>
+<span>  default_tolerance <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  default_charge <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -58,16 +63,27 @@
 
 
 <dt id="arg-isotopocules">isotopocules<a class="anchor" aria-label="anchor" href="#arg-isotopocules"></a></dt>
-<dd><p>list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).
-Required columns are <code>isotopocule/isotopolog</code>, <code>mz/mass</code>, <code>tolerance/tolerance [mmu]/tolerance [mDa]</code>, and <code>charge/z</code> (these alternative names for the columns, including uppercase versions, are recognized automatically).
-Optional column: <code>#compound/compound</code> as well as any other columns that don't match these others.
+<dd><p>list of isotopocules to map, can be a data frame/tibble, a named vector such as <code>c("M0" = 61.9878, "15N" = 62.9850)</code>, or the name of a file to read from (.csv/.tsv/.xlsx are all supported).
+If provided as a tibble/file, the required columns are <code>isotopocule/isotopolog</code> and <code>mz/mass</code> (these alternative names for the columns, including uppercase versions, are recognized automatically).
+In addition, <code>tolerance/tolerance [mmu]/tolerance [mDa]</code>, <code>charge/z</code>, <code>#compound/compound</code>, and <code>fragment</code> are recognized, as well as any other (arbitrarily named) columns with additional information.
 Character columns in the <code>isotopocules</code> table (including <code>isotopocule</code> and <code>compound</code>) are turned into factors with levels that preserve the order of isotopocules.
-That means that to change the order of isotopocules in downstream plotting functions, make sure to list them in the order you'd like them presented in.</p></dd>
+That means that to change the order of isotopocules in downstream plotting functions, make sure to list them in the order you'd like them presented in.
+Note that if <code>tolerance/tolerance [mmu]/tolerance [mDa]</code> or <code>charge/z</code> are not provided, the values in the parameters <code>default_tolerance</code> and <code>default_charge</code> are used, respectively.</p></dd>
+
+
+<dt id="arg-default-tolerance">default_tolerance<a class="anchor" aria-label="anchor" href="#arg-default-tolerance"></a></dt>
+<dd><p>tolerance (in mmu) to be used for isotopocule identification if a <code>tolerance/tolerance [mmu]/tolerance [mDa]</code> column is not included in <code>isotopocules</code></p></dd>
+
+
+<dt id="arg-default-charge">default_charge<a class="anchor" aria-label="anchor" href="#arg-default-charge"></a></dt>
+<dd><p>charge to be used for any unidentified peak, and if a <code>charge/z</code> column is not included in <code>isotopocules</code></p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>same object as provided in <code>aggregated_data</code> with added columns <code>compound</code> (if provided), <code>itc_uidx</code> (introduced unique isotopocule index), <code>isotopocule</code>, <code>mzExact</code> and <code>charge</code> as well as any other additional information columns provided in <code>isotopocules</code>. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.</p>
+    <p>same object as provided in <code>aggregated_data</code> with added columns <code>compound</code> (if provided), <code>itc_uidx</code> (introduced unique isotopocule index), <code>isotopocule</code>, <code>mzExact</code>, <code>charge</code>, and <code>ions.incremental</code> (via <code><a href="orbi_calculate_ions.html">orbi_calculate_ions()</a></code>), as as well as any other additional information columns provided in <code>isotopocules</code>.
+Note that if the default <code>CN</code> and <code>RN</code> values of <code><a href="orbi_calculate_ions.html">orbi_calculate_ions()</a></code> are not the ones that should be used, simply run <code><a href="orbi_calculate_ions.html">orbi_calculate_ions()</a></code> explicitly afterwards.
+Also note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
