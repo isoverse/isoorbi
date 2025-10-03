@@ -43,7 +43,7 @@ test_that("orbi_read_isox()", {
 
       # read single file
       expect_snapshot({
-        df <- orbi_read_isox(orbi_get_example_files("dual_inlet.raw"))
+        df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox"))
       })
 
       # check output

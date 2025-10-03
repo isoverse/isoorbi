@@ -81,6 +81,7 @@ format_number <- function(x) {
 #' By default, it will download only cache files (.raw.cache.zip) instead of the original .raw files because the cache files are significantely smaller.
 #' Todownload the original raw files instead, use `download_raw_files = TRUE`.
 #'
+#' @param filenames names of the example files
 #' @param download_raw_files should the original raw files be downloaded? By default only cache files (raw.cache.zip) are downloaded as they are usually much smaller.
 #' However, they will not work for retrieving additional spectra. To download the original spectra, switch to `download_raw_files = TRUE`
 #' @param download_always whether to download files anew even if they already exist locally

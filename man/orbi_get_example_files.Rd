@@ -11,6 +11,8 @@ orbi_get_example_files(
 )
 }
 \arguments{
+\item{filenames}{names of the example files}
+
 \item{download_raw_files}{should the original raw files be downloaded? By default only cache files (raw.cache.zip) are downloaded as they are usually much smaller.
 However, they will not work for retrieving additional spectra. To download the original spectra, switch to \code{download_raw_files = TRUE}}
 
