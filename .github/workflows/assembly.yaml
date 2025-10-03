@@ -6,6 +6,10 @@ on:
     paths:
       - .github/workflows/assembly.yaml
       - inst/assembly/src/*
+  pull_request:
+     paths:
+      - .github/workflows/assembly.yaml
+      - inst/assembly/src/*
 
 env:
   DOTNET_DOCKER: mcr.microsoft.com/dotnet/sdk:8.0
