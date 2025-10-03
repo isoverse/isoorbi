@@ -68,10 +68,11 @@ test_that("orbi_read_isox()", {
       # read multiple files
       expect_snapshot({
         df2 <-
-          orbi_read_isox(c(
-            orbi_get_example_files("dual_inlet.raw"),
-            system.file("extdata", "testfile_flow.isox", package = "isoorbi")
-          ))
+          orbi_get_example_files(c(
+            "testfile_dual_inlet.isox",
+            "testfile_flow.isox"
+          )) |>
+          orbi_read_isox()
 
         # check result
         expect_equal(nrow(df2), 11633)

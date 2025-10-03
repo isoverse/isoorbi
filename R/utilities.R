@@ -140,7 +140,7 @@ orbi_get_example_files <- function(
       start_info("downloading {cli::col_blue(basename(dest_path))}")
       download_path <- paste0(srcdir, basename(dest_path))
       out <- download_path |>
-        download.file(destfile = dest_path, quiet = TRUE) |>
+        utils::download.file(destfile = dest_path, quiet = TRUE) |>
         try_catch_cnds()
       finish_info()
       show_cnds(
