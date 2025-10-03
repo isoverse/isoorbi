@@ -74,15 +74,11 @@ To use the latest updates, you can install the development version of
 
 ### Identify isotopcules
 
-    # define isotopcules of interest (could come from tsv, csv, or excel file)
-    isotopocules <- data.frame(
-      isotopocule = c("M0", "15N", "17O", "18O"),
-      mass = c(61.9878, 62.9850, 62.9922, 63.9922),
-      tolerance = 1, charge = 1
-    )
-
     # identify isotopcules
-    raw_files <- raw_files |> orbi_identify_isotopocules(isotopocules)
+    # these could also come from a data frame or a tsv/csv/excel file
+    raw_files <- raw_files |> orbi_identify_isotopocules(
+      isotopocules = c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
+    )
 
     # plot again, now with the isotopocules identified
     raw_files |> orbi_plot_spectra()
@@ -95,8 +91,6 @@ To use the latest updates, you can install the development version of
     dataset <- raw_files |>
       # filter out unidentified peaks
       orbi_filter_isotopocules() |>
-      # calculate ions
-      orbi_calculate_ions() |>
       # check for satellite peaks
       orbi_flag_satellite_peaks() |>
       # define base peak
