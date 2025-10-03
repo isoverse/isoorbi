@@ -72,7 +72,7 @@ test_that("orbi_identify_isotopocules()", {
         default_charge = 2
       )
     )
-    expect_equal(out$charge[1], 2L)
+    expect_equal(out2$charge[1], 2L)
     expect_equal(
       out |> select(-"compound", -"charge"),
       out2 |> dplyr::select(-"charge")
