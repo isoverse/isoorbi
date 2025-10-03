@@ -11,6 +11,7 @@ This is a minor update to enhance usability.
 * provide a stastic of ion counts identified when running `orbi_identify_isotopocules` (#94)
 * provide more informative error when `orbi_read_raw` fails because the raw file is still being acquired
 * provide `orbi_get_example_files` function as a one-point stop to get both system package test files as well as downloadable test files
+* `orbi_find_raw` now finds both .raw and .RAW extensions (i.e. no longer case-sensitive)
 
 # isoorbi 1.5.0
 
