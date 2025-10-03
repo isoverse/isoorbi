@@ -1119,8 +1119,8 @@ orbi_plot_isotopocule_coverage <- function(
         data = group_outlines |> filter(.data$is_weak_isotopocule),
         map = ggplot2::aes(
           fill = "was flagged as weak",
-          ymin = .data$y - 0.5,
-          ymax = .data$y + 0.5
+          ymin = .data$y - 0.45,
+          ymax = .data$y + 0.45
         ),
         color = NA_character_
       )
@@ -1133,7 +1133,11 @@ orbi_plot_isotopocule_coverage <- function(
       data = isotopocule_coverage,
       map = ggplot2::aes(fill = "isotopocule detected")
     ) +
-    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
+    ggplot2::scale_x_continuous(
+      breaks = x_breaks,
+      expand = c(0, 0),
+      labels = format_number
+    ) +
     ggplot2::scale_y_reverse(
       breaks = seq_along(levels(isotopocule_coverage$isotopocule)),
       labels = levels(isotopocule_coverage$isotopocule),
