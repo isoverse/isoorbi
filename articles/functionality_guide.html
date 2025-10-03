@@ -107,7 +107,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># aggregate raw data</span></span>
 <span><span class="va">agg_data</span> <span class="op">&lt;-</span> <span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[562ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[536ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
 (138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">standard</span> aggregator
 </code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -233,7 +233,7 @@ providing access to additional columns from the raw data files.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using the extended aggregator instead of the default (standard)</span></span>
 <span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="st">"extended"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[968ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[915ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
 (138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">extended</span> aggregator
 </code></pre>
 <pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
@@ -308,7 +308,7 @@ these are empty.</p>
 <span></span>
 <span><span class="co"># identify</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_identify_isotopocules.html">orbi_identify_isotopocules</a></span><span class="op">(</span><span class="va">isotopocules</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[39ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[37ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
 representing 100% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
 and <span style="color: #00BB00;">18O</span>
 </code></pre>
@@ -320,7 +320,7 @@ and <span style="color: #00BB00;">18O</span>
 <code class="sourceCode R"><span><span class="co"># this can happen here or later on in the workflow</span></span>
 <span><span class="co"># in the case of these files there are no satellite peaks</span></span>
 <span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_satellite_peaks.html">orbi_plot_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[10ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[9ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
 </code></pre>
 <pre class="fansi fansi-message"><code>`geom_line()`: Each group consists of only one observation.
 <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?
