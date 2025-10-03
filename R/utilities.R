@@ -101,7 +101,7 @@ orbi_get_example_files <- function(
   check_arg(
     download_raw_files,
     is_scalar_logical(download_raw_files),
-    "must be TRUE or FALSE"
+    "must be TRUE or FALSE (did you forget `c()` around the filenames?)"
   )
   check_arg(
     download_always,
