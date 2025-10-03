@@ -33,7 +33,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="articles/quick_start.html">Quick Start</a></li>
+<li class="nav-item"><a class="nav-link" href="index.html#show-me-some-code">Quick Start</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/functionality_guide.html">Functionality Guide</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
@@ -97,9 +97,9 @@
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># and search for raw files in that folder</span></span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>file_paths <span class="ot">&lt;-</span> <span class="fu">orbi_find_raw</span>(my_data_folder)</span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># for this example, we use a small test file bundled with the package</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># instead (remove this line if working with your own data)</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>file_paths <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="at">package =</span> <span class="st">"isoorbi"</span>, <span class="st">"extdata"</span>,<span class="st">"nitrate_test_10scans.raw"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># for this example, we use a small raw test file bundled with the</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># package instead (remove this line if working with your own data)</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>file_paths <span class="ot">&lt;-</span> <span class="fu">orbi_get_example_files</span>(<span class="st">"nitrate_test_10scans.raw"</span>)</span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a></span>
 <span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co"># read the raw file incluing 2 of the raw spectra</span></span>
 <span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>raw_files <span class="ot">&lt;-</span> file_paths <span class="sc">|&gt;</span></span>
@@ -157,7 +157,7 @@
 <span style="color: #BCBCBC;">2</span>     1 nitrate_test_10scans 17O         0.001<span style="text-decoration: underline;">32</span> 0.000<span style="text-decoration: underline;">055</span>4
 <span style="color: #BCBCBC;">3</span>     1 nitrate_test_10scans 18O         0.007<span style="text-decoration: underline;">75</span> 0.000<span style="text-decoration: underline;">162</span>
 </code></pre>
-<p>For additional functionality, please check out our vignettes, and peruse the full package structure below.</p>
+<p>For additional code, please check out our <strong>Examples</strong> in the main menu at <a href="https://isoorbi.isoverse.org/">isoorbi.isoverse.org</a>, and peruse the full package structure below.</p>
 </div>
 </div>
 <div class="section level2">

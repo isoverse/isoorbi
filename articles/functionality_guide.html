@@ -35,7 +35,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../articles/quick_start.html">Quick Start</a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html#show-me-some-code">Quick Start</a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/functionality_guide.html">Functionality Guide</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
@@ -308,7 +308,7 @@ these are empty.</p>
 <span></span>
 <span><span class="co"># identify</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_identify_isotopocules.html">orbi_identify_isotopocules</a></span><span class="op">(</span><span class="va">isotopocules</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[44ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[39ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
 representing 100% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
 and <span style="color: #00BB00;">18O</span>
 </code></pre>
@@ -320,7 +320,7 @@ and <span style="color: #00BB00;">18O</span>
 <code class="sourceCode R"><span><span class="co"># this can happen here or later on in the workflow</span></span>
 <span><span class="co"># in the case of these files there are no satellite peaks</span></span>
 <span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_satellite_peaks.html">orbi_plot_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[12ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[11ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
 </code></pre>
 <pre class="fansi fansi-message"><code>`geom_line()`: Each group consists of only one observation.
 <span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?

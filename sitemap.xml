@@ -6,8 +6,6 @@
 <url><loc>https://isoorbi.isoverse.org/articles/flow_injection.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/articles/functionality_guide.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/articles/index.html</loc></url>
-<url><loc>https://isoorbi.isoverse.org/articles/isoxl_demo.html</loc></url>
-<url><loc>https://isoorbi.isoverse.org/articles/quick_start.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/authors.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/index.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/news/index.html</loc></url>
@@ -41,6 +39,7 @@
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_flag_weak_isotopocules.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_data.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_get_example_files.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_get_settings.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_identify_isotopocules.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_isotopocule_coverage.html</loc></url>

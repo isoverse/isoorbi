@@ -15,7 +15,7 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/quick_start.html">Quick Start</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html#show-me-some-code">Quick Start</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/functionality_guide.html">Functionality Guide</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
@@ -41,12 +41,29 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.5.1" id="isoorbi-151">isoorbi 1.5.1<a class="anchor" aria-label="anchor" href="#isoorbi-151"></a></h2>
+<p>This is a minor update to enhance usability.</p>
 <div class="section level3">
-<h3 id="breaking-changes-1-5-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-5-1"></a></h3>
+<h3 id="enhancements-1-5-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-5-1"></a></h3>
+<ul><li>show panel lables in spectral plots, i.e. M+1, M+2, etc. (<a href="https://github.com/isoverse/isoorbi/issues/93" class="external-link">#93</a>)</li>
+<li>align x-axes in spectral plots (<a href="https://github.com/isoverse/isoorbi/issues/98" class="external-link">#98</a>)</li>
+<li>introduce default_tolerance and default_charge parameters for <code>orbi_identify_isotopocules</code> (<a href="https://github.com/isoverse/isoorbi/issues/95" class="external-link">#95</a>)</li>
+<li>automatically calculate ions during <code>orbi_identify_isotopocules</code>
+</li>
+<li>provide a stastic of ion counts identified when running <code>orbi_identify_isotopocules</code> (<a href="https://github.com/isoverse/isoorbi/issues/94" class="external-link">#94</a>)</li>
+<li>provide more informative error when <code>orbi_read_raw</code> fails because the raw file is still being acquired</li>
+<li>provide <code>orbi_get_example_files</code> function as a one-point stop to get both system package test files as well as downloadable test files</li>
+<li>
+<code>orbi_find_raw</code> now finds both .raw and .RAW extensions (i.e. no longer case-sensitive)</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.5.0" id="isoorbi-150">isoorbi 1.5.0<a class="anchor" aria-label="anchor" href="#isoorbi-150"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-1-5-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-5-0"></a></h3>
 <p>There are no breaking changes in this release (all changes and new features are backwards compatible).</p>
 </div>
 <div class="section level3">
-<h3 id="new-features-1-5-1">New features<a class="anchor" aria-label="anchor" href="#new-features-1-5-1"></a></h3>
+<h3 id="new-features-1-5-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-5-0"></a></h3>
 <ul><li>implemented an optimized and expanded raw file reader (isoraw) that is packaged with isoorbi and is used in <code><a href="../reference/orbi_read_raw.html">orbi_read_raw()</a></code>
 </li>
 <li>implemented versatile isotopocule mapping via <code>orbi_identifiy_isotopocule()</code> from csv, tsv, and excel inputs</li>
@@ -54,14 +71,14 @@
 <li>implemented <code><a href="../reference/orbi_plot_spectra.html">orbi_plot_spectra()</a></code> to plot</li>
 </ul></div>
 <div class="section level3">
-<h3 id="enhancements-1-5-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-5-1"></a></h3>
+<h3 id="enhancements-1-5-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-5-0"></a></h3>
 <ul><li>upgraded all data processing and plotting functions to be compatible with both isox and raw file datasets</li>
 <li>improved default print outputs for S3 classes used in the package</li>
 <li>improved package structure documentation</li>
 <li>expanded <code><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers()</a></code> functionality (contributed by Florian Rubach)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-1-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-5-1"></a></h3>
+<h3 id="bug-fixes-1-5-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-5-0"></a></h3>
 <ul><li>fixed incompatibility with ggplot2 version 4.0.0 (<a href="https://github.com/isoverse/isoorbi/issues/69" class="external-link">#69</a>)</li>
 </ul></div>
 </div>
