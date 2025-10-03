@@ -91,24 +91,28 @@
 <span>  <span class="fu"><a href="../reference/orbi_get_example_files.html">orbi_get_example_files</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span>include_spectra <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[267ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">ac5.RAW</span> from cache, included the <span style="color: #00BB00;">spectrum</span> from 1
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[272ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">ac5.RAW</span> from cache, included the <span style="color: #00BB00;">spectrum</span> from 1
 <span style="color: #00BB00;">scan</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[97ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">ac6.RAW</span> from cache, included the <span style="color: #00BB00;">spectrum</span> from 1
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[100ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">ac6.RAW</span> from cache, included the <span style="color: #00BB00;">spectrum</span> from 1
 <span style="color: #00BB00;">scan</span>
 </code></pre>
 <pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[76ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">s3744.RAW</span> from cache, included the <span style="color: #00BB00;">spectrum</span> from
 1 <span style="color: #00BB00;">scan</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[568ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 3 files
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[576ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 3 files
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[850ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (3), <span style="color: #0000BB;">scans</span> (16.63k), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[861ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (3), <span style="color: #0000BB;">scans</span> (16.63k), <span style="color: #0000BB;">peaks</span>
 (514.98k), and <span style="color: #0000BB;">spectra</span> (1.98k) from 3 files using the <span style="font-weight: bold; font-style: italic;">standard</span> aggregator
 </code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># quick glance at the spectra (m/z range 96 to 102)</span></span>
 <span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_spectra.html">orbi_plot_spectra</a></span><span class="op">(</span><span class="fl">96</span>, <span class="fl">102</span><span class="op">)</span></span></code></pre></div>
-<p><img src="flow_injection_files/figure-html/fig-spectra-1.png" width="960"></p>
+<div class="figure">
+<img src="flow_injection_files/figure-html/fig-spectra-1.png" alt="One spectrum from each file with the M+x regions highlighted." width="1152"><p class="caption">
+One spectrum from each file with the M+x regions highlighted.
+</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="identify-isotopocules">Identify isotopocules<a class="anchor" aria-label="anchor" href="#identify-isotopocules"></a>
@@ -135,7 +139,7 @@
 <span>  <span class="co"># check for minor peaks that are in the same mass tolerance</span></span>
 <span>  <span class="co"># window of an isotopocule </span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #BBBB00;">!</span> <span style="color: #B2B2B2;">[3.5s]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 84.85k/514.98k peaks (16%)
+<pre class="fansi fansi-message"><code><span style="color: #BBBB00;">!</span> <span style="color: #B2B2B2;">[3.6s]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 84.85k/514.98k peaks (16%)
 representing 94% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>,
 <span style="color: #00BB00;">34S</span>, <span style="color: #00BB00;">18O</span>, <span style="color: #00BB00;">36S</span>, <span style="color: #00BB00;">33S18O</span>, <span style="color: #00BB00;">34S17O</span>, and <span style="color: #00BB00;">18O18O</span> using the <span style="color: #00BB00;">default_tolerance</span> of 1
 mmu but encountered <span style="color: #BBBB00;">1 warning</span>
@@ -143,7 +147,7 @@ mmu but encountered <span style="color: #BBBB00;">1 warning</span>
   missing from some scans (64.84k missing peaks in total) - make sure to
   evaluate coverage with e.g. <span style="font-weight: bold;">orbi_plot_isotopocule_coverage()</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[14ms]</span> <span style="font-weight: bold;">orbi_filter_isotopocules()</span> removed 430.13k / 579.82k peaks (74%)
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[15ms]</span> <span style="font-weight: bold;">orbi_filter_isotopocules()</span> removed 430.13k / 579.82k peaks (74%)
 because they were <span style="color: #BBBB00;">unidentified</span> peaks (430.13k). Remaining isotopocules: <span style="color: #00BB00;">M0</span>,
 <span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, <span style="color: #00BB00;">18O</span>, <span style="color: #00BB00;">34S17O</span>, <span style="color: #00BB00;">33S18O</span>, <span style="color: #00BB00;">36S</span>, and <span style="color: #00BB00;">18O18O</span>.
 </code></pre>
@@ -152,11 +156,19 @@ because they were <span style="color: #BBBB00;">unidentified</span> peaks (430.1
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot again now with the isotopocules identified</span></span>
 <span><span class="va">raw_files_w_isotopocules</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_spectra.html">orbi_plot_spectra</a></span><span class="op">(</span><span class="fl">96</span>, <span class="fl">102</span><span class="op">)</span></span></code></pre></div>
-<p><img src="flow_injection_files/figure-html/fig-spectra-w-isotopocules-1.png" width="960"></p>
+<div class="figure">
+<img src="flow_injection_files/figure-html/fig-spectra-w-isotopocules-1.png" alt="Spectra with identified isotopocules (missing ones highlighted in pink)." width="1152"><p class="caption">
+Spectra with identified isotopocules (missing ones highlighted in pink).
+</p>
+</div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># check coverage (as suggested during isotopocule identifiation)</span></span>
 <span><span class="va">raw_files_w_isotopocules</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_isotopocule_coverage.html">orbi_plot_isotopocule_coverage</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="flow_injection_files/figure-html/fig-coverage-1.png" width="576"></p>
+<div class="figure">
+<img src="flow_injection_files/figure-html/fig-coverage-1.png" alt="isotopocule coverage in each file across the scans." width="768"><p class="caption">
+isotopocule coverage in each file across the scans.
+</p>
+</div>
 </div>
 </div>
 <div class="section level2">
@@ -188,7 +200,7 @@ isotopocule <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00
 isotopocules: all are detected in at least 99% of scans in each of the 15 data
 groups (based on <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">compound</span>, and <span style="color: #00BB00;">isotopocule</span>)
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[26ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> flagged 44/16632 scans (0.26%) as <span style="color: #BBBB00;">outliers</span> based
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[27ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> flagged 44/16632 scans (0.26%) as <span style="color: #BBBB00;">outliers</span> based
 on <span style="color: #00BB00;">2 fold AGC cutoff</span>, i.e. based on <span style="font-style: italic;">scans below 1/2 and above 2 times the</span>
 <span style="font-style: italic;">average number of ions </span><span style="color: #00BB00; font-style: italic;">tic</span><span style="font-style: italic;"> * </span><span style="color: #00BB00; font-style: italic;">it.ms</span><span style="font-style: italic;"> in the Orbitrap analyzer</span>, in 3 data groups
 (based on <span style="color: #00BB00;">uidx</span>) → use <span style="font-weight: bold;">orbi_plot_raw_data(y = tic * it.ms)</span> to visualize them
@@ -198,19 +210,19 @@ on <span style="color: #00BB00;">2 fold AGC cutoff</span>, i.e. based on <span s
 </code></pre>
 <p>Let’s take a look at the AGC cutoff flagged samples</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># and in terms of the ions</span></span>
-<span><span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span><span class="va">data</span>, y <span class="op">=</span> <span class="va">ions.incremental</span>, y_scale <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># in terms of scans</span></span>
+<span><span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span><span class="va">data</span>, y <span class="op">=</span> <span class="va">tic</span> <span class="op">*</span> <span class="va">it.ms</span>, y_scale <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="flow_injection_files/figure-html/fig-raw-data-tic-it.ms-1.png" alt="Ions in analyzer" width="576"><p class="caption">
-Ions in analyzer
+<img src="flow_injection_files/figure-html/fig-raw-data-tic-it.ms-1.png" alt="Estimated ions in the analyzer" width="768"><p class="caption">
+Estimated ions in the analyzer
 </p>
 </div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># and in terms of the ions</span></span>
 <span><span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span><span class="va">data</span>, y <span class="op">=</span> <span class="va">ions.incremental</span>, y_scale <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="flow_injection_files/figure-html/fig-raw-data-ions-1.png" alt="Ions of the isotopocules" width="576"><p class="caption">
-Ions of the isotopocules
+<img src="flow_injection_files/figure-html/fig-raw-data-ions-1.png" alt="Isotopocules ions" width="768"><p class="caption">
+Isotopocules ions
 </p>
 </div>
 <p>Seems like the issue is mostly towards the end of the s3744 analysis.
@@ -218,7 +230,7 @@ What about the resulting ratios?</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span> </span></code></pre></div>
 <div class="figure">
-<img src="flow_injection_files/figure-html/fig-ratios-1.png" alt="Isotopocule ratios vs M0" width="576"><p class="caption">
+<img src="flow_injection_files/figure-html/fig-ratios-1.png" alt="Isotopocule ratios vs M0" width="768"><p class="caption">
 Isotopocule ratios vs M0
 </p>
 </div>
@@ -234,7 +246,7 @@ included in the summary calculation of the resulting ratios.</p>
 <span><span class="va">data_summary</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_summarize_results.html">orbi_summarize_results</a></span><span class="op">(</span>ratio_method <span class="op">=</span> <span class="st">"sum"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[91ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 66.33k peak (<span style="font-style: italic;">excluding</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[90ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 66.33k peak (<span style="font-style: italic;">excluding</span>
 68 flagged peaks; <span style="font-style: italic;">excluding</span> 0 unused peaks) using the <span style="font-weight: bold; font-style: italic;">sum</span> method and grouping
 the data by <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">basepeak</span>, and <span style="color: #00BB00;">isotopocule</span>
 </code></pre>
@@ -242,7 +254,7 @@ the data by <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB
 <code class="sourceCode R"><span><span class="co"># data</span></span>
 <span><span class="va">data_summary</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>summary <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compound"</span>, <span class="st">"isotopocule"</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"ratio"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[9ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 12 records from the combination of <span style="color: #0000BB;">file_info</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[10ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 12 records from the combination of <span style="color: #0000BB;">file_info</span>
 (3) and <span style="color: #0000BB;">summary</span> (12) via <span style="color: #00BB00;">uidx</span>
 </code></pre>
 <pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 12 × 7</span>
@@ -268,7 +280,7 @@ the data by <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB
 <span>  file <span class="op">=</span> <span class="st">"output.xlsx"</span>,</span>
 <span>  include <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file_info"</span>, <span class="st">"summary"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[410ms]</span> <span style="font-weight: bold;">orbi_export_data_to_excel()</span> exported the <span style="color: #00BB00;">dataset</span> (3 rows of <span style="color: #00BB00;">file_info</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[417ms]</span> <span style="font-weight: bold;">orbi_export_data_to_excel()</span> exported the <span style="color: #00BB00;">dataset</span> (3 rows of <span style="color: #00BB00;">file_info</span>
 and 12 rows of <span style="color: #00BB00;">summary</span>) to <span style="color: #0000BB;">output.xlsx</span>
 </code></pre>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -285,7 +297,7 @@ and 12 rows of <span style="color: #00BB00;">summary</span>) to <span style="col
 <span>    y <span class="op">=</span> <span class="va">ratio</span>, ymin <span class="op">=</span> <span class="va">ratio</span> <span class="op">-</span> <span class="va">ratio_sem</span>, ymax <span class="op">=</span> <span class="va">ratio</span> <span class="op">+</span> <span class="va">ratio_sem</span>,</span>
 <span>    color <span class="op">=</span> <span class="va">filename</span>, shape <span class="op">=</span> <span class="va">filename</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Dark2"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/pretty_breaks.html" class="external-link">pretty_breaks</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">panel</span> <span class="op">~</span> <span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span>, switch <span class="op">=</span> <span class="st">"y"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -305,7 +317,7 @@ and 12 rows of <span style="color: #00BB00;">summary</span>) to <span style="col
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fig</span></span></code></pre></div>
 <div class="figure">
-<img src="flow_injection_files/figure-html/fig-ratios-summary-1.png" alt="Isotopocule ratios summary" width="576"><p class="caption">
+<img src="flow_injection_files/figure-html/fig-ratios-summary-1.png" alt="Isotopocule ratios summary" width="768"><p class="caption">
 Isotopocule ratios summary
 </p>
 </div>
