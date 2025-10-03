@@ -21,8 +21,7 @@ orbi_identify_isotopocules <- function(
   aggregated_data,
   isotopocules,
   default_tolerance = 1,
-  default_charge = 1,
-  calculate_ions = TRUE
+  default_charge = 1
 ) {
   # current env
   root_env <- current_env()
