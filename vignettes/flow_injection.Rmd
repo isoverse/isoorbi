@@ -32,8 +32,9 @@ library(ggplot2) # for data visualization
 
 ```{r}
 #| label: fig-spectra
-#| fig-width: 10
-#| fig-height: 8
+#| fig-cap: One spectrum from each file with the M+x regions highlighted.
+#| fig-width: 12
+#| fig-height: 7
 # read raw files including 1 spectrum
 raw_files <-
   c("ac5.RAW", "ac6.RAW", "s3744.RAW") |>
@@ -49,8 +50,9 @@ raw_files |> orbi_plot_spectra(96, 102)
 
 ```{r}
 #| label: fig-spectra-w-isotopocules
-#| fig-width: 10
-#| fig-height: 8
+#| fig-cap: Spectra with identified isotopocules (missing ones highlighted in pink).
+#| fig-width: 12
+#| fig-height: 7
 # identify sulfate isotopocules
 # could come from a tsv, csv, or xlsx spreadsheet instead
 isotopocules <- tibble(
@@ -79,8 +81,9 @@ raw_files_w_isotopocules |> orbi_plot_spectra(96, 102)
 
 ```{r}
 #| label: fig-coverage
-#| fig-width: 6
-#| fig-height: 9
+#| fig-cap: isotopocule coverage in each file across the scans.
+#| fig-width: 8
+#| fig-height: 7
 
 # check coverage (as suggested during isotopocule identifiation)
 raw_files_w_isotopocules |> orbi_plot_isotopocule_coverage()
@@ -110,18 +113,18 @@ Let's take a look at the AGC cutoff flagged samples
 
 ```{r}
 #| label: fig-raw-data-tic-it.ms
-#| fig-cap: Ions in analyzer
-#| fig-width: 6
+#| fig-cap: Estimated ions in the analyzer
+#| fig-width: 8
 #| fig-height: 4
 #| warning: false
-# and in terms of the ions
-orbi_plot_raw_data(data, y = ions.incremental, y_scale = "log")
+# in terms of scans
+orbi_plot_raw_data(data, y = tic * it.ms, y_scale = "log")
 ```
 
 ```{r}
 #| label: fig-raw-data-ions
-#| fig-cap: Ions of the isotopocules
-#| fig-width: 6
+#| fig-cap: Isotopocules ions
+#| fig-width: 8
 #| fig-height: 4
 #| warning: false
 # and in terms of the ions
@@ -133,7 +136,7 @@ Seems like the issue is mostly towards the end of the s3744 analysis. What about
 ```{r}
 #| label: fig-ratios
 #| fig-cap: Isotopocule ratios vs M0
-#| fig-width: 6
+#| fig-width: 8
 #| fig-height: 4
 #| warning: false
 data |> orbi_plot_raw_data(y = ratio) 
@@ -168,7 +171,7 @@ unlink("output.xlsx")
 ```{r}
 #| label: fig-ratios-summary
 #| fig-cap: Isotopocule ratios summary
-#| fig-width: 6
+#| fig-width: 8
 #| fig-height: 6
 
 fig <- 
@@ -184,7 +187,7 @@ fig <-
     y = ratio, ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
     color = filename, shape = filename
   ) +
-  geom_pointrange() +
+  geom_pointrange(size = 1) +
   scale_color_brewer(palette = "Dark2") +
   scale_y_continuous(breaks = scales::pretty_breaks(5)) +
   facet_grid(panel ~ ., scales = "free_y", switch = "y") +
