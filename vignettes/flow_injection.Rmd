@@ -28,52 +28,107 @@ library(ggplot2) # for data visualization
 
 # Data
 
-## Load data
+## Load raw file(s)
 
 ```{r}
-# load and process data
+#| label: fig-spectra
+#| fig-width: 10
+#| fig-height: 8
+# read raw files including 1 spectrum
+raw_files <-
+  c("ac5.RAW", "ac6.RAW", "s3744.RAW") |>
+  orbi_get_example_files() |>
+  orbi_read_raw(include_spectra = 100) |>
+  orbi_aggregate_raw()
+
+# quick glance at the spectra (m/z range 96 to 102)
+raw_files |> orbi_plot_spectra(96, 102)
+```
+
+## Identify isotopocules
+
+```{r}
+#| label: fig-spectra-w-isotopocules
+#| fig-width: 10
+#| fig-height: 8
+# identify sulfate isotopocules
+# could come from a tsv, csv, or xlsx spreadsheet instead
+isotopocules <- tibble(
+  compound = "HSO4-",
+  isotopocule = c(
+    "M0", "33S", "17O", "34S", "18O", 
+    # also look for a few clumped isotopocules
+    "33S18O", "34S17O", "36S", "18O18O"),
+  mass = c(
+    96.96000, 97.95940, 97.96420, 98.95580, 98.96430, 
+    99.9632, 99.9590, 100.9551, 100.968046)
+)
+
+# identify
+raw_files_w_isotopocules <- raw_files |>
+  orbi_identify_isotopocules(isotopocules) |>
+  # disregard unidentified isotopocules but keep missing
+  orbi_filter_isotopocules(keep_missing = TRUE) |>
+  # check for minor peaks that are in the same mass tolerance
+  # window of an isotopocule 
+  orbi_flag_satellite_peaks()
+
+# plot again now with the isotopocules identified
+raw_files_w_isotopocules |> orbi_plot_spectra(96, 102)
+```
+
+```{r}
+#| label: fig-coverage
+#| fig-width: 6
+#| fig-height: 9
+
+# check coverage (as suggested during isotopocule identifiation)
+raw_files_w_isotopocules |> orbi_plot_isotopocule_coverage()
+```
+
+# Processing
+
+It's clear from the plots above that we don't have good coverage for the clumped isotopocules and 36S (i.e. they are missing from some/many scans). We won't work with these further anyways but it's a good visual example of how much harder these are to detect.
+
+```{r}
+# Preprocess data (this is exactly the same as with an isox file)
 data <- 
-  # load file included in isoorbi package
-  system.file(package = "isoorbi", "extdata", "testfile_flow.isox") |>
-  orbi_read_isox() |>
-  orbi_simplify_isox() |>
-  # define data block where signal is stable (plateau)
-  orbi_define_block_for_flow_injection(start_time.min = 0.1, end_time.min = 0.9) |>
-  # flag extreme TICxIT values
-  orbi_flag_outliers(agc_fold_cutoff = 2)
+  raw_files_w_isotopocules |>
+  # focus on the main single substitutions
+  orbi_filter_isotopocules(c("M0", "33S", "17O", "34S", "18O")) |>
+  # double check the remainng isotopcoules
+  orbi_flag_weak_isotopocules(min_percent = 99) |> 
+  # flags outlying scans that have more than 2 times or less than
+  # 1/2 times the average number of ions in the Orbitrap analyzer
+  orbi_flag_outliers(agc_fold_cutoff = 2) |>
+  # sets one isotopocule in the dataset as the base peak
+  # (denominator) for ratio calculation
+  orbi_define_basepeak(basepeak_def = "M0") 
 ```
 
-# Calculations
-
-## Ratios
+Let's take a look at the AGC cutoff flagged samples
 
 ```{r}
-# basepeak & ratios
-data_w_basepeak <- 
-  data |>
-  orbi_define_basepeak("M0")
-
-# ratio summaries
-data_summary <- 
-  data_w_basepeak |>
-  orbi_summarize_results(ratio_method = "sum")
-
-```
-
-# Figures
-
-## Visualize data
-
-```{r}
-#| label: fig-raw-data
-#| fig-cap: Ions of isotopocules in time
+#| label: fig-raw-data-tic-it.ms
+#| fig-cap: Ions in analyzer
 #| fig-width: 6
 #| fig-height: 4
 #| warning: false
+# and in terms of the ions
 orbi_plot_raw_data(data, y = ions.incremental, y_scale = "log")
 ```
 
-## Raw ratios
+```{r}
+#| label: fig-raw-data-ions
+#| fig-cap: Ions of the isotopocules
+#| fig-width: 6
+#| fig-height: 4
+#| warning: false
+# and in terms of the ions
+orbi_plot_raw_data(data, y = ions.incremental, y_scale = "log")
+```
+
+Seems like the issue is mostly towards the end of the s3744 analysis. What about the resulting ratios?
 
 ```{r}
 #| label: fig-ratios
@@ -81,20 +136,47 @@ orbi_plot_raw_data(data, y = ions.incremental, y_scale = "log")
 #| fig-width: 6
 #| fig-height: 4
 #| warning: false
-data_w_basepeak |> orbi_plot_raw_data(y = ratio) 
+data |> orbi_plot_raw_data(y = ratio) 
 ```
 
-## Ratios for 18O
+The ratios suggest that there really is an issue at the end of the s3744 run. Having flagged these outliers, they will automatically not be included in the summary calculation of the resulting ratios.
+
+# Summary
 
 ```{r}
-#| label: fig-ratios-18O
-#| fig-cap: Isotopocule ratios 18O vs M0
+# summarize the ratio summaries
+data_summary <- 
+  data |>
+  orbi_summarize_results(ratio_method = "sum")
+
+# data
+data_summary |>
+  orbi_get_data(summary = c("compound", "isotopocule", starts_with("ratio")))
+
+# export file info and summary to excel
+data_summary |> orbi_export_data_to_excel(
+  file = "output.xlsx",
+  include = c("file_info", "summary")
+)
+```
+
+```{r}
+#| include: false
+unlink("output.xlsx")
+```
+
+```{r}
+#| label: fig-ratios-summary
+#| fig-cap: Isotopocule ratios summary
 #| fig-width: 6
-#| fig-height: 4
+#| fig-height: 6
 
 fig <- 
   data_summary |>
-  filter(isotopocule == "18O") |>
+  # get out all summary data
+  orbi_get_data(summary = everything()) |>
+  # generate a custom label for the data panels
+  mutate(panel = glue::glue("ratio\n{isotopocule} / {basepeak}")) |>
   # plot
   ggplot() +
   aes(
@@ -104,15 +186,17 @@ fig <-
   ) +
   geom_pointrange() +
   scale_color_brewer(palette = "Dark2") +
-  # theme definitions
+  scale_y_continuous(breaks = scales::pretty_breaks(5)) +
+  facet_grid(panel ~ ., scales = "free_y", switch = "y") +
+  # styling
   theme_bw() +
   theme(
     text = element_text(size = 16),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    strip.text.y.left = element_text(angle = 0),
+    strip.placement = "outside",
+    strip.background = element_blank()
   ) +
-  # labels
-  labs(
-    y = expression("ratio ("^18*O/M0*")")
-  )
+  labs(y = NULL, x = NULL)
 fig
 ```
