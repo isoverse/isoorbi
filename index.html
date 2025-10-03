@@ -154,8 +154,11 @@
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># print results</span></span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>results <span class="sc">|&gt;</span>  <span class="fu">orbi_get_data</span>(<span class="at">summary =</span> <span class="fu">c</span>(<span class="st">"isotopocule"</span>, <span class="st">"ratio"</span>, <span class="st">"ratio_sem"</span>))</span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># export data &amp; results to excel</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>results <span class="sc">|&gt;</span> <span class="fu">orbi_export_data_to_excel</span>(<span class="at">file =</span> <span class="st">"data_summary.xlsx"</span>)</span></code></pre></div>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># export results to excel</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>results <span class="sc">|&gt;</span> <span class="fu">orbi_export_data_to_excel</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"data_summary.xlsx"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="at">include =</span> <span class="fu">c</span>(<span class="st">"file_info"</span>, <span class="st">"summary"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>)</span></code></pre></div>
 <pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 3 × 5</span>
    uidx filename             isotopocule   ratio ratio_sem
   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>
