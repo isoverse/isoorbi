@@ -73,10 +73,10 @@ test_that("orbi_read_isox()", {
             "testfile_flow.isox"
           )) |>
           orbi_read_isox()
-
-        # check result
-        expect_equal(nrow(df2), 11633)
       })
+
+      # check result
+      expect_equal(nrow(df2), 11633)
     }
   ) |>
     withr::with_options(new = list(show_exec_times = FALSE))
