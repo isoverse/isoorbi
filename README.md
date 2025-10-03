@@ -17,7 +17,7 @@ coverage](https://codecov.io/gh/isoverse/isoorbi/graph/badge.svg)](https://app.c
 The goal of the isoorbi R package is to help you process isotopocule
 measurements from an **Orbitrap Isotope Solutions** mass spectrometer.
 It can read both the <code>.raw</code> files (recommended approach) as
-well as <code>.isox</code> output created by IsoX(legacy approach).
+well as <code>.isox</code> output created by IsoX (legacy approach).
 
 ## Installation
 
