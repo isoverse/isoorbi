@@ -62,9 +62,9 @@ my_data_folder <- file.path("project", "data")
 # and search for raw files in that folder
 file_paths <- orbi_find_raw(my_data_folder)
 
-# for this example, we use a small test file bundled with the package
-# instead (remove this line if working with your own data)
-file_paths <- system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
+# for this example, we use a small raw test file bundled with the
+# package instead (remove this line if working with your own data)
+file_paths <- orbi_get_example_files("nitrate_test_10scans.raw")
 
 # read the raw file incluing 2 of the raw spectra
 raw_files <- file_paths |>
@@ -77,8 +77,7 @@ raw_files |> orbi_plot_spectra()
 
 ```{r "read-raw", messages = FALSE, echo = FALSE, fig.width = 8, fig.height = 4}
 library(isoorbi)
-file_paths <- 
-  system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
+file_paths <- orbi_get_example_files("nitrate_test_10scans.raw")
 raw_files <- file_paths |>
     orbi_read_raw(include_spectra = c(1, 10)) |>
     orbi_aggregate_raw()
@@ -145,7 +144,7 @@ if (params$generating_pkgdown_index) {
   readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
 } else {
   # if we're making README.md
-  cat("[![](man/figures/figure_flowchart.svg)](https://isoorbi.isoverse.org)")
+  cat("[![](man/figures/figure_flowchart.svg)](https://isoorbi.isoverse.org/#package-structure)")
 }
 ```
 
