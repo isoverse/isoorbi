@@ -1,3 +1,11 @@
+# isoorbi 1.5.2
+
+This is a minor update to decrease package size for CRAN. 
+
+## Enhancements
+
+ * added `orbi_get_example_files()` that can download additional example files to provide easier access to test files for users
+
 # isoorbi 1.5.1
 
 This is a minor update to enhance usability.
