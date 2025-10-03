@@ -28,8 +28,8 @@ You can install the current CRAN version of `isoorbi` with:
 To use the latest updates, you can install the development version of
 `isoorbi` from [GitHub](https://github.com/) with:
 
-    if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
-    pak::pak("isoverse/isoorbi")
+    if(!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
+    devtools::install_github("isoverse/isoorbi")
 
 > Important: as of isoorbi version 1.5.0, it is possible to read .raw
 > files directly using the [isoraw
@@ -77,7 +77,8 @@ To use the latest updates, you can install the development version of
     # identify isotopcules
     # these could also come from a data frame or a tsv/csv/excel file
     raw_files <- raw_files |> orbi_identify_isotopocules(
-      isotopocules = c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
+      isotopocules = 
+        c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
     )
 
     # plot again, now with the isotopocules identified
