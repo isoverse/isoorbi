@@ -1,10 +1,10 @@
 
-testfile_dual_inlet_new.isox
-- data collected on Boulder Isoorbi on 18-May-2023 (ESI-OT Exploris 240 Isotope Solutions)
-- NO3- with M0 data, 10 microscans
-- "dual inlet": 7 blocks, 10min each, 5min at beginning added for stabilization of spray
-- 80% of data (4 out of 5 scans) were removed to keep file size small for CRAN upload
+# RAW file information
 
+Any raw files and cached raw files larger than 1 MB have been moved to https://github.com/isoverse/isodata to ensure small package sizes for CRAN.
+
+
+# ISOX file information
 
 testfile_dual_inlet.isox
 - measured on January 25th 2022 by Kristýna Kantnerová on Q Exactive HF

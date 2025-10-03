@@ -312,11 +312,7 @@ test_that("orbi_calculate_summarized_ratio()", {
 
 # orbi_calculate_ratios
 test_that("orbi_calculate_ratios()", {
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     suppressMessages()
   df_results <-
     df |>
@@ -348,11 +344,7 @@ test_that("orbi_calculate_ratios()", {
 
 test_that("orbi_summarize_results()", {
   # test data
-  df <- orbi_read_isox(system.file(
-    "extdata",
-    "testfile_dual_inlet.isox",
-    package = "isoorbi"
-  )) |>
+  df <- orbi_read_isox(orbi_get_example_files("testfile_dual_inlet.isox")) |>
     orbi_simplify_isox() |>
     orbi_define_basepeak(basepeak_def = "15N") |>
     suppressMessages()
