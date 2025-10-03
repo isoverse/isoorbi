@@ -50,9 +50,7 @@ isotopocules <- tibble(
 data_all <- data_all |>
   orbi_identify_isotopocules(isotopocules) |>
   # disregard unidentified and missing isotopocules
-  orbi_filter_isotopocules() |>
-  # calculate ions
-  orbi_calculate_ions()
+  orbi_filter_isotopocules()
 ```
 
 # Show spectrum

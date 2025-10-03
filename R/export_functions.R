@@ -2,7 +2,7 @@
 #' @description This functions exports the `dataset` into an Excel file. If the `dataset` is aggregated data, use the `include` parameter to decide which part of the data to export.
 #' @inheritParams orbi_flag_satellite_peaks
 #' @inheritParams orbi_aggregate_raw
-#' @param file file path to export the file
+#' @param file file path to export the file - recursively creates the directory if non-existent
 #' @param dbl_digits how many digits to show for dbls (all are exported)
 #' @param int_format the excel formatting style for integers
 #' @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
@@ -34,6 +34,12 @@ orbi_export_data_to_excel <- function(
     "must be a filepath"
   )
   check_arg(include, is_character(include), "must be a character vector")
+
+  # Check if output path exists
+  output_dir <- dirname(file)
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+  }
 
   # info
   start <- start_info("is writing {.field {pb_status}} | {pb_elapsed}")

@@ -327,6 +327,38 @@ run_isoraw <- function(
     )
   }
 
+  # check for warnings
+  warnings <- output[grepl("warning", output, ignore.case = TRUE)]
+  if (length(warnings) > 0) {
+    # still being aquired
+    if (any(grepl("RAW file is still being aquired", warnings, fixed = TRUE))) {
+      cli_abort(
+        c(
+          "trying to read a RAW file that is still being acquired - raw files in acquisition have a different format that is not yet supported",
+          if (!is.null(logfile)) {
+            c(
+              "i" = "see {.file {gsub(getwd(), '.', logfile, fixed = TRUE)}} for details"
+            )
+          }
+        )
+      )
+    }
+
+    # other wranings
+    cli_warn(
+      c(
+        "encountered {length(warnings)} warning{?s} when running the isoraw raw file reader",
+        if (!is.null(logfile)) {
+          c(
+            # --> cache folders ARE cleaned up if there are erorrs
+            "i" = "see {.file {gsub(getwd(), '.', logfile, fixed = TRUE)}} for details (you might have to unzip the cache.zip first)"
+          )
+        },
+        warnings |> set_names("!")
+      )
+    )
+  }
+
   # check for errors
   errors <- output[grepl("error", output, ignore.case = TRUE)]
   if (length(errors) > 0) {
@@ -341,21 +373,6 @@ run_isoraw <- function(
           )
         },
         errors |> set_names("x")
-      )
-    )
-  }
-  warnings <- output[grepl("warning", output, ignore.case = TRUE)]
-  if (length(warnings) > 0) {
-    cli_warn(
-      c(
-        "encountered {length(warnings)} warnings{?s} when running the isoraw raw file reader",
-        if (!is.null(logfile)) {
-          c(
-            # --> cache folders ARE cleaned up if there are erorrs
-            "i" = "see {.file {gsub(getwd(), '.', logfile, fixed = TRUE)}} for details (you might have to unzip the cache.zip first)"
-          )
-        },
-        warnings |> set_names("!")
       )
     )
   }

@@ -26,9 +26,13 @@ test_that("orbi_identify_isotopocules()", {
   orbi_identify_isotopocules(42) |>
     expect_error("must be.*aggregated raw files.*or.*peaks")
   orbi_identify_isotopocules(tibble()) |>
-    expect_error("must be.*csv.*tsv.*xlsx.*or.*isotopocules")
+    expect_error(
+      "must be.*csv.*tsv.*xlsx.*data frame.*isotopocules.*.or.*named vector"
+    )
   orbi_identify_isotopocules(tibble(), 42) |>
-    expect_error("must be.*csv.*tsv.*xlsx.*or.*isotopocules")
+    expect_error(
+      "must be.*csv.*tsv.*xlsx.*data frame.*isotopocules.*.or.*named vector"
+    )
   test_xlsx <- file.path(tempdir(), "test.xlsx")
   cat("DNE", file = test_xlsx)
   orbi_identify_isotopocules(tibble(), test_xlsx) |>
@@ -41,13 +45,6 @@ test_that("orbi_identify_isotopocules()", {
     expect_error("could not identify.*isotopocule")
   orbi_identify_isotopocules(tibble(), tibble(isotopocule = 1)) |>
     expect_error("could not identify.*mz")
-  orbi_identify_isotopocules(tibble(), tibble(isotopologue = 1, mass = 1)) |>
-    expect_error("could not identify.*tolerance")
-  orbi_identify_isotopocules(
-    tibble(),
-    tibble(isotopolog = 1, Mass = 1, `Tolerance [mmu]` = 1)
-  ) |>
-    expect_error("could not identify.*charge")
 
   # missing columns in peaks
   orbi_identify_isotopocules(tibble(), isotopologs) |>
@@ -60,10 +57,26 @@ test_that("orbi_identify_isotopocules()", {
   ) |>
     expect_error("overlapping tolerance")
 
-  # successful return value
+  # success
   test_that_cli("orbi_identify_isotopocules()", configs = c("plain", "fancy"), {
+    # with isotopologs tibble
     expect_snapshot(out <- orbi_identify_isotopocules(peaks, isotopologs))
     expect_snapshot_value(out, style = "json2")
+
+    # with vector
+    expect_snapshot(
+      out2 <- orbi_identify_isotopocules(
+        peaks,
+        isotopologs |> select("isotopolog", "mass") |> tibble::deframe(),
+        default_tolerance = 0.9,
+        default_charge = 2
+      )
+    )
+    expect_equal(out2$charge[1], 2L)
+    expect_equal(
+      out |> select(-"compound", -"charge"),
+      out2 |> dplyr::select(-"charge")
+    )
   })
 
   # test with file based isotopologs

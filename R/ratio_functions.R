@@ -11,7 +11,8 @@
 #' only critical if the number of ions are interpreted outside of ratio calculations (in ratio calculations, these factors cancel).
 #'
 #' If using a dataset read from isox files you might have to add a `charge` column if it does not yet exist that indicates the charge of the isotopocule.
-#' If using data from raw files, use [orbi_identify_isotopocules()] to identify the isotopocules and set their charge values.
+#' If using data from raw files, [orbi_identify_isotopocules()] will automatically call this function with the default `CN` and `RN` so you don't need to
+#' call it explicitly unless you want to change these parameters.
 #'
 #' @inheritParams orbi_flag_satellite_peaks
 #' @param CN noise factor

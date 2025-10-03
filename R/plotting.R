@@ -206,8 +206,8 @@ orbi_plot_spectra <- function(
 
   # any spectra
   if (nrow(aggregated_data$spectra) == 0) {
-    cli_text(
-      "{cli::col_yellow('!')} {.strong Warning}: there are no {.field spectra} in the data, make sure to include them when reading the raw files e.g. with {.strong orbi_read_raw(include_spectra = c(1, 10, 100))}"
+    cli_abort(
+      "there are no {.field spectra} in the data, make sure to include them when reading the raw files e.g. with {.strong orbi_read_raw(include_spectra = c(1, 10, 100))}"
     )
   }
 
@@ -229,6 +229,7 @@ orbi_plot_spectra <- function(
     files <- files[1:max_files]
   }
 
+  # spectra
   spectra <- aggregated_data$spectra |>
     dplyr::filter(.data$scan.no %in% !!scans, .data$uidx %in% !!files)
 
@@ -270,7 +271,7 @@ orbi_plot_spectra <- function(
       dplyr::mutate(
         .by = c("uidx", "scan.no"),
         main_peak = !is.na(.data$intensity) &
-          .data$intensity == max(.data$intensity),
+          .data$intensity == max(.data$intensity, na.rm = TRUE),
         mz_main_peak = .data$mzEffective[.data$main_peak][1]
       ) |>
       # find global main peak (closest to median from all files and scans)
@@ -295,6 +296,7 @@ orbi_plot_spectra <- function(
   }
 
   # determine offset mass windows
+  mz_focus_nominal_offsets <- as.integer(mz_focus_nominal_offsets)
   mz_offset_windows <-
     dplyr::bind_rows(
       dplyr::tibble(
@@ -315,9 +317,7 @@ orbi_plot_spectra <- function(
           )
       }
     ) |>
-    dplyr::filter(
-      .data$mz_nominal_offset %in% as.integer(mz_focus_nominal_offsets)
-    )
+    dplyr::filter(.data$mz_nominal_offset %in% !!mz_focus_nominal_offsets)
 
   if (nrow(mz_offset_windows) == 0) {
     cli_abort(
@@ -328,7 +328,8 @@ orbi_plot_spectra <- function(
   # create plot data frame
   plot_df <- spectra |>
     dplyr::cross_join(mz_offset_windows) |>
-    dplyr::filter(.data$mz >= .data$mz_min, .data$mz <= .data$mz_max)
+    dplyr::filter(.data$mz >= .data$mz_min, .data$mz <= .data$mz_max) |>
+    dplyr::mutate(panel = paste(.data$uidx, .data$mz_nominal_offset))
 
   # start plot
   plot <- plot_df |>
@@ -344,6 +345,29 @@ orbi_plot_spectra <- function(
     plot <- plot + ggplot2::aes(group = factor(.data$scan.no))
   }
 
+  # synchronize x axes vertically
+  x_expand <- 0.1 # 10% expansion
+  x_ranges <- mz_offset_windows |>
+    tidyr::crossing(uidx = files) |>
+    dplyr::mutate(panel = paste(.data$uidx, .data$mz_nominal_offset))
+  plot <- plot +
+    ggplot2::geom_blank(
+      data = x_ranges,
+      map = ggplot2::aes(
+        x = .data$mz_min - x_expand * (.data$mz_max - .data$mz_min),
+        y = 0
+      ),
+      inherit.aes = FALSE
+    ) +
+    ggplot2::geom_blank(
+      data = x_ranges,
+      map = ggplot2::aes(
+        x = .data$mz_max + x_expand * (.data$mz_max - .data$mz_min),
+        y = 0
+      ),
+      inherit.aes = FALSE
+    )
+
   # background coloration for the offset foci
   if (
     show_focus_backgrounds &&
@@ -354,12 +378,18 @@ orbi_plot_spectra <- function(
       dplyr::filter(.data$mz_nominal_offset > 0) |>
       dplyr::mutate(
         fill = background_colors[1:(nrow(mz_offset_windows) - 1)]
-      )
+      ) |>
+      tidyr::crossing(uidx = files) |>
+      dplyr::mutate(panel = paste(.data$uidx, .data$mz_nominal_offset))
 
     plot <- plot +
       # backgrounds in the base peak window
       ggplot2::geom_rect(
-        data = highlights |> dplyr::mutate(mz_nominal_offset = 0L),
+        data = highlights |>
+          dplyr::mutate(
+            mz_nominal_offset = 0L,
+            panel = paste(.data$uidx, .data$mz_nominal_offset)
+          ),
         mapping = ggplot2::aes(
           xmin = .data$mz_min - 0.1,
           xmax = .data$mz_max + 0.1,
@@ -392,7 +422,13 @@ orbi_plot_spectra <- function(
     ggplot2::geom_line() +
     # wrap by windows and file (one file per row)
     ggplot2::facet_wrap(
-      ~ .data$uidx + .data$mz_nominal_offset,
+      ~ .data$panel,
+      labeller = function(x) {
+        # replace offsets with M+x
+        x$panel <- gsub("^(\\d+) (\\d+)$", "\\2", x$panel)
+        x$panel <- ifelse(x$panel == "0", "all", paste0("M+", x$panel))
+        return(x)
+      },
       ncol = nrow(mz_offset_windows),
       scales = "free"
     ) +
@@ -409,18 +445,21 @@ orbi_plot_spectra <- function(
     plot <- plot +
       ggplot2::scale_x_continuous(
         breaks = scales::pretty_breaks(3),
-        expand = c(0, 0.01)
+        expand = c(0, 0)
       )
+  } else {
+    plot <- plot + ggplot2::scale_x_continuous(expand = c(0, 0))
   }
 
   plot <- plot +
     # make the text size a bit smaller as there is a lot going on on these plots
-    orbi_default_theme(text_size = 12) +
-    ggplot2::theme(
-      strip.background = ggplot2::element_blank(),
-      strip.text = ggplot2::element_blank()
-    ) +
-    ggplot2::labs(x = "m/z")
+    orbi_default_theme(text_size = 12, facet_text_size = 16) +
+    ggplot2::labs(x = "m/z", y = "intensity")
+
+  # only showing the spectrum itself?
+  if (identical(mz_focus_nominal_offsets, 0L)) {
+    plot <- plot + ggplot2::theme(strip.text = ggplot2::element_blank())
+  }
 
   # show file names?
   if (show_filenames) {
@@ -429,7 +468,8 @@ orbi_plot_spectra <- function(
         data = aggregated_data$file_info |>
           dplyr::filter(.data$uidx %in% !!files) |>
           dplyr::mutate(
-            mz_nominal_offset = min(mz_offset_windows$mz_nominal_offset)
+            mz_nominal_offset = min(mz_offset_windows$mz_nominal_offset),
+            panel = paste(.data$uidx, .data$mz_nominal_offset)
           ),
         map = ggplot2::aes(label = .data$filename),
         x = -Inf,
@@ -451,6 +491,7 @@ orbi_plot_spectra <- function(
         .data$mzEffective <= .data$mz_max
       ) |>
       dplyr::mutate(
+        panel = paste(.data$uidx, .data$mz_nominal_offset),
         label = dplyr::if_else(
           is.na(.data$isotopocule),
           sprintf("%.4f", .data$mzMeasured),

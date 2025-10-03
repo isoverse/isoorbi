@@ -16,7 +16,7 @@
       > scans (3): uidx, scan.no, tic, it.ms
       > peaks (14): uidx, scan.no, tic (2 NA), it.ms (2 NA), mzMeasured (2 NA),
       intensity (2 NA), compound (1 NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact
-      (1 NA), charge (1 NA), is_satellite_peak
+      (1 NA), charge, is_satellite_peak
 
 ---
 
@@ -113,9 +113,9 @@
           "value": [61.9878, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.9922, 63.9922, "NA"]
         },
         {
-          "type": "double",
+          "type": "integer",
           "attributes": {},
-          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         },
         {
           "type": "logical",
@@ -150,7 +150,7 @@
       → [34mscans[39m (3): [32muidx[39m, [32mscan.no[39m, [32mtic[39m, [32mit.ms[39m
       → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mtic[39m ([33m2 NA[39m), [32mit.ms[39m ([33m2 NA[39m), [32mmzMeasured[39m ([33m2 NA[39m),
       [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1 NA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m
-      ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m), [32mis_satellite_peak[39m
+      ([33m1 NA[39m), [32mcharge[39m, [32mis_satellite_peak[39m
 
 ---
 
@@ -247,9 +247,9 @@
           "value": [61.9878, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.9922, 63.9922, "NA"]
         },
         {
-          "type": "double",
+          "type": "integer",
           "attributes": {},
-          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         },
         {
           "type": "logical",
@@ -286,7 +286,7 @@
       > scans (3): uidx, scan.no, tic, it.ms
       > peaks (14): uidx, scan.no, tic (2 NA), it.ms (2 NA), mzMeasured (2 NA),
       intensity (2 NA), compound (1 NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact
-      (1 NA), charge (1 NA), is_weak_isotopocule
+      (1 NA), charge, is_weak_isotopocule
 
 ---
 
@@ -383,9 +383,9 @@
           "value": [61.9878, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.9922, 63.9922, "NA"]
         },
         {
-          "type": "double",
+          "type": "integer",
           "attributes": {},
-          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         },
         {
           "type": "logical",
@@ -433,7 +433,7 @@
       → [34mscans[39m (3): [32muidx[39m, [32mscan.no[39m, [32mtic[39m, [32mit.ms[39m
       → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mtic[39m ([33m2 NA[39m), [32mit.ms[39m ([33m2 NA[39m), [32mmzMeasured[39m ([33m2 NA[39m),
       [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1 NA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m
-      ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m), [32mis_weak_isotopocule[39m
+      ([33m1 NA[39m), [32mcharge[39m, [32mis_weak_isotopocule[39m
 
 ---
 
@@ -530,9 +530,9 @@
           "value": [61.9878, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.985, 62.9922, 63.9922, 61.9878, 62.985, 62.9922, 63.9922, "NA"]
         },
         {
-          "type": "double",
+          "type": "integer",
           "attributes": {},
-          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "NA"]
+          "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         },
         {
           "type": "logical",
@@ -580,7 +580,7 @@
       > scans (3): uidx, scan.no, tic, it.ms, is_outlier, outlier_type
       > peaks (14): uidx, scan.no, tic (2 NA), it.ms (2 NA), mzMeasured (2 NA),
       intensity (2 NA), compound (1 NA), itc_uidx (1 NA), isotopocule (1 NA), mzExact
-      (1 NA), charge (1 NA)
+      (1 NA), charge
 
 ---
 
@@ -686,7 +686,7 @@
       → [34mscans[39m (3): [32muidx[39m, [32mscan.no[39m, [32mtic[39m, [32mit.ms[39m, [32mis_outlier[39m, [32moutlier_type[39m
       → [34mpeaks[39m (14): [32muidx[39m, [32mscan.no[39m, [32mtic[39m ([33m2 NA[39m), [32mit.ms[39m ([33m2 NA[39m), [32mmzMeasured[39m ([33m2 NA[39m),
       [32mintensity[39m ([33m2 NA[39m), [32mcompound[39m ([33m1 NA[39m), [32mitc_uidx[39m ([33m1 NA[39m), [32misotopocule[39m ([33m1 NA[39m), [32mmzExact[39m
-      ([33m1 NA[39m), [32mcharge[39m ([33m1 NA[39m)
+      ([33m1 NA[39m), [32mcharge[39m
 
 ---
 

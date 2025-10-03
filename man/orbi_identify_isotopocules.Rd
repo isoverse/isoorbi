@@ -4,19 +4,31 @@
 \alias{orbi_identify_isotopocules}
 \title{Identify isotopocules}
 \usage{
-orbi_identify_isotopocules(aggregated_data, isotopocules)
+orbi_identify_isotopocules(
+  aggregated_data,
+  isotopocules,
+  default_tolerance = 1,
+  default_charge = 1
+)
 }
 \arguments{
 \item{aggregated_data}{either data aggregated from \code{\link[=orbi_aggregate_raw]{orbi_aggregate_raw()}} or a straight-up tibble data frame of the peaks (e.g. retrieved via \code{orbi_get_data(peaks = everything())}).}
 
-\item{isotopocules}{list of isotopocules to map, can be a data frame/tibble or name of a file to read from (.csv/.tsv/.xlsx are all supported).
-Required columns are \code{isotopocule/isotopolog}, \code{mz/mass}, \code{tolerance/tolerance [mmu]/tolerance [mDa]}, and \code{charge/z} (these alternative names for the columns, including uppercase versions, are recognized automatically).
-Optional column: \verb{#compound/compound} as well as any other columns that don't match these others.
+\item{isotopocules}{list of isotopocules to map, can be a data frame/tibble, a named vector such as \code{c("M0" = 61.9878, "15N" = 62.9850)}, or the name of a file to read from (.csv/.tsv/.xlsx are all supported).
+If provided as a tibble/file, the required columns are \code{isotopocule/isotopolog} and \code{mz/mass} (these alternative names for the columns, including uppercase versions, are recognized automatically).
+In addition, \code{tolerance/tolerance [mmu]/tolerance [mDa]}, \code{charge/z}, \verb{#compound/compound}, and \code{fragment} are recognized, as well as any other (arbitrarily named) columns with additional information.
 Character columns in the \code{isotopocules} table (including \code{isotopocule} and \code{compound}) are turned into factors with levels that preserve the order of isotopocules.
-That means that to change the order of isotopocules in downstream plotting functions, make sure to list them in the order you'd like them presented in.}
+That means that to change the order of isotopocules in downstream plotting functions, make sure to list them in the order you'd like them presented in.
+Note that if \code{tolerance/tolerance [mmu]/tolerance [mDa]} or \code{charge/z} are not provided, the values in the parameters \code{default_tolerance} and \code{default_charge} are used, respectively.}
+
+\item{default_tolerance}{tolerance (in mmu) to be used for isotopocule identification if a \code{tolerance/tolerance [mmu]/tolerance [mDa]} column is not included in \code{isotopocules}}
+
+\item{default_charge}{charge to be used for any unidentified peak, and if a \code{charge/z} column is not included in \code{isotopocules}}
 }
 \value{
-same object as provided in \code{aggregated_data} with added columns \code{compound} (if provided), \code{itc_uidx} (introduced unique isotopocule index), \code{isotopocule}, \code{mzExact} and \code{charge} as well as any other additional information columns provided in \code{isotopocules}. Note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
+same object as provided in \code{aggregated_data} with added columns \code{compound} (if provided), \code{itc_uidx} (introduced unique isotopocule index), \code{isotopocule}, \code{mzExact}, \code{charge}, and \code{ions.incremental} (via \code{\link[=orbi_calculate_ions]{orbi_calculate_ions()}}), as as well as any other additional information columns provided in \code{isotopocules}.
+Note that if the default \code{CN} and \code{RN} values of \code{\link[=orbi_calculate_ions]{orbi_calculate_ions()}} are not the ones that should be used, simply run \code{\link[=orbi_calculate_ions]{orbi_calculate_ions()}} explicitly afterwards.
+Also note that the information about columns that were NOT aggregated in previous steps is purposefully not preserved at this step.
 }
 \description{
 Map the mass spectral peaks to specific isotopocules based on their mass.

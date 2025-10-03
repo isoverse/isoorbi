@@ -36,6 +36,7 @@
        > tic = as.numeric(TIC)
        > it.ms = as.numeric(`Ion Injection Time (ms)`)
        > resolution = as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))
+       > microscans = as.integer(`Micro Scan Count`)
       Dataset peaks:
        > scan.no = as.integer(scan.no)
        > mzMeasured = as.numeric(mass)
@@ -66,6 +67,7 @@
        > tic = as.numeric(TIC)
        > it.ms = as.numeric(`Ion Injection Time (ms)`)
        > resolution = as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))
+       > microscans = as.integer(`Micro Scan Count`)
        > basePeakMz = as.numeric(BasePeakMass)
        > basePeakIntensity = as.numeric(BasePeakIntensity)
        > lowMass = as.numeric(LowMass)
@@ -74,7 +76,6 @@
        > intensCompFactor = as.numeric(`OT Intens Comp Factor`)
        > agc = as.character(AGC)
        > agcTarget = as.integer(`AGC Target`)
-       > microscans = as.integer(`Micro Scan Count`)
        > numberLockmassesFound = as.integer(`Number of LM Found`)
        > analyzerTemperature = as.numeric(`Analyzer Temperature`)
       Dataset peaks:
@@ -107,6 +108,7 @@
        > tic = as.numeric(TIC)
        > it.ms = as.numeric(`Ion Injection Time (ms)`)
        > resolution = as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))
+       > microscans = as.integer(`Micro Scan Count`)
        > basePeakMz = as.numeric(BasePeakMass)
        > basePeakIntensity = as.numeric(BasePeakIntensity)
        > lowMass = as.numeric(LowMass)
@@ -115,7 +117,6 @@
        > intensCompFactor = as.numeric(`OT Intens Comp Factor`)
        > agc = as.character(AGC)
        > agcTarget = as.integer(`AGC Target`)
-       > microscans = as.integer(`Micro Scan Count`)
        > numberLockmassesFound = as.integer(`Number of LM Found`)
        > analyzerTemperature = as.numeric(`Analyzer Temperature`)
        > (.*) = as.character(all_matches("(.*)"))
@@ -187,6 +188,7 @@
        → [32mtic[39m = [3mas.numeric(TIC)[23m
        → [32mit.ms[39m = [3mas.numeric(`Ion Injection Time (ms)`)[23m
        → [32mresolution[39m = [3mas.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))[23m
+       → [32mmicroscans[39m = [3mas.integer(`Micro Scan Count`)[23m
       [1mDataset[22m [34mpeaks[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmzMeasured[39m = [3mas.numeric(mass)[23m
@@ -217,6 +219,7 @@
        → [32mtic[39m = [3mas.numeric(TIC)[23m
        → [32mit.ms[39m = [3mas.numeric(`Ion Injection Time (ms)`)[23m
        → [32mresolution[39m = [3mas.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))[23m
+       → [32mmicroscans[39m = [3mas.integer(`Micro Scan Count`)[23m
        → [32mbasePeakMz[39m = [3mas.numeric(BasePeakMass)[23m
        → [32mbasePeakIntensity[39m = [3mas.numeric(BasePeakIntensity)[23m
        → [32mlowMass[39m = [3mas.numeric(LowMass)[23m
@@ -225,7 +228,6 @@
        → [32mintensCompFactor[39m = [3mas.numeric(`OT Intens Comp Factor`)[23m
        → [32magc[39m = [3mas.character(AGC)[23m
        → [32magcTarget[39m = [3mas.integer(`AGC Target`)[23m
-       → [32mmicroscans[39m = [3mas.integer(`Micro Scan Count`)[23m
        → [32mnumberLockmassesFound[39m = [3mas.integer(`Number of LM Found`)[23m
        → [32manalyzerTemperature[39m = [3mas.numeric(`Analyzer Temperature`)[23m
       [1mDataset[22m [34mpeaks[39m:
@@ -258,6 +260,7 @@
        → [32mtic[39m = [3mas.numeric(TIC)[23m
        → [32mit.ms[39m = [3mas.numeric(`Ion Injection Time (ms)`)[23m
        → [32mresolution[39m = [3mas.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))[23m
+       → [32mmicroscans[39m = [3mas.integer(`Micro Scan Count`)[23m
        → [32mbasePeakMz[39m = [3mas.numeric(BasePeakMass)[23m
        → [32mbasePeakIntensity[39m = [3mas.numeric(BasePeakIntensity)[23m
        → [32mlowMass[39m = [3mas.numeric(LowMass)[23m
@@ -266,7 +269,6 @@
        → [32mintensCompFactor[39m = [3mas.numeric(`OT Intens Comp Factor`)[23m
        → [32magc[39m = [3mas.character(AGC)[23m
        → [32magcTarget[39m = [3mas.integer(`AGC Target`)[23m
-       → [32mmicroscans[39m = [3mas.integer(`Micro Scan Count`)[23m
        → [32mnumberLockmassesFound[39m = [3mas.integer(`Number of LM Found`)[23m
        → [32manalyzerTemperature[39m = [3mas.numeric(`Analyzer Temperature`)[23m
        → [35m(.*)[39m = [3mas.character(all_matches("(.*)"))[23m

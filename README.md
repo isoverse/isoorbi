@@ -17,7 +17,7 @@ coverage](https://codecov.io/gh/isoverse/isoorbi/graph/badge.svg)](https://app.c
 The goal of the isoorbi R package is to help you process isotopocule
 measurements from an **Orbitrap Isotope Solutions** mass spectrometer.
 It can read both the <code>.raw</code> files (recommended approach) as
-well as <code>.isox</code> output created by IsoX(legacy approach).
+well as <code>.isox</code> output created by IsoX (legacy approach).
 
 ## Installation
 
@@ -52,12 +52,18 @@ To use the latest updates, you can install the development version of
     # load library
     library(isoorbi)
 
-    # path to a small test file bundled with the package
-    file_path <- 
-      system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
+    # provide the path to your data folder here:
+    my_data_folder <- file.path("project", "data")
+
+    # and search for raw files in that folder
+    file_paths <- orbi_find_raw(my_data_folder)
+
+    # for this example, we use a small test file bundled with the package
+    # instead (remove this line if working with your own data)
+    file_paths <- system.file(package = "isoorbi", "extdata","nitrate_test_10scans.raw")
 
     # read the raw file incluing 2 of the raw spectra
-    raw_files <- file_path |>
+    raw_files <- file_paths |>
         orbi_read_raw(include_spectra = c(1, 10)) |>
         orbi_aggregate_raw()
 
@@ -68,15 +74,11 @@ To use the latest updates, you can install the development version of
 
 ### Identify isotopcules
 
-    # define isotopcules of interest (could come from tsv, csv, or excel file)
-    isotopocules <- data.frame(
-      isotopocule = c("M0", "15N", "17O", "18O"),
-      mass = c(61.9878, 62.9850, 62.9922, 63.9922),
-      tolerance = 1, charge = 1
-    )
-
     # identify isotopcules
-    raw_files <- raw_files |> orbi_identify_isotopocules(isotopocules)
+    # these could also come from a data frame or a tsv/csv/excel file
+    raw_files <- raw_files |> orbi_identify_isotopocules(
+      isotopocules = c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
+    )
 
     # plot again, now with the isotopocules identified
     raw_files |> orbi_plot_spectra()
@@ -89,8 +91,6 @@ To use the latest updates, you can install the development version of
     dataset <- raw_files |>
       # filter out unidentified peaks
       orbi_filter_isotopocules() |>
-      # calculate ions
-      orbi_calculate_ions() |>
       # check for satellite peaks
       orbi_flag_satellite_peaks() |>
       # define base peak
