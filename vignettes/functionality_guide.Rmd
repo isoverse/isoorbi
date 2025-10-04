@@ -34,9 +34,10 @@ First step is reading in your .raw data files.
 
 ```{r}
 #| include: false
-dir.create("data")
+if (!dir.exists("data")) dir.create("data")
 system.file(package = "isoorbi", "extdata") |>
   orbi_find_raw() |>
+  paste0(".cache.zip") |>
   file.copy(to = "data", overwrite = TRUE)
 ```
 
