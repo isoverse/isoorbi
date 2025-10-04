@@ -11,6 +11,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+> This step-by-step functionality guide is still in development. Eventually all functions in the [package structure flowchart](https://isoorbi.isoverse.org/index.html#package-structure) will be covered with detailed examples. All functions below labelled with an `*` are required steps of the standard data processing flow. Everything else is optional. Rarely used additional features that are mentioned here but not part of the standard flowchart are labeled as `bonus`.
+
 ```{r, include=FALSE}
 # default chunk options
 knitr::opts_chunk$set(collapse = FALSE, message = TRUE, comment = "")
@@ -24,35 +26,67 @@ library(dplyr) # for mutating data frames
 ```
 
 
-# Read raw files
+# Reading raw files
+
+First step is reading in your .raw data files.
+
+## `orbi_find_raw()`
+
+```{r}
+#| include: false
+dir.create("data")
+system.file(package = "isoorbi", "extdata") |>
+  orbi_find_raw() |>
+  file.copy(to = "data", overwrite = TRUE)
+```
 
 ```{r}
 #| label: read files
-# raw files directory
-raw_folder <- system.file(package = "isoorbi", "extdata")
+# path to your data folder
+data_folder <- file.path("data")
 
-# read files
+# finding raw files with "nitrate" in the name in the data folder
+file_paths <- data_folder |> orbi_find_raw(pattern = "nitrate")
+
+# show what was found
+file_paths
+```
+
+## `orbi_read_raw()` *
+
+```{r}
+# read files (simplest)
+raw_files <- file_paths |> orbi_read_raw()
+
+# read files including some raw spectra
 raw_files <-
-  raw_folder |> 
-  orbi_find_raw(pattern = "nitrate") |> 
+  file_paths |>
+  # load the spectra from scans 1, 10, and 100
   orbi_read_raw(include_spectra = c(1, 10, 100)) |>
+  # you can quiet any call with suppressMessages
+  # that way it won't print the info message
   suppressMessages()
 
-# show summary for the read files
+# show summary for the files that were read
 raw_files
 ```
 
-# Combine (aggregate) data
+## `orbi_aggregate_data()` *
+
+Combine (aggregate) the data from the raw files.
 
 ```{r}
 # aggregate raw data
 agg_data <- raw_files |> orbi_aggregate_raw()
+
+# shaw all that was recovered
+# (as well as what was ignored/not aggregated)
 agg_data
 ```
 
-## Optional: use a different aggregator
+### bonus `orbi_get_aggregator()`
 
-The `minimal` aggregator contains a smaller set of columns to aggregate. The `extended` aggregator is more elaborate, providing access to additional columns from the raw data files.
+You can optionally use a different aggregator. The `minimal` aggregator contains a smaller set of columns to aggregate. The `extended` aggregator is more elaborate, providing access to additional columns from the raw data files.
 
 ```{r}
 # example: minimal vs. extended aggregator
@@ -63,16 +97,58 @@ orbi_get_aggregator("extended")
 raw_files |> orbi_aggregate_raw(aggregator = "extended")
 ```
 
-## Optional: check for problems
+### bonus `orbi_register_aggregator()`
 
-There were no problems reading and/or aggregating the raw data so these are empty.
+Or even build your own aggregator with `orbi_start_aggregator()` and/or expand an existing one with `orgi_add_to_aggregator()` and then register it via `orbi_register_aggregator()`. This funnctionality is rarely needed and thus not part of the package structure flowchart.
+
+```{r}
+my_agg <- 
+  orbi_get_aggregator("minimal") |>
+  # pull out the S-Lens RF Level information from the scans and store it as a number
+  orbi_add_to_aggregator("scans", "slens_rf", source = "S-Lens RF Level", cast = "as.numeric") |>
+  orbi_register_aggregator(name = "test")
+
+# show my agg summary
+my_agg
+
+# use it
+raw_files |> orbi_aggregate_raw(aggregator = "test")
+```
+
+### bonus `orbi_get_problems()`
+
+There were no problems reading and/or aggregating the raw data so these are empty but this can be very helpful to see what went wrong during reading or aggregation.
 
 ```{r}
 raw_files |> orbi_get_problems()
 agg_data |> orbi_get_problems()
 ```
 
-# Identify isotopocules
+## `orbi_get_data()`
+
+At this point (and any later point), you can always extract the data of interest from the aggregated data set using `orbi_get_data()`. If you prefer working with a data frame tibble from `orbi_get_data()` instead of the aggregated data structure, you can switch to that at any point and use the resulting data frame tibble in subsequent functions.
+
+```{r}
+# direct access to the data stored in the aggregated dataset
+agg_data$file_info
+agg_data$scans
+agg_data$peaks
+agg_data$spectra
+
+# better way to retrieve+combine the data with dplyr select syntax:
+agg_data |>
+  orbi_get_data(
+    file_info = c("filename", "creation_date", "instrument" = "InstrumentModel"),
+    scans = c("time.min", "tic", "resolution"),
+    peaks = c("mz" = "mzMeasured", starts_with("peak"))
+  )
+```
+
+# Identifying isotopocules
+
+The next step is identifying isotpocules.
+
+## `orbi_identify_isotopocules()` *
 
 ```{r}
 # list of isotopocules (can alternatively be in a tsv/csv/xlsx file)
@@ -88,7 +164,11 @@ isotopocules <- tibble(
 data <- agg_data |> orbi_identify_isotopocules(isotopocules)
 ```
 
-# Check satellite peaks
+## `orbi_plot_spectra()`
+
+# Data checks
+
+## `orbi_flag_satellite_peas()` *
 
 ```{r}
 #| warning: false
@@ -97,7 +177,7 @@ data <- agg_data |> orbi_identify_isotopocules(isotopocules)
 data |> orbi_flag_satellite_peaks() |> orbi_plot_satellite_peaks()
 ```
 
-# Check coverage
+## `orbi_plot_isotopocule_coverage()`
 
 ```{r}
 # this can happen here or later on in the workflow
@@ -105,8 +185,8 @@ data |> orbi_get_isotopocule_coverage()
 data |> orbi_plot_isotopocule_coverage()
 ```
 
-# Retrieve (get) data
+# Ratio calculations
 
-```{r}
-agg_data |> orbi_get_data(peaks = everything())
-```
+## `orbi_define_basepeak()` *
+
+## `orbi_summarize_results()` *
