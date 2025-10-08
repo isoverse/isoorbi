@@ -126,12 +126,13 @@ version](https://cran.r-project.org/) 4.4 or newer).
       include = c("file_info", "summary")
     )
 
-    # A tibble: 3 × 5
-       uidx filename             isotopocule   ratio ratio_sem
-      <int> <chr>                <fct>         <dbl>     <dbl>
-    1     1 nitrate_test_10scans 15N         0.00422 0.0000980
-    2     1 nitrate_test_10scans 17O         0.00132 0.0000554
-    3     1 nitrate_test_10scans 18O         0.00775 0.000162 
+<PRE class="fansi fansi-output"><CODE><span style='color: #949494;'># A tibble: 3 × 5</span>
+   uidx filename             isotopocule   ratio ratio_sem
+  <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>                <span style='color: #949494; font-style: italic;'>&lt;fct&gt;</span>         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>     <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
+<span style='color: #BCBCBC;'>1</span>     1 nitrate_test_10scans 15N         0.004<span style='text-decoration: underline;'>22</span> 0.000<span style='text-decoration: underline;'>098</span>0
+<span style='color: #BCBCBC;'>2</span>     1 nitrate_test_10scans 17O         0.001<span style='text-decoration: underline;'>32</span> 0.000<span style='text-decoration: underline;'>055</span>4
+<span style='color: #BCBCBC;'>3</span>     1 nitrate_test_10scans 18O         0.007<span style='text-decoration: underline;'>75</span> 0.000<span style='text-decoration: underline;'>162</span> 
+</CODE></PRE>
 
 For additional code, please check out our **Examples** in the main menu
 at [isoorbi.isoverse.org](https://isoorbi.isoverse.org/), and peruse the
@@ -148,3 +149,14 @@ example on [GitHub](https://github.com/isoverse/isoorbi/issues).
 
 For questions and other discussion, please use the [isoorbi slack
 workspace](https://isoorbi.slack.com).
+
+## isoverse <a href='http://www.isoverse.org'><img src='man/figures/isoverse_logo_thumb.png' align="right" height="138.5"/></a>
+
+This package is part of the isoverse suite of data tools for stable
+isotopes. If you like the functionality that isoverse packages provide
+to the geochemical community, please help us spread the word and include
+an isoverse or individual package logo on one of your posters or slides.
+All logos are posted in high resolution in [this
+repository](https://github.com/isoverse/logos). If you have suggestions
+for new features or other constructive feedback, please let us know on
+this short [feeback form](https://www.isoverse.org/feedback/).
