@@ -113,11 +113,11 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read files (simplest)</span></span>
 <span><span class="va">raw_files</span> <span class="op">&lt;-</span> <span class="va">file_paths</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[237ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_10scans.raw</span> from cache
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[233ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_10scans.raw</span> from cache
 </code></pre>
 <pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[50ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_1scan.raw</span> from cache
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[382ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 2 files
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[379ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 2 files
 </code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read files including some raw spectra</span></span>
@@ -147,7 +147,7 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># aggregate raw data</span></span>
 <span><span class="va">agg_data</span> <span class="op">&lt;-</span> <span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[569ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[573ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
 (138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">standard</span> aggregator
 </code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -276,7 +276,7 @@ providing access to additional columns from the raw data files.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using the extended aggregator instead of the default (standard)</span></span>
 <span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="st">"extended"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[942ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[933ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
 (138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">extended</span> aggregator
 </code></pre>
 <pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
@@ -368,7 +368,7 @@ needed and thus not part of the package structure flowchart.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># use it</span></span>
 <span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[241ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[238ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
 (138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">test</span> aggregator
 </code></pre>
 <pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
@@ -559,7 +559,7 @@ data frame tibble in subsequent functions.</p>
 <span></span>
 <span><span class="co"># identify</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_identify_isotopocules.html">orbi_identify_isotopocules</a></span><span class="op">(</span><span class="va">isotopocules</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[38ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[37ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
 representing 100% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
 and <span style="color: #00BB00;">18O</span>
 </code></pre>
