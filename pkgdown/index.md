@@ -23,7 +23,10 @@ well as <code>.isox</code> output created by IsoX (legacy approach).
 
 You can install the current CRAN version of `isoorbi` with:
 
+    # install the isoorbi package
     install.packages("isoorbi")
+    # check/install the isoraw reader
+    isoorbi::orbi_check_isoraw()
 
 To use the latest updates, you can install the development version of
 `isoorbi` from [GitHub](https://github.com/). If you are on Windows,
@@ -40,6 +43,9 @@ version](https://cran.r-project.org/) 4.4 or newer).
     # installs the latest isoorbi package from GitHub
     if(!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
     pak::pak("isoverse/isoorbi")
+
+    # check/install the isoraw reader
+    isoorbi::orbi_check_isoraw()
 
 > Important: as of isoorbi version 1.5.0, it is possible to read .raw
 > files directly using the [isoraw
@@ -74,11 +80,13 @@ version](https://cran.r-project.org/) 4.4 or newer).
 
     # read the raw file incluing 2 of the raw spectra
     raw_files <- file_paths |>
-        orbi_read_raw(include_spectra = c(1, 10)) |>
-        orbi_aggregate_raw()
+        orbi_read_raw(include_spectra = c(1, 10))
+
+    # aggregate the raw data (processes the read files)
+    raw_agg <- raw_files |> orbi_aggregate_raw()
 
     # plot the spectra
-    raw_files |> orbi_plot_spectra()
+    raw_agg |> orbi_plot_spectra()
 
 <img src="man/figures/README-read-raw-1.png" width="100%" />
 
@@ -86,20 +94,20 @@ version](https://cran.r-project.org/) 4.4 or newer).
 
     # identify isotopcules
     # these could also come from a data frame or a tsv/csv/excel file
-    raw_files <- raw_files |> orbi_identify_isotopocules(
+    raw_agg <- raw_agg |> orbi_identify_isotopocules(
       isotopocules = 
         c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
     )
 
     # plot again, now with the isotopocules identified
-    raw_files |> orbi_plot_spectra()
+    raw_agg |> orbi_plot_spectra()
 
 <img src="man/figures/README-map-isotopocules-1.png" width="100%" />
 
 ### Process data
 
     # process raw files data
-    dataset <- raw_files |>
+    dataset <- raw_agg |>
       # filter out unidentified peaks
       orbi_filter_isotopocules() |>
       # check for satellite peaks
