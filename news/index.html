@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,18 @@
       <small>Source: <a href="https://github.com/isoverse/isoorbi/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.5.3" id="isoorbi-153">isoorbi 1.5.3<a class="anchor" aria-label="anchor" href="#isoorbi-153"></a></h2>
+<p>This is a minor update to support the latest version of testthat and address a few small bugs.</p>
+<div class="section level3">
+<h3 id="bug-fixes--improvements-1-5-3">Bug fixes &amp; improvements<a class="anchor" aria-label="anchor" href="#bug-fixes--improvements-1-5-3"></a></h3>
+<ul><li>updated snapshots for continuous integration tests to work with testthat 3.3.0</li>
+<li>changed <code><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel()</a></code> to only export <code>file_info</code> and <code>summary</code> by default to avoid uintentionally enormous excel files when exporting large datasets (<a href="https://github.com/isoverse/isoorbi/issues/106" class="external-link">#106</a>)</li>
+<li>fixed issue with <code><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak()</a></code> not correctly handling unidentified peaks, they are now automatically filtered out when this function is called (<a href="https://github.com/isoverse/isoorbi/issues/114" class="external-link">#114</a>)</li>
+<li>improved error messages in functions that need an isotopocule defintion ifisotopocules have not yet been identified</li>
+<li>clarified installation instructions</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.5.2" id="isoorbi-152">isoorbi 1.5.2<a class="anchor" aria-label="anchor" href="#isoorbi-152"></a></h2><p class="text-muted">CRAN release: 2025-10-03</p>
 <p>This is a minor update to decrease package size for CRAN.</p>
@@ -217,7 +229,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

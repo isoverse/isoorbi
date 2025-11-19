@@ -1,0 +1,53 @@
+# Segment data blocks
+
+This step is optional and is intended to make it easy to explore the
+data within a sample or ref data block. Note that any raw data not
+identified with `data_type` set to "data"
+(`orbi_get_option("data_type_data")`) will stay unsegmented. This
+includes raw data flagged as "startup", "changeover", and "unused".
+
+## Usage
+
+``` r
+orbi_segment_blocks(
+  dataset,
+  into_segments = NULL,
+  by_scans = NULL,
+  by_time_interval = NULL
+)
+```
+
+## Arguments
+
+- dataset:
+
+  An aggregated dataset or a data frame of peaks (i.e. works directly
+  after
+  [`orbi_identify_isotopocules()`](https://isoorbi.isoverse.org/reference/orbi_identify_isotopocules.md)
+  as well as with a tibble from [orbi_get_data(peaks =
+  everything())](https://isoorbi.isoverse.org/reference/orbi_get_data.md)
+  or when reading from an IsoX file)
+
+- into_segments:
+
+  segment each data block into this many segments. The result will have
+  exactly this number of segments for each data block except for if
+  there are more segments requested than observations in a group (in
+  which case each observation will be one segment)
+
+- by_scans:
+
+  segment each data block into segments spanning this number of scans.
+  The result will be approximately the requested number of scans per
+  segment, depending on what is the most sensible distribution of the
+  data. For example, in a hypothetical data block with 31 scans, if
+  by_scans = 10, this function will create 3 segments with 11, 10 and 10
+  scans each (most evenly distributed), instead of 4 segments with 10,
+  10, 10, 1 (less evenly distributed).
+
+- by_time_interval:
+
+  segment each data block into segments spanning this time interval. The
+  result will have the requested time interval for all segments except
+  usually the last one which is almost always shorter than the requested
+  interval.

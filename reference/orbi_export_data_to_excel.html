@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,7 @@
 <span>  dbl_digits <span class="op">=</span> <span class="fl">7</span>,</span>
 <span>  int_format <span class="op">=</span> <span class="st">"0"</span>,</span>
 <span>  dbl_format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%%.%sf"</span>, <span class="va">dbl_digits</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span>,</span>
-<span>  include <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file_info"</span>, <span class="st">"summary"</span>, <span class="st">"scans"</span>, <span class="st">"peaks"</span>, <span class="st">"problems"</span><span class="op">)</span>,</span>
+<span>  include <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file_info"</span>, <span class="st">"summary"</span><span class="op">)</span>,</span>
 <span>  show_progress <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_interactive.html" class="external-link">is_interactive</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -82,7 +82,9 @@
 
 
 <dt id="arg-include">include<a class="anchor" aria-label="anchor" href="#arg-include"></a></dt>
-<dd><p>which tibbles to include if <code>dataset</code> is aggregated data. By default includes all but spectra</p></dd>
+<dd><p>which tibbles to include if <code>dataset</code> is aggregated data. By default includes just the file_info and summary (if it exists) to avoid accidentally generating massive excel files.
+To export e.g. the file_info, scans, and peaks, use <code>include = c("file_info", "scans", "peaks")</code> (using <code><a href="orbi_filter_isotopocules.html">orbi_filter_isotopocules()</a></code> first is highly recommended if exporting peaks).
+To export the entire spectra in the dataset, use <code>include = c("file_info", "spectra")</code>.</p></dd>
 
 
 <dt id="arg-show-progress">show_progress<a class="anchor" aria-label="anchor" href="#arg-show-progress"></a></dt>
@@ -103,7 +105,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
