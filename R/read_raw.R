@@ -12,7 +12,11 @@
 #' @param min_version the minimum version number required
 #' @param source the URL (or local path) where to find the raw file reader, by default this is the latests release of the executables on github
 #' @param accept_license explicitly accept Thermo's license agreement (if this is FALSE and the license has not previously been accepted, you will be asked about it)
+#' @param show_version whether to print a confirmation message with the version number if the reader is already installed and ready to use (default: `TRUE`).
+#' Set to `FALSE` to keep the check silent, which is what the automatic calls during a raw file read do. Note that the message about a (re-)installation is always shown.
 #' @param ... passed on to `download.file` if (re-) installing the reader
+#' @return called for its side effect of ensuring a working isoraw reader (at least `min_version`) is installed and that Thermo's license agreement has been
+#' accepted; returns `TRUE` invisibly and aborts if either of those cannot be achieved
 #' @export
 orbi_check_isoraw <- function(
   install_if_missing = !on_cran(),
@@ -24,6 +28,7 @@ orbi_check_isoraw <- function(
     min_version
   ),
   accept_license = FALSE,
+  show_version = TRUE,
   ...
 ) {
   # start
@@ -32,6 +37,7 @@ orbi_check_isoraw <- function(
   # check existence
   isoraw_exists <- file.exists(get_isoraw_path())
   outdated <- FALSE
+  just_installed <- FALSE
 
   # version
   if (isoraw_exists) {
@@ -106,6 +112,7 @@ orbi_check_isoraw <- function(
     # get new version
     isoraw_version <- get_isoraw_version()
     if (!is.null(isoraw_version)) {
+      just_installed <- TRUE
       finish_info(
         "successfully installed the isoorbi raw file reader version {isoraw_version}",
         start = start
@@ -124,7 +131,18 @@ orbi_check_isoraw <- function(
   }
 
   # license check
-  check_license(accept = accept_license)
+  license_ok <- check_license(accept = accept_license)
+
+  # confirm that an already installed reader is ready to go (the installation
+  # itself is already reported above, so don't report it twice)
+  if (show_version && !just_installed) {
+    finish_info(
+      "found the isoorbi raw file reader version {isoraw_version} ready for use",
+      start = start
+    )
+  }
+
+  return(invisible(license_ok))
 }
 
 # check license acceptance
@@ -743,7 +761,7 @@ orbi_read_raw <- function(
   # any files to read?
   if (nrow(read_files) > 0) {
     # check first for raw file reader
-    orbi_check_isoraw()
+    orbi_check_isoraw(show_version = FALSE)
 
     read_files <- read_files |>
       dplyr::mutate(
@@ -1107,7 +1125,7 @@ read_cached_raw_file <- function(
         )
 
         # run isoraw only for the spectra
-        orbi_check_isoraw()
+        orbi_check_isoraw(show_version = FALSE)
         out <- try_catch_cnds(
           run_isoraw(
             file_path_info$file_path,
@@ -1248,7 +1266,7 @@ read_raw_file <- function(
 
   # run isoraw
   update_progress("running isoraw")
-  orbi_check_isoraw()
+  orbi_check_isoraw(show_version = FALSE)
   out <- try_catch_cnds(
     run_isoraw(
       file_path_info$file_path,

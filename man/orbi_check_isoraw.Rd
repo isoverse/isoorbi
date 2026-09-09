@@ -12,6 +12,7 @@ orbi_check_isoraw(
   source = paste0("https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version),
   accept_license = FALSE,
+  show_version = TRUE,
   ...
 )
 }
@@ -28,7 +29,14 @@ orbi_check_isoraw(
 
 \item{accept_license}{explicitly accept Thermo's license agreement (if this is FALSE and the license has not previously been accepted, you will be asked about it)}
 
+\item{show_version}{whether to print a confirmation message with the version number if the reader is already installed and ready to use (default: \code{TRUE}).
+Set to \code{FALSE} to keep the check silent, which is what the automatic calls during a raw file read do. Note that the message about a (re-)installation is always shown.}
+
 \item{...}{passed on to \code{download.file} if (re-) installing the reader}
+}
+\value{
+called for its side effect of ensuring a working isoraw reader (at least \code{min_version}) is installed and that Thermo's license agreement has been
+accepted; returns \code{TRUE} invisibly and aborts if either of those cannot be achieved
 }
 \description{
 By default, this will install the isoraw reader if it is missing or outdated, and will ask the user to agree to Thermo's license agreement
