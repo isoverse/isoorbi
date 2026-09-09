@@ -96,7 +96,7 @@ raw_agg <- raw_files |> orbi_aggregate_raw()
 raw_agg |> orbi_plot_spectra()
 ```
 
-<img src="man/figures/README-read-raw-1.png" width="100%" />
+<img src="man/figures/README-read-raw-1.png" alt="" width="100%" />
 
 ### Identify isotopcules
 
@@ -117,7 +117,7 @@ raw_agg <- raw_agg |>
 raw_agg |> orbi_plot_spectra()
 ```
 
-<img src="man/figures/README-map-isotopocules-1.png" width="100%" />
+<img src="man/figures/README-map-isotopocules-1.png" alt="" width="100%" />
 
 ### Process data
 
@@ -136,7 +136,7 @@ dataset <- raw_agg |>
 dataset |> orbi_plot_raw_data(y = ratio)
 ```
 
-<img src="man/figures/README-process-data-1.png" width="100%" />
+<img src="man/figures/README-process-data-1.png" alt="" width="100%" />
 
 ### Summarize results
 

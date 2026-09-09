@@ -176,6 +176,7 @@ For additional code, please check out our **Examples** in the main menu at [isoo
 ```{r}
 #| echo: false
 #| results: asis
+#| warning: false
 if (params$generating_pkgdown_index) {
   # if we're in index.md
   cat(
