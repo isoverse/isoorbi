@@ -99,12 +99,30 @@ try_catch_cnds <- function(
     dplyr::mutate(
       call = .data$condition |>
         purrr::map_chr(~ as.character(conditionCall(.x))[1]),
-      message = .data$condition |> purrr::map_chr(conditionMessage),
+      message = .data$condition |> purrr::map_chr(condition_cnd_message),
       .before = "condition"
     )
 
   # return
   return(list(result = result, conditions = conds))
+}
+
+# condition cnd message to preserve intended linebreaks and avoid introduced linebreaks
+condition_cnd_message <- function(cnd) {
+  # conditionMessage can introduce line breaks where none exist for long message
+  # we want to avoid that behaviour (only intended line breaks here) for later
+  # formatting to fit the console width
+  lines <- strsplit(cnd$message, "\n", fixed = TRUE)[[1]] |>
+    purrr::map_chr(
+      ~ {
+        cnd$message <- .x
+        conditionMessage(cnd) |>
+          # don't let condition Message do any splits
+          gsub(pattern = "\n", replacement = " ", fixed = TRUE)
+      }
+    )
+  # bring the purposeful line breaks back in
+  lines |> paste(collapse = "\n")
 }
 
 # summarize cnds, i.e. how many issues/errors in cli format
@@ -202,7 +220,7 @@ format_cnds <- function(
     return(c())
   }
   out <- conditions |>
-    mutate(
+    dplyr::mutate(
       symbol = ifelse(
         .data$type == "error",
         format_inline("{col_red(cli::symbol$cross)} "),
@@ -220,6 +238,7 @@ format_cnds <- function(
           }
         ),
       # account for multi-line messages
+
       message_w_type = strsplit(.data$message, "\n", fixed = TRUE) |>
         list(.data$symbol, .data$call_label) |>
         purrr::pmap(
@@ -237,7 +256,7 @@ format_cnds <- function(
           }
         )
     ) |>
-    pull(.data$message_w_type) |>
+    dplyr::pull(.data$message_w_type) |>
     unlist()
 
   # take care of proper line breaks (also covers escaping {})
@@ -320,7 +339,6 @@ summarize_and_format_cnds <- function(
           ""
         }
       )
-
     # if the cnds are a single line long --> combine with summary
     if (
       collapse_single_line_cnd && include_summary && length(formatted_cnds) == 1
