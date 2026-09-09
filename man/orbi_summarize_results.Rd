@@ -25,7 +25,7 @@ orbi_summarize_results(
 i.e. scans with more ions in the Orbitrap do not contribute disproportionately to the total \code{sum} of \code{x} and \code{y} that is used to calculate \code{x/y}.
 }}
 
-\item{.by}{additional grouping columns for the results summary (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.}
+\item{.by}{additional grouping columns for the results summary (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarize]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset. Note that the order of these is also used to arrange the summary.}
 
 \item{include_flagged_data}{whether to include flagged data in the calculations (FALSE by default)}
 

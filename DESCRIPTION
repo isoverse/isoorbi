@@ -6,12 +6,12 @@ Authors@R:
     c(person(
         given = "Caj", family = "Neubauer",
         email = "caj.neubauer@colorado.edu",
-        role = c("aut", "cre", "cph"),
+        role = c("aut", "cre"),
         comment = c(ORCID = "0000-0002-5348-5609")),
     person(
         given = "Sebastian", family = "Kopf",
         email = "sebastian.kopf@colorado.edu",
-        role = c("aut"),
+        role = c("aut", "cre"),
         comment = c(ORCID = "0000-0002-2044-0201")),
     person(
         given = "Kristýna", family = "Kantnerová",
@@ -57,6 +57,6 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
