@@ -11,7 +11,7 @@ Authors@R:
     person(
         given = "Sebastian", family = "Kopf",
         email = "sebastian.kopf@colorado.edu",
-        role = c("aut", "cre"),
+        role = c("aut"),
         comment = c(ORCID = "0000-0002-2044-0201")),
     person(
         given = "Kristýna", family = "Kantnerová",
