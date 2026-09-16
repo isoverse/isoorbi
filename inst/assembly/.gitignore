@@ -11,3 +11,4 @@ obj
 out
 output
 Gemfile.lock
+!tests/*.raw

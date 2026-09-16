@@ -74,6 +74,16 @@ task :checkdocker do
   end
 end
 
+### TESTING ###
+
+desc "Run the isoraw smoke tests against the local executable (build it first)"
+task :test do
+  sh "bash ./test.sh exe=#{executable}"
+end
+
+desc "Build and then test"
+task :buildAndTest => [:build, :test]
+
 ### RUNNING ###
 
 desc "Get the program version"
