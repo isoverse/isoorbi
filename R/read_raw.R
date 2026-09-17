@@ -118,6 +118,10 @@ orbi_check_isoraw <- function(
         start = start
       )
     }
+
+    # any previously downloaded example files were cached with the reader version
+    # that was just replaced, so discard them to avoid reading outdated caches
+    clear_example_files()
   }
 
   # final check
