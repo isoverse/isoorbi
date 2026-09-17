@@ -22,7 +22,7 @@ orbi_check_isoraw <- function(
   install_if_missing = !on_cran(),
   reinstall_if_outdated = !on_cran(),
   reinstall_always = FALSE,
-  min_version = "0.2.2",
+  min_version = "0.3.0",
   source = paste0(
     "https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version
@@ -1025,8 +1025,32 @@ read_cached_raw_file <- function(
     return(tibble())
   }
 
-  # check about isoorbi version
-  # can use existing_cache_info$isoorbi_version to determine whether a new read is necessary
+  # check about the isoraw version - the reader version determines the schema of the
+  # cached datasets (v0.3.0 reads ALL peaks and replaces the `is_ref`/`is_lock_peak`
+  # peak columns with the raw `flags` bitmask), so anything older has to be read anew.
+  # note: keep in sync with the `min_version` of orbi_check_isoraw() for major version changes
+  min_isoraw_version <- numeric_version("0.3.0")
+  # older caches don't record the reader version at all, hence the NULL check
+  cached_isoraw_version <- existing_cache_info$result[["isoraw_version"]]
+  cached_isoraw_version <-
+    if (is.null(cached_isoraw_version) || is.na(cached_isoraw_version)) {
+      NULL
+    } else {
+      # strict = FALSE yields NA (instead of an error) for an unparseable version
+      numeric_version(cached_isoraw_version, strict = FALSE)
+    }
+  if (is.null(cached_isoraw_version) || is.na(cached_isoraw_version)) {
+    cli_warn(
+      "cache was created by a raw file reader older than {min_isoraw_version}, cache is outdated"
+    )
+    return(tibble())
+  }
+  if (cached_isoraw_version < min_isoraw_version) {
+    cli_warn(
+      "cache was created by raw file reader version {cached_isoraw_version} but at least version {min_isoraw_version} is required, cache is outdated"
+    )
+    return(tibble())
+  }
 
   # simplify progress updates
   update_progress <- function(status) {
@@ -1344,6 +1368,8 @@ read_raw_file <- function(
       tibble(
         file_size = as.integer(file_path_info$file_size),
         isoorbi_version = as.character(utils::packageVersion("isoorbi")),
+        # the reader version determines the schema of the cached datasets
+        isoraw_version = as.character(get_isoraw_version() %||% NA),
         cache_timestamp = Sys.time()
       ),
       sink = file.path(file_path_info$output_path, file_path_info$cache_info)

@@ -257,7 +257,10 @@ orbi_plot_spectra <- function(
       dplyr::bind_rows(
         peaks |>
           dplyr::filter(
-            !is.na(.data$intensity) & .data$isRefPeak | .data$isLockPeak
+            !is.na(.data$intensity) &
+              # either flag qualifies, hence the two separate calls
+              (orbi_peak_flags_include(.data$flags, "reference") |
+                orbi_peak_flags_include(.data$flags, "lock peak"))
           ) |>
           dplyr::select("uidx", "scan.no", "mz" = "mzMeasured", "intensity")
       )

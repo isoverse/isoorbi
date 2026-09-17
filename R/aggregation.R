@@ -1025,3 +1025,193 @@ get_data <- function(
   # return
   return(out)
 }
+
+# peak flags ==========
+
+# Thermo `PeakOptions` bitmask values as reported in the `flags` column of the
+# peaks read by isoraw, see inst/assembly/src/isoraw.cs
+# note: deliberately listed in alphabetical order so that the decoded text comes out
+# alphabetical without needing a sort (which would be locale dependent)
+peak_flag_values <- c(
+  "exception" = 8L,
+  "fragmented" = 2L,
+  "lock peak" = 64L,
+  "merged" = 4L,
+  "modified" = 32L,
+  "reference" = 16L,
+  "saturated" = 1L
+)
+
+# the text used for peaks that carry no flags at all
+no_peak_flags_text <- "none"
+
+# how the individual flags are concatenated in the decoded text - used both when
+# encoding (orbi_peak_flags_to_text) and when decoding (orbi_peak_flags_include)
+peak_flags_separator <- " + "
+
+# validate flag name(s), returns them unchanged
+check_peak_flags <- function(flag, .env = caller_env()) {
+  check_arg(
+    flag,
+    !missing(flag) && is_character(flag) && length(flag) > 0,
+    "must be at least one flag name",
+    .env = .env
+  )
+  unknown <- setdiff(flag, names(peak_flag_values))
+  if (length(unknown) > 0) {
+    # "none" is a valid value of the decoded flags column but not a bit in the bitmask
+    if (no_peak_flags_text %in% unknown) {
+      cli_abort(
+        c(
+          "{.val {no_peak_flags_text}} is not a flag that a peak's flags can include",
+          "i" = "to find peaks by their exact set of flags, compare the {.field flags} column instead",
+          "i" = 'e.g. {.code dplyr::filter(peaks, flags == "{no_peak_flags_text}")} for the peaks that carry no flags at all'
+        ),
+        call = .env
+      )
+    }
+    cli_abort(
+      c(
+        "unknown peak flag{?s} {.val {unknown}}",
+        "i" = "available flags: {.val {names(peak_flag_values)}}"
+      ),
+      call = .env
+    )
+  }
+  return(flag)
+}
+
+#' Peak flags
+#'
+#' The raw file reader reports the `PeakOptions` bitmask the instrument assigned to each peak.
+#' The built-in aggregators (see [orbi_aggregate_raw()]) decode it with
+#' [orbi_peak_flags_to_text()] and provide it as the readable `flags` factor column of the
+#' `peaks` dataset.
+#'
+#' Filtering for an *exact* set of flags does not need any function - compare that column
+#' directly, e.g. `dplyr::filter(peaks, flags == "reference")` for the peaks that are
+#' exclusively a reference peak, or `dplyr::filter(peaks, flags == "none")` for those without
+#' any flags. [orbi_peak_flags_include()] covers the case a comparison cannot: finding peaks
+#' that carry a flag *irrespective* of which others they carry, which would otherwise require
+#' a comparatively expensive regular expression search. It accepts both the decoded text and
+#' the raw numeric bitmask and returns the same result for either.
+#'
+#' The available flags are `"exception"` (part of the reference but not used by calibration),
+#' `"fragmented"` (peak split by the centroider), `"lock peak"` (high resolution SIM lock mass),
+#' `"merged"` (peaks combined by the centroider), `"modified"` (mathematically modified packet),
+#' `"reference"` (hi-res internal reference compound) and `"saturated"` (signal over the ADC limit),
+#' plus `"none"` for peaks that carry no flags at all.
+#'
+#' Note that only `"reference"` and `"lock peak"` describe what a peak *is* - every other flag
+#' reports a problem with the centroiding, so a reference or lock mass peak that carries any
+#' additional flag is problematic as well.
+#'
+#' @param flags the peak flags, i.e. the decoded `flags` column of the `peaks` dataset or the
+#' raw numeric `PeakOptions` bitmask reported by the reader. [orbi_peak_flags_include()] accepts
+#' either and gives the same result for both, [orbi_peak_flags_to_text()] decodes the bitmask.
+#' @param flag one or more flag names, see the list of available flags in the details below
+#' (`"none"` is not a flag a peak can include, see above)
+#' @return a vector of the same length as `flags`: logical for `orbi_peak_flags_include()`,
+#' character for `orbi_peak_flags_to_text()`
+#' @examples
+#' # the `flags` column of an aggregated dataset holds the decoded flags
+#' flags <- c("none", "exception", "reference", "fragmented + reference", "lock peak")
+#'
+#' # any peak that carries the reference flag, whether or not it carries others
+#' orbi_peak_flags_include(flags, "reference")
+#'
+#' # several flags have to ALL be present
+#' orbi_peak_flags_include(flags, c("reference", "fragmented"))
+#'
+#' # for any of several flags, combine the individual calls
+#' orbi_peak_flags_include(flags, "reference") |
+#'   orbi_peak_flags_include(flags, "lock peak")
+#'
+#' # an exact set of flags does not need a function, compare the column directly
+#' flags == "reference"
+#' flags == "none"
+#'
+#' # problematic peaks, i.e. anything that is not purely unflagged/reference/lock mass
+#' !flags %in% c("none", "reference", "lock peak", "lock peak + reference")
+#'
+#' # the raw bitmask reported by the reader works just as well
+#' bitmask <- c(0L, 8L, 16L, 18L, 64L)
+#' orbi_peak_flags_to_text(bitmask)
+#' orbi_peak_flags_include(bitmask, "reference")
+#'
+#' @name orbi_peak_flags
+NULL
+
+#' @describeIn orbi_peak_flags whether the peak's flags include all of the provided `flag`(s),
+#' i.e. additional flags may be present as well but every provided flag has to be. Accepts
+#' either the decoded text or the raw bitmask and returns the same result for both.
+#' To test for *any* of several flags, combine the individual calls with `|`. Note that
+#' `"none"` is not a flag a peak can include - compare the column instead
+#' (`dplyr::filter(peaks, flags == "none")`) for peaks without any flags.
+#' @export
+orbi_peak_flags_include <- function(flags, flag) {
+  flag <- check_peak_flags(flag)
+
+  # the numeric bitmask, i.e. the `flags` column
+  if (is.numeric(flags)) {
+    mask <- sum(peak_flag_values[flag])
+    return(bitwAnd(as.integer(flags), mask) == mask)
+  }
+
+  # the decoded text, i.e. the `flags` column of an aggregated dataset. Comparing the
+  # terms rather than searching the string keeps this identical to the bitmask result,
+  # and since the column only ever holds a handful of distinct values it stays just as cheap.
+  if (is.character(flags) || is.factor(flags)) {
+    flags <- as.character(flags)
+    distinct_flags <- unique(flags)
+    included <- vapply(
+      distinct_flags,
+      function(text) {
+        if (is.na(text)) {
+          return(NA)
+        }
+        terms <- strsplit(text, peak_flags_separator, fixed = TRUE)[[1]]
+        return(all(flag %in% terms))
+      },
+      logical(1),
+      USE.NAMES = FALSE
+    )
+    return(included[match(flags, distinct_flags)])
+  }
+
+  cli_abort(
+    c(
+      "{.field flags} must be the decoded peak flags or the raw numeric bitmask",
+      "i" = "got {.obj_type_friendly {flags}}"
+    )
+  )
+}
+
+#' @describeIn orbi_peak_flags convert the flags to an alphabetically sorted, comma separated
+#' text representation, e.g. `10` becomes `"exception + fragmented"`. Peaks without any flags
+#' become `"none"`.
+#' @export
+orbi_peak_flags_to_text <- function(flags) {
+  flags <- as.integer(flags)
+  # the flags of a raw file only ever take a handful of distinct values (out of at most 128)
+  # while there can be millions of peaks, so decode the distinct values and map them back
+  distinct_flags <- unique(flags)
+  decoded <- vapply(
+    distinct_flags,
+    function(flag) {
+      if (is.na(flag)) {
+        return(NA_character_)
+      }
+      set_flags <- names(peak_flag_values)[
+        bitwAnd(flag, peak_flag_values) > 0L
+      ]
+      if (length(set_flags) == 0L) {
+        return(no_peak_flags_text)
+      }
+      paste(set_flags, collapse = peak_flags_separator)
+    },
+    character(1)
+  )
+  # match() pairs NA with NA so missing flags stay missing
+  return(decoded[match(flags, distinct_flags)])
+}

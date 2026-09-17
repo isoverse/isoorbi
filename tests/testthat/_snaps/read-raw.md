@@ -14,15 +14,15 @@
       x
     Message
       ---------------- 2 raw files - combine with orbi_aggregate_raw() ---------------
-      1. nitrate_test_10scans.raw has 10 scans with 126 peaks; no spectra were loaded
-      2. nitrate_test_1scan.raw   has  1 scans with  12 peaks; no spectra were loaded
+      1. nitrate_test_10scans.raw has 10 scans with 307 peaks; no spectra were loaded
+      2. nitrate_test_1scan.raw   has  1 scans with  30 peaks; no spectra were loaded
 
 ---
 
     Code
       y <- orbi_aggregate_raw(x)
     Message
-      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (138), and
+      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (337), and
       spectra (0) from 2 files using the standard aggregator
 
 ---
@@ -59,8 +59,8 @@
       Source CID eV, AGC Fill, Injection t0, t0 FLP, Iso Para R, Inj Para R, Access
       Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On, FAIMS
       CV)
-      > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
-      peakResolution, isRefPeak, isLockPeak
+      > peaks (337): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
+      peakResolution, flags
       > spectra (0): uidx, scan.no, mz, intensity
       > problems: has no issues
 
@@ -92,9 +92,9 @@
       x
     Message
       ---------------- 2 raw files - combine with orbi_aggregate_raw() ---------------
-      1. nitrate_test_10scans.raw has 10 scans with 126 peaks; + loaded 1 spectrum
+      1. nitrate_test_10scans.raw has 10 scans with 307 peaks; + loaded 1 spectrum
       (350 points)
-      2. nitrate_test_1scan.raw   has  1 scans with  12 peaks; + loaded 1 spectrum
+      2. nitrate_test_1scan.raw   has  1 scans with  30 peaks; + loaded 1 spectrum
       (325 points)
 
 ---
@@ -102,7 +102,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "extended")
     Message
-      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (138), and
+      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (337), and
       spectra (675) from 2 files using the extended aggregator
 
 ---
@@ -139,8 +139,8 @@
       Source CID eV, AGC Fill, Injection t0, t0 FLP, Iso Para R, Inj Para R, Access
       Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On, FAIMS
       CV
-      > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
-      peakResolution, isRefPeak, isLockPeak
+      > peaks (337): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
+      peakResolution, flags
       > spectra (675): uidx, scan.no, mz, intensity
       > problems: has no issues
 
@@ -149,7 +149,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "minimal")
     Message
-      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (138), and
+      v orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks (337), and
       spectra (675) from 2 files using the minimal aggregator
 
 ---
@@ -186,8 +186,8 @@
       Offset, Source CID eV, AGC Fill, Injection t0, t0 FLP, Iso Para R, Inj Para R,
       Access Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On,
       FAIMS CV)
-      > peaks (138): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
-      peakResolution, isRefPeak, isLockPeak
+      > peaks (337): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
+      peakResolution, flags
       > spectra (675): uidx, scan.no, mz, intensity
       > problems: has no issues
 
@@ -196,8 +196,12 @@
     Code
       z <- orbi_identify_isotopocules(y, isotopologs)
     Message
-      v orbi_identify_isotopocules() identified 44/138 peaks (32%) representing 100%
-      of the total ion current (TIC) as isotopocules M0, 15N, 17O, and 18O
+      !  orbi_identify_isotopocules() identified 50/337 peaks (15%) representing 96%
+      of the total ion current (TIC) as isotopocules M0, 15N, 17O, and 18O but
+      encountered 1 warning
+        > !  isotopocule M0 matches multiple peaks in some same scans (4
+        multi-matched peaks in total) - make sure to run orbi_flag_satellite_peaks()
+        and orbi_plot_satellite_peak()
 
 ---
 
@@ -223,15 +227,15 @@
       x
     Message
       ──────────────── [1m2 raw files - combine with orbi_aggregate_raw()[22m ───────────────
-      1. [34mnitrate_test_10scans.raw[39m has 10 [32mscans[39m with 126 [32mpeaks[39m; no [32mspectra[39m were loaded
-      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscans[39m with  12 [32mpeaks[39m; no [32mspectra[39m were loaded
+      1. [34mnitrate_test_10scans.raw[39m has 10 [32mscans[39m with 307 [32mpeaks[39m; no [32mspectra[39m were loaded
+      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscans[39m with  30 [32mpeaks[39m; no [32mspectra[39m were loaded
 
 ---
 
     Code
       y <- orbi_aggregate_raw(x)
     Message
-      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (337), and
       [34mspectra[39m (0) from 2 files using the [1m[3mstandard[23m[22m aggregator
 
 ---
@@ -268,8 +272,8 @@
       [3m[33mSource CID eV[39m[23m, [3m[33mAGC Fill[39m[23m, [3m[33mInjection t0[39m[23m, [3m[33mt0 FLP[39m[23m, [3m[33mIso Para R[39m[23m, [3m[33mInj Para R[39m[23m, [3m[33mAccess[39m[23m
       [3m[33mId[39m[23m, [3m[33mAnalog In A (V)[39m[23m, [3m[33mAnalog In B (V)[39m[23m, [3m[33mFAIMS Attached[39m[23m, [3m[33mFAIMS Voltage On[39m[23m, [3m[33mFAIMS[39m[23m
       [3m[33mCV[39m[23m)
-      → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
-      [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
+      → [34mpeaks[39m (337): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
+      [32mpeakResolution[39m, [32mflags[39m
       → [34mspectra[39m (0): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
 
@@ -301,9 +305,9 @@
       x
     Message
       ──────────────── [1m2 raw files - combine with orbi_aggregate_raw()[22m ───────────────
-      1. [34mnitrate_test_10scans.raw[39m has 10 [32mscans[39m with 126 [32mpeaks[39m; + loaded 1 [32mspectrum[39m
+      1. [34mnitrate_test_10scans.raw[39m has 10 [32mscans[39m with 307 [32mpeaks[39m; + loaded 1 [32mspectrum[39m
       (350 points)
-      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscans[39m with  12 [32mpeaks[39m; + loaded 1 [32mspectrum[39m
+      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscans[39m with  30 [32mpeaks[39m; + loaded 1 [32mspectrum[39m
       (325 points)
 
 ---
@@ -311,7 +315,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "extended")
     Message
-      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (337), and
       [34mspectra[39m (675) from 2 files using the [1m[3mextended[23m[22m aggregator
 
 ---
@@ -348,8 +352,8 @@
       [32mSource CID eV[39m, [32mAGC Fill[39m, [32mInjection t0[39m, [32mt0 FLP[39m, [32mIso Para R[39m, [32mInj Para R[39m, [32mAccess[39m
       [32mId[39m, [32mAnalog In A (V)[39m, [32mAnalog In B (V)[39m, [32mFAIMS Attached[39m, [32mFAIMS Voltage On[39m, [32mFAIMS[39m
       [32mCV[39m
-      → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
-      [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
+      → [34mpeaks[39m (337): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
+      [32mpeakResolution[39m, [32mflags[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
 
@@ -358,7 +362,7 @@
     Code
       y <- orbi_aggregate_raw(x, aggregator = "minimal")
     Message
-      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (138), and
+      [32m✔[39m [1morbi_aggregate_raw()[22m aggregated [34mfile_info[39m (2), [34mscans[39m (11), [34mpeaks[39m (337), and
       [34mspectra[39m (675) from 2 files using the [1m[3mminimal[23m[22m aggregator
 
 ---
@@ -395,8 +399,8 @@
       [3m[33mOffset[39m[23m, [3m[33mSource CID eV[39m[23m, [3m[33mAGC Fill[39m[23m, [3m[33mInjection t0[39m[23m, [3m[33mt0 FLP[39m[23m, [3m[33mIso Para R[39m[23m, [3m[33mInj Para R[39m[23m,
       [3m[33mAccess Id[39m[23m, [3m[33mAnalog In A (V)[39m[23m, [3m[33mAnalog In B (V)[39m[23m, [3m[33mFAIMS Attached[39m[23m, [3m[33mFAIMS Voltage On[39m[23m,
       [3m[33mFAIMS CV[39m[23m)
-      → [34mpeaks[39m (138): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
-      [32mpeakResolution[39m, [32misRefPeak[39m, [32misLockPeak[39m
+      → [34mpeaks[39m (337): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
+      [32mpeakResolution[39m, [32mflags[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
 
@@ -405,8 +409,12 @@
     Code
       z <- orbi_identify_isotopocules(y, isotopologs)
     Message
-      [32m✔[39m [1morbi_identify_isotopocules()[22m identified 44/138 peaks (32%) representing 100%
-      of the total ion current (TIC) as isotopocules [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m
+      [33m![39m [1morbi_identify_isotopocules()[22m identified 50/337 peaks (15%) representing 96%
+      of the total ion current (TIC) as isotopocules [32mM0[39m, [32m15N[39m, [32m17O[39m, and [32m18O[39m but
+      encountered [33m1 warning[39m
+        → [33m![39m isotopocule [32mM0[39m matches multiple peaks in some same scans (4 multi-matched
+        peaks in total) - make sure to run [1morbi_flag_satellite_peaks()[22m and
+        [1morbi_plot_satellite_peak()[22m
 
 ---
 
