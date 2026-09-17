@@ -1,14 +1,18 @@
 # isoorbi 1.6.0
 
+This release switches to version 0.3 of the `isoraw` raw file reader, which changes how peak flags are reported and which peaks are read by default.
+
 ## Breaking changes
 
- * the `isoraw` raw file reader now requires version 0.3 or later (`orbi_check_isoraw()` upgrades automatically). Version 0.3 no longer reports the `is_ref` and `is_lock_peak` columns and instead reports the raw Thermo `PeakOptions` bitmask in a `flags` column, from which these and other flags can be derived.
- * version 0.3 of the reader also reads **all** peaks by default, including the ones the centroider flagged as problematic (saturated, fragmented, merged, exception, modified). Previously these were silently discarded during the read. Pass `--skipProblematicPeaks` to the executable to get the old behavior, or filter them out after aggregation (see below).
- * as a result of the above, the `peaks` dataset of the aggregators now provides a readable `flags` column (a factor with values such as `"none"`, `"reference"` or `"exception + fragmented"`) instead of the previous `isRefPeak` and `isLockPeak` columns. Any cached raw files (`.raw.cache.zip`) created with an earlier version of the reader have to be re-read to pick up the new columns.
+ * the `isoraw` raw file reader now requires version 0.3.0 or later (`orbi_check_isoraw()` upgrades automatically). Version 0.3 no longer reports the `is_ref` and `is_lock_peak` columns and instead reports the raw Thermo `PeakOptions` bitmask in a `flags` column, from which these and every other flag can be derived.
+ * version 0.3 of the reader also reads **all** peaks by default, including the ones the centroider flagged as problematic (saturated, fragmented, merged, exception, modified). Previously these were silently discarded during the read, so expect noticeably more peaks than before - for the example file bundled with the package the peak count goes from 126 to 307. Filter them out after aggregation (see below) if you do not want them.
+ * as a result of the above, the `peaks` dataset of the aggregators now provides a readable `flags` column (a factor with values such as `"none"`, `"reference"` or `"exception + fragmented"`) instead of the previous `isRefPeak` and `isLockPeak` columns.
+ * raw file caches (`.raw.cache.zip`) created with an earlier version of the reader are detected and the corresponding raw file is read anew (with a warning). If the original `.raw` file is no longer available next to such a cache, the read reports a `cannot find this .raw file` problem (see `orbi_get_problems()`) - copy the `.raw` file back in or obtain an up to date cache.
 
 ## New features
 
- * new peak flags function `orbi_peak_flags_include()` to work with the peak flags. To filter for an exact set of flags, compare the `flags` column directly (it is a factor, so this is fast), e.g. `dplyr::filter(peaks, flags == "none")` keeps only the peaks without any flags and `flags %in% c("lock mass", "reference")` only those that are exclusively either a reference peak or a lock mass peak. Use `orbi_peak_flags_include(flags, "reference")` to find every peak carrying the reference flag whether or not it carries others.
+ * new `orbi_peak_flags_include()` function works with the peak flags. To filter for an exact set of flags, compare the `flags` column directly (it is a factor, so this is fast), e.g. `dplyr::filter(peaks, flags == "none")` keeps only the peaks without any flags and `flags %in% c("lock peak", "reference")` only those that are exclusively either a lock mass or a reference peak. Use `orbi_peak_flags_include(flags, "reference")` on the flags column to find every peak carrying the reference flag whether or not it carries others.
+ * `orbi_check_isoraw()` now confirms which reader version is ready for use instead of staying silent when nothing needs to be installed. Set `show_version = FALSE` to suppress that message (the automatic checks during a raw file read already do).
 
 ### Restoring the `isRefPeak` / `isLockPeak` columns
 
@@ -31,6 +35,12 @@ raw_files |> orbi_aggregate_raw(aggregator = my_aggregator)
 ```
 
 Register it with `my_aggregator |> orbi_register_aggregator("my_aggregator")` to be able to refer to it by name in `orbi_aggregate_raw()`.
+
+## Bug fixes & improvements
+
+ * fixed the order of the legends in `orbi_add_blocks_to_plot()` and `orbi_plot_shot_noise()`. Without an explicit order ggplot2 does not guarantee a stable sequence, so the same plot could come out with its legends swapped on different operating systems or ggplot2 versions.
+ * fixed `orbi_plot_spectra()` including lock mass peaks with a missing intensity when `show_ref_and_lock_peaks = TRUE` (an operator precedence issue in the peak selection).
+ * documentation is now generated with roxygen2 8.0.0.
 
 # isoorbi 1.5.3
 
