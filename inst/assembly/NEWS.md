@@ -4,7 +4,7 @@ This isoraw release is used by isoorbi version 1.6.0+.
 
 ## Breaking changes
 
- * `peaks.parquet` no longer contains the `is_ref` and `is_lock_peak` columns. The raw Thermo `PeakOptions` bitmask is instead reported in the `flags` column and both of these (and every other flag) can be derived from it downstream - in isoorbi via `orbi_peak_flags_has_flag()` and `orbi_peak_flags_is_flag()`.
+ * `peaks.parquet` no longer contains the `is_ref` and `is_lock_peak` columns. The raw Thermo `PeakOptions` bitmask is instead reported in the `flags` column and both of these (and every other flag) can be derived from it downstream.
  * **all** peaks are now read by default. Previously the reader silently kept only the peaks that carried no flags, the reference flag or the lock mass flag, and discarded the rest. Use the new `--skipProblematicPeaks` option to get the previous behavior.
 
 ## New features
