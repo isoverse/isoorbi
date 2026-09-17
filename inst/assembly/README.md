@@ -1,5 +1,7 @@
 # isoraw executable commandline options
 
+See [NEWS.md](NEWS.md) for the changes in each version of isoraw.
+
 ## Usage
 
 Directly from command line (assuming the executables are in the current working directory):
@@ -58,7 +60,7 @@ Problematic peaks make up a substantial fraction of a typical file, so keeping t
 
 i.e. roughly **1.3x larger** on disk and 24% more rows. The 70,246 dropped peaks in that file are 58,265 `Exception`, 11,147 `Fragmented|Exception`, 773 `Fragmented`, 38 `Merged` and 23 `Fragmented|Merged`. The default is still to keep everything, since the `flags` column allows exactly the same filtering downstream - use `--skipProblematicPeaks` when disk space or read speed matter more than being able to revisit those peaks later.
 
-Or via the rakefile (install with `bundle install`) assuming the executables are in the `out` directory of the current working directory (e.g. if they've been built via `rake buildAll`, see below):
+Or via the rakefile (install with `bundle install`) assuming the executables are in the `dist` directory of the current working directory (e.g. if they've been built via `rake buildAll`, see below):
 
 ```
 # show the version
@@ -109,7 +111,7 @@ rake build
 rake buildAll
 ```
 
-The resulting executables are stored in the `out` folder and can be used from there, copied elsewhere (e.g. to your local isoorbi package via `isoorbi::orbi_check_isoraw(source = "PATH/TO/out", reinstall_always = TRUE)` - then check with `isoorbi:::get_isoraw_version()`), or uploaded for distribution in a release. Note that local build is also possible (`rake buildLocal`) if dotnet is installed but not recommended. On MacOS it leads to non-functional binaries for osx (see [this issue](https://github.com/thermofisherlsms/RawFileReader/issues/3)).
+The resulting executables are stored in the `dist` folder and can be used from there, copied elsewhere (e.g. to your local isoorbi package via `isoorbi::orbi_check_isoraw(source = "PATH/TO/dist", reinstall_always = TRUE)` - then check with `isoorbi:::get_isoraw_version()`), or uploaded for distribution in a release. Note that local build is also possible (`rake buildLocal`) if dotnet is installed but not recommended. On MacOS it leads to non-functional binaries for osx (see [this issue](https://github.com/thermofisherlsms/RawFileReader/issues/3)).
 
 ## Tests
 
@@ -125,8 +127,8 @@ rake buildAndTest
 
 # directly, optionally against a specific executable / test folder
 bash test.sh
-bash test.sh exe=out/isoraw-linux-x64
-bash test.sh exe=out/isoraw-linux-x64 tests=/path/to/other/raw/files
+bash test.sh exe=dist/isoraw-linux-x64
+bash test.sh exe=dist/isoraw-linux-x64 tests=/path/to/other/raw/files
 ```
 
 The test files in `tests/` are deliberately small and cover different peak flag combinations:
