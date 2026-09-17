@@ -9,6 +9,7 @@ RawFileReader
 bin
 obj
 out
+dist
 output
 Gemfile.lock
 !tests/*.raw

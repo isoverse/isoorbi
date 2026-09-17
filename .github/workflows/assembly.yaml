@@ -26,12 +26,12 @@ jobs:
       - name: Pull image
         run: docker pull $DOTNET_DOCKER
       - name: Build
-        run: cd inst/assembly && docker run --rm -v $PWD:/app -w /app $DOTNET_DOCKER /app/build.sh project=/app output=/app/out
+        run: cd inst/assembly && docker run --rm -v $PWD:/app -w /app $DOTNET_DOCKER /app/build.sh project=/app output=/app/dist
       - name: Publish results
         uses: actions/upload-artifact@v4
         with:
           name: isoraw
-          path: inst/assembly/out
+          path: inst/assembly/dist
           retention-days: 1
 
   verify:

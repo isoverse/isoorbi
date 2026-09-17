@@ -3,7 +3,7 @@
 #
 # Designed to work both as a local call:
 #   bash test.sh
-#   bash test.sh exe=out/isoraw-linux-x64
+#   bash test.sh exe=dist/isoraw-linux-x64
 # AND via the dotnet docker image (see the `test` task in the Rakefile):
 #   docker run --rm -v $PWD:/app -w /app mcr.microsoft.com/dotnet/sdk:8.0 /app/test.sh
 #
@@ -39,9 +39,9 @@ done
 # Find the executable for this platform if it was not provided
 if [[ -z "$exe" ]]; then
   case "$(uname -s)" in
-    Darwin*)            exe="out/isoraw-osx-x64" ;;
-    Linux*)             exe="out/isoraw-linux-x64" ;;
-    MINGW*|MSYS*|CYGWIN*) exe="out/isoraw-win-x64.exe" ;;
+    Darwin*)            exe="dist/isoraw-osx-x64" ;;
+    Linux*)             exe="dist/isoraw-linux-x64" ;;
+    MINGW*|MSYS*|CYGWIN*) exe="dist/isoraw-win-x64.exe" ;;
     *)                  echo "Unsupported OS: $(uname -s)"; exit 1 ;;
   esac
 fi
