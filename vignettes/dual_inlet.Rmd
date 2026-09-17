@@ -60,22 +60,22 @@ data_all |> orbi_plot_spectra()
 
 ```{r}
 # Preprocess data (this is exactly the same as with an isox file)
-df <- 
+df <-
   data_all |>
   # check for issues
   # removes minor peaks that are in the same mass tolerance window
-  # of an isotopocule 
-  orbi_flag_satellite_peaks() |> 
+  # of an isotopocule
+  orbi_flag_satellite_peaks() |>
   # flag signals of isotopocules that were not detected
   # in all scans
-  orbi_flag_weak_isotopocules(min_percent = 100) |> 
+  orbi_flag_weak_isotopocules(min_percent = 100) |>
   # flags outlying scans that have more than 2 times or less than
-  # 1/2 times the average number of ions in the Orbitrap analyzer; 
+  # 1/2 times the average number of ions in the Orbitrap analyzer;
   # another method: agc_window (see function documentation for more details)
   orbi_flag_outliers(agc_fold_cutoff = 2) |>
   # sets one isotopocule in the dataset as the base peak
   # (denominator) for ratio calculation
-  orbi_define_basepeak(basepeak_def = "M0") 
+  orbi_define_basepeak(basepeak_def = "M0")
 ```
 
 No satellite peaks, no weak isotopocules, a few AGC fold outliers:
@@ -93,23 +93,23 @@ df_w_blocks <-
   # general definition
   orbi_define_blocks_for_dual_inlet(
     # the reference block is 10 min long
-    ref_block_time.min = 10, 
+    ref_block_time.min = 10,
     # the sample block is 10 min long
-    sample_block_time.min = 10, 
-    # there is 5 min of data before the reference block starts, 
+    sample_block_time.min = 10,
+    # there is 5 min of data before the reference block starts,
     # to stabilize spray conditions
-    startup_time.min = 5, 
+    startup_time.min = 5,
     # it takes 2 min to make sure the right solution is measured
     # after switching the valve
-    change_over_time.min = 2, 
+    change_over_time.min = 2,
     sample_block_name = "sample",
     ref_block_name = "reference"
-  ) |> 
+  ) |>
   # fine adjustments
   # the 1st reference block is shorter by 2 min, cut from the start
-  orbi_adjust_block(block = 1, shift_start_time.min = 2) |> 
+  orbi_adjust_block(block = 1, shift_start_time.min = 2) |>
   # the start and end of the 2nd reference block are manually set
-  orbi_adjust_block(block = 4, set_start_time.min = 38, set_end_time.min = 44) 
+  orbi_adjust_block(block = 4, set_start_time.min = 38, set_end_time.min = 44)
 
 # get blocks info
 blocks_info <- df_w_blocks |> orbi_get_blocks_info()
@@ -126,14 +126,14 @@ df_w_blocks |> orbi_plot_raw_data(y = intensity, y_scale = "linear")
 
 # isotopocule ratios - you can see that even the AGC outliers
 # still create decent ratios
-df_w_blocks |>  orbi_plot_raw_data(y = ratio)
+df_w_blocks |> orbi_plot_raw_data(y = ratio)
 ```
 
 
 ## Plot 2: highlight blocks in data + no outliers
 
 ```{r, fig.width=8, fig.height=5}
-df_w_blocks |> 
+df_w_blocks |>
   orbi_plot_raw_data(
     isotopocules = "15N",
     y = ratio,
@@ -148,7 +148,7 @@ df_w_blocks |>
 ## Plot 3: highlight sample blocks on top
 
 ```{r, fig.width=8, fig.height=5}
-df_w_blocks |> 
+df_w_blocks |>
   orbi_plot_raw_data(
     isotopocules = "15N",
     y = ratio,
@@ -163,7 +163,7 @@ df_w_blocks |>
 
 ```{r}
 # calculate summary
-df_w_summary <- 
+df_w_summary <-
   df_w_blocks |>
   # segment (optional)
   orbi_segment_blocks(into_segments = 3) |>
@@ -174,10 +174,11 @@ df_w_summary <-
   )
 
 # export file info and summary to excel
-df_w_summary |> orbi_export_data_to_excel(
-  file = "output.xlsx",
-  include = c("file_info", "summary")
-)
+df_w_summary |>
+  orbi_export_data_to_excel(
+    file = "output.xlsx",
+    include = c("file_info", "summary")
+  )
 ```
 
 ```{r}
@@ -197,7 +198,9 @@ df_w_summary |>
   ggplot() +
   aes(
     x = block_seg,
-    y = ratio, ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
+    y = ratio,
+    ymin = ratio - ratio_sem,
+    ymax = ratio + ratio_sem,
     color = sample_name
   ) +
   geom_pointrange() +
@@ -224,19 +227,21 @@ plot2 <- df_w_blocks |>
     add_all_blocks = TRUE,
     show_outliers = FALSE
   ) +
-   # ratio summary data
+  # ratio summary data
   geom_pointrange(
     data = function(df) {
-      df_w_summary |> 
+      df_w_summary |>
         orbi_get_data(summary = everything()) |>
-        filter(as.character(isotopocule) == df$isotopocule[1]) |> 
+        filter(as.character(isotopocule) == df$isotopocule[1]) |>
         mutate(panel = "summary")
     },
     map = aes(
-      x = mean_time.min, y = ratio, 
-      ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
+      x = mean_time.min,
+      y = ratio,
+      ymin = ratio - ratio_sem,
+      ymax = ratio + ratio_sem,
       shape = sample_name
-    ), 
+    ),
     size = 0.5
   ) +
   facet_grid(panel ~ ., switch = "y") +
@@ -249,9 +254,11 @@ plot2
 ```{r, fig.width=8, fig.height=6}
 #| warning: false
 # same but with 18O
-plot2 %+% 
-  (df_w_blocks |> orbi_get_data(scans = everything(), peaks = everything()) |>
-   filter(isotopocule == "18O") |> mutate(panel = "raw ratios")) +
+plot2 +
+  (df_w_blocks |>
+    orbi_get_data(scans = everything(), peaks = everything()) |>
+    filter(isotopocule == "18O") |>
+    mutate(panel = "raw ratios")) +
   labs(title = "18O/M0")
 ```
 
