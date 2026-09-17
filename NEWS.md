@@ -1,3 +1,37 @@
+# isoorbi 1.6.0
+
+## Breaking changes
+
+ * the `isoraw` raw file reader now requires version 0.3 or later (`orbi_check_isoraw()` upgrades automatically). Version 0.3 no longer reports the `is_ref` and `is_lock_peak` columns and instead reports the raw Thermo `PeakOptions` bitmask in a `flags` column, from which these and other flags can be derived.
+ * version 0.3 of the reader also reads **all** peaks by default, including the ones the centroider flagged as problematic (saturated, fragmented, merged, exception, modified). Previously these were silently discarded during the read. Pass `--skipProblematicPeaks` to the executable to get the old behavior, or filter them out after aggregation (see below).
+ * as a result of the above, the `peaks` dataset of the aggregators now provides a readable `flags` column (a factor with values such as `"none"`, `"reference"` or `"exception + fragmented"`) instead of the previous `isRefPeak` and `isLockPeak` columns. Any cached raw files (`.raw.cache.zip`) created with an earlier version of the reader have to be re-read to pick up the new columns.
+
+## New features
+
+ * new peak flags function `orbi_peak_flags_include()` to work with the peak flags. To filter for an exact set of flags, compare the `flags` column directly (it is a factor, so this is fast), e.g. `dplyr::filter(peaks, flags == "none")` keeps only the peaks without any flags and `flags %in% c("lock mass", "reference")` only those that are exclusively either a reference peak or a lock mass peak. Use `orbi_peak_flags_include(flags, "reference")` to find every peak carrying the reference flag whether or not it carries others.
+
+### Restoring the `isRefPeak` / `isLockPeak` columns
+
+If you rely on the previous boolean columns, add them back with a custom aggregator:
+
+```r
+my_aggregator <- orbi_get_aggregator("standard") |>
+  orbi_add_to_aggregator(
+    "peaks", "isRefPeak", source = "flags",
+    func = "orbi_peak_flags_include", args = list(flag = "reference"),
+    cast = "as.logical"
+  ) |>
+  orbi_add_to_aggregator(
+    "peaks", "isLockPeak", source = "flags",
+    func = "orbi_peak_flags_include", args = list(flag = "lock peak"),
+    cast = "as.logical"
+  )
+
+raw_files |> orbi_aggregate_raw(aggregator = my_aggregator)
+```
+
+Register it with `my_aggregator |> orbi_register_aggregator("my_aggregator")` to be able to refer to it by name in `orbi_aggregate_raw()`.
+
 # isoorbi 1.5.3
 
 This is a minor update to support the latest version of testthat and address a few small bugs.
