@@ -221,7 +221,7 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
     fill_scale$palette(3),
     c(
       "isotopocules (no flags)" = "black",
-      "isotopocules (exception)" = "#1B9E77",
+      "isotopocules (exception)" = "#7570B3",
       "not detected" = "white"
     )
   )

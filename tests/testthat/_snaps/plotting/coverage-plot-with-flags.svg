@@ -29,11 +29,11 @@
 <rect x='59.47' y='173.56' width='447.46' height='96.93' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #FFFFFF;' />
 <rect x='59.47' y='294.72' width='447.46' height='96.93' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #FFFFFF;' />
 <rect x='59.47' y='415.89' width='447.46' height='96.93' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #FFFFFF;' />
-<rect x='34.61' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1B9E77;' />
+<rect x='34.61' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #7570B3;' />
 <rect x='34.61' y='52.39' width='497.18' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
-<rect x='134.05' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1B9E77;' />
-<rect x='233.48' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1B9E77;' />
-<rect x='482.07' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1B9E77;' />
+<rect x='134.05' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #7570B3;' />
+<rect x='233.48' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #7570B3;' />
+<rect x='482.07' y='52.39' width='49.72' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #7570B3;' />
 <rect x='34.61' y='173.56' width='497.18' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
 <rect x='34.61' y='294.72' width='497.18' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
 <rect x='34.61' y='415.89' width='497.18' height='96.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
@@ -61,7 +61,7 @@
 <text x='283.20' y='567.20' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='56.05px' lengthAdjust='spacingAndGlyphs'>scan.no</text>
 <text x='548.23' y='259.45' style='font-size: 16.00px; font-family: sans;' textLength='48.05px' lengthAdjust='spacingAndGlyphs'>legend</text>
 <rect x='548.93' y='267.30' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000;' />
-<rect x='548.93' y='284.58' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1B9E77;' />
+<rect x='548.93' y='284.58' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #7570B3;' />
 <rect x='548.93' y='301.86' width='15.86' height='15.86' style='stroke-width: 1.07; stroke-linecap: butt; stroke-linejoin: miter; fill: #FFFFFF;' />
 <text x='570.99' y='279.63' style='font-size: 12.80px; font-family: sans;' textLength='128.09px' lengthAdjust='spacingAndGlyphs'>isotopocules (no flags)</text>
 <text x='570.99' y='296.91' style='font-size: 12.80px; font-family: sans;' textLength='138.06px' lengthAdjust='spacingAndGlyphs'>isotopocules (exception)</text>
