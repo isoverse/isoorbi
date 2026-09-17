@@ -10,6 +10,7 @@
 > `bonus`.
 
 ``` r
+
 # libraries
 library(isoorbi) #load isoorbi R package
 library(dplyr) # for mutating data frames
@@ -22,6 +23,7 @@ First step is reading in your .raw data files.
 ### `orbi_find_raw()`
 
 ``` r
+
 # path to your data folder
 data_folder <- file.path("data")
 
@@ -38,23 +40,25 @@ file_paths
 ### `orbi_read_raw()` \*
 
 ``` r
+
 # read files (simplest)
 raw_files <- file_paths |> orbi_read_raw()
 ```
 
 ``` fansi
-✔ [244ms] orbi_read_raw() read nitrate_test_10scans.raw from cache
+✔ [238ms] orbi_read_raw() read nitrate_test_10scans.raw from cache
 ```
 
 ``` fansi
-✔ [51ms] orbi_read_raw() read nitrate_test_1scan.raw from cache
+✔ [40ms] orbi_read_raw() read nitrate_test_1scan.raw from cache
 ```
 
 ``` fansi
-✔ [395ms] orbi_read_raw() finished reading 2 files
+✔ [391ms] orbi_read_raw() finished reading 2 files
 ```
 
 ``` r
+
 # read files including some raw spectra
 raw_files <-
   file_paths |>
@@ -84,16 +88,18 @@ raw_files
 Combine (aggregate) the data from the raw files.
 
 ``` r
+
 # aggregate raw data
 agg_data <- raw_files |> orbi_aggregate_raw()
 ```
 
 ``` fansi
-✔ [608ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
+✔ [552ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
 (138), and spectra (943) from 2 files using the standard aggregator
 ```
 
 ``` r
+
 # shaw all that was recovered
 # (as well as what was ignored/not aggregated)
 agg_data
@@ -158,6 +164,7 @@ aggregator is more elaborate, providing access to additional columns
 from the raw data files.
 
 ``` r
+
 # example: minimal vs. extended aggregator
 orbi_get_aggregator("minimal")
 ```
@@ -195,6 +202,7 @@ Dataset spectra:
 ```
 
 ``` r
+
 orbi_get_aggregator("extended")
 ```
 
@@ -243,12 +251,13 @@ Dataset spectra:
 ```
 
 ``` r
+
 # using the extended aggregator instead of the default (standard)
 raw_files |> orbi_aggregate_raw(aggregator = "extended")
 ```
 
 ``` fansi
-✔ [974ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
+✔ [969ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
 (138), and spectra (943) from 2 files using the extended aggregator
 ```
 
@@ -314,6 +323,7 @@ This funnctionality is rarely needed and thus not part of the package
 structure flowchart.
 
 ``` r
+
 my_agg <- 
   orbi_get_aggregator("minimal") |>
   # pull out the S-Lens RF Level information from the scans and store it as a number
@@ -358,12 +368,13 @@ Dataset spectra:
 ```
 
 ``` r
+
 # use it
 raw_files |> orbi_aggregate_raw(aggregator = "test")
 ```
 
 ``` fansi
-✔ [252ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
+✔ [244ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
 (138), and spectra (943) from 2 files using the test aggregator
 ```
 
@@ -424,6 +435,7 @@ are empty but this can be very helpful to see what went wrong during
 reading or aggregation.
 
 ``` r
+
 raw_files |> orbi_get_problems()
 ```
 
@@ -434,6 +446,7 @@ raw_files |> orbi_get_problems()
 ```
 
 ``` r
+
 agg_data |> orbi_get_problems()
 ```
 
@@ -454,6 +467,7 @@ instead of the aggregated data structure, you can switch to that at any
 point and use the resulting data frame tibble in subsequent functions.
 
 ``` r
+
 # direct access to the data stored in the aggregated dataset
 agg_data$file_info
 ```
@@ -474,6 +488,7 @@ agg_data$file_info
 ```
 
 ``` r
+
 agg_data$scans
 ```
 
@@ -498,6 +513,7 @@ agg_data$scans
 ```
 
 ``` r
+
 agg_data$peaks
 ```
 
@@ -520,6 +536,7 @@ agg_data$peaks
 ```
 
 ``` r
+
 agg_data$spectra
 ```
 
@@ -541,6 +558,7 @@ agg_data$spectra
 ```
 
 ``` r
+
 # better way to retrieve+combine the data with dplyr select syntax:
 agg_data |>
   orbi_get_data(
@@ -551,7 +569,7 @@ agg_data |>
 ```
 
 ``` fansi
-✔ [16ms] orbi_get_data() retrieved 138 records from the combination of
+✔ [15ms] orbi_get_data() retrieved 138 records from the combination of
 file_info (2), scans (11), and peaks (138) via uidx and scan.no
 ```
 
@@ -581,6 +599,7 @@ The next step is identifying isotpocules.
 ### `orbi_identify_isotopocules()` \*
 
 ``` r
+
 # list of isotopocules (can alternatively be in a tsv/csv/xlsx file)
 isotopocules <- tibble(
     compound = "nitrate",
@@ -595,7 +614,7 @@ data <- agg_data |> orbi_identify_isotopocules(isotopocules)
 ```
 
 ``` fansi
-✔ [45ms] orbi_identify_isotopocules() identified 44/138 peaks (32%)
+✔ [38ms] orbi_identify_isotopocules() identified 44/138 peaks (32%)
 representing 100% of the total ion current (TIC) as isotopocules M0, 15N, 17O,
 and 18O
 ```
@@ -607,13 +626,14 @@ and 18O
 ### `orbi_flag_satellite_peas()` \*
 
 ``` r
+
 # this can happen here or later on in the workflow
 # in the case of these files there are no satellite peaks
 data |> orbi_flag_satellite_peaks() |> orbi_plot_satellite_peaks()
 ```
 
 ``` fansi
-✔ [11ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [10ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` fansi
@@ -626,6 +646,7 @@ data |> orbi_flag_satellite_peaks() |> orbi_plot_satellite_peaks()
 ### `orbi_plot_isotopocule_coverage()`
 
 ``` r
+
 # this can happen here or later on in the workflow
 data |> orbi_get_isotopocule_coverage()
 ```
@@ -647,6 +668,7 @@ data |> orbi_get_isotopocule_coverage()
 ```
 
 ``` r
+
 data |> orbi_plot_isotopocule_coverage()
 ```
 

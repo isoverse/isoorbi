@@ -1,6 +1,7 @@
 # Flow Injection
 
 ``` r
+
 # load libraries
 library(isoorbi) # for Orbitrap functions
 library(dplyr) # for data wrangling
@@ -12,6 +13,7 @@ library(ggplot2) # for data visualization
 ### Load raw file(s)
 
 ``` r
+
 # read raw files including 1 spectrum
 raw_files <-
   c("ac5.RAW", "ac6.RAW", "s3744.RAW") |>
@@ -21,30 +23,31 @@ raw_files <-
 ```
 
 ``` fansi
-✔ [273ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
+✔ [274ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [101ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
+✔ [107ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [78ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
+✔ [72ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
 1 scan
 ```
 
 ``` fansi
-✔ [582ms] orbi_read_raw() finished reading 3 files
+✔ [579ms] orbi_read_raw() finished reading 3 files
 ```
 
 ``` fansi
-✔ [843ms] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
+✔ [854ms] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
 (514.98k), and spectra (1.98k) from 3 files using the standard aggregator
 ```
 
 ``` r
+
 # quick glance at the spectra (m/z range 96 to 102)
 raw_files |> orbi_plot_spectra(96, 102)
 ```
@@ -57,6 +60,7 @@ One spectrum from each file with the M+x regions highlighted.
 ### Identify isotopocules
 
 ``` r
+
 # identify sulfate isotopocules
 # could come from a tsv, csv, or xlsx spreadsheet instead
 isotopocules <- tibble(
@@ -81,7 +85,7 @@ raw_files_w_isotopocules <- raw_files |>
 ```
 
 ``` fansi
-! [3.7s] orbi_identify_isotopocules() identified 84.85k/514.98k peaks (16%)
+! [4s] orbi_identify_isotopocules() identified 84.85k/514.98k peaks (16%)
 representing 94% of the total ion current (TIC) as isotopocules M0, 33S, 17O,
 34S, 18O, 36S, 33S18O, 34S17O, and 18O18O using the default_tolerance of 1
 mmu but encountered 1 warning
@@ -97,10 +101,11 @@ because they were unidentified peaks (430.13k). Remaining isotopocules: M0,
 ```
 
 ``` fansi
-✔ [2.7s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [2.8s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` r
+
 # plot again now with the isotopocules identified
 raw_files_w_isotopocules |> orbi_plot_spectra(96, 102)
 ```
@@ -111,6 +116,7 @@ pink).](flow_injection_files/figure-html/fig-spectra-w-isotopocules-1.png)
 Spectra with identified isotopocules (missing ones highlighted in pink).
 
 ``` r
+
 # check coverage (as suggested during isotopocule identifiation)
 raw_files_w_isotopocules |> orbi_plot_isotopocule_coverage()
 ```
@@ -128,6 +134,7 @@ scans). We won’t work with these further anyways but it’s a good visual
 example of how much harder these are to detect.
 
 ``` r
+
 # Preprocess data (this is exactly the same as with an isox file)
 data <- 
   raw_files_w_isotopocules |>
@@ -144,7 +151,7 @@ data <-
 ```
 
 ``` fansi
-✔ [25ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
+✔ [27ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
 because they were missing isotopocules (64.84k), or not the selected
 isotopocule M0, 33S, 17O, 34S, and 18O (1.82k).
 ```
@@ -156,20 +163,21 @@ groups (based on uidx, compound, and isotopocule)
 ```
 
 ``` fansi
-✔ [26ms] orbi_flag_outliers() flagged 44/16632 scans (0.26%) as outliers based
+✔ [25ms] orbi_flag_outliers() flagged 44/16632 scans (0.26%) as outliers based
 on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
 average number of ions tic * it.ms in the Orbitrap analyzer, in 3 data groups
 (based on uidx) → use orbi_plot_raw_data(y = tic * it.ms) to visualize them
 ```
 
 ``` fansi
-✔ [2.1s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
+✔ [1.9s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
 66.40k ratio values for 4 isotopocules (33S, 17O, 34S, and 18O)
 ```
 
 Let’s take a look at the AGC cutoff flagged samples
 
 ``` r
+
 # in terms of scans
 orbi_plot_raw_data(data, y = tic * it.ms, y_scale = "log")
 ```
@@ -180,6 +188,7 @@ analyzer](flow_injection_files/figure-html/fig-raw-data-tic-it.ms-1.png)
 Estimated ions in the analyzer
 
 ``` r
+
 # and in terms of the ions
 orbi_plot_raw_data(data, y = ions.incremental, y_scale = "log")
 ```
@@ -193,6 +202,7 @@ Seems like the issue is mostly towards the end of the s3744 analysis.
 What about the resulting ratios?
 
 ``` r
+
 data |> orbi_plot_raw_data(y = ratio) 
 ```
 
@@ -208,6 +218,7 @@ included in the summary calculation of the resulting ratios.
 ## Summary
 
 ``` r
+
 # summarize the ratio summaries
 data_summary <- 
   data |>
@@ -215,12 +226,13 @@ data_summary <-
 ```
 
 ``` fansi
-✔ [97ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
+✔ [92ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
 68 flagged peaks; excluding 0 unused peaks) using the sum method and grouping
 the data by uidx, filename, compound, basepeak, and isotopocule
 ```
 
 ``` r
+
 # data
 data_summary |>
   orbi_get_data(summary = c("compound", "isotopocule", starts_with("ratio")))
@@ -251,6 +263,7 @@ data_summary |>
 ```
 
 ``` r
+
 # export file info and summary to excel
 data_summary |> orbi_export_data_to_excel(
   file = "output.xlsx",
@@ -259,11 +272,12 @@ data_summary |> orbi_export_data_to_excel(
 ```
 
 ``` fansi
-✔ [426ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
+✔ [422ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
 and 12 rows of summary) to output.xlsx
 ```
 
 ``` r
+
 fig <- 
   data_summary |>
   # get out all summary data
@@ -299,6 +313,7 @@ fig <-
 ```
 
 ``` r
+
 fig
 ```
 

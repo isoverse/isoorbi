@@ -77,11 +77,11 @@ df <-
   orbi_read_isox(file = fpath) |>
   orbi_simplify_isox() |>
   orbi_flag_outliers(agc_window = c(1,99))
-#> ✔ [21ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [19ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 #> ✔ [5ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
-#> ✔ [27ms] orbi_flag_outliers() flagged 30/1290 scans (2.3%) as outliers based on
+#> ✔ [28ms] orbi_flag_outliers() flagged 30/1290 scans (2.3%) as outliers based on
 #> AGC window (1% to 99%) cutoff, i.e. based on scans whose number of ions tic *
 #> it.ms in the Orbitrap analyzer fall into the lowest (<1%) or highest (>99%)
 #> quantiles, in 3 data groups (based on filename) → use orbi_plot_raw_data(y =

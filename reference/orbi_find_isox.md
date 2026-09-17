@@ -21,6 +21,7 @@ orbi_find_isox(folder, recursive = TRUE)
 ## Examples
 
 ``` r
+
 # all .isox files provided with the isoorbi package
 orbi_find_isox(system.file("extdata", package = "isoorbi"))
 #> [1] "/home/runner/work/_temp/Library/isoorbi/extdata/testfile_dual_inlet.isox"

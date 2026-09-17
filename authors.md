@@ -13,7 +13,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/isoverse/isoorbi/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/inst/CITATION)
 
 Kantnerova et al.
 

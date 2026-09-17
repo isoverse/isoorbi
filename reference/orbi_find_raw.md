@@ -31,6 +31,7 @@ orbi_find_raw(folder, pattern = NULL, include_cache = TRUE, recursive = TRUE)
 ## Examples
 
 ``` r
+
 # all .raw files provided with the isoorbi package
 orbi_find_raw(system.file("extdata", package = "isoorbi"))
 #> [1] "/home/runner/work/_temp/Library/isoorbi/extdata/nitrate_test_10scans.raw"

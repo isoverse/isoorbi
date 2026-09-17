@@ -47,7 +47,7 @@ Additional information on the columns:
 ``` r
 fpath <- system.file("extdata", "testfile_dual_inlet.isox", package = "isoorbi")
 df <- orbi_read_isox(file = fpath)
-#> ✔ [11ms] orbi_read_isox() loaded 5184 peaks for 1 compound (NO3-) with 6
+#> ✔ [9ms] orbi_read_isox() loaded 5184 peaks for 1 compound (NO3-) with 6
 #> isotopocules (15N, 17O, 18O, 15N18O, 17O18O, and 18O18O) from
 #> testfile_dual_inlet.isox
 ```
