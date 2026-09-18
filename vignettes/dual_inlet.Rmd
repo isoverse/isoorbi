@@ -201,7 +201,7 @@ df_w_summary |>
     y = ratio,
     ymin = ratio - ratio_sem,
     ymax = ratio + ratio_sem,
-    color = sample_name
+    color = block_name
   ) +
   geom_pointrange() +
   facet_grid(isotopocule ~ ., scales = "free_y") +
@@ -240,7 +240,7 @@ plot2 <- df_w_blocks |>
       y = ratio,
       ymin = ratio - ratio_sem,
       ymax = ratio + ratio_sem,
-      shape = sample_name
+      shape = block_name
     ),
     size = 0.5
   ) +

@@ -964,7 +964,7 @@ orbi_plot_isotopocule_coverage <- function(
             "uidx",
             "scan.no",
             "time.min",
-            dplyr::any_of(c("block", "data_group", "sample_name", "data_type"))
+            dplyr::any_of(c("block", "data_group", "block_name", "data_type"))
           ),
         by = c("uidx", "scan.no")
       )

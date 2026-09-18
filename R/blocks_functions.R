@@ -8,7 +8,8 @@
 #' @param end_time.min set the end time of the block
 #' @param start_scan.no set the start scan of the block
 #' @param end_scan.no set the end scan of the block
-#' @param sample_name if provided, will be used as the `sample_name` for the block
+#' @param block_name if provided, will be used as the `block_name` for the block
+#' @param sample_name `r lifecycle::badge("deprecated")` renamed to `block_name` since the column it sets names the block rather than necessarily a sample
 #' @return A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of `orbi_get_option("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
 #' @export
 orbi_define_block_for_flow_injection <- function(
@@ -17,8 +18,20 @@ orbi_define_block_for_flow_injection <- function(
   end_time.min = NULL,
   start_scan.no = NULL,
   end_scan.no = NULL,
-  sample_name = NULL
+  block_name = NULL,
+  sample_name = lifecycle::deprecated()
 ) {
+  # deprecated arguments
+  if (lifecycle::is_present(sample_name)) {
+    lifecycle::deprecate_warn(
+      "1.6.0",
+      "orbi_define_block_for_flow_injection(sample_name = )",
+      "orbi_define_block_for_flow_injection(block_name = )",
+      details = "the `sample_name` column created by the block definitions was renamed to `block_name`"
+    )
+    block_name <- sample_name
+  }
+
   # saftey checks
   check_dataset_arg(dataset)
   check_arg(
@@ -100,7 +113,7 @@ orbi_define_block_for_flow_injection <- function(
         "time.min",
         "data_group",
         "block",
-        "sample_name",
+        "block_name",
         "data_type",
         "segment"
       ))
@@ -111,8 +124,8 @@ orbi_define_block_for_flow_injection <- function(
   if (!"block" %in% names(single_scans)) {
     single_scans$block <- 0L
   }
-  if (!"sample_name" %in% names(single_scans)) {
-    single_scans$sample_name <- NA_character_
+  if (!"block_name" %in% names(single_scans)) {
+    single_scans$block_name <- NA_character_
   }
   if (!"data_type" %in% names(single_scans)) {
     single_scans$data_type <- orbi_get_option("data_type_unused")
@@ -161,7 +174,7 @@ orbi_define_block_for_flow_injection <- function(
   out <-
     try_catch_cnds(
       single_scans |>
-        # introduce updated segment, block, data type and sample_name
+        # introduce updated segment, block, data type and block_name
         dplyr::mutate(
           new_block = ifelse(
             .data$scan.no >= .data$start_scan.no &
@@ -169,10 +182,10 @@ orbi_define_block_for_flow_injection <- function(
             .data$next_block,
             .data$block
           ),
-          sample_name = ifelse(
-            !is.null(!!sample_name) & .data$new_block == .data$next_block,
-            !!sample_name,
-            .data$sample_name
+          block_name = ifelse(
+            !is.null(!!block_name) & .data$new_block == .data$next_block,
+            !!block_name,
+            .data$block_name
           ),
           data_type = ifelse(
             .data$new_block == .data$next_block,
@@ -204,7 +217,7 @@ orbi_define_block_for_flow_injection <- function(
           -dplyr::any_of(c(
             "data_group",
             "block",
-            "sample_name",
+            "block_name",
             "data_type",
             "segment"
           ))
@@ -216,7 +229,7 @@ orbi_define_block_for_flow_injection <- function(
               "scan.no",
               "data_group",
               "block" = "new_block",
-              "sample_name",
+              "block_name",
               "data_type",
               "segment"
             ),
@@ -262,7 +275,7 @@ orbi_define_block_for_flow_injection <- function(
 #' @return A data frame (tibble) with block annotations in the form of the additional columns described below:
 #' * `data_group` is an integer that numbers each data group (whether that's startup, a sample block, a segment, etc.) in each file sequentially to uniquely identify groups of data that belong together - this columns is NOT static (i.e. functions like [orbi_adjust_block()] and [orbi_segment_blocks()] will lead to renumbering) and should be used purely for grouping purposes in calculations and visualization
 #' * `block` is an integer counting the data blocks in each file (0 is the startup block)
-#' * `sample_name` is the name of the material being measured as defined by the `ref_block_name` and `sample_block_name` parameters
+#' * `block_name` is the name of the material being measured as defined by the `ref_block_name` and `sample_block_name` parameters
 #' * `segment` is an integer defines segments within individual blocks - this will be `NA` until the optional [orbi_segment_blocks()] is called
 #' * `data_type` is a text value describing the type of data in each `data_group` - for a list of the main categories, call `orbi_get_options("data_type")`
 #' @export
@@ -349,7 +362,7 @@ orbi_define_blocks_for_dual_inlet <- function(
     dplyr::left_join(
       tibble(
         idx = c(0L, 1L, 2L),
-        sample_name = c(ref_block_name, ref_block_name, sample_block_name),
+        block_name = c(ref_block_name, ref_block_name, sample_block_name),
         startup = c(TRUE, FALSE, FALSE)
       ),
       by = "idx"
@@ -391,8 +404,8 @@ orbi_define_blocks_for_dual_inlet <- function(
   # info message
   finish_info(
     "identified {blocks |> dplyr::filter(.data$block > 0) |> nrow()} blocks ",
-    "({blocks |> dplyr::filter(.data$block > 0, .data$sample_name == ref_block_name) |> nrow()} {.field {ref_block_name}}, ",
-    "{blocks |> dplyr::filter(.data$block > 0, .data$sample_name == sample_block_name) |> nrow()} {.field {sample_block_name}}) ",
+    "({blocks |> dplyr::filter(.data$block > 0, .data$block_name == ref_block_name) |> nrow()} {.field {ref_block_name}}, ",
+    "{blocks |> dplyr::filter(.data$block > 0, .data$block_name == sample_block_name) |> nrow()} {.field {sample_block_name}}) ",
     "in data from ",
     "{blocks |> dplyr::select('filename') |> dplyr::distinct() |> nrow()} file{?s}",
     start = start
@@ -408,7 +421,7 @@ orbi_define_blocks_for_dual_inlet <- function(
           "scan.no",
           "data_group",
           "block",
-          "sample_name",
+          "block_name",
           "data_type",
           "segment"
         ),
@@ -534,7 +547,7 @@ orbi_adjust_block <- function(
         "time.min"
       },
       "block",
-      "sample_name",
+      "block_name",
       "data_type"
     ),
     .arg = "dataset"
@@ -546,7 +559,7 @@ orbi_adjust_block <- function(
       "filename",
       "scan.no",
       "block",
-      "sample_name",
+      "block_name",
       "data_type",
       dplyr::any_of(c(
         "uidx",
@@ -774,10 +787,10 @@ orbi_adjust_block <- function(
         .data$block
       ),
       # update sample name
-      sample_name = ifelse(
+      block_name = ifelse(
         .data$scan.no >= new_start_scan & .data$scan.no <= new_end_scan,
-        old_start_row$sample_name,
-        .data$sample_name
+        old_start_row$block_name,
+        .data$block_name
       )
     ) |>
     # determine data groups
@@ -796,7 +809,7 @@ orbi_adjust_block <- function(
     scans |>
     dplyr::select(
       -"block",
-      -"sample_name",
+      -"block_name",
       -"data_type",
       -dplyr::any_of(c("data_group", "segment"))
     ) |>
@@ -810,7 +823,7 @@ orbi_adjust_block <- function(
               "scan.no",
               "data_group",
               "block",
-              "sample_name",
+              "block_name",
               "data_type",
               "segment"
             )
@@ -886,7 +899,7 @@ orbi_segment_blocks <- function(
     "scan.no",
     "time.min",
     "block",
-    "sample_name",
+    "block_name",
     "data_type"
   )
   if ("uidx" %in% names(scans)) {
@@ -981,7 +994,7 @@ orbi_segment_blocks <- function(
     scans |>
     dplyr::select(
       -"block",
-      -"sample_name",
+      -"block_name",
       -"data_type",
       -dplyr::any_of(c("data_group", "segment"))
     ) |>
@@ -992,7 +1005,7 @@ orbi_segment_blocks <- function(
           "scan.no",
           "data_group",
           "block",
-          "sample_name",
+          "block_name",
           "data_type",
           "segment"
         ),
@@ -1024,7 +1037,7 @@ orbi_get_blocks_info <- function(
     "injection",
     "data_group",
     "block",
-    "sample_name",
+    "block_name",
     "data_type",
     "segment"
   )
@@ -1073,7 +1086,7 @@ orbi_get_blocks_info <- function(
       .by = dplyr::any_of(c("uidx", "filename")),
       data_group = NA_integer_,
       block = NA_integer_,
-      sample_name = NA_character_,
+      block_name = NA_character_,
       data_type = factor(NA_character_),
       segment = NA_integer_,
       start_scan.no = min(.data$scan.no),
@@ -1258,7 +1271,7 @@ orbi_add_blocks_to_plot <- function(
 
 # check if dataset has blocks
 has_blocks <- function(dataset) {
-  return(all(c("block", "sample_name", "data_type") %in% names(dataset)))
+  return(all(c("block", "block_name", "data_type") %in% names(dataset)))
 }
 
 # helper function to find blocks (internal)

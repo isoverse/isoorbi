@@ -381,7 +381,7 @@ test_that("orbi_summarize_results()", {
       block = as.factor("block1"),
       segment = as.factor("segment2"),
       injection = as.factor("injection3"),
-      sample_name = as.factor("sample_name4")
+      block_name = as.factor("sample_name4")
     ) |>
     orbi_summarize_results(ratio_method = "mean") |>
     expect_snapshot_value(style = "json2") |>

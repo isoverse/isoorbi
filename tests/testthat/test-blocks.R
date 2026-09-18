@@ -61,6 +61,32 @@ test_that("orbi_define_block_for_flow_injection()", {
     end_time.min = 0.9
   ) |>
     expect_message("added a new block")
+
+  # block_name sets the block_name column
+  with_name <- orbi_define_block_for_flow_injection(
+    test_data,
+    start_time.min = 0.1,
+    end_time.min = 0.9,
+    block_name = "my block"
+  ) |>
+    suppressMessages()
+  expect_true("block_name" %in% names(with_name))
+  expect_equal(setdiff(unique(with_name$block_name), NA), "my block")
+
+  # the renamed sample_name argument is deprecated but still forwards
+  # (lifecycle only warns once per session unless the verbosity is forced)
+  withr::local_options(lifecycle_verbosity = "warning")
+  expect_warning(
+    deprecated_name <- orbi_define_block_for_flow_injection(
+      test_data,
+      start_time.min = 0.1,
+      end_time.min = 0.9,
+      sample_name = "my block"
+    ) |>
+      suppressMessages(),
+    "sample_name.*deprecated"
+  )
+  expect_equal(deprecated_name, with_name)
 })
 
 test_that("internal find_intervals()", {
@@ -332,7 +358,7 @@ test_that("orbi_define_blocks_for_dual_inlet()", {
       dplyr::mutate(
         data_group = c(1L, 1L, 2L, 3L, 3L, 3L, 1:4),
         block = rep(1:4, c(2, 4, 2, 2)),
-        sample_name = rep(c("ref", "sam", "ref", "sam"), c(2, 4, 2, 2)),
+        block_name = rep(c("ref", "sam", "ref", "sam"), c(2, 4, 2, 2)),
         data_type = c(
           "data",
           "data",
@@ -366,7 +392,7 @@ test_that("orbi_define_blocks_for_dual_inlet()", {
       dplyr::mutate(
         data_group = c(1L, 2L, 2L, 3L, 4L, 4L, 1L, 1L, 2L, 3L),
         block = rep(0:3, c(1, 2, 5, 2)),
-        sample_name = rep(c("ref", "sam", "ref"), c(3, 5, 2)),
+        block_name = rep(c("ref", "sam", "ref"), c(3, 5, 2)),
         data_type = c(
           "startup",
           "data",
@@ -456,7 +482,7 @@ test_that("orbi_adjust_block()", {
     time.min = (1:6) / 10,
     data_group = rep(1:3, each = 2),
     block = rep(1:2, each = 3),
-    sample_name = "name",
+    block_name = "name",
     data_type = "data",
     segment = rep(c(NA_integer_, 1L), c(4, 2))
   )
@@ -642,7 +668,7 @@ test_that("orbi_segment_block()", {
     scan.no = integer(),
     time.min = numeric(),
     block = integer(),
-    sample_name = character(),
+    block_name = character(),
     data_type = character()
   )
   expect_error(
@@ -660,7 +686,7 @@ test_that("orbi_segment_block()", {
     scan.no = 1:10,
     time.min = scan.no^2 / 10,
     block = rep(c(1L, 2L, 1L), c(4, 2, 4)),
-    sample_name = c("test"),
+    block_name = c("test"),
     data_type = rep(c("unused", "data"), c(2, 8))
   )
 

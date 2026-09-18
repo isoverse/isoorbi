@@ -7,7 +7,7 @@
 orbi_summarize_results(
   dataset,
   ratio_method = c("mean", "sum", "median", "geometric_mean", "slope", "weighted_sum"),
-  .by = c("block", "sample_name", "segment", "data_group", "data_type", "injection"),
+  .by = c("block", "block_name", "segment", "data_group", "data_type", "injection"),
   include_flagged_data = FALSE,
   include_unused_data = FALSE
 )

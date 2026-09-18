@@ -506,7 +506,7 @@ orbi_summarize_results <- function(
   ),
   .by = c(
     "block",
-    "sample_name",
+    "block_name",
     "segment",
     "data_group",
     "data_type",

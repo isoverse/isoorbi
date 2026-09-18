@@ -10,7 +10,8 @@ orbi_define_block_for_flow_injection(
   end_time.min = NULL,
   start_scan.no = NULL,
   end_scan.no = NULL,
-  sample_name = NULL
+  block_name = NULL,
+  sample_name = lifecycle::deprecated()
 )
 }
 \arguments{
@@ -24,7 +25,9 @@ orbi_define_block_for_flow_injection(
 
 \item{end_scan.no}{set the end scan of the block}
 
-\item{sample_name}{if provided, will be used as the \code{sample_name} for the block}
+\item{block_name}{if provided, will be used as the \code{block_name} for the block}
+
+\item{sample_name}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} renamed to \code{block_name} since the column it sets names the block rather than necessarily a sample}
 }
 \value{
 A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
