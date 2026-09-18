@@ -63,6 +63,35 @@ test_that("orbi_get_isotopocule_coverage() tests", {
   dataset <- df |> factorize_dataset(c("filename", "compound", "isotopocule"))
 
   expect_snapshot_value(orbi_get_isotopocule_coverage(dataset), style = "json2")
+
+  # peak flags are used as an additional grouping if they are available
+  raw <- orbi_read_raw(
+    orbi_get_example_files("nitrate_test_10scans.raw"),
+    show_progress = FALSE,
+    show_problems = FALSE
+  ) |>
+    orbi_aggregate_raw(show_progress = FALSE, show_problems = FALSE) |>
+    orbi_identify_isotopocules(
+      c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
+    ) |>
+    suppressMessages()
+
+  raw_coverage <- orbi_get_isotopocule_coverage(raw) |> suppressMessages()
+  expect_true("flags" %in% names(raw_coverage))
+  # M0 has both unflagged and exception peaks, so it must appear in both groups
+  expect_setequal(
+    raw_coverage |>
+      dplyr::filter(.data$isotopocule == "M0") |>
+      dplyr::pull(.data$flags) |>
+      as.character() |>
+      unique(),
+    c("none", "exception")
+  )
+  # without the flags the stretches would be merged, with them there are more
+  expect_gt(
+    nrow(raw_coverage),
+    raw_coverage |> dplyr::select(-"flags") |> dplyr::distinct() |> nrow() - 1L
+  )
 })
 
 # orbi_plot_satellite_peaks
@@ -165,6 +194,41 @@ test_that("orbi_plot_isotopocule_coverage() tests", {
   vdiffr::expect_doppelganger(
     "coverage plot",
     orbi_plot_isotopocule_coverage(df)
+  )
+
+  # with peak flags available the detected isotopocules are split by their flags
+  raw <- orbi_read_raw(
+    orbi_get_example_files("nitrate_test_10scans.raw"),
+    show_progress = FALSE,
+    show_problems = FALSE
+  ) |>
+    orbi_aggregate_raw(show_progress = FALSE, show_problems = FALSE) |>
+    orbi_identify_isotopocules(
+      c("M0" = 61.9878, "15N" = 62.9850, "17O" = 62.9922, "18O" = 63.9922)
+    ) |>
+    suppressMessages()
+
+  raw_plot <- orbi_plot_isotopocule_coverage(raw) |> suppressMessages()
+  fill_scale <- raw_plot$scales$scales[[
+    which(purrr::map_lgl(raw_plot$scales$scales, ~ "fill" %in% .x$aesthetics))
+  ]]
+  expect_equal(
+    fill_scale$breaks,
+    c("isotopocules (no flags)", "isotopocules (exception)", "not detected")
+  )
+  # unflagged stays black, flagged picks up the first color, missing stays white
+  expect_equal(
+    fill_scale$palette(3),
+    c(
+      "isotopocules (no flags)" = "black",
+      "isotopocules (exception)" = "#7570B3",
+      "not detected" = "white"
+    )
+  )
+
+  vdiffr::expect_doppelganger(
+    "coverage plot with flags",
+    raw_plot
   )
 })
 

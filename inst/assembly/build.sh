@@ -5,7 +5,7 @@
 # bash build.sh runtime=osx-x64
 # AND via the dotnet docker image:
 # docker pull mcr.microsoft.com/dotnet/sdk:8.0
-# docker run --rm -v $PWD:/app -w /app mcr.microsoft.com/dotnet/sdk:8.0 /app/build.sh project=/app output=/app/out runtime=osx-x64
+# docker run --rm -v $PWD:/app -w /app mcr.microsoft.com/dotnet/sdk:8.0 /app/build.sh project=/app output=/app/dist runtime=osx-x64
 
 # Setup
 set -euo pipefail
@@ -16,7 +16,7 @@ echo "--- STARTING BUILD SCRIPT ---"
 
 # Parameters
 project_folder="$PWD"
-output_folder="$PWD/out"
+output_folder="$PWD/dist"
 runtimes="linux-x64 osx-x64 win-x64"
 
 for arg in "$@"; do

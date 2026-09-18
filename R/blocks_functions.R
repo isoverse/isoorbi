@@ -1237,11 +1237,20 @@ orbi_add_blocks_to_plot <- function(
       }
     } +
     ggplot2::guides(
-      color = ggplot2::guide_legend(override.aes = list(fill = NA_character_))
+      color = ggplot2::guide_legend(
+        override.aes = list(fill = NA_character_),
+        order = 1
+      )
     ) +
     ggplot2::guides(
-      shape = ggplot2::guide_legend(override.aes = list(fill = NA_character_))
-    )
+      shape = ggplot2::guide_legend(
+        override.aes = list(fill = NA_character_),
+        order = 1
+      )
+    ) +
+    # keep the blocks legend after the data legends - without an explicit order
+    # ggplot2 does not guarantee a stable sequence across platforms
+    ggplot2::guides(fill = ggplot2::guide_legend(order = 2))
   return(plot)
 }
 

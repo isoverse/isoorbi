@@ -176,12 +176,14 @@ For additional code, please check out our **Examples** in the main menu at [isoo
 ```{r}
 #| echo: false
 #| results: asis
+#| warning: false
 if (params$generating_pkgdown_index) {
   # if we're in index.md
   cat(
-    "<p>Click on the individual functions to jump straight to their documenation.</p>\n"
+    "<p>Click on the individual functions to jump straight to their documenation.</p>\n\n```{=html}\n"
   )
   readLines("man/figures/figure_flowchart.svg") |> cat(sep = "\n")
+  cat("\n```\n\n")
 } else {
   # if we're making README.md
   cat(
@@ -195,15 +197,18 @@ if (params$generating_pkgdown_index) {
 #| include: false
 # trigger index.md generation
 if (!params$generating_pkgdown_index) {
-  out <- xfun::Rscript_call(
-    rmarkdown::render,
-    args = list(
-      input = "README.Rmd",
-      output_format = "md_document",
-      output_file = "pkgdown/index.md",
-      params = list(generating_pkgdown_index = TRUE)
+  # Use knitr::knit() directly (not rmarkdown::render) so that ```{=html} fences
+  # are written verbatim — rmarkdown's md_document runs Pandoc which strips them.
+  xfun::Rscript_call(function() {
+    env <- new.env(parent = globalenv())
+    env$params <- list(generating_pkgdown_index = TRUE)
+    knitr::knit(
+      "README.Rmd",
+      output = "pkgdown/index.md",
+      envir = env,
+      quiet = TRUE
     )
-  )
+  })
 }
 ```
 

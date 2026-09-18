@@ -13,7 +13,7 @@ orbi_get_blocks_info(
 \arguments{
 \item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
-\item{.by}{grouping columns for block info (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarise]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset.}
+\item{.by}{grouping columns for block info (akin to dplyr's \code{.by} parameter e.g. in \code{\link[dplyr:summarize]{dplyr::summarize()}}). If not set by the user, all columns in the parameter's default values are used, if present in the dataset.}
 }
 \value{
 a block summary or if no blocks defined yet, an empty tibble (with warning)

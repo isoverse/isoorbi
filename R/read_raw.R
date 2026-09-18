@@ -12,18 +12,23 @@
 #' @param min_version the minimum version number required
 #' @param source the URL (or local path) where to find the raw file reader, by default this is the latests release of the executables on github
 #' @param accept_license explicitly accept Thermo's license agreement (if this is FALSE and the license has not previously been accepted, you will be asked about it)
+#' @param show_version whether to print a confirmation message with the version number if the reader is already installed and ready to use (default: `TRUE`).
+#' Set to `FALSE` to keep the check silent, which is what the automatic calls during a raw file read do. Note that the message about a (re-)installation is always shown.
 #' @param ... passed on to `download.file` if (re-) installing the reader
+#' @return called for its side effect of ensuring a working isoraw reader (at least `min_version`) is installed and that Thermo's license agreement has been
+#' accepted; returns `TRUE` invisibly and aborts if either of those cannot be achieved
 #' @export
 orbi_check_isoraw <- function(
   install_if_missing = !on_cran(),
   reinstall_if_outdated = !on_cran(),
   reinstall_always = FALSE,
-  min_version = "0.2.2",
+  min_version = "0.3.0",
   source = paste0(
     "https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version
   ),
   accept_license = FALSE,
+  show_version = TRUE,
   ...
 ) {
   # start
@@ -32,6 +37,7 @@ orbi_check_isoraw <- function(
   # check existence
   isoraw_exists <- file.exists(get_isoraw_path())
   outdated <- FALSE
+  just_installed <- FALSE
 
   # version
   if (isoraw_exists) {
@@ -106,11 +112,16 @@ orbi_check_isoraw <- function(
     # get new version
     isoraw_version <- get_isoraw_version()
     if (!is.null(isoraw_version)) {
+      just_installed <- TRUE
       finish_info(
         "successfully installed the isoorbi raw file reader version {isoraw_version}",
         start = start
       )
     }
+
+    # any previously downloaded example files were cached with the reader version
+    # that was just replaced, so discard them to avoid reading outdated caches
+    clear_example_files()
   }
 
   # final check
@@ -124,7 +135,18 @@ orbi_check_isoraw <- function(
   }
 
   # license check
-  check_license(accept = accept_license)
+  license_ok <- check_license(accept = accept_license)
+
+  # confirm that an already installed reader is ready to go (the installation
+  # itself is already reported above, so don't report it twice)
+  if (show_version && !just_installed) {
+    finish_info(
+      "found the isoorbi raw file reader version {isoraw_version} ready for use",
+      start = start
+    )
+  }
+
+  return(invisible(license_ok))
 }
 
 # check license acceptance
@@ -743,7 +765,7 @@ orbi_read_raw <- function(
   # any files to read?
   if (nrow(read_files) > 0) {
     # check first for raw file reader
-    orbi_check_isoraw()
+    orbi_check_isoraw(show_version = FALSE)
 
     read_files <- read_files |>
       dplyr::mutate(
@@ -1007,8 +1029,32 @@ read_cached_raw_file <- function(
     return(tibble())
   }
 
-  # check about isoorbi version
-  # can use existing_cache_info$isoorbi_version to determine whether a new read is necessary
+  # check about the isoraw version - the reader version determines the schema of the
+  # cached datasets (v0.3.0 reads ALL peaks and replaces the `is_ref`/`is_lock_peak`
+  # peak columns with the raw `flags` bitmask), so anything older has to be read anew.
+  # note: keep in sync with the `min_version` of orbi_check_isoraw() for major version changes
+  min_isoraw_version <- numeric_version("0.3.0")
+  # older caches don't record the reader version at all, hence the NULL check
+  cached_isoraw_version <- existing_cache_info$result[["isoraw_version"]]
+  cached_isoraw_version <-
+    if (is.null(cached_isoraw_version) || is.na(cached_isoraw_version)) {
+      NULL
+    } else {
+      # strict = FALSE yields NA (instead of an error) for an unparseable version
+      numeric_version(cached_isoraw_version, strict = FALSE)
+    }
+  if (is.null(cached_isoraw_version) || is.na(cached_isoraw_version)) {
+    cli_warn(
+      "cache was created by a raw file reader older than {min_isoraw_version}, cache is outdated"
+    )
+    return(tibble())
+  }
+  if (cached_isoraw_version < min_isoraw_version) {
+    cli_warn(
+      "cache was created by raw file reader version {cached_isoraw_version} but at least version {min_isoraw_version} is required, cache is outdated"
+    )
+    return(tibble())
+  }
 
   # simplify progress updates
   update_progress <- function(status) {
@@ -1107,7 +1153,7 @@ read_cached_raw_file <- function(
         )
 
         # run isoraw only for the spectra
-        orbi_check_isoraw()
+        orbi_check_isoraw(show_version = FALSE)
         out <- try_catch_cnds(
           run_isoraw(
             file_path_info$file_path,
@@ -1248,7 +1294,7 @@ read_raw_file <- function(
 
   # run isoraw
   update_progress("running isoraw")
-  orbi_check_isoraw()
+  orbi_check_isoraw(show_version = FALSE)
   out <- try_catch_cnds(
     run_isoraw(
       file_path_info$file_path,
@@ -1326,6 +1372,8 @@ read_raw_file <- function(
       tibble(
         file_size = as.integer(file_path_info$file_size),
         isoorbi_version = as.character(utils::packageVersion("isoorbi")),
+        # the reader version determines the schema of the cached datasets
+        isoraw_version = as.character(get_isoraw_version() %||% NA),
         cache_timestamp = Sys.time()
       ),
       sink = file.path(file_path_info$output_path, file_path_info$cache_info)

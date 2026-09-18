@@ -74,17 +74,13 @@
       "resolution",
       cast = "as.numeric"
     ) |>
+    # the reader reports the raw PeakOptions bitmask, decode it into readable text
     orbi_add_to_aggregator(
       "peaks",
-      "isRefPeak",
-      "is_ref",
-      cast = "as.logical"
-    ) |>
-    orbi_add_to_aggregator(
-      "peaks",
-      "isLockPeak",
-      "is_lock_peak",
-      cast = "as.logical"
+      "flags",
+      source = "flags",
+      func = "orbi_peak_flags_to_text",
+      cast = "as.factor"
     ) |>
     orbi_add_to_aggregator("spectra", "scan.no", cast = "as.integer") |>
     orbi_add_to_aggregator("spectra", "mz", "mass", cast = "as.numeric") |>

@@ -56,6 +56,7 @@ reference:
   - orbi_register_aggregator
   - orbi_get_aggregator
   - orbi_get_data
+  - orbi_peak_flags
 
 - title: Read ISOX files
   desc: >

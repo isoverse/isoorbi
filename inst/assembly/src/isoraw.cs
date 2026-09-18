@@ -64,13 +64,19 @@ namespace Isoorbi
         /// <param name="skipPeaks">
         /// Whether to skip reading the peaks.
         /// </param>
+        /// <param name="skipProblematicPeaks">
+        /// [Optional] If set to true, only unproblematic peaks are processed, i.e. those that carry no
+        /// flags at all or exclusively the reference and/or lock mass flag. Every other flag (saturated,
+        /// fragmented, merged, exception, modified) marks a peak as problematic, also when combined with
+        /// the reference/lock mass flag. By default all peaks are processed.
+        /// </param>
         /// <param name="allSpectra">
         /// [Optional] If set to true, reads all available scan spectra and ignores the 'spectra' parameter.
         /// </param>
         /// <param name="spectra">
         /// [Optional] Array of scans from which to read the spectra.
         /// </param>
-        public static async Task ReadFile(string path, string output, bool skipFileInfo = false, bool skipScans = false, bool skipPeaks = false, bool allSpectra = false, int[]? spectra = null)
+        public static async Task ReadFile(string path, string output, bool skipFileInfo = false, bool skipScans = false, bool skipPeaks = false, bool skipProblematicPeaks = false, bool allSpectra = false, int[]? spectra = null)
         {
 
             // default for spectra == null
@@ -170,7 +176,7 @@ namespace Isoorbi
                 {
                     var stopwatch = Stopwatch.StartNew();
                     Console.WriteLine($"\nINFO: reading peaks from {nScans} scans ...");
-                    var peaksTable = ReadPeaks(rawFile, firstScanNumber, lastScanNumber);
+                    var peaksTable = ReadPeaks(rawFile, firstScanNumber, lastScanNumber, skipProblematicPeaks);
                     Console.WriteLine($"INFO: writing peaks to peaks.parquet ...");
                     await ParquetRawWriter.WritePeaks(peaksTable, Path.Combine(output, "peaks.parquet"));
                     stopwatch.Stop();
@@ -391,8 +397,11 @@ namespace Isoorbi
         /// <summary>
         /// Read centroid peaks in the raw file.
         /// </summary>
-        private static ParquetRawWriter.PeaksTable ReadPeaks(IRawDataPlus rawFile, int firstScanNumber, int lastScanNumber)
+        private static ParquetRawWriter.PeaksTable ReadPeaks(IRawDataPlus rawFile, int firstScanNumber, int lastScanNumber, bool skipProblematicPeaks = false)
         {
+            // the only flags that do NOT make a peak problematic (see skipProblematicPeaks below)
+            const PeakOptions unproblematicFlags = PeakOptions.Reference | PeakOptions.LockPeak;
+
             // data (more structured than file info + scans, can be written more efficiently to parquet)
             var scans = new List<int>();
             var masses = new List<double>();
@@ -400,8 +409,7 @@ namespace Isoorbi
             var resolutions = new List<double>();
             var baselines = new List<double>();
             var noises = new List<double>();
-            var isRefs = new List<bool>();
-            var isLockPeaks = new List<bool>();
+            var peakFlags = new List<int>();
 
             // loop through scans
             foreach (int scanNumber in Enumerable.Range(firstScanNumber, lastScanNumber))
@@ -413,19 +421,54 @@ namespace Isoorbi
                     var centroidStream = rawFile.GetCentroidStream(scanNumber, includeReferenceAndExceptionPeaks: true);
                     for (int i = 0; i < centroidStream.Length; i++)
                     {
-                        // pull out all peaks that have either no flags or the reference flag or the lock peak flag
-                        if (centroidStream.Flags[i] == PeakOptions.None || (centroidStream.Flags[i] & PeakOptions.Reference) != 0 || (centroidStream.Flags[i] & PeakOptions.LockPeak) != 0)
+
+                        // public enum PeakOptions
+                        // {
+                        //     /// <summary>No peak flags</summary>
+                        //     [EnumMember]
+                        //     None = 0,
+                        //     /// <summary>Saturation flag (signal over ADC limit)</summary>
+                        //     [EnumMember]
+                        //     Saturated = 1,
+                        //     /// <summary>Fragmentation flag (peak split by centroider)</summary>
+                        //     [EnumMember]
+                        //     Fragmented = 2,
+                        //     /// <summary>Merged flag (peaks combined by centroider)</summary>
+                        //     [EnumMember]
+                        //     Merged = 4,
+                        //     /// <summary>Exception peak flag (part of reference, but not used by calibration)</summary>
+                        //     [EnumMember]
+                        //     Exception = 8,
+                        //     /// <summary>Reference peak flag (hi-res internal reference compound)</summary>
+                        //     [EnumMember]
+                        //     Reference = 0x10,
+                        //     /// <summary>Mathematically modified packet</summary>
+                        //     [EnumMember]
+                        //     Modified = 0x20,
+                        //     /// <summary>High resolution SIM lock mass</summary>
+                        //     [EnumMember]
+                        //     LockPeak = 0x40
+                        // }
+
+
+                        // if requested, keep only the peaks that are unproblematic, i.e. that carry no
+                        // flags at all or exclusively the reference and/or lock mass flag. Any other
+                        // flag (saturated, fragmented, merged, exception, modified) marks the peak as
+                        // problematic, also in combination with reference/lock mass.
+                        // By default all peaks are kept.
+                        if (skipProblematicPeaks && (centroidStream.Flags[i] & ~unproblematicFlags) != 0)
                         {
-                            // note: could also include charges[i] but not clear this provides useful additional information
-                            scans.Add(scanNumber);
-                            masses.Add(centroidStream.Masses[i]);
-                            intensities.Add(centroidStream.Intensities[i]);
-                            resolutions.Add(centroidStream.Resolutions[i]);
-                            baselines.Add(centroidStream.Baselines[i]);
-                            noises.Add(centroidStream.Noises[i]);
-                            isRefs.Add((centroidStream.Flags[i] & PeakOptions.Reference) != 0);
-                            isLockPeaks.Add((centroidStream.Flags[i] & PeakOptions.LockPeak) != 0);
+                            continue;
                         }
+
+                        // note: could also include charges[i] but not clear this provides useful additional information
+                        scans.Add(scanNumber);
+                        masses.Add(centroidStream.Masses[i]);
+                        intensities.Add(centroidStream.Intensities[i]);
+                        resolutions.Add(centroidStream.Resolutions[i]);
+                        baselines.Add(centroidStream.Baselines[i]);
+                        noises.Add(centroidStream.Noises[i]);
+                        peakFlags.Add((int)centroidStream.Flags[i]);
                     }
                 }
                 catch (Exception ex)
@@ -433,7 +476,7 @@ namespace Isoorbi
                     Console.WriteLine($"ERROR: could not read peaks for scan #{scanNumber}: {ex.Message}");
                 }
             }
-            return new ParquetRawWriter.PeaksTable(scans.ToArray(), masses.ToArray(), intensities.ToArray(), resolutions.ToArray(), baselines.ToArray(), noises.ToArray(), isRefs.ToArray(), isLockPeaks.ToArray());
+            return new ParquetRawWriter.PeaksTable(scans.ToArray(), masses.ToArray(), intensities.ToArray(), resolutions.ToArray(), baselines.ToArray(), noises.ToArray(), peakFlags.ToArray());
         }
 
         /// <summary>
@@ -547,8 +590,7 @@ namespace Isoorbi
             double[] resolutions,
             double[] baselines,
             double[] noises,
-            bool[] isRefs,
-            bool[] isLockPeaks
+            int[] peakFlags
         );
 
         public static async Task WritePeaks(PeaksTable peaks, string path)
@@ -562,8 +604,7 @@ namespace Isoorbi
                 new DataField<double>("resolution"),
                 new DataField<double>("baseline"),
                 new DataField<double>("noise"),
-                new DataField<bool>("is_ref"),
-                new DataField<bool>("is_lock_peak")
+                new DataField<int>("flags")
             );
 
             // write file
@@ -593,10 +634,7 @@ namespace Isoorbi
                             new DataColumn(schema.DataFields[5], peaks.noises)
                         );
                         await groupWriter.WriteColumnAsync(
-                            new DataColumn(schema.DataFields[6], peaks.isRefs)
-                        );
-                        await groupWriter.WriteColumnAsync(
-                            new DataColumn(schema.DataFields[7], peaks.isLockPeaks)
+                            new DataColumn(schema.DataFields[6], peaks.peakFlags)
                         );
                     }
                 }
@@ -663,7 +701,7 @@ namespace Isoorbi
 
             // usage string:
             string? exeName = Path.GetFileName(Process.GetCurrentProcess().MainModule?.FileName);
-            string help = $"Usage: {exeName} [--version] [--help] [--file <path>] [--skip <fileInfo,scans,peaks>] [--spectra <all|1,4,6>]";
+            string help = $"Usage: {exeName} [--version] [--help] [--file <path>] [--skip <fileInfo,scans,peaks>] [--skipProblematicPeaks] [--spectra <all|1,4,6>]";
 
             // print help
             if (args.Contains("--help"))
@@ -717,9 +755,15 @@ namespace Isoorbi
                             break;
                     }
                 }
+                // problematic peaks are processed unless explicitly skipped
+                bool skipProblematicPeaks = args.Contains("--skipProblematicPeaks");
+                if (skipProblematicPeaks)
+                {
+                    skipInfo += ", problematic peaks";
+                }
                 if (!string.IsNullOrEmpty(skipInfo) && skipInfo.Length > 0)
                 {
-                    skipInfo = " and skipping " + skipInfo.Substring(1);
+                    skipInfo = " and skipping " + skipInfo.Substring(2);
                 }
 
                 // read file
@@ -727,7 +771,7 @@ namespace Isoorbi
                 try
                 {
                     string output = path + ".cache";
-                    await RawReader.ReadFile(path, output, skipFileInfo: skipFileInfo, skipScans: skipScans, skipPeaks: skipPeaks, allSpectra: allSpectra, spectra: scanSpectra);
+                    await RawReader.ReadFile(path, output, skipFileInfo: skipFileInfo, skipScans: skipScans, skipPeaks: skipPeaks, skipProblematicPeaks: skipProblematicPeaks, allSpectra: allSpectra, spectra: scanSpectra);
                 }
                 catch (Exception ex)
                 {
