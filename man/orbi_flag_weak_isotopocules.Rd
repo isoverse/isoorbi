@@ -13,7 +13,7 @@ orbi_flag_weak_isotopocules(dataset, min_percent = 100)
 is defined relative to the most commonly observed isotopocule of each compound). The default is 100, the most stringent condition to ensure reliable
 isotpocule coverage and ratio calculations across data blocks. If you lower the default, be mindful of potential misinterprations from using isotopotcules
 that are very close to their detection limit within a datablock. For continuous flow operations it may be necessary to make data blocks smaller using
-\code{\link[=orbi_define_block_for_flow_injection]{orbi_define_block_for_flow_injection()}} and \code{\link[=orbi_adjust_block]{orbi_adjust_block()}}.}
+\code{\link[=orbi_define_blocks]{orbi_define_blocks()}} and \code{\link[=orbi_adjust_block]{orbi_adjust_block()}}.}
 }
 \value{
 same object as provided in \code{dataset} with new column \code{is_weak_isotopocule} that flags weak isotopocules.

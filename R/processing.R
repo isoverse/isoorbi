@@ -139,7 +139,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 #' is defined relative to the most commonly observed isotopocule of each compound). The default is 100, the most stringent condition to ensure reliable
 #' isotpocule coverage and ratio calculations across data blocks. If you lower the default, be mindful of potential misinterprations from using isotopotcules
 #' that are very close to their detection limit within a datablock. For continuous flow operations it may be necessary to make data blocks smaller using
-#' [orbi_define_block_for_flow_injection()] and [orbi_adjust_block()].
+#' [orbi_define_blocks()] and [orbi_adjust_block()].
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")

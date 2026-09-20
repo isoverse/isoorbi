@@ -1,7 +1,7 @@
-test_that("orbi_define_block_for_flow_injection()", {
+test_that("orbi_define_blocks()", {
   # type checks
   expect_error(
-    orbi_define_block_for_flow_injection(),
+    orbi_define_blocks(),
     "dataset.*must be.*aggregated.*or.*data frame"
   )
 
@@ -9,44 +9,44 @@ test_that("orbi_define_block_for_flow_injection()", {
     suppressMessages()
 
   expect_error(
-    orbi_define_block_for_flow_injection(df),
-    "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`"
+    orbi_define_blocks(df),
+    "block definition.*incomplete"
   )
   expect_error(
-    orbi_define_block_for_flow_injection(
+    orbi_define_blocks(
       df,
       start_time.min = 0,
       start_scan.no = 5
     ),
-    "block definition requires either `start_time.min` and `end_time.min` or `start_scan.no` and `end_scan.no`"
+    "block definition.*incomplete"
   )
 
   expect_error(
-    orbi_define_block_for_flow_injection(df, start_time.min = "a"),
-    "start_time.min.*must be a single number"
+    orbi_define_blocks(df, start_time.min = "a"),
+    "start_time.min.*must be a number"
   )
   expect_error(
-    orbi_define_block_for_flow_injection(df, end_time.min = "a"),
-    "end_time.min.*must be a single number"
+    orbi_define_blocks(df, end_time.min = "a"),
+    "end_time.min.*must be a number"
   )
   expect_error(
-    orbi_define_block_for_flow_injection(df, start_scan.no = "a"),
-    "start_scan.no.*must be a single integer"
+    orbi_define_blocks(df, start_scan.no = "a"),
+    "start_scan.no.*must be a whole number"
   )
   expect_error(
-    orbi_define_block_for_flow_injection(df, end_scan.no = "a"),
-    "end_scan.no.*must be a single integer"
+    orbi_define_blocks(df, end_scan.no = "a"),
+    "end_scan.no.*must be a whole number"
   )
 
   expect_error(
-    orbi_define_block_for_flow_injection(
+    orbi_define_blocks(
       df,
       start_time.min = 0,
       start_scan.no = 5,
       end_time.min = 2,
       end_scan.no = 10
     ),
-    "block definition can either be by time or by scan but not both"
+    "block definition.*can either be by time or by scan but not both"
   )
 
   # results checks
@@ -55,15 +55,17 @@ test_that("orbi_define_block_for_flow_injection()", {
     scan.no = 1:10,
     time.min = scan.no / 10
   )
-  orbi_define_block_for_flow_injection(
-    test_data,
-    start_time.min = 0.1,
-    end_time.min = 0.9
-  ) |>
-    expect_message("added a new block")
+  suppressMessages(
+    orbi_define_blocks(
+      test_data,
+      start_time.min = 0.1,
+      end_time.min = 0.9
+    ) |>
+      expect_message("added 1 block")
+  )
 
   # block_name sets the block_name column
-  with_name <- orbi_define_block_for_flow_injection(
+  with_name <- orbi_define_blocks(
     test_data,
     start_time.min = 0.1,
     end_time.min = 0.9,
@@ -73,20 +75,116 @@ test_that("orbi_define_block_for_flow_injection()", {
   expect_true("block_name" %in% names(with_name))
   expect_equal(setdiff(unique(with_name$block_name), NA), "my block")
 
-  # the renamed sample_name argument is deprecated but still forwards
-  # (lifecycle only warns once per session unless the verbosity is forced)
-  withr::local_options(lifecycle_verbosity = "warning")
-  expect_warning(
-    deprecated_name <- orbi_define_block_for_flow_injection(
-      test_data,
-      start_time.min = 0.1,
-      end_time.min = 0.9,
-      sample_name = "my block"
+  # several blocks at once, via vectors and via a blocks table
+  # note: blocks are numbered per file, so each file gets its own blocks 1 and 2
+  multi_data <- tibble(
+    filename = rep(c("test1", "test2"), each = 10),
+    scan.no = rep(1:10, 2),
+    time.min = scan.no / 10
+  )
+  multi <- orbi_define_blocks(
+    multi_data,
+    start_scan.no = c(1L, 4L),
+    end_scan.no = c(2L, 5L),
+    block_name = c("a", "b")
+  ) |>
+    suppressMessages()
+  expect_equal(sort(unique(multi$block)), c(0L, 1L, 2L))
+  expect_setequal(setdiff(unique(multi$block_name), NA), c("a", "b"))
+  # both blocks cover their scans in both files
+  expect_equal(sum(multi$block == 1L), 4L)
+  expect_equal(sum(multi$block == 2L), 4L)
+  expect_equal(
+    orbi_define_blocks(
+      multi_data,
+      blocks_table = tibble(
+        start_scan.no = c(1L, 4L),
+        end_scan.no = c(2L, 5L),
+        block_name = c("a", "b")
+      )
     ) |>
       suppressMessages(),
-    "sample_name.*deprecated"
+    multi
   )
-  expect_equal(deprecated_name, with_name)
+
+  # blocks that fall outside the data warn (but are still added where they fit),
+  # by scan number...
+  orbi_define_blocks(test_data, start_scan.no = 100L, end_scan.no = 200L) |>
+    suppressMessages() |>
+    expect_warning("outside the data in 2 files.*covers scans 1 to 6")
+  # test1 holds scans 1-6 and test2 scans 7-10, so this only fits the first file
+  partial <- NULL
+  expect_warning(
+    partial <- orbi_define_blocks(
+      test_data,
+      start_scan.no = 1L,
+      end_scan.no = 4L
+    ) |>
+      suppressMessages(),
+    "outside the data in 1 file.*test2"
+  )
+  expect_equal(sum(partial$block == 1L), 4L)
+  # ... and by time, which is treated the same way (the file's time range is named)
+  orbi_define_blocks(test_data, start_time.min = 5, end_time.min = 6) |>
+    suppressMessages() |>
+    expect_warning("outside the data in 2 files.*covers 0.1 to 0.6 min")
+  orbi_define_blocks(test_data, start_time.min = 0.001, end_time.min = 0.01) |>
+    suppressMessages() |>
+    expect_warning("outside the data in 2 files")
+  # a block that misses only some of the files is still added to the others
+  time_partial <- NULL
+  expect_warning(
+    time_partial <- orbi_define_blocks(
+      test_data,
+      start_time.min = 0.1,
+      end_time.min = 0.5
+    ) |>
+      suppressMessages(),
+    "outside the data in 1 file.*test2"
+  )
+  expect_equal(sum(time_partial$block == 1L), 4L)
+  # a reversed time range covers no scans either
+  tibble(filename = "test1", scan.no = 1:10, time.min = scan.no / 10) |>
+    orbi_define_blocks(start_time.min = 0.9, end_time.min = 0.2) |>
+    suppressMessages() |>
+    expect_warning("outside the data")
+
+  # the summary reports what each block actually covers, not what was requested
+  expect_message(
+    orbi_define_blocks(multi_data, start_time.min = 0, end_time.min = 99) |>
+      expect_message("added 1 block"),
+    "covers scans 1 to 10 \\(0.1 to 1 min\\) in 2 files"
+  )
+  # and says so when a block could not be added anywhere
+  suppressWarnings(
+    # note: each summary bullet is its own message, so mop up the remaining one
+    suppressMessages(
+      expect_message(
+        orbi_define_blocks(
+          multi_data,
+          start_time.min = c(0.2, 5),
+          end_time.min = c(0.5, 6),
+          block_name = c("here", "gone")
+        ) |>
+          expect_message("added 1 of 2 blocks"),
+        "block gone: not added, outside the data in 2 files"
+      )
+    )
+  )
+
+  # blocks_table checks
+  orbi_define_blocks(test_data, blocks_table = 42) |>
+    expect_error("must be a data frame")
+  orbi_define_blocks(test_data, blocks_table = tibble()) |>
+    expect_error("at least one row")
+  orbi_define_blocks(test_data, blocks_table = tibble(foo = 1)) |>
+    expect_error("none of the block definition columns")
+  orbi_define_blocks(
+    test_data,
+    start_time.min = c(0.1, 0.2, 0.3),
+    end_time.min = c(0.4, 0.5)
+  ) |>
+    expect_error("cannot be recycled")
 })
 
 test_that("internal find_intervals()", {
@@ -237,6 +335,53 @@ test_that("find_blocks()", {
       last = c(FALSE, FALSE, TRUE, FALSE, TRUE)
     )
   )
+})
+
+test_that("orbi_define_block_for_flow_injection() is deprecated", {
+  # note: the deprecations use always = TRUE, so they warn on every call rather
+  # than once every 8 hours - hence no need to force the lifecycle verbosity here
+  # (and calling the function twice below warns both times)
+  test_data <- tibble(
+    filename = rep(c("test1", "test2"), c(6, 4)),
+    scan.no = 1:10,
+    time.min = scan.no / 10
+  )
+  expected <- orbi_define_blocks(
+    test_data,
+    start_time.min = 0.1,
+    end_time.min = 0.9,
+    block_name = "my block"
+  ) |>
+    suppressMessages()
+
+  # the function itself is deprecated
+  expect_warning(
+    renamed <- orbi_define_block_for_flow_injection(
+      test_data,
+      start_time.min = 0.1,
+      end_time.min = 0.9,
+      block_name = "my block"
+    ) |>
+      suppressMessages(),
+    "orbi_define_block_for_flow_injection.*deprecated"
+  )
+  expect_equal(renamed, expected)
+
+  # as is the sample_name argument, which still forwards to block_name
+  expect_warning(
+    expect_warning(
+      old_arg <- orbi_define_block_for_flow_injection(
+        test_data,
+        start_time.min = 0.1,
+        end_time.min = 0.9,
+        sample_name = "my block"
+      ) |>
+        suppressMessages(),
+      "sample_name.*deprecated"
+    ),
+    "orbi_define_block_for_flow_injection.*deprecated"
+  )
+  expect_equal(old_arg, expected)
 })
 
 test_that("orbi_define_blocks_for_dual_inlet()", {

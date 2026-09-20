@@ -80,6 +80,7 @@ reference:
   desc: >
     These functions are useful for annotating and processing `dual inlet` and `flow injection` data.
   contents:
+  - orbi_define_blocks
   - orbi_define_block_for_flow_injection
   - orbi_define_blocks_for_dual_inlet
   - orbi_adjust_block
