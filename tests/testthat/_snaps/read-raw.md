@@ -60,7 +60,7 @@
       Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On, FAIMS
       CV)
       > peaks (337): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
-      peakResolution, flags
+      peakResolution, centroiderFlags
       > spectra (0): uidx, scan.no, mz, intensity
       > problems: has no issues
 
@@ -140,7 +140,7 @@
       Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On, FAIMS
       CV
       > peaks (337): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
-      peakResolution, flags
+      peakResolution, centroiderFlags
       > spectra (675): uidx, scan.no, mz, intensity
       > problems: has no issues
 
@@ -187,7 +187,7 @@
       Access Id, Analog In A (V), Analog In B (V), FAIMS Attached, FAIMS Voltage On,
       FAIMS CV)
       > peaks (337): uidx, scan.no, mzMeasured, intensity, baseline, peakNoise,
-      peakResolution, flags
+      peakResolution, centroiderFlags
       > spectra (675): uidx, scan.no, mz, intensity
       > problems: has no issues
 
@@ -273,7 +273,7 @@
       [3m[33mId[39m[23m, [3m[33mAnalog In A (V)[39m[23m, [3m[33mAnalog In B (V)[39m[23m, [3m[33mFAIMS Attached[39m[23m, [3m[33mFAIMS Voltage On[39m[23m, [3m[33mFAIMS[39m[23m
       [3m[33mCV[39m[23m)
       → [34mpeaks[39m (337): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
-      [32mpeakResolution[39m, [32mflags[39m
+      [32mpeakResolution[39m, [32mcentroiderFlags[39m
       → [34mspectra[39m (0): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
 
@@ -353,7 +353,7 @@
       [32mId[39m, [32mAnalog In A (V)[39m, [32mAnalog In B (V)[39m, [32mFAIMS Attached[39m, [32mFAIMS Voltage On[39m, [32mFAIMS[39m
       [32mCV[39m
       → [34mpeaks[39m (337): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
-      [32mpeakResolution[39m, [32mflags[39m
+      [32mpeakResolution[39m, [32mcentroiderFlags[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
 
@@ -400,7 +400,7 @@
       [3m[33mAccess Id[39m[23m, [3m[33mAnalog In A (V)[39m[23m, [3m[33mAnalog In B (V)[39m[23m, [3m[33mFAIMS Attached[39m[23m, [3m[33mFAIMS Voltage On[39m[23m,
       [3m[33mFAIMS CV[39m[23m)
       → [34mpeaks[39m (337): [32muidx[39m, [32mscan.no[39m, [32mmzMeasured[39m, [32mintensity[39m, [32mbaseline[39m, [32mpeakNoise[39m,
-      [32mpeakResolution[39m, [32mflags[39m
+      [32mpeakResolution[39m, [32mcentroiderFlags[39m
       → [34mspectra[39m (675): [32muidx[39m, [32mscan.no[39m, [32mmz[39m, [32mintensity[39m
       → [34mproblems[39m: has [32mno issues[39m
 

@@ -11,7 +11,7 @@ orbi_peak_flags_include(flags, flag)
 orbi_peak_flags_to_text(flags)
 }
 \arguments{
-\item{flags}{the peak flags, i.e. the decoded \code{flags} column of the \code{peaks} dataset or the
+\item{flags}{the peak flags, i.e. the decoded \code{centroiderFlags} column of the \code{peaks} dataset or the
 raw numeric \code{PeakOptions} bitmask reported by the reader. \code{\link[=orbi_peak_flags_include]{orbi_peak_flags_include()}} accepts
 either and gives the same result for both, \code{\link[=orbi_peak_flags_to_text]{orbi_peak_flags_to_text()}} decodes the bitmask.}
 
@@ -25,14 +25,15 @@ character for \code{orbi_peak_flags_to_text()}
 \description{
 The raw file reader reports the \code{PeakOptions} bitmask the instrument assigned to each peak.
 The built-in aggregators (see \code{\link[=orbi_aggregate_raw]{orbi_aggregate_raw()}}) decode it with
-\code{\link[=orbi_peak_flags_to_text]{orbi_peak_flags_to_text()}} and provide it as the readable \code{flags} factor column of the
-\code{peaks} dataset.
+\code{\link[=orbi_peak_flags_to_text]{orbi_peak_flags_to_text()}} and provide it as the readable \code{centroiderFlags} factor column of
+the \code{peaks} dataset. The name sets these apart from the peaks that \code{isoorbi} itself flags
+later on (satellite peaks, weak isotopocules and outliers).
 }
 \details{
 Filtering for an \emph{exact} set of flags does not need any function - compare that column
-directly, e.g. \code{dplyr::filter(peaks, flags == "reference")} for the peaks that are
-exclusively a reference peak, or \code{dplyr::filter(peaks, flags == "none")} for those without
-any flags. \code{\link[=orbi_peak_flags_include]{orbi_peak_flags_include()}} covers the case a comparison cannot: finding peaks
+directly, e.g. \code{dplyr::filter(peaks, centroiderFlags == "reference")} for the peaks that are
+exclusively a reference peak, or \code{dplyr::filter(peaks, centroiderFlags == "none")} for those
+without any flags. \code{\link[=orbi_peak_flags_include]{orbi_peak_flags_include()}} covers the case a comparison cannot: finding peaks
 that carry a flag \emph{irrespective} of which others they carry, which would otherwise require
 a comparatively expensive regular expression search. It accepts both the decoded text and
 the raw numeric bitmask and returns the same result for either.
@@ -54,7 +55,7 @@ i.e. additional flags may be present as well but every provided flag has to be. 
 either the decoded text or the raw bitmask and returns the same result for both.
 To test for \emph{any} of several flags, combine the individual calls with \code{|}. Note that
 \code{"none"} is not a flag a peak can include - compare the column instead
-(\code{dplyr::filter(peaks, flags == "none")}) for peaks without any flags.
+(\code{dplyr::filter(peaks, centroiderFlags == "none")}) for peaks without any flags.
 
 \item \code{orbi_peak_flags_to_text()}: convert the flags to an alphabetically sorted, comma separated
 text representation, e.g. \code{10} becomes \code{"exception + fragmented"}. Peaks without any flags
@@ -62,7 +63,7 @@ become \code{"none"}.
 
 }}
 \examples{
-# the `flags` column of an aggregated dataset holds the decoded flags
+# the `centroiderFlags` column of an aggregated dataset holds the decoded flags
 flags <- c("none", "exception", "reference", "fragmented + reference", "lock peak")
 
 # any peak that carries the reference flag, whether or not it carries others

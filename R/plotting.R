@@ -259,8 +259,8 @@ orbi_plot_spectra <- function(
           dplyr::filter(
             !is.na(.data$intensity) &
               # either flag qualifies, hence the two separate calls
-              (orbi_peak_flags_include(.data$flags, "reference") |
-                orbi_peak_flags_include(.data$flags, "lock peak"))
+              (orbi_peak_flags_include(.data$centroiderFlags, "reference") |
+                orbi_peak_flags_include(.data$centroiderFlags, "lock peak"))
           ) |>
           dplyr::select("uidx", "scan.no", "mz" = "mzMeasured", "intensity")
       )
@@ -1043,17 +1043,17 @@ orbi_plot_isotopocule_coverage <- function(
   # unflagged peaks get their own label and are always drawn in black
   unflagged_label <- "isotopocules (no flags)"
   flag_label <- function(flags) sprintf("isotopocules (%s)", flags)
-  if ("flags" %in% names(isotopocule_coverage)) {
+  if ("centroiderFlags" %in% names(isotopocule_coverage)) {
     isotopocule_coverage <- isotopocule_coverage |>
       dplyr::mutate(
         fill_label = dplyr::if_else(
-          as.character(.data$flags) == !!no_peak_flags_text,
+          as.character(.data$centroiderFlags) == !!no_peak_flags_text,
           !!unflagged_label,
-          flag_label(.data$flags)
+          flag_label(.data$centroiderFlags)
         )
       )
     # "no flags" first, the remaining flag combinations in the order of the factor
-    present_flags <- isotopocule_coverage$flags |>
+    present_flags <- isotopocule_coverage$centroiderFlags |>
       factor() |>
       droplevels() |>
       levels()

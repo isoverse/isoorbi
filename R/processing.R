@@ -350,8 +350,8 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       "filename",
       "compound",
       "isotopocule",
-      # make sure the peak flags column is included if it exists
-      "flags",
+      # make sure the centroider peak flags column is included if it exists
+      "centroiderFlags",
       # make sure a data group column is included if it exists
       "data_group",
       # make sure a weak isotopocule column is included if it exists

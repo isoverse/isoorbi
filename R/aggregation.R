@@ -1064,8 +1064,8 @@ check_peak_flags <- function(flag, .env = caller_env()) {
       cli_abort(
         c(
           "{.val {no_peak_flags_text}} is not a flag that a peak's flags can include",
-          "i" = "to find peaks by their exact set of flags, compare the {.field flags} column instead",
-          "i" = 'e.g. {.code dplyr::filter(peaks, flags == "{no_peak_flags_text}")} for the peaks that carry no flags at all'
+          "i" = "to find peaks by their exact set of flags, compare the {.field centroiderFlags} column instead",
+          "i" = 'e.g. {.code dplyr::filter(peaks, centroiderFlags == "{no_peak_flags_text}")} for the peaks that carry no flags at all'
         ),
         call = .env
       )
@@ -1085,13 +1085,14 @@ check_peak_flags <- function(flag, .env = caller_env()) {
 #'
 #' The raw file reader reports the `PeakOptions` bitmask the instrument assigned to each peak.
 #' The built-in aggregators (see [orbi_aggregate_raw()]) decode it with
-#' [orbi_peak_flags_to_text()] and provide it as the readable `flags` factor column of the
-#' `peaks` dataset.
+#' [orbi_peak_flags_to_text()] and provide it as the readable `centroiderFlags` factor column of
+#' the `peaks` dataset. The name sets these apart from the peaks that `isoorbi` itself flags
+#' later on (satellite peaks, weak isotopocules and outliers).
 #'
 #' Filtering for an *exact* set of flags does not need any function - compare that column
-#' directly, e.g. `dplyr::filter(peaks, flags == "reference")` for the peaks that are
-#' exclusively a reference peak, or `dplyr::filter(peaks, flags == "none")` for those without
-#' any flags. [orbi_peak_flags_include()] covers the case a comparison cannot: finding peaks
+#' directly, e.g. `dplyr::filter(peaks, centroiderFlags == "reference")` for the peaks that are
+#' exclusively a reference peak, or `dplyr::filter(peaks, centroiderFlags == "none")` for those
+#' without any flags. [orbi_peak_flags_include()] covers the case a comparison cannot: finding peaks
 #' that carry a flag *irrespective* of which others they carry, which would otherwise require
 #' a comparatively expensive regular expression search. It accepts both the decoded text and
 #' the raw numeric bitmask and returns the same result for either.
@@ -1106,7 +1107,7 @@ check_peak_flags <- function(flag, .env = caller_env()) {
 #' reports a problem with the centroiding, so a reference or lock mass peak that carries any
 #' additional flag is problematic as well.
 #'
-#' @param flags the peak flags, i.e. the decoded `flags` column of the `peaks` dataset or the
+#' @param flags the peak flags, i.e. the decoded `centroiderFlags` column of the `peaks` dataset or the
 #' raw numeric `PeakOptions` bitmask reported by the reader. [orbi_peak_flags_include()] accepts
 #' either and gives the same result for both, [orbi_peak_flags_to_text()] decodes the bitmask.
 #' @param flag one or more flag names, see the list of available flags in the details below
@@ -1114,7 +1115,7 @@ check_peak_flags <- function(flag, .env = caller_env()) {
 #' @return a vector of the same length as `flags`: logical for `orbi_peak_flags_include()`,
 #' character for `orbi_peak_flags_to_text()`
 #' @examples
-#' # the `flags` column of an aggregated dataset holds the decoded flags
+#' # the `centroiderFlags` column of an aggregated dataset holds the decoded flags
 #' flags <- c("none", "exception", "reference", "fragmented + reference", "lock peak")
 #'
 #' # any peak that carries the reference flag, whether or not it carries others
@@ -1147,18 +1148,18 @@ NULL
 #' either the decoded text or the raw bitmask and returns the same result for both.
 #' To test for *any* of several flags, combine the individual calls with `|`. Note that
 #' `"none"` is not a flag a peak can include - compare the column instead
-#' (`dplyr::filter(peaks, flags == "none")`) for peaks without any flags.
+#' (`dplyr::filter(peaks, centroiderFlags == "none")`) for peaks without any flags.
 #' @export
 orbi_peak_flags_include <- function(flags, flag) {
   flag <- check_peak_flags(flag)
 
-  # the numeric bitmask, i.e. the `flags` column
+  # the numeric bitmask, i.e. the raw `flags` column reported by the reader
   if (is.numeric(flags)) {
     mask <- sum(peak_flag_values[flag])
     return(bitwAnd(as.integer(flags), mask) == mask)
   }
 
-  # the decoded text, i.e. the `flags` column of an aggregated dataset. Comparing the
+  # the decoded text, i.e. the `centroiderFlags` column of an aggregated dataset. Comparing the
   # terms rather than searching the string keeps this identical to the bitmask result,
   # and since the column only ever holds a handful of distinct values it stays just as cheap.
   if (is.character(flags) || is.factor(flags)) {

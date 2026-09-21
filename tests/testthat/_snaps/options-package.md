@@ -44,7 +44,7 @@
        > baseline = as.numeric(baseline)
        > peakNoise = as.numeric(noise)
        > peakResolution = as.numeric(resolution)
-       > flags = as.factor(orbi_peak_flags_to_text(flags))
+       > centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
       Dataset spectra:
        > scan.no = as.integer(scan.no)
        > mz = as.numeric(mass)
@@ -84,7 +84,7 @@
        > baseline = as.numeric(baseline)
        > peakNoise = as.numeric(noise)
        > peakResolution = as.numeric(resolution)
-       > flags = as.factor(orbi_peak_flags_to_text(flags))
+       > centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
       Dataset spectra:
        > scan.no = as.integer(scan.no)
        > mz = as.numeric(mass)
@@ -125,7 +125,7 @@
        > baseline = as.numeric(baseline)
        > peakNoise = as.numeric(noise)
        > peakResolution = as.numeric(resolution)
-       > flags = as.factor(orbi_peak_flags_to_text(flags))
+       > centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
       Dataset spectra:
        > scan.no = as.integer(scan.no)
        > mz = as.numeric(mass)
@@ -186,7 +186,7 @@
        → [32mbaseline[39m = [3mas.numeric(baseline)[23m
        → [32mpeakNoise[39m = [3mas.numeric(noise)[23m
        → [32mpeakResolution[39m = [3mas.numeric(resolution)[23m
-       → [32mflags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
+       → [32mcentroiderFlags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
       [1mDataset[22m [34mspectra[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m
@@ -226,7 +226,7 @@
        → [32mbaseline[39m = [3mas.numeric(baseline)[23m
        → [32mpeakNoise[39m = [3mas.numeric(noise)[23m
        → [32mpeakResolution[39m = [3mas.numeric(resolution)[23m
-       → [32mflags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
+       → [32mcentroiderFlags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
       [1mDataset[22m [34mspectra[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m
@@ -267,7 +267,7 @@
        → [32mbaseline[39m = [3mas.numeric(baseline)[23m
        → [32mpeakNoise[39m = [3mas.numeric(noise)[23m
        → [32mpeakResolution[39m = [3mas.numeric(resolution)[23m
-       → [32mflags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
+       → [32mcentroiderFlags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
       [1mDataset[22m [34mspectra[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m

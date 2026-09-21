@@ -77,12 +77,12 @@ test_that("orbi_get_isotopocule_coverage() tests", {
     suppressMessages()
 
   raw_coverage <- orbi_get_isotopocule_coverage(raw) |> suppressMessages()
-  expect_true("flags" %in% names(raw_coverage))
+  expect_true("centroiderFlags" %in% names(raw_coverage))
   # M0 has both unflagged and exception peaks, so it must appear in both groups
   expect_setequal(
     raw_coverage |>
       dplyr::filter(.data$isotopocule == "M0") |>
-      dplyr::pull(.data$flags) |>
+      dplyr::pull(.data$centroiderFlags) |>
       as.character() |>
       unique(),
     c("none", "exception")
@@ -90,7 +90,11 @@ test_that("orbi_get_isotopocule_coverage() tests", {
   # without the flags the stretches would be merged, with them there are more
   expect_gt(
     nrow(raw_coverage),
-    raw_coverage |> dplyr::select(-"flags") |> dplyr::distinct() |> nrow() - 1L
+    raw_coverage |>
+      dplyr::select(-"centroiderFlags") |>
+      dplyr::distinct() |>
+      nrow() -
+      1L
   )
 })
 
