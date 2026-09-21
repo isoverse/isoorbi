@@ -271,10 +271,19 @@ orbi_plot_shot_noise <- function(
       shape = "data",
       linetype = "shot noise"
     ) +
+    # the explicit orders keep the legend sequence stable - without them
+    # ggplot2 does not guarantee the same order across platforms
     ggplot2::guides(
-      color = ggplot2::guide_legend(override.aes = list(linetype = 0)),
+      color = ggplot2::guide_legend(
+        override.aes = list(linetype = 0),
+        order = 2
+      ),
+      # shape shares the "data" title with color and must carry the same order
+      # so the two stay merged into a single legend
+      shape = ggplot2::guide_legend(order = 2),
       linetype = ggplot2::guide_legend(
-        override.aes = list(color = colors[1:length(levels(plot_df[[color]]))])
+        override.aes = list(color = colors[1:length(levels(plot_df[[color]]))]),
+        order = 1
       )
     )
 

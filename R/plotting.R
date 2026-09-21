@@ -257,7 +257,10 @@ orbi_plot_spectra <- function(
       dplyr::bind_rows(
         peaks |>
           dplyr::filter(
-            !is.na(.data$intensity) & .data$isRefPeak | .data$isLockPeak
+            !is.na(.data$intensity) &
+              # either flag qualifies, hence the two separate calls
+              (orbi_peak_flags_include(.data$centroiderFlags, "reference") |
+                orbi_peak_flags_include(.data$centroiderFlags, "lock peak"))
           ) |>
           dplyr::select("uidx", "scan.no", "mz" = "mzMeasured", "intensity")
       )
@@ -917,7 +920,8 @@ orbi_plot_raw_data <- function(
 
 #' @inheritParams orbi_plot_satellite_peaks
 #' @inheritParams orbi_plot_raw_data
-#' @describeIn orbi_isotopocule_coverage visualizes isotope coverage. Weak isotopocules (if previously defined by [orbi_flag_weak_isotopocules()]) are highlighted in red.
+#' @describeIn orbi_isotopocule_coverage visualizes isotope coverage. Detected isotopocules are shown by their peak flags - those without any flags in black, those carrying flags in the `colors` provided. Weak isotopocules (if previously defined by [orbi_flag_weak_isotopocules()]) are highlighted in red.
+#' @param colors the fill colors for the isotopocules that carry peak flags, one per flag combination encountered in the data (recycled if there are more combinations than colors). Isotopocules without any flags are always shown in black.
 #' @return a ggplot object
 #' @export
 orbi_plot_isotopocule_coverage <- function(
@@ -925,7 +929,18 @@ orbi_plot_isotopocule_coverage <- function(
   isotopocules = c(),
   x = c("scan.no", "time.min"),
   x_breaks = scales::breaks_pretty(5),
-  add_data_blocks = TRUE
+  add_data_blocks = TRUE,
+  colors = c(
+    "#7570B3",
+    "#E6AB02",
+    "#66A61E",
+    "#A6761D",
+    "#D95F02",
+    "#1B9E77",
+    "#E7298A",
+    "#666666",
+    "#BBBBBB"
+  )
 ) {
   # safety checks
   check_dataset_arg(dataset)
@@ -949,7 +964,7 @@ orbi_plot_isotopocule_coverage <- function(
             "uidx",
             "scan.no",
             "time.min",
-            dplyr::any_of(c("block", "data_group", "sample_name", "data_type"))
+            dplyr::any_of(c("block", "data_group", "block_name", "data_type"))
           ),
         by = c("uidx", "scan.no")
       )
@@ -1022,6 +1037,39 @@ orbi_plot_isotopocule_coverage <- function(
     )
   if (!"data_group" %in% names(isotopocule_coverage)) {
     isotopocule_coverage$data_group <- NA_integer_
+  }
+
+  # label the detected stretches by their peak flags (if the flags are available),
+  # unflagged peaks get their own label and are always drawn in black
+  unflagged_label <- "isotopocules (no flags)"
+  flag_label <- function(flags) sprintf("isotopocules (%s)", flags)
+  if ("centroiderFlags" %in% names(isotopocule_coverage)) {
+    isotopocule_coverage <- isotopocule_coverage |>
+      dplyr::mutate(
+        fill_label = dplyr::if_else(
+          as.character(.data$centroiderFlags) == !!no_peak_flags_text,
+          !!unflagged_label,
+          flag_label(.data$centroiderFlags)
+        )
+      )
+    # "no flags" first, the remaining flag combinations in the order of the factor
+    present_flags <- isotopocule_coverage$centroiderFlags |>
+      factor() |>
+      droplevels() |>
+      levels()
+    flagged <- setdiff(present_flags, no_peak_flags_text)
+    detected_fills <- c(
+      if (no_peak_flags_text %in% present_flags) {
+        stats::setNames("black", unflagged_label)
+      },
+      if (length(flagged) > 0) {
+        stats::setNames(rep_len(colors, length(flagged)), flag_label(flagged))
+      }
+    )
+  } else {
+    # no flags information available (e.g. when reading from IsoX)
+    isotopocule_coverage$fill_label <- "isotopocule detected"
+    detected_fills <- c("isotopocule detected" = "black")
   }
 
   # outlines (to show which isotopocules are recorded at all)
@@ -1131,7 +1179,7 @@ orbi_plot_isotopocule_coverage <- function(
     # data
     ggplot2::geom_rect(
       data = isotopocule_coverage,
-      map = ggplot2::aes(fill = "isotopocule detected")
+      map = ggplot2::aes(fill = .data$fill_label)
     ) +
     ggplot2::scale_x_continuous(
       breaks = x_breaks,
@@ -1146,8 +1194,16 @@ orbi_plot_isotopocule_coverage <- function(
     orbi_default_theme() +
     ggplot2::labs(x = x_column, y = NULL)
 
+  # fill scale - named values with explicit breaks so that the legend entries are
+  # always mapped and ordered the same way no matter which ones are present
+  fill_values <- c(detected_fills, "not detected" = "white")
+  if (has_weak_col && any(group_outlines$is_weak_isotopocule, na.rm = TRUE)) {
+    fill_values <- c(fill_values, "was flagged as weak" = "red")
+  }
+
   # blocks
   if (add_data_blocks && has_blocks(peaks)) {
+    fill_values <- c(fill_values, "data block" = "#1B9E77")
     plot <- plot |>
       orbi_add_blocks_to_plot(
         x = x_column,
@@ -1155,13 +1211,18 @@ orbi_plot_isotopocule_coverage <- function(
         fill = "data block",
         fill_scale = scale_fill_manual(
           "legend",
-          values = c("#1B9E77", "black", "white", "red")
+          values = fill_values,
+          breaks = names(fill_values)
         ),
         show.legend = TRUE
       )
   } else {
     plot <- plot +
-      ggplot2::scale_fill_manual("legend", values = c("black", "white", "red"))
+      ggplot2::scale_fill_manual(
+        "legend",
+        values = fill_values,
+        breaks = names(fill_values)
+      )
   }
 
   # return

@@ -74,17 +74,15 @@
       "resolution",
       cast = "as.numeric"
     ) |>
+    # the reader reports the raw PeakOptions bitmask, decode it into readable text
+    # note: named centroiderFlags to set it apart from the peaks that isoorbi itself
+    # flags later on (satellite peaks, weak isotopocules, outliers)
     orbi_add_to_aggregator(
       "peaks",
-      "isRefPeak",
-      "is_ref",
-      cast = "as.logical"
-    ) |>
-    orbi_add_to_aggregator(
-      "peaks",
-      "isLockPeak",
-      "is_lock_peak",
-      cast = "as.logical"
+      "centroiderFlags",
+      source = "flags",
+      func = "orbi_peak_flags_to_text",
+      cast = "as.factor"
     ) |>
     orbi_add_to_aggregator("spectra", "scan.no", cast = "as.integer") |>
     orbi_add_to_aggregator("spectra", "mz", "mass", cast = "as.numeric") |>

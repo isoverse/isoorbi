@@ -10,7 +10,9 @@ orbi_plot_isotopocule_coverage(
   isotopocules = c(),
   x = c("scan.no", "time.min"),
   x_breaks = scales::breaks_pretty(5),
-  add_data_blocks = TRUE
+  add_data_blocks = TRUE,
+  colors = c("#7570B3", "#E6AB02", "#66A61E", "#A6761D", "#D95F02", "#1B9E77", "#E7298A",
+    "#666666", "#BBBBBB")
 )
 
 orbi_get_isotopocule_coverage(dataset)
@@ -25,6 +27,8 @@ orbi_get_isotopocule_coverage(dataset)
 \item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
 
 \item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
+
+\item{colors}{the fill colors for the isotopocules that carry peak flags, one per flag combination encountered in the data (recycled if there are more combinations than colors). Isotopocules without any flags are always shown in black.}
 }
 \value{
 a ggplot object
@@ -36,7 +40,7 @@ The coverage of each isotopcule across scans/time is an important indicator for 
 }
 \section{Functions}{
 \itemize{
-\item \code{orbi_plot_isotopocule_coverage()}: visualizes isotope coverage. Weak isotopocules (if previously defined by \code{\link[=orbi_flag_weak_isotopocules]{orbi_flag_weak_isotopocules()}}) are highlighted in red.
+\item \code{orbi_plot_isotopocule_coverage()}: visualizes isotope coverage. Detected isotopocules are shown by their peak flags - those without any flags in black, those carrying flags in the \code{colors} provided. Weak isotopocules (if previously defined by \code{\link[=orbi_flag_weak_isotopocules]{orbi_flag_weak_isotopocules()}}) are highlighted in red.
 
 \item \code{orbi_get_isotopocule_coverage()}: calculates which stretches of the data have data for which isotopocules. This function is usually used indicrectly by \code{\link[=orbi_plot_isotopocule_coverage]{orbi_plot_isotopocule_coverage()}} but can be called directly to investigate isotopocule coverage.
 

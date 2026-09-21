@@ -113,7 +113,7 @@ orbi_get_example_files <- function(
   srcdir <- "https://github.com/isoverse/isodata/raw/refs/heads/main/isoorbi/"
   sysdir <- system.file("extdata", package = "isoorbi")
   syspaths <- file.path(sysdir, filenames)
-  destdir <- tools::R_user_dir("isoorbi", which = "data")
+  destdir <- get_example_files_dir()
   destpaths <- file.path(destdir, filenames)
   info <- get_file_paths_info(destpaths)
   for (i in seq_along(info$idx)) {
@@ -152,4 +152,28 @@ orbi_get_example_files <- function(
     }
   }
   return(destpaths)
+}
+
+# path to the folder where downloaded example files are stored
+get_example_files_dir <- function() {
+  tools::R_user_dir("isoorbi", which = "data")
+}
+
+# remove all downloaded example files, they are re-downloaded on demand by
+# orbi_get_example_files(). Called after a new raw file reader is installed since
+# the downloaded caches were created by the previous version of the reader.
+clear_example_files <- function() {
+  datadir <- get_example_files_dir()
+  files <- if (dir.exists(datadir)) list.files(datadir) else character(0)
+  if (length(files) == 0) {
+    return(invisible(FALSE))
+  }
+  unlink(datadir, recursive = TRUE)
+  cli_inform(
+    c(
+      "i" = "removed {length(files)} previously downloaded example file{?s} that {cli::qty(length(files))}{?was/were} cached with an older version of the raw file reader",
+      "i" = "{.strong orbi_get_example_files()} will download {cli::qty(length(files))}{?it/them} again when needed"
+    )
+  )
+  return(invisible(TRUE))
 }

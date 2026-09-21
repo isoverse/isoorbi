@@ -139,7 +139,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["filename", "compound", "basepeak", "isotopocule", "block", "sample_name", "segment", "injection", "start_scan.no", "end_scan.no", "start_time.min", "mean_time.min", "end_time.min", "ratio", "ratio_relative_sem_permil", "shot_noise_permil", "ratio_sem", "minutes_to_1e6_ions", "number_of_scans"]
+          "value": ["filename", "compound", "basepeak", "isotopocule", "block", "block_name", "segment", "injection", "start_scan.no", "end_scan.no", "start_time.min", "mean_time.min", "end_time.min", "ratio", "ratio_relative_sem_permil", "shot_noise_permil", "ratio_sem", "minutes_to_1e6_ions", "number_of_scans"]
         },
         "row.names": {
           "type": "integer",

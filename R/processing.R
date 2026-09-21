@@ -4,13 +4,19 @@
 #' @param ... parameters passed on to the new function [orbi_flag_satellite_peaks()].
 #' @export
 orbi_filter_satellite_peaks <- function(...) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.2.0",
     "orbi_filter_satellite_peaks()",
-    "orbi_flag_satellite_peaks()"
+    "orbi_flag_satellite_peaks()",
+    always = TRUE
   )
-  orbi_flag_satellite_peaks(...) |>
-    orbi_filter_flagged_data()
+  # the nested call to the (also deprecated) orbi_filter_flagged_data() is this
+  # function's own doing, so don't saddle the user with its deprecation warning too
+  withr::with_options(
+    list(lifecycle_verbosity = "quiet"),
+    orbi_flag_satellite_peaks(...) |>
+      orbi_filter_flagged_data()
+  )
 }
 
 #' @title Flag minor satellite peaks
@@ -119,13 +125,18 @@ orbi_flag_satellite_peaks <- function(dataset) {
 #' @param ... parameters passed on to the new function orbi_flag_weak_isotopocules().
 #' @export
 orbi_filter_weak_isotopocules <- function(...) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.2.0",
     "orbi_filter_weak_isotopocules()",
-    "orbi_flag_weak_isotopocules()"
+    "orbi_flag_weak_isotopocules()",
+    always = TRUE
   )
-  orbi_flag_weak_isotopocules(...) |>
-    orbi_filter_flagged_data()
+  # see orbi_filter_satellite_peaks() on why the nested deprecation is silenced
+  withr::with_options(
+    list(lifecycle_verbosity = "quiet"),
+    orbi_flag_weak_isotopocules(...) |>
+      orbi_filter_flagged_data()
+  )
 }
 
 #' Flag weak isotopocules
@@ -139,7 +150,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 #' is defined relative to the most commonly observed isotopocule of each compound). The default is 100, the most stringent condition to ensure reliable
 #' isotpocule coverage and ratio calculations across data blocks. If you lower the default, be mindful of potential misinterprations from using isotopotcules
 #' that are very close to their detection limit within a datablock. For continuous flow operations it may be necessary to make data blocks smaller using
-#' [orbi_define_block_for_flow_injection()] and [orbi_adjust_block()].
+#' [orbi_define_blocks()] and [orbi_adjust_block()].
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
@@ -339,6 +350,8 @@ orbi_get_isotopocule_coverage <- function(dataset) {
       "filename",
       "compound",
       "isotopocule",
+      # make sure the centroider peak flags column is included if it exists
+      "centroiderFlags",
       # make sure a data group column is included if it exists
       "data_group",
       # make sure a weak isotopocule column is included if it exists
@@ -408,21 +421,27 @@ orbi_get_isotopocule_coverage <- function(dataset) {
 #' @param outlier_percent outlier_percent needs to be between 0 and 10, flags extreme scans based on TIC x injection time (i.e., ion intensity)
 #' @export
 orbi_filter_scan_intensity <- function(..., outlier_percent) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.2.0",
     "orbi_filter_scan_intensity()",
-    "orbi_flag_outliers()"
+    "orbi_flag_outliers()",
+    always = TRUE
   )
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.2.0",
     "orbi_filter_scan_intensity(outlier_percent)",
-    details = "the argument `outlier_percent` has been superseded by `agc_window`"
+    details = "the argument `outlier_percent` has been superseded by `agc_window`",
+    always = TRUE
   )
-  orbi_flag_outliers(
-    ...,
-    agc_window = c(outlier_percent, 100 - outlier_percent)
-  ) |>
-    orbi_filter_flagged_data()
+  # see orbi_filter_satellite_peaks() on why the nested deprecation is silenced
+  withr::with_options(
+    list(lifecycle_verbosity = "quiet"),
+    orbi_flag_outliers(
+      ...,
+      agc_window = c(outlier_percent, 100 - outlier_percent)
+    ) |>
+      orbi_filter_flagged_data()
+  )
 }
 
 
@@ -707,10 +726,11 @@ orbi_filter_flagged_data <- function(dataset) {
   )
 
   # deprecation
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.3.0",
     "orbi_filter_flagged_data()",
-    details = "filtering flagged data is no longer necessary as orbi_summarize_results() and other functions take flagged data into consideration and treat it appropriately"
+    details = "filtering flagged data is no longer necessary as orbi_summarize_results() and other functions take flagged data into consideration and treat it appropriately",
+    always = TRUE
   )
 
   # original n

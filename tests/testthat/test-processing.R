@@ -128,10 +128,13 @@ test_that("orbi_flag_weak_isotopocules()", {
 })
 
 test_that("orbi_filter_scan_intensity()", {
-  # DEPRECATED
-  orbi_filter_scan_intensity(peaks, outlier_percent = 5) |>
-    suppressMessages() |>
-    expect_warning("deprecated")
+  # DEPRECATED - both the function and its outlier_percent argument warn
+  expect_warning(
+    orbi_filter_scan_intensity(peaks, outlier_percent = 5) |>
+      suppressMessages() |>
+      expect_warning("orbi_filter_scan_intensity\\(\\).*deprecated"),
+    "outlier_percent.*deprecated"
+  )
 })
 
 test_that("orbi_flag_outliers()", {

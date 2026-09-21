@@ -10,26 +10,31 @@ orbi_define_block_for_flow_injection(
   end_time.min = NULL,
   start_scan.no = NULL,
   end_scan.no = NULL,
-  sample_name = NULL
+  block_name = NA_character_,
+  sample_name = lifecycle::deprecated()
 )
 }
 \arguments{
 \item{dataset}{An aggregated dataset or a data frame of peaks (i.e. works directly after \code{\link[=orbi_identify_isotopocules]{orbi_identify_isotopocules()}} as well as with a tibble from \link[=orbi_get_data]{orbi_get_data(peaks = everything())} or when reading from an IsoX file)}
 
-\item{start_time.min}{set the start time of the block}
+\item{start_time.min}{start time of the block(s), a single value or a vector for multiple blocks}
 
-\item{end_time.min}{set the end time of the block}
+\item{end_time.min}{end time of the block(s), a single value or a vector for multiple blocks}
 
-\item{start_scan.no}{set the start scan of the block}
+\item{start_scan.no}{start scan of the block(s), a single value or a vector for multiple blocks}
 
-\item{end_scan.no}{set the end scan of the block}
+\item{end_scan.no}{end scan of the block(s), a single value or a vector for multiple blocks}
 
-\item{sample_name}{if provided, will be used as the \code{sample_name} for the block}
+\item{block_name}{name(s) for the block(s), a single value or a vector for multiple blocks, \code{NA} by default (i.e. unnamed)}
+
+\item{sample_name}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} renamed to \code{block_name} since the column it sets names the block rather than necessarily a sample}
 }
 \value{
-A data frame (tibble) with block definition added. Any data that is not part of a block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
+see \code{\link[=orbi_define_blocks]{orbi_define_blocks()}}
 }
 \description{
-Define a data block by either start and end time or start and end scan number.
-If you want to make segments in the blocks (optional), note that this function - manually defining blocks - removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{only after} finishing block definitions.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+\code{orbi_define_block_for_flow_injection()} was renamed \code{\link[=orbi_define_blocks]{orbi_define_blocks()}} since it is not specific to flow injection
+and can now define several blocks at once.
 }

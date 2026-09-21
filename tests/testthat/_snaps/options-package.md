@@ -44,8 +44,7 @@
        > baseline = as.numeric(baseline)
        > peakNoise = as.numeric(noise)
        > peakResolution = as.numeric(resolution)
-       > isRefPeak = as.logical(is_ref)
-       > isLockPeak = as.logical(is_lock_peak)
+       > centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
       Dataset spectra:
        > scan.no = as.integer(scan.no)
        > mz = as.numeric(mass)
@@ -85,8 +84,7 @@
        > baseline = as.numeric(baseline)
        > peakNoise = as.numeric(noise)
        > peakResolution = as.numeric(resolution)
-       > isRefPeak = as.logical(is_ref)
-       > isLockPeak = as.logical(is_lock_peak)
+       > centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
       Dataset spectra:
        > scan.no = as.integer(scan.no)
        > mz = as.numeric(mass)
@@ -127,19 +125,11 @@
        > baseline = as.numeric(baseline)
        > peakNoise = as.numeric(noise)
        > peakResolution = as.numeric(resolution)
-       > isRefPeak = as.logical(is_ref)
-       > isLockPeak = as.logical(is_lock_peak)
+       > centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
       Dataset spectra:
        > scan.no = as.integer(scan.no)
        > mz = as.numeric(mass)
        > intensity = as.numeric(intensity)
-    Output
-      
-      $aggregators$test
-    Message
-      -------------------------------- Aggregator test -------------------------------
-      Dataset ds:
-       > col = as.character(col)
     Output
       
       
@@ -196,8 +186,7 @@
        → [32mbaseline[39m = [3mas.numeric(baseline)[23m
        → [32mpeakNoise[39m = [3mas.numeric(noise)[23m
        → [32mpeakResolution[39m = [3mas.numeric(resolution)[23m
-       → [32misRefPeak[39m = [3mas.logical(is_ref)[23m
-       → [32misLockPeak[39m = [3mas.logical(is_lock_peak)[23m
+       → [32mcentroiderFlags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
       [1mDataset[22m [34mspectra[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m
@@ -237,8 +226,7 @@
        → [32mbaseline[39m = [3mas.numeric(baseline)[23m
        → [32mpeakNoise[39m = [3mas.numeric(noise)[23m
        → [32mpeakResolution[39m = [3mas.numeric(resolution)[23m
-       → [32misRefPeak[39m = [3mas.logical(is_ref)[23m
-       → [32misLockPeak[39m = [3mas.logical(is_lock_peak)[23m
+       → [32mcentroiderFlags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
       [1mDataset[22m [34mspectra[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m
@@ -279,19 +267,11 @@
        → [32mbaseline[39m = [3mas.numeric(baseline)[23m
        → [32mpeakNoise[39m = [3mas.numeric(noise)[23m
        → [32mpeakResolution[39m = [3mas.numeric(resolution)[23m
-       → [32misRefPeak[39m = [3mas.logical(is_ref)[23m
-       → [32misLockPeak[39m = [3mas.logical(is_lock_peak)[23m
+       → [32mcentroiderFlags[39m = [3mas.factor(orbi_peak_flags_to_text(flags))[23m
       [1mDataset[22m [34mspectra[39m:
        → [32mscan.no[39m = [3mas.integer(scan.no)[23m
        → [32mmz[39m = [3mas.numeric(mass)[23m
        → [32mintensity[39m = [3mas.numeric(intensity)[23m
-    Output
-      
-      $aggregators$test
-    Message
-      ──────────────────────────────── [1mAggregator [3mtest[23m[22m ───────────────────────────────
-      [1mDataset[22m [34mds[39m:
-       → [32mcol[39m = [3mas.character(col)[23m
     Output
       
       
