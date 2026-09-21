@@ -31,7 +31,7 @@ Imports:
     cli (>= 3.6.0),
     glue,
     withr (>= 3.0.0),
-    lifecycle (>= 1.0.0),
+    lifecycle (>= 1.0.2),
     tidyr (>= 1.2.0),
     tibble,
     tidyselect (>= 1.2.0),

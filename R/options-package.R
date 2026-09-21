@@ -118,11 +118,12 @@ get_pkg_options <- function() {
 #' @param ... named arguments to set specific options, passed on to [orbi_options()]
 #' @export
 orbi_set_settings <- function(...) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.4.0",
     "orbi_set_settings()",
     "orbi_options()",
-    details = "`isoorbi` switched from 'settings' to 'options' to be consistent with base R naming conventions"
+    details = "`isoorbi` switched from 'settings' to 'options' to be consistent with base R naming conventions",
+    always = TRUE
   )
   return(invisible(orbi_options(...)))
 }
@@ -136,11 +137,12 @@ orbi_set_settings <- function(...) {
 #' @param pattern passed on to [orbi_get_options()]
 #' @export
 orbi_get_settings <- function(pattern = NULL) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "1.4.0",
     "orbi_get_settings()",
     "orbi_get_options()",
-    details = "`isoorbi` switched from 'settings' to 'options' to be consistent with base R naming conventions"
+    details = "`isoorbi` switched from 'settings' to 'options' to be consistent with base R naming conventions",
+    always = TRUE
   )
   return(orbi_get_options(pattern))
 }

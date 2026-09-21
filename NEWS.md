@@ -44,6 +44,7 @@ Register it with `my_aggregator |> orbi_register_aggregator("my_aggregator")` to
  * fixed the order of the legends in `orbi_add_blocks_to_plot()` and `orbi_plot_shot_noise()`. Without an explicit order ggplot2 does not guarantee a stable sequence, so the same plot could come out with its legends swapped on different operating systems or ggplot2 versions.
  * fixed `orbi_plot_spectra()` including lock mass peaks with a missing intensity when `show_ref_and_lock_peaks = TRUE` (an operator precedence issue in the peak selection).
  * documentation is now generated with roxygen2 8.0.0.
+ * deprecation warnings now show on every call to a deprecated function or argument instead of only once every 8 hours (this requires `lifecycle` 1.0.2 or later).
 
 # isoorbi 1.5.3
 
