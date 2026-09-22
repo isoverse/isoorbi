@@ -124,6 +124,7 @@ assert_contains "$out" "isoraw version" "--version reports a version"
 out=$("$exe" --help 2>&1)
 assert_contains "$out" "Usage:" "--help reports usage"
 assert_contains "$out" "--skipProblematicPeaks" "--help lists --skipProblematicPeaks"
+assert_contains "$out" "statusLog" "--help lists the statusLog skip target"
 
 # --- missing file -----------------------------------------------------------
 
@@ -144,6 +145,7 @@ for raw in "${test_files[@]}"; do
   assert_file "$raw.cache/file_info.parquet" "$name writes file_info.parquet"
   assert_file "$raw.cache/scans.parquet" "$name writes scans.parquet"
   assert_file "$raw.cache/peaks.parquet" "$name writes peaks.parquet"
+  assert_file "$raw.cache/status_log.parquet" "$name writes status_log.parquet"
   assert_file "$raw.cache/spectra.parquet" "$name writes spectra.parquet"
   clean_cache "$raw"
 done
@@ -162,13 +164,34 @@ clean_cache "$raw"
 # --- --skip -----------------------------------------------------------------
 
 echo ""
-echo "TEST: --skip fileInfo,scans,peaks"
+echo "TEST: --skip fileInfo,scans,peaks,statusLog"
 clean_cache "$raw"
-out=$("$exe" --file "$raw" --skip fileInfo,scans,peaks 2>&1)
+out=$("$exe" --file "$raw" --skip fileInfo,scans,peaks,statusLog 2>&1)
 assert_not_contains "$out" "ERROR:" "skipping everything reads without errors"
 assert_no_file "$raw.cache/file_info.parquet" "--skip fileInfo omits file_info.parquet"
 assert_no_file "$raw.cache/scans.parquet" "--skip scans omits scans.parquet"
 assert_no_file "$raw.cache/peaks.parquet" "--skip peaks omits peaks.parquet"
+assert_no_file "$raw.cache/status_log.parquet" "--skip statusLog omits status_log.parquet"
+clean_cache "$raw"
+
+# --- status log --------------------------------------------------------------
+# the status log is read by default (checked above) and holds the instrument
+# readbacks recorded independently of the scans
+
+raw="$test_dir/reference.raw"
+echo ""
+echo "TEST: status log"
+clean_cache "$raw"
+out=$("$exe" --file "$raw" --skip fileInfo,scans,peaks 2>&1)
+assert_not_contains "$out" "ERROR:" "reading only the status log works without errors"
+assert_contains "$out" "reading status log" "the status log is read by default"
+assert_contains "$out" "channels) to status_log.parquet" "the status log reports its channels"
+assert_file "$raw.cache/status_log.parquet" "the status log is written to status_log.parquet"
+clean_cache "$raw"
+out=$("$exe" --file "$raw" --skip statusLog 2>&1)
+assert_contains "$out" "and skipping status log" "--skip statusLog is reported in the banner"
+assert_contains "$out" "INFO: skipping status log" "--skip statusLog skips the status log"
+assert_no_file "$raw.cache/status_log.parquet" "--skip statusLog omits status_log.parquet"
 clean_cache "$raw"
 
 # --- --skipProblematicPeaks ---------------------------------------------------
@@ -182,10 +205,10 @@ for raw in "${test_files[@]}"; do
   # stash the unfiltered peaks outside the cache folder so the second run cannot touch it
   all_peaks=$(mktemp)
   clean_cache "$raw"
-  "$exe" --file "$raw" --skip fileInfo,scans >/dev/null 2>&1
+  "$exe" --file "$raw" --skip fileInfo,scans,statusLog >/dev/null 2>&1
   cp "$raw.cache/peaks.parquet" "$all_peaks"
   clean_cache "$raw"
-  out=$("$exe" --file "$raw" --skip fileInfo,scans --skipProblematicPeaks 2>&1)
+  out=$("$exe" --file "$raw" --skip fileInfo,scans,statusLog --skipProblematicPeaks 2>&1)
   assert_contains "$out" "problematic peaks" "$name reports --skipProblematicPeaks in the banner"
   assert_not_contains "$out" "ERROR:" "$name reads without errors"
   assert_file "$raw.cache/peaks.parquet" "$name still writes peaks.parquet"

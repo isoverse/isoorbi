@@ -108,27 +108,32 @@ end
 
 desc "Read just the fileInfo"
 task :fileInfo do
-  sh "#{executable} --file #{file} --skip peaks,scans"
+  sh "#{executable} --file #{file} --skip peaks,scans,statusLog"
 end
 
 desc "Read just the scans"
 task :scans do
-  sh "#{executable} --file #{file} --skip fileInfo,peaks"
+  sh "#{executable} --file #{file} --skip fileInfo,peaks,statusLog"
 end
 
 desc "Read just the peaks"
 task :peaks do
-  sh "#{executable} --file #{file} --skip fileInfo,scans"
+  sh "#{executable} --file #{file} --skip fileInfo,scans,statusLog"
+end
+
+desc "Read just the status log"
+task :statusLog do
+  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks"
 end
 
 desc "Read just the spectra"
 task :spectra do
-  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks --spectra #{scans}"
+  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks,statusLog --spectra #{scans}"
 end
 
 desc "Read ALL spectra (generates large files)"
 task :spectraAll do
-  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks --spectra all"
+  sh "#{executable} --file #{file} --skip fileInfo,scans,peaks,statusLog --spectra all"
 end
 
 desc "Run the program with local dotnet (faster for testing)"
