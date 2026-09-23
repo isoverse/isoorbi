@@ -71,13 +71,13 @@ df <-
     compounds = "HSO4-",
     isotopocules = c("M0", "34S", "18O")
   )
-#> ✔ [20ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [19ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 #> ✔ [5ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
 #> ✔ [6ms] orbi_filter_isotopocules() removed 860 / 2.15k peaks (40%) because they
 #> were not the selected isotopocule M0, 34S, and 18O (860).
-#> ✔ [72ms] orbi_filter_files() filtered the dataset by filenames (s3744),
+#> ✔ [70ms] orbi_filter_files() filtered the dataset by filenames (s3744),
 #> compounds (HSO4-), and isotopocules (M0, 34S, 18O) and removed a total of
 #> 5.16k/6.45k peaks (80%)
 ```

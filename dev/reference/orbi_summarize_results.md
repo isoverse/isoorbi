@@ -110,13 +110,13 @@ df <- orbi_read_isox(file = fpath) |>
       orbi_simplify_isox() |>
       orbi_define_basepeak("M0")  |>
       orbi_summarize_results(ratio_method = "sum")
-#> ✔ [19ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [18ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 #> ✔ [5ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
-#> ✔ [158ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated
+#> ✔ [154ms] orbi_define_basepeak() set M0 as the ratio denominator and calculated
 #> 5.16k ratio values for 4 isotopocules (33S, 17O, 34S, and 18O)
-#> ✔ [94ms] orbi_summarize_results() summarized ratios from 5.16k peak using the
+#> ✔ [90ms] orbi_summarize_results() summarized ratios from 5.16k peak using the
 #> sum method and grouping the data by filename, compound, basepeak, and
 #> isotopocule
 ```

@@ -48,11 +48,11 @@ fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(file = fpath) |>
       orbi_simplify_isox() |>
       orbi_flag_weak_isotopocules(min_percent = 100)
-#> ✔ [20ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [19ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 #> ✔ [5ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
-#> ✔ [37ms] orbi_flag_weak_isotopocules() flagged 1 of 15 isotopocules as weak
+#> ✔ [34ms] orbi_flag_weak_isotopocules() flagged 1 of 15 isotopocules as weak
 #> because they were NOT present in at least 100% of scans in each of the 15 data
 #> groups (based on filename, compound, and isotopocule) → use
 #> orbi_plot_isotopocule_coverage() to visualize them

@@ -46,15 +46,15 @@ raw_files <- file_paths |> orbi_read_raw()
 ```
 
 ``` fansi
-✔ [241ms] orbi_read_raw() read nitrate_test_10scans.raw from cache
+✔ [233ms] orbi_read_raw() read nitrate_test_10scans.raw from cache
 ```
 
 ``` fansi
-✔ [40ms] orbi_read_raw() read nitrate_test_1scan.raw from cache
+✔ [39ms] orbi_read_raw() read nitrate_test_1scan.raw from cache
 ```
 
 ``` fansi
-✔ [391ms] orbi_read_raw() finished reading 2 files
+✔ [379ms] orbi_read_raw() finished reading 2 files
 ```
 
 ``` r
@@ -94,7 +94,7 @@ agg_data <- raw_files |> orbi_aggregate_raw()
 ```
 
 ``` fansi
-✔ [539ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
+✔ [532ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
 (337), and spectra (943) from 2 files using the standard aggregator
 ```
 
@@ -255,7 +255,7 @@ raw_files |> orbi_aggregate_raw(aggregator = "extended")
 ```
 
 ``` fansi
-✔ [934ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
+✔ [921ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
 (337), and spectra (943) from 2 files using the extended aggregator
 ```
 
@@ -371,7 +371,7 @@ raw_files |> orbi_aggregate_raw(aggregator = "test")
 ```
 
 ``` fansi
-✔ [231ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
+✔ [226ms] orbi_aggregate_raw() aggregated file_info (2), scans (11), peaks
 (337), and spectra (943) from 2 files using the test aggregator
 ```
 
@@ -566,7 +566,7 @@ agg_data |>
 ```
 
 ``` fansi
-✔ [15ms] orbi_get_data() retrieved 337 records from the combination of
+✔ [14ms] orbi_get_data() retrieved 337 records from the combination of
 file_info (2), scans (11), and peaks (337) via uidx and scan.no
 ```
 
@@ -611,7 +611,7 @@ data <- agg_data |> orbi_identify_isotopocules(isotopocules)
 ```
 
 ``` fansi
-! [51ms] orbi_identify_isotopocules() identified 50/337 peaks (15%)
+! [50ms] orbi_identify_isotopocules() identified 50/337 peaks (15%)
 representing 96% of the total ion current (TIC) as isotopocules M0, 15N, 17O,
 and 18O but encountered 1 warning
   → ! isotopocule M0 matches multiple peaks in some same scans (4 multi-matched
@@ -633,7 +633,7 @@ data |> orbi_flag_satellite_peaks() |> orbi_plot_satellite_peaks()
 ```
 
 ``` fansi
-✔ [10ms] orbi_flag_satellite_peaks() flagged 6/337 peaks in 1 isotopocule (M0)
+✔ [9ms] orbi_flag_satellite_peaks() flagged 6/337 peaks in 1 isotopocule (M0)
 as satellite peaks (1.8%)
 ```
 

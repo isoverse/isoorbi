@@ -65,7 +65,7 @@ Single value ratio between the isotopocules defined as `numerator` and
 df <-
   system.file("extdata", "testfile_flow.isox", package = "isoorbi") |>
   orbi_read_isox()
-#> ✔ [161ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [186ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 
 ions_18O <- dplyr::filter(df, isotopocule == "18O")$ions.incremental

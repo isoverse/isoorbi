@@ -23,26 +23,26 @@ raw_files <-
 ```
 
 ``` fansi
-✔ [296ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
+✔ [300ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [122ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
+✔ [121ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [84ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
+✔ [88ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
 1 scan
 ```
 
 ``` fansi
-✔ [630ms] orbi_read_raw() finished reading 3 files
+✔ [639ms] orbi_read_raw() finished reading 3 files
 ```
 
 ``` fansi
-✔ [1s] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
+✔ [1.1s] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
 (694.07k), and spectra (1.98k) from 3 files using the standard aggregator
 ```
 
@@ -85,7 +85,7 @@ raw_files_w_isotopocules <- raw_files |>
 ```
 
 ``` fansi
-! [4.3s] orbi_identify_isotopocules() identified 84.85k/694.07k peaks (12%)
+! [4.2s] orbi_identify_isotopocules() identified 84.85k/694.07k peaks (12%)
 representing 91% of the total ion current (TIC) as isotopocules M0, 33S, 17O,
 34S, 18O, 36S, 33S18O, 34S17O, and 18O18O using the default_tolerance of 1
 mmu but encountered 1 warning
@@ -101,7 +101,7 @@ because they were unidentified peaks (609.22k). Remaining isotopocules: M0,
 ```
 
 ``` fansi
-✔ [2.9s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [2.8s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` r
@@ -151,13 +151,13 @@ data <-
 ```
 
 ``` fansi
-✔ [35ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
+✔ [34ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
 because they were missing isotopocules (64.84k), or not the selected
 isotopocule M0, 33S, 17O, 34S, and 18O (1.82k).
 ```
 
 ``` fansi
-✔ [44ms] orbi_flag_weak_isotopocules() confirmed there are no weak
+✔ [43ms] orbi_flag_weak_isotopocules() confirmed there are no weak
 isotopocules: all are detected in at least 99% of scans in each of the 15 data
 groups (based on uidx, compound, and isotopocule)
 ```
@@ -226,7 +226,7 @@ data_summary <-
 ```
 
 ``` fansi
-✔ [91ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
+✔ [90ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
 68 flagged peaks; excluding 0 unused peaks) using the sum method and grouping
 the data by uidx, filename, compound, basepeak, and isotopocule
 ```
@@ -272,7 +272,7 @@ data_summary |> orbi_export_data_to_excel(
 ```
 
 ``` fansi
-✔ [422ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
+✔ [408ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
 and 12 rows of summary) to output.xlsx
 ```
 
@@ -308,7 +308,7 @@ fig <-
 ```
 
 ``` fansi
-✔ [10ms] orbi_get_data() retrieved 12 records from the combination of file_info
+✔ [9ms] orbi_get_data() retrieved 12 records from the combination of file_info
 (3) and summary (12) via uidx
 ```
 

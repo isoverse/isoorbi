@@ -40,7 +40,7 @@ If you want to make segments in the blocks (optional), note that this function -
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Define data blocks</h1>
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/R/blocks_functions.R" class="external-link"><code>R/blocks_functions.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.1/R/blocks_functions.R" class="external-link"><code>R/blocks_functions.R</code></a></small>
       <div class="d-none name"><code>orbi_define_blocks.Rd</code></div>
     </div>
 
@@ -116,7 +116,7 @@ If you want to make segments in the blocks (optional), note that this function -
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a single block</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">|&gt;</span> <span class="fu">orbi_define_blocks</span><span class="op">(</span>start_time.min <span class="op">=</span> <span class="fl">0.2</span>, end_time.min <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[48ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[47ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 3 files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> block: covers scans 87 to 344 (0.202 to 0.799 min) in 3 files</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    filepath      filename scan.no time.min compound isotopocule ions.incremental</span>
@@ -141,7 +141,7 @@ If you want to make segments in the blocks (optional), note that this function -
 <span class="r-in"><span>  end_time.min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.8</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  block_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first"</span>, <span class="st">"second"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[85ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[82ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 3 files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> block <span style="color: #00BB00;">first</span>: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> block <span style="color: #00BB00;">second</span>: covers scans 216 to 344 (0.502 to 0.799 min) in 3 files</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>
@@ -176,7 +176,7 @@ If you want to make segments in the blocks (optional), note that this function -
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> no scans in <span style="color: #00BB00;">s3744</span> (covers scans 1 to 430)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> no scans in <span style="color: #00BB00;">ac5</span> (covers scans 1 to 430)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> no scans in <span style="color: #00BB00;">ac6</span> (covers scans 1 to 430)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[115ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 of 2 blocks to 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[112ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 of 2 blocks to 3 files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> block <span style="color: #00BB00;">first</span>: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> block <span style="color: #00BB00;">second</span>: not added, outside the data in 3 files</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>

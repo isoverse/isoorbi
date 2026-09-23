@@ -26,7 +26,7 @@ data_all <-
 ```
 
 ``` fansi
-✔ [316ms] orbi_read_raw() read dual_inlet.raw from cache, included the spectra
+✔ [287ms] orbi_read_raw() read dual_inlet.raw from cache, included the spectra
 from 2 scans
 ```
 
@@ -57,7 +57,7 @@ and 18O using the default_tolerance of 1 mmu
 ```
 
 ``` fansi
-✔ [140ms] orbi_filter_isotopocules() removed 135.42k / 184.77k peaks (73%)
+✔ [133ms] orbi_filter_isotopocules() removed 135.42k / 184.77k peaks (73%)
 because they were unidentified peaks (135.42k). Remaining isotopocules: M0,
 15N, 17O, and 18O.
 ```
@@ -99,13 +99,13 @@ df <-
 ```
 
 ``` fansi
-✔ [43ms] orbi_flag_weak_isotopocules() confirmed there are no weak
+✔ [42ms] orbi_flag_weak_isotopocules() confirmed there are no weak
 isotopocules: all are detected in at least 100% of scans in each of the 4 data
 groups (based on uidx, compound, and isotopocule)
 ```
 
 ``` fansi
-✔ [26ms] orbi_flag_outliers() flagged 14/12338 scans (0.11%) as outliers based
+✔ [25ms] orbi_flag_outliers() flagged 14/12338 scans (0.11%) as outliers based
 on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
 average number of ions tic * it.ms in the Orbitrap analyzer → use
 orbi_plot_raw_data(y = tic * it.ms) to visualize them
@@ -156,7 +156,7 @@ df_w_blocks <-
 
 ``` fansi
 Adding missing grouping variables: `uidx`
-✔ [44ms] orbi_define_blocks_for_dual_inlet() identified 8 blocks (4 reference,
+✔ [45ms] orbi_define_blocks_for_dual_inlet() identified 8 blocks (4 reference,
 4 sample) in data from 1 file
 ✔ [8ms] orbi_adjust_block() made the following block adjustments in file
 dual_inlet:
@@ -273,7 +273,7 @@ segments per block (on average) with 420 scans per segment (on average)
 ```
 
 ``` fansi
-✔ [588ms] orbi_summarize_results() summarized ratios from 36.97k peak
+✔ [584ms] orbi_summarize_results() summarized ratios from 36.97k peak
 (excluding 42 flagged peaks; including 10.35k unused peaks) using the sum
 method and grouping the data by uidx, filename, compound, basepeak,
 isotopocule, block, block_name, segment, data_group, and data_type
@@ -290,7 +290,7 @@ df_w_summary |>
 ```
 
 ``` fansi
-✔ [415ms] orbi_export_data_to_excel() exported the dataset (1 row of file_info
+✔ [413ms] orbi_export_data_to_excel() exported the dataset (1 row of file_info
 and 96 rows of summary) to output.xlsx
 ```
 
@@ -366,7 +366,7 @@ plot2 <- df_w_blocks |>
 ```
 
 ``` fansi
-✔ [18ms] orbi_get_data() retrieved 37.01k records from the combination of
+✔ [17ms] orbi_get_data() retrieved 37.01k records from the combination of
 file_info (1), scans (12.34k), and peaks (37.01k) via uidx and scan.no
 ```
 

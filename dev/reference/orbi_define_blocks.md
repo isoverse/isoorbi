@@ -101,7 +101,7 @@ df <- orbi_read_isox(file = fpath) |> orbi_simplify_isox()
 
 # a single block
 df |> orbi_define_blocks(start_time.min = 0.2, end_time.min = 0.8)
-#> ✔ [48ms] orbi_define_blocks() added 1 block to 3 files
+#> ✔ [47ms] orbi_define_blocks() added 1 block to 3 files
 #> • block: covers scans 87 to 344 (0.202 to 0.799 min) in 3 files
 #> # A tibble: 6,449 × 14
 #>    filepath      filename scan.no time.min compound isotopocule ions.incremental
@@ -126,7 +126,7 @@ df |> orbi_define_blocks(
   end_time.min = c(0.4, 0.8),
   block_name = c("first", "second")
 )
-#> ✔ [85ms] orbi_define_blocks() added 2 blocks to 3 files
+#> ✔ [82ms] orbi_define_blocks() added 2 blocks to 3 files
 #> • block first: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files
 #> • block second: covers scans 216 to 344 (0.502 to 0.799 min) in 3 files
 #> # A tibble: 6,449 × 14
@@ -161,7 +161,7 @@ df |> orbi_define_blocks(
 #> ℹ no scans in s3744 (covers scans 1 to 430)
 #> ℹ no scans in ac5 (covers scans 1 to 430)
 #> ℹ no scans in ac6 (covers scans 1 to 430)
-#> ✔ [115ms] orbi_define_blocks() added 1 of 2 blocks to 3 files
+#> ✔ [112ms] orbi_define_blocks() added 1 of 2 blocks to 3 files
 #> • block first: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files
 #> • block second: not added, outside the data in 3 files
 #> # A tibble: 6,449 × 14
