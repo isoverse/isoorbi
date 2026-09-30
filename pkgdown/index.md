@@ -48,10 +48,10 @@ if (!requireNamespace("pkgbuild", quietly = TRUE)) {
 pkgbuild::check_build_tools()
 
 # installs the latest isoorbi package from GitHub
-if (!requireNamespace("pak", quietly = TRUE)) {
-  install.packages("pak")
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
 }
-pak::pak("isoverse/isoorbi")
+remotes::install_github("isoverse/isoorbi")
 
 # check/install the isoraw reader
 isoorbi::orbi_check_isoraw()

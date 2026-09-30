@@ -22,7 +22,7 @@ orbi_check_isoraw <- function(
   install_if_missing = !on_cran(),
   reinstall_if_outdated = !on_cran(),
   reinstall_always = FALSE,
-  min_version = "0.3.0",
+  min_version = "0.3.1",
   source = paste0(
     "https://github.com/isoverse/isoorbi/releases/download/isoraw-v",
     min_version
@@ -277,6 +277,7 @@ run_isoraw <- function(
   skip_file_info = FALSE,
   skip_scans = FALSE,
   skip_peaks = FALSE,
+  skip_status_log = FALSE,
   all_spectra = FALSE,
   select_spectra = integer(0)
 ) {
@@ -286,6 +287,7 @@ run_isoraw <- function(
     is_scalar_logical(skip_file_info),
     is_scalar_logical(skip_scans),
     is_scalar_logical(skip_peaks),
+    is_scalar_logical(skip_status_log),
     is_scalar_logical(all_spectra),
     is_integerish(select_spectra)
   )
@@ -293,7 +295,7 @@ run_isoraw <- function(
 
   # assemble arguments
   args <- c("--file", sprintf("\"%s\"", path))
-  if (skip_file_info || skip_scans || skip_peaks) {
+  if (skip_file_info || skip_scans || skip_peaks || skip_status_log) {
     args <- c(
       args,
       "--skip",
@@ -301,7 +303,9 @@ run_isoraw <- function(
         c(
           if (skip_file_info) "fileInfo",
           if (skip_scans) "scans",
-          if (skip_peaks) "peaks"
+          if (skip_peaks) "peaks",
+          # note: only understood by isoraw 0.3.1+, older readers warn and move on
+          if (skip_status_log) "statusLog"
         ),
         collapse = ","
       )
@@ -580,7 +584,7 @@ orbi_find_raw <- function(
 #' @param cache whether to automatically cache the read raw files (writes highly efficient .parquet files in a folder with the same name as the file .cache appended)
 #' @param cache_spectra whether to automatically cache requested scan spectra (this can take up significant disc space), by default the same as `cache`
 #' @param keep_cached_spectra whether to keep the spectra from a raw file that were previously cached whenever `include_spectra` changes and requires reading the file anew. Having this TRUE (the default) makes it faster to iterate on code that changes which spectra to read but leads to larger cache files.
-#' @return a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically `file_info`, `scans`, `peaks`, and `spectra`). This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use [orbi_aggregate_raw()] to extract safely across files.
+#' @return a tibble data frame where each row holds the file path and nested tibbles of datasets extracted from the raw file (typically `file_info`, `scans`, `peaks`, `status_log`, and `spectra`). The `status_log` holds the instrument readbacks (temperatures, pressures, voltages, etc.) that the instrument records independently of the scans - it is only available if the raw file reader stored one (isoraw 0.3.1+), otherwise it comes back empty. This is the safest way to extract the data without needing to make assumptions about compatibility across files. Extract your data of interest from the tibble columns or use [orbi_aggregate_raw()] to extract safely across files.
 #' @export
 orbi_read_raw <- function(
   file_paths,
@@ -868,6 +872,11 @@ print.orbi_raw_files <- function(x, ...) {
         0L
       },
       peaks_spacers = max(n_digits(.data$n_peaks)) - n_digits(.data$n_peaks),
+      n_status_log = if ("status_log" %in% names(x)) {
+        purrr::map_int(.data$status_log, nrow)
+      } else {
+        0L
+      },
       n_spectral_data = if ("spectra" %in% names(x)) {
         purrr::map_int(.data$spectra, nrow)
       } else {
@@ -904,7 +913,13 @@ print.orbi_raw_files <- function(x, ...) {
         ),
         strrep("\u00a0", .data$peaks_spacers),
         format_inline(
-          "{n_peaks} {.field peak{?s}}; ",
+          "{n_peaks} {.field peak{?s}}",
+          if_else(
+            .data$n_status_log > 0,
+            " and {n_status_log} {.field status log} entr{?y/ies}",
+            ""
+          ),
+          "; ",
           if_else(
             .data$n_spectral_data > 0,
             "+ loaded {n_spectra} {.field spectr{?um/a}} ({n_spectral_data} points)",
@@ -941,6 +956,7 @@ get_file_paths_info <- function(
     scans = "scans.parquet",
     peaks = "peaks.parquet",
     problems = "problems.parquet",
+    status_log = "status_log.parquet",
     spectra = "spectra.parquet",
     is_cached = !!read_cache & file.exists(.data$cache_path),
     read_file_size = if_else(
@@ -1011,6 +1027,10 @@ read_cached_raw_file <- function(
       zip_info = zip_info
     )
   }
+  # is a dataset part of this cache? (not all of them always are)
+  cache_has <- function(file) {
+    file.path(basename(file_path_info$output_path), file) %in% zip_info$Name
+  }
   existing_cache_info <- try_catch_cnds(read_cached_output(
     file_path_info$cache_info
   ))
@@ -1030,10 +1050,11 @@ read_cached_raw_file <- function(
   }
 
   # check about the isoraw version - the reader version determines the schema of the
-  # cached datasets (v0.3.0 reads ALL peaks and replaces the `is_ref`/`is_lock_peak`
-  # peak columns with the raw `flags` bitmask), so anything older has to be read anew.
-  # note: keep in sync with the `min_version` of orbi_check_isoraw() for major version changes
-  min_isoraw_version <- numeric_version("0.3.0")
+  # cached datasets (v0.3.1 reads ALL peaks and replaces the `is_ref`/`is_lock_peak`
+  # peak columns with the raw `flags` bitmask, plus reads the status logs),
+  # so anything older has to be read anew.
+  # note: keep this in sync with the `min_version` of orbi_check_isoraw() for major version changes
+  min_isoraw_version <- numeric_version("0.3.1")
   # older caches don't record the reader version at all, hence the NULL check
   cached_isoraw_version <- existing_cache_info$result[["isoraw_version"]]
   cached_isoraw_version <-
@@ -1089,6 +1110,18 @@ read_cached_raw_file <- function(
     cli_abort("failed to read cached peaks")
   }
 
+  # read status log from cache
+  # note: only caches created by isoraw 0.3.1+ include a status log, older ones
+  # are still perfectly valid and simply come back without one
+  update_progress("reading cached status log")
+  status_log <- list(result = tibble(), conditions = tibble())
+  if (cache_has(file_path_info$status_log)) {
+    status_log <- try_catch_cnds(read_cached_output(file_path_info$status_log))
+    if (nrow(status_log$conditions) > 0) {
+      cli_abort("failed to read cached status log")
+    }
+  }
+
   # read problems from cache
   update_progress("reading cached problems")
   problems <- try_catch_cnds(read_cached_output(file_path_info$problems))
@@ -1108,13 +1141,7 @@ read_cached_raw_file <- function(
   # are any spectra actually requested?
   if (all_spectra || length(select_spectra) > 0) {
     # read what's in the cache
-    if (
-      file.path(
-        basename(file_path_info$output_path),
-        file_path_info$spectra
-      ) %in%
-        zip_info$Name
-    ) {
+    if (cache_has(file_path_info$spectra)) {
       spectra <- try_catch_cnds(read_cached_output(
         file_path_info$spectra
       ))
@@ -1160,6 +1187,7 @@ read_cached_raw_file <- function(
             skip_file_info = TRUE,
             skip_scans = TRUE,
             skip_peaks = TRUE,
+            skip_status_log = TRUE,
             all_spectra = all_spectra,
             select_spectra = select_spectra
           ),
@@ -1239,6 +1267,7 @@ read_cached_raw_file <- function(
     file_info = list(file_info$result),
     scans = list(scans$result),
     peaks = list(peaks$result),
+    status_log = list(status_log$result),
     spectra = list(spectra$result),
     problems = list(problems)
   )
@@ -1341,6 +1370,21 @@ read_raw_file <- function(
   )
   problems <- dplyr::bind_rows(problems, peaks$conditions)
 
+  # read status log from output
+  # note: only isoraw 0.3.1+ writes a status log, with older readers there
+  # simply isn't one to read
+  update_progress("reading status log")
+  status_log_path <- file.path(
+    file_path_info$output_path,
+    file_path_info$status_log
+  )
+  status_log <- if (file.exists(status_log_path)) {
+    try_catch_cnds(read_isoraw_output(status_log_path), error_value = tibble())
+  } else {
+    list(result = tibble(), conditions = tibble())
+  }
+  problems <- dplyr::bind_rows(problems, status_log$conditions)
+
   # read spectra from output
   if (all_spectra || length(select_spectra) > 0) {
     update_progress("reading spectra")
@@ -1413,6 +1457,7 @@ read_raw_file <- function(
       file_info = list(file_info$result),
       scans = list(scans$result),
       peaks = list(peaks$result),
+      status_log = list(status_log$result),
       spectra = list(spectra$result),
       problems = list(problems)
     )

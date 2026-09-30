@@ -64,6 +64,9 @@ namespace Isoorbi
         /// <param name="skipPeaks">
         /// Whether to skip reading the peaks.
         /// </param>
+        /// <param name="skipStatusLog">
+        /// Whether to skip reading the instrument status log.
+        /// </param>
         /// <param name="skipProblematicPeaks">
         /// [Optional] If set to true, only unproblematic peaks are processed, i.e. those that carry no
         /// flags at all or exclusively the reference and/or lock mass flag. Every other flag (saturated,
@@ -76,7 +79,7 @@ namespace Isoorbi
         /// <param name="spectra">
         /// [Optional] Array of scans from which to read the spectra.
         /// </param>
-        public static async Task ReadFile(string path, string output, bool skipFileInfo = false, bool skipScans = false, bool skipPeaks = false, bool skipProblematicPeaks = false, bool allSpectra = false, int[]? spectra = null)
+        public static async Task ReadFile(string path, string output, bool skipFileInfo = false, bool skipScans = false, bool skipPeaks = false, bool skipStatusLog = false, bool skipProblematicPeaks = false, bool allSpectra = false, int[]? spectra = null)
         {
 
             // default for spectra == null
@@ -153,7 +156,7 @@ namespace Isoorbi
                     var stopwatch = Stopwatch.StartNew();
                     Console.WriteLine($"\nINFO: reading {nScans} scans ...");
                     var scansTable = ReadScans(rawFile, firstScanNumber, lastScanNumber);
-                    Console.WriteLine($"INFO: writing peaks to peaks.parquet ...");
+                    Console.WriteLine($"INFO: writing scans to scans.parquet ...");
                     await ParquetRawWriter.WriteScans(scansTable, Path.Combine(output, "scans.parquet"));
                     stopwatch.Stop();
                     Console.WriteLine($"INFO: reading+writing scans complete in {stopwatch.ElapsedMilliseconds} ms");
@@ -190,6 +193,30 @@ namespace Isoorbi
             else
             {
                 Console.WriteLine($"\nINFO: skipping peaks.");
+            }
+
+            // STATUS LOG ========
+            if (!skipStatusLog)
+            {
+                // read status log (without threading the async part is a bit pointless)
+                try
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    Console.WriteLine($"\nINFO: reading status log ...");
+                    var statusLogTable = ReadStatusLog(rawFile);
+                    Console.WriteLine($"INFO: writing status log ({statusLogTable.data.Count} entries, {statusLogTable.fields.Count - 2} channels) to status_log.parquet ...");
+                    await ParquetRawWriter.WriteStatusLog(statusLogTable, Path.Combine(output, "status_log.parquet"));
+                    stopwatch.Stop();
+                    Console.WriteLine($"INFO: reading+writing status log complete in {stopwatch.ElapsedMilliseconds} ms");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ERROR: reading/writing status log failed: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"\nINFO: skipping status log.");
             }
 
             // SPECTRA ========
@@ -395,6 +422,129 @@ namespace Isoorbi
         }
 
         /// <summary>
+        /// Read the instrument status log in the RAW file.
+        /// </summary>
+        /// <remarks>
+        /// The status log holds the instrument readbacks that are recorded independently of the scans
+        /// (typically every couple of seconds), i.e. the traces that Thermo's Qual Browser offers as
+        /// "trace types": ion source and ion optics settings, temperatures (ambient, Orbitrap block,
+        /// detector, ...) and diagnostic data (pressures, supply voltages, fan speeds, pump status, ...).
+        /// Which channels exist depends entirely on the instrument, so they are read dynamically the
+        /// same way the scan trailer is.
+        /// </remarks>
+        /// <param name="rawFile">
+        /// The raw file.
+        /// </param>
+        private static ParquetRawWriter.StatusLogTable ReadStatusLog(IRawDataPlus rawFile)
+        {
+            // the header describes the channels and is the same for all entries in the log
+            // (a file without a status log simply leads to an empty status log table)
+            var header = rawFile.GetStatusLogHeaderInformation() ?? new HeaderItem[0];
+            var labels = GetStatusLogLabels(header);
+
+            // initialize the data fields: log entry number, retention time and one column per channel
+            // (values are always string, just like for the scan trailer information)
+            var fields = new List<DataField>();
+            fields.Add(new DataField<int>("log.no"));
+            fields.Add(new DataField<double>("StartTime"));
+            foreach (var label in labels)
+            {
+                fields.Add(new DataField<string>(label));
+            }
+
+            // initialize the data
+            var data = new List<Dictionary<string, object?>>();
+
+            // loop through the log entries
+            int nEntries = rawFile.GetStatusLogEntriesCount();
+            for (int i = 0; i < nEntries; i++)
+            {
+                try
+                {
+                    // note: reading the values unformatted keeps the full precision of the recorded
+                    // numbers (e.g. 33.677056130200654 instead of the displayed 33.68)
+                    var entry = rawFile.GetStatusLogValues(i, ifFormatted: false);
+                    var values = entry.Values ?? new string[0];
+                    var logData = new Dictionary<string, object?>();
+
+                    // basic log entry information ======
+                    logData.Add("log.no", i + 1);
+                    logData.Add("StartTime", entry.RetentionTime);
+
+                    // status log channels ======
+                    for (int j = 0; j < labels.Length; j++)
+                    {
+                        logData.Add(labels[j], (j < values.Length) ? values[j]?.Trim() : null);
+                    }
+
+                    // add to data
+                    data.Add(logData);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ERROR: could not read status log entry #{i + 1}: {ex.Message}");
+                }
+            }
+
+            // status log structure
+            return new ParquetRawWriter.StatusLogTable(fields, data);
+        }
+
+        /// <summary>
+        /// Derive unique column labels from the status log header.
+        /// </summary>
+        /// <remarks>
+        /// The status log is organized in sections introduced by a heading (a header item without a
+        /// data type, e.g. "=====  Temperatures:  =====" or "TURBO PUMP 1") and the same channel name
+        /// can show up in several sections (e.g. "Temperature (°C)" once per turbo pump). Labels that
+        /// occur more than once are therefore prefixed with their section, anything that is still
+        /// ambiguous afterwards gets a number appended.
+        /// </remarks>
+        /// <param name="header">
+        /// The status log header information.
+        /// </param>
+        private static string[] GetStatusLogLabels(HeaderItem[] header)
+        {
+            // labels with the trailing colon removed (same as for the scan trailer information)
+            var labels = header.Select(item => item.Label.Trim().TrimEnd(':').Trim()).ToArray();
+
+            // the section each channel belongs to (a heading itself belongs to no section)
+            var sections = new string[labels.Length];
+            var section = "";
+            for (int i = 0; i < labels.Length; i++)
+            {
+                if (header[i].DataType == GenericDataTypes.NULL)
+                {
+                    // heading, e.g. "=====  Temperatures:  =====" --> "Temperatures"
+                    section = labels[i].Trim('=', ':', ' ');
+                    sections[i] = "";
+                }
+                else
+                {
+                    sections[i] = section;
+                }
+            }
+
+            // disambiguate duplicated labels
+            var counts = labels.GroupBy(label => label).ToDictionary(group => group.Key, group => group.Count());
+            var used = new HashSet<string>();
+            var uniqueLabels = new string[labels.Length];
+            for (int i = 0; i < labels.Length; i++)
+            {
+                var label = (counts[labels[i]] > 1 && sections[i].Length > 0) ?
+                    $"{sections[i]}: {labels[i]}" : labels[i];
+                var uniqueLabel = label;
+                for (int j = 2; used.Contains(uniqueLabel); j++)
+                {
+                    uniqueLabel = $"{label} ({j})";
+                }
+                used.Add(uniqueLabel);
+                uniqueLabels[i] = uniqueLabel;
+            }
+            return uniqueLabels;
+        }
+
+        /// <summary>
         /// Read centroid peaks in the raw file.
         /// </summary>
         private static ParquetRawWriter.PeaksTable ReadPeaks(IRawDataPlus rawFile, int firstScanNumber, int lastScanNumber, bool skipProblematicPeaks = false)
@@ -580,6 +730,25 @@ namespace Isoorbi
         }
 
         /// <summary>
+        /// Structure of the status log table (dyamic)
+        /// </summary>
+        public record StatusLogTable
+        (
+            List<DataField> fields,
+            List<Dictionary<string, object?>> data
+        );
+
+        public static async Task WriteStatusLog(StatusLogTable statusLog, string path)
+        {
+            CleanFile(path);
+            var schema = new ParquetSchema(statusLog.fields.ToArray());
+            using (Stream fs = System.IO.File.OpenWrite(path))
+            {
+                await ParquetSerializer.SerializeAsync(schema, statusLog.data, fs);
+            }
+        }
+
+        /// <summary>
         /// Structure of the peaks table.
         /// </summary>
         public record PeaksTable
@@ -701,7 +870,7 @@ namespace Isoorbi
 
             // usage string:
             string? exeName = Path.GetFileName(Process.GetCurrentProcess().MainModule?.FileName);
-            string help = $"Usage: {exeName} [--version] [--help] [--file <path>] [--skip <fileInfo,scans,peaks>] [--skipProblematicPeaks] [--spectra <all|1,4,6>]";
+            string help = $"Usage: {exeName} [--version] [--help] [--file <path>] [--skip <fileInfo,scans,peaks,statusLog>] [--skipProblematicPeaks] [--spectra <all|1,4,6>]";
 
             // print help
             if (args.Contains("--help"))
@@ -731,7 +900,7 @@ namespace Isoorbi
                 string? skip = GetArgumentValue(args, "--skip");
                 string[] skips = (skip == null) ? new string[0] :
                     skip.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-                bool skipFileInfo = false, skipScans = false, skipPeaks = false;
+                bool skipFileInfo = false, skipScans = false, skipPeaks = false, skipStatusLog = false;
                 string skipInfo = "";
                 foreach (string s in skips)
                 {
@@ -749,6 +918,11 @@ namespace Isoorbi
                         case "peaks":
                             skipPeaks = true;
                             skipInfo += ", peaks";
+                            break;
+                        case "statusLog":
+                        case "statuslog":
+                            skipStatusLog = true;
+                            skipInfo += ", status log";
                             break;
                         default:
                             Console.WriteLine($"Warning: unexpected skip value '{s}'");
@@ -771,7 +945,7 @@ namespace Isoorbi
                 try
                 {
                     string output = path + ".cache";
-                    await RawReader.ReadFile(path, output, skipFileInfo: skipFileInfo, skipScans: skipScans, skipPeaks: skipPeaks, skipProblematicPeaks: skipProblematicPeaks, allSpectra: allSpectra, spectra: scanSpectra);
+                    await RawReader.ReadFile(path, output, skipFileInfo: skipFileInfo, skipScans: skipScans, skipPeaks: skipPeaks, skipStatusLog: skipStatusLog, skipProblematicPeaks: skipProblematicPeaks, allSpectra: allSpectra, spectra: scanSpectra);
                 }
                 catch (Exception ex)
                 {

@@ -26,8 +26,8 @@
     Message
       ------------------------------ Aggregator minimal ------------------------------
       Dataset file_info:
-       > filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
-      fixed = TRUE))
+       > filename = as.character(sub(FileName, pattern = "\\.raw$", replacement = "",
+      ignore.case = TRUE))
        > creation_date = as.POSIXct(CreationDate)
        > in_aquisition = as.logical(InAquisition)
       Dataset scans:
@@ -55,8 +55,8 @@
     Message
       ------------------------------ Aggregator standard -----------------------------
       Dataset file_info:
-       > filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
-      fixed = TRUE))
+       > filename = as.character(sub(FileName, pattern = "\\.raw$", replacement = "",
+      ignore.case = TRUE))
        > creation_date = as.POSIXct(CreationDate)
        > in_aquisition = as.logical(InAquisition)
        > (.*) = as.character(all_matches("(.*)"))
@@ -95,8 +95,8 @@
     Message
       ------------------------------ Aggregator extended -----------------------------
       Dataset file_info:
-       > filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
-      fixed = TRUE))
+       > filename = as.character(sub(FileName, pattern = "\\.raw$", replacement = "",
+      ignore.case = TRUE))
        > creation_date = as.POSIXct(CreationDate)
        > in_aquisition = as.logical(InAquisition)
        > (.*) = as.character(all_matches("(.*)"))
@@ -168,8 +168,8 @@
     Message
       ────────────────────────────── [1mAggregator [3mminimal[23m[22m ──────────────────────────────
       [1mDataset[22m [34mfile_info[39m:
-       → [32mfilename[39m = [3mas.character(sub(FileName, pattern = ".raw", replacement = "",[23m
-      [3mfixed = TRUE))[23m
+       → [32mfilename[39m = [3mas.character(sub(FileName, pattern = "\\.raw$", replacement = "",[23m
+      [3mignore.case = TRUE))[23m
        → [32mcreation_date[39m = [3mas.POSIXct(CreationDate)[23m
        → [32min_aquisition[39m = [3mas.logical(InAquisition)[23m
       [1mDataset[22m [34mscans[39m:
@@ -197,8 +197,8 @@
     Message
       ────────────────────────────── [1mAggregator [3mstandard[23m[22m ─────────────────────────────
       [1mDataset[22m [34mfile_info[39m:
-       → [32mfilename[39m = [3mas.character(sub(FileName, pattern = ".raw", replacement = "",[23m
-      [3mfixed = TRUE))[23m
+       → [32mfilename[39m = [3mas.character(sub(FileName, pattern = "\\.raw$", replacement = "",[23m
+      [3mignore.case = TRUE))[23m
        → [32mcreation_date[39m = [3mas.POSIXct(CreationDate)[23m
        → [32min_aquisition[39m = [3mas.logical(InAquisition)[23m
        → [35m(.*)[39m = [3mas.character(all_matches("(.*)"))[23m
@@ -237,8 +237,8 @@
     Message
       ────────────────────────────── [1mAggregator [3mextended[23m[22m ─────────────────────────────
       [1mDataset[22m [34mfile_info[39m:
-       → [32mfilename[39m = [3mas.character(sub(FileName, pattern = ".raw", replacement = "",[23m
-      [3mfixed = TRUE))[23m
+       → [32mfilename[39m = [3mas.character(sub(FileName, pattern = "\\.raw$", replacement = "",[23m
+      [3mignore.case = TRUE))[23m
        → [32mcreation_date[39m = [3mas.POSIXct(CreationDate)[23m
        → [32min_aquisition[39m = [3mas.logical(InAquisition)[23m
        → [35m(.*)[39m = [3mas.character(all_matches("(.*)"))[23m

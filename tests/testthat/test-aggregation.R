@@ -106,6 +106,40 @@ test_that("orbi_register_aggregator() and orbi_get_aggregator()", {
   expect_equal(orbi_get_aggregator("test"), agg)
 })
 
+test_that("included aggregators remove the .raw extension from filenames", {
+  raw_files <- system.file(
+    "extdata",
+    "nitrate_test_1scan.raw.cache.zip",
+    package = "isoorbi"
+  ) |>
+    orbi_read_raw(show_progress = FALSE) |>
+    suppressMessages()
+
+  # the extension in any capitalization, but only at the end of the name
+  file_names <- c(
+    "a.raw",
+    "b.RAW",
+    "c.Raw",
+    "d.raw.backup",
+    "e.raw.f.raw",
+    "no_extension"
+  )
+  expected <- c("a", "b", "c", "d.raw.backup", "e.raw.f", "no_extension")
+  for (aggregator in c("minimal", "standard", "extended")) {
+    for (i in seq_along(file_names)) {
+      raw_files$file_info[[1]]$FileName <- file_names[i]
+      agg <- raw_files |>
+        orbi_aggregate_raw(
+          aggregator = aggregator,
+          show_progress = FALSE,
+          show_problems = FALSE
+        ) |>
+        suppressMessages()
+      expect_equal(agg$file_info$filename, expected[i])
+    }
+  }
+})
+
 test_that("get_data()", {
   # errors
   get_data() |> expect_error("must be.*list")

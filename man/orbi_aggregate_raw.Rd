@@ -25,7 +25,7 @@ and/or \code{\link[=orbi_add_to_aggregator]{orbi_add_to_aggregator()}}) that def
 \item{show_problems}{whether to show problems encountered along the way (rather than just keeping track of them with \code{\link[=orbi_get_problems]{orbi_get_problems()}}). Set to \code{show_problems = FALSE} to turn off the live printout. Either way, all encountered problems can be retrieved with running \code{\link[=orbi_get_problems]{orbi_get_problems()}} for the returned list}
 }
 \value{
-a list of merged dataframes collected from the \code{files_data} based on the \code{aggregator} definitions
+a list of merged dataframes collected from the \code{files_data} based on the \code{aggregator} definitions. Printing it summarizes the aggregated columns of each dataset along with how many columns were not aggregated, use \code{print(x, show_all = TRUE)} to list all of the not aggregated columns.
 }
 \description{
 This function allows dynamic aggregation and validation of data read by \code{\link[=orbi_read_raw]{orbi_read_raw()}}. Like \code{\link[=orbi_read_raw]{orbi_read_raw()}}, it is designed to be fail save by safely catching errors and reporting back on them (see \code{\link[=orbi_get_problems]{orbi_get_problems()}}). This function should work out of the box for most files without additional modification of the \code{aggregator}.

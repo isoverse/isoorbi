@@ -1,6 +1,11 @@
-# isoraw 0.3.0
+# isoraw 0.3.1
 
-This isoraw release is used by isoorbi version 1.6.0+.
+## New features
+
+ * new `status_log.parquet` output with the instrument status log, i.e. the instrument readbacks that are recorded independently of the scans (typically every couple of seconds) and that Thermo's Qual Browser offers as *trace types*: ion source and ion optics settings, temperatures (ambient, Orbitrap block, detector, ion transfer tube, ...) and diagnostic data (vacuum pressures, supply voltages, fan and turbopump status, up-time, ...). Which channels exist depends on the instrument, so they are read dynamically the same way the scan trailer information is. See the README for the layout of the table.
+ * the status log is read by default and can be skipped with the new `statusLog` target of the `--skip` option (i.e. `--skip statusLog`).
+
+# isoraw 0.3.0
 
 ## Breaking changes
 
