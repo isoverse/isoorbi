@@ -11,6 +11,7 @@ orbi_define_blocks(
   start_scan.no = NULL,
   end_scan.no = NULL,
   block_name = NA_character_,
+  in_filename = NULL,
   blocks_table = NULL
 )
 }
@@ -27,7 +28,9 @@ orbi_define_blocks(
 
 \item{block_name}{name(s) for the block(s), a single value or a vector for multiple blocks, \code{NA} by default (i.e. unnamed)}
 
-\item{blocks_table}{alternative to the individual parameters: a data frame with any of the columns \code{start_time.min}, \code{end_time.min}, \code{start_scan.no}, \code{end_scan.no} and \code{block_name}, one row per block. Any other columns are ignored. If provided, the individual parameters are not used.}
+\item{in_filename}{the file(s) to add the block(s) to, a single value or a vector for multiple blocks, \code{NA} (the default if not provided) adds a block to all files. This must be the \code{filename} of the file(s) as it appears in the \code{dataset}.}
+
+\item{blocks_table}{alternative to the individual parameters: a data frame with any of the columns \code{start_time.min}, \code{end_time.min}, \code{start_scan.no}, \code{end_scan.no}, \code{block_name} and \code{in_filename}, one row per block. Any other columns are ignored. If provided, the individual parameters are not used.}
 }
 \value{
 A data frame (tibble) with the block definitions added. Any data that is not part of a block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
@@ -39,6 +42,8 @@ If you want to make segments in the blocks (optional), note that this function -
 }
 \details{
 Each block has to be defined either by time (\code{start_time.min} \strong{and} \code{end_time.min}) or by scan number (\code{start_scan.no} \strong{and} \code{end_scan.no}) but not by both. Different blocks in the same call can use different definitions.
+
+By default, each block is added to all files in the \code{dataset}. To add a block only to a specific file, provide its \code{in_filename}. Since all parameters are recycled, the same block definition can be added to several (but not all) files by providing a vector of filenames, e.g. \code{in_filename = c("file1", "file2")} defines the block once for each of these two files.
 
 Blocks are matched against the scans of each file separately. A block whose range reaches beyond what a file recorded is trimmed to the scans that exist in that file, and a block that does not overlap a file at all is not added there - this is reported with a warning naming the affected files and the range each of them covers. The summary message lists the scans and times each block actually ended up covering, which is what to check if a block was trimmed.
 }
@@ -61,9 +66,16 @@ df |> orbi_define_blocks(
   blocks_table = tibble::tibble(
     start_time.min = c(0.1, NA),
     end_time.min = c(0.4, NA),
-    start_scan.no = c(NA, 2000),
-    end_scan.no = c(NA, 2500),
+    start_scan.no = c(NA, 200),
+    end_scan.no = c(NA, 350),
     block_name = c("first", "second")
   )
+)
+
+# a block that is only added to a specific file
+df |> orbi_define_blocks(
+  start_time.min = 0.2,
+  end_time.min = 0.8,
+  in_filename = "ac5"
 )
 }

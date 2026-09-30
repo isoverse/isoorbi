@@ -11,8 +11,11 @@
 #' @param start_scan.no start scan of the block(s), a single value or a vector for multiple blocks
 #' @param end_scan.no end scan of the block(s), a single value or a vector for multiple blocks
 #' @param block_name name(s) for the block(s), a single value or a vector for multiple blocks, `NA` by default (i.e. unnamed)
-#' @param blocks_table alternative to the individual parameters: a data frame with any of the columns `start_time.min`, `end_time.min`, `start_scan.no`, `end_scan.no` and `block_name`, one row per block. Any other columns are ignored. If provided, the individual parameters are not used.
+#' @param in_filename the file(s) to add the block(s) to, a single value or a vector for multiple blocks, `NA` (the default if not provided) adds a block to all files. This must be the `filename` of the file(s) as it appears in the `dataset`.
+#' @param blocks_table alternative to the individual parameters: a data frame with any of the columns `start_time.min`, `end_time.min`, `start_scan.no`, `end_scan.no`, `block_name` and `in_filename`, one row per block. Any other columns are ignored. If provided, the individual parameters are not used.
 #' @details Each block has to be defined either by time (`start_time.min` **and** `end_time.min`) or by scan number (`start_scan.no` **and** `end_scan.no`) but not by both. Different blocks in the same call can use different definitions.
+#'
+#' By default, each block is added to all files in the `dataset`. To add a block only to a specific file, provide its `in_filename`. Since all parameters are recycled, the same block definition can be added to several (but not all) files by providing a vector of filenames, e.g. `in_filename = c("file1", "file2")` defines the block once for each of these two files.
 #'
 #' Blocks are matched against the scans of each file separately. A block whose range reaches beyond what a file recorded is trimmed to the scans that exist in that file, and a block that does not overlap a file at all is not added there - this is reported with a warning naming the affected files and the range each of them covers. The summary message lists the scans and times each block actually ended up covering, which is what to check if a block was trimmed.
 #' @return A data frame (tibble) with the block definitions added. Any data that is not part of a block will be marked with the value of `orbi_get_option("data_type_unused")`. Any previously applied segmentation will be discarded (`segment` column set to `NA`) to avoid unintended side effects.
@@ -35,10 +38,17 @@
 #'   blocks_table = tibble::tibble(
 #'     start_time.min = c(0.1, NA),
 #'     end_time.min = c(0.4, NA),
-#'     start_scan.no = c(NA, 2000),
-#'     end_scan.no = c(NA, 2500),
+#'     start_scan.no = c(NA, 200),
+#'     end_scan.no = c(NA, 350),
 #'     block_name = c("first", "second")
 #'   )
+#' )
+#'
+#' # a block that is only added to a specific file
+#' df |> orbi_define_blocks(
+#'   start_time.min = 0.2,
+#'   end_time.min = 0.8,
+#'   in_filename = "ac5"
 #' )
 #' @export
 orbi_define_blocks <- function(
@@ -48,6 +58,7 @@ orbi_define_blocks <- function(
   start_scan.no = NULL,
   end_scan.no = NULL,
   block_name = NA_character_,
+  in_filename = NULL,
   blocks_table = NULL
 ) {
   # safety checks
@@ -60,11 +71,30 @@ orbi_define_blocks <- function(
     end_time.min = end_time.min,
     start_scan.no = start_scan.no,
     end_scan.no = end_scan.no,
-    block_name = block_name
+    block_name = block_name,
+    in_filename = in_filename
   )
 
+  # blocks for specific files need those files to be in the dataset
+  # note: a dataset without filenames at all is caught when adding the blocks
+  is_agg <- is(dataset, "orbi_aggregated_data")
+  filenames <- if (is_agg) dataset$file_info$filename else dataset[["filename"]]
+  filenames <- unique(as.character(filenames))
+  unknown <- setdiff(
+    stats::na.omit(blocks_table$in_filename),
+    filenames
+  )
+  if (length(filenames) > 0L && length(unknown) > 0L) {
+    cli_abort(
+      c(
+        "{.field in_filename} {.val {unknown}} {?is/are} not in this {.field dataset}",
+        "i" = "available filename{?s}: {.val {filenames}}"
+      )
+    )
+  }
+
   # how many files are we working with?
-  scans <- if (is(dataset, "orbi_aggregated_data")) dataset$scans else dataset
+  scans <- if (is_agg) dataset$scans else dataset
   n_files <- if ("uidx" %in% names(scans)) {
     length(unique(scans$uidx))
   } else if ("filename" %in% names(scans)) {
@@ -93,25 +123,31 @@ orbi_define_blocks <- function(
   # note: a block that fell outside the data everywhere was not added at all
   # (it warned about it), so don't count it here
   n_added <- coverage |> purrr::map_lgl(~ any(.x$n_scans > 0L)) |> sum()
+  # the files that actually got a block (not all do if blocks are for specific
+  # files or outside the data of some files)
+  n_files_added <- coverage |>
+    dplyr::bind_rows() |>
+    dplyr::filter(.data$n_scans > 0L) |>
+    dplyr::distinct(dplyr::across(dplyr::any_of(c("uidx", "filename")))) |>
+    nrow()
   if (n_added < n_blocks) {
     finish_info(
-      "added {n_added} of {n_blocks} block{?s} to {n_files} file{?s}",
+      "added {n_added} of {n_blocks} block{?s} to {n_files_added} file{?s}",
       start = start
     )
   } else {
     finish_info(
-      "added {n_blocks} block{?s} to {n_files} file{?s}",
+      "added {n_blocks} block{?s} to {n_files_added} file{?s}",
       start = start
     )
   }
-  cli_bullets(
-    seq_len(n_blocks) |>
-      purrr::map_chr(
-        ~ describe_block_coverage(blocks_table[.x, ], coverage[[.x]])
-      ) |>
-      format_bullets_raw() |>
-      set_names("*")
-  )
+  seq_len(n_blocks) |>
+    purrr::map_chr(\(i) {
+      desc <- describe_block_coverage(blocks_table[i, ], coverage[[i]])
+      paste0("\u00a0", format_inline("{symbol$arrow_right} {desc}"))
+    }) |>
+    cli_bullets_raw() |>
+    cli()
 
   # return updated dataset
   return(dataset)
@@ -1177,7 +1213,8 @@ block_def_cols <- c(
   "end_time.min",
   "start_scan.no",
   "end_scan.no",
-  "block_name"
+  "block_name",
+  "in_filename"
 )
 
 # assemble the block definitions from either a blocks_table or the individual
@@ -1189,6 +1226,7 @@ get_blocks_table <- function(
   start_scan.no,
   end_scan.no,
   block_name,
+  in_filename = NULL,
   .env = caller_env()
 ) {
   if (!is.null(blocks_table)) {
@@ -1226,7 +1264,8 @@ get_blocks_table <- function(
       end_time.min = end_time.min,
       start_scan.no = start_scan.no,
       end_scan.no = end_scan.no,
-      block_name = block_name
+      block_name = block_name,
+      in_filename = in_filename
     )
     n <- max(c(1L, lengths(args)))
     wrong_length <- names(args)[
@@ -1256,7 +1295,8 @@ get_blocks_table <- function(
     end_time.min = c("numeric", "a number"),
     start_scan.no = c("integerish", "a whole number"),
     end_scan.no = c("integerish", "a whole number"),
-    block_name = c("character", "text")
+    block_name = c("character", "text"),
+    in_filename = c("character", "text")
   )
   for (col in block_def_cols) {
     values <- blocks_table[[col]]
@@ -1281,7 +1321,8 @@ get_blocks_table <- function(
       end_time.min = as.numeric(.data$end_time.min),
       start_scan.no = as.integer(.data$start_scan.no),
       end_scan.no = as.integer(.data$end_scan.no),
-      block_name = as.character(.data$block_name)
+      block_name = as.character(.data$block_name),
+      in_filename = as.character(.data$in_filename)
     )
 
   # each block has to be defined by time OR by scan, not both and not neither
@@ -1368,6 +1409,10 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
     tidyr::nest(data = -dplyr::any_of(c("uidx", "filename")))
   root_env <- current_env()
 
+  # which files does this block apply to? (all unless it has an in_filename)
+  single_scans$in_block_file <- is.na(block_def$in_filename) |
+    single_scans$filename == block_def$in_filename
+
   # find start scans
   # note: a time outside a file's range yields NA (i.e. the block is not added in
   # that file) rather than an error, the same way an out of range scan number does
@@ -1398,6 +1443,21 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
         end_scan.no = !!block_def$end_scan.no
       )
   }
+
+  # files the block does not apply to don't get any part of it
+  single_scans <- single_scans |>
+    dplyr::mutate(
+      start_scan.no = dplyr::if_else(
+        .data$in_block_file,
+        .data$start_scan.no,
+        NA_integer_
+      ),
+      end_scan.no = dplyr::if_else(
+        .data$in_block_file,
+        .data$end_scan.no,
+        NA_integer_
+      )
+    )
 
   # determine new block numbers
   single_scans <- single_scans |>
@@ -1442,7 +1502,10 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
 
   # what does the block actually cover in each file? (the requested start/end are
   # snapped to the scans that exist, so this can be narrower than what was asked for)
-  coverage <- summarize_block_coverage(single_scans)
+  # note: only for the files the block applies to
+  coverage <- single_scans |>
+    dplyr::filter(.data$in_block_file) |>
+    summarize_block_coverage()
 
   # warn about files where the block does not cover any scans at all, i.e. where the
   # requested times or scan numbers fall outside what the file recorded (this also
@@ -1464,7 +1527,7 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
           )
         }
         format_inline(
-          "no scans in {.field {unmatched$filename[i]}} ({file_range})"
+          "no scans in {col_blue(unmatched$filename[i])} ({file_range})"
         )
       }
     )
@@ -1584,14 +1647,18 @@ summarize_block_coverage <- function(single_scans) {
   )
 }
 
-# the label of each block ("block" or "block <name>")
+# the label of each block ("block", "block <name>", "block <name> in <file>")
 block_labels <- function(blocks_table) {
   # format each name on its own, format_inline() would collapse the whole vector
   name <- blocks_table$block_name |>
     purrr::map_chr(
       ~ if (is.na(.x)) "" else format_inline(" {.field {.x}}")
     )
-  return(sprintf("block%s", name))
+  file <- blocks_table$in_filename |>
+    purrr::map_chr(
+      ~ if (is.na(.x)) "" else format_inline(" in {col_blue(.x)}")
+    )
+  return(sprintf("block%s%s", name, file))
 }
 
 # one line description of each block definition, used for warnings and errors
@@ -1617,8 +1684,12 @@ describe_blocks <- function(blocks_table) {
 # which can differ if the requested range extends beyond the recorded data
 describe_block_coverage <- function(block_def, coverage) {
   label <- block_labels(block_def)
+  # a block for a specific file already names it in the label
+  for_one_file <- !is.na(block_def$in_filename)
   added <- coverage |> dplyr::filter(.data$n_scans > 0L)
-  if (nrow(added) == 0L) {
+  if (nrow(added) == 0L && for_one_file) {
+    return(format_inline("{label}: not added, outside the data"))
+  } else if (nrow(added) == 0L) {
     return(format_inline(
       "{label}: not added, outside the data in {nrow(coverage)} file{?s}"
     ))
@@ -1630,6 +1701,9 @@ describe_block_coverage <- function(block_def, coverage) {
     covers <- format_inline(
       "{covers} ({signif(min(added$start_time))} to {signif(max(added$end_time))} min)"
     )
+  }
+  if (for_one_file) {
+    return(format_inline("{label}: covers {covers}"))
   }
   return(format_inline(
     "{label}: covers {covers} in {nrow(added)} file{?s}"

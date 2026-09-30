@@ -298,6 +298,62 @@ data |>
   orbi_plot_isotopocule_coverage()
 ```
 
+# Data blocks
+
+## `orbi_define_blocks()`
+
+Data blocks mark which scans belong together (e.g. one sample in a flow injection) and which scans are not used for the ratio calculations. Each block is defined either by time (`start_time.min` and `end_time.min`) or by scan number (`start_scan.no` and `end_scan.no`). By default, a block is added to every file.
+
+```{r}
+# one block for all files (by time)
+data |>
+  orbi_define_blocks(start_time.min = 0, end_time.min = 0.015) |>
+  orbi_get_blocks_info()
+```
+
+To add a block only to specific file(s), use `in_filename`. Like all the other parameters, it can be a single value or a vector with one value per block.
+
+```{r}
+# two blocks (by scan number) only in the 10 scan file
+blocks_data <- data |>
+  orbi_define_blocks(
+    start_scan.no = c(2, 6),
+    end_scan.no = c(4, 9),
+    block_name = c("first", "second"),
+    in_filename = "nitrate_test_10scans"
+  )
+
+# overview of the blocks in each file
+blocks_data |> orbi_get_blocks_info()
+```
+
+```{r}
+#| label: fig-blocks
+#| fig-cap: The two blocks defined in the 10 scan test file (scans outside the blocks are unused).
+#| fig-width: 8
+#| fig-height: 4
+blocks_data |>
+  orbi_filter_files("nitrate_test_10scans") |>
+  orbi_plot_raw_data(y = tic * it.ms, x = "scan.no") +
+  geom_point(size = 4) # add the data points for clarity
+```
+
+For many blocks, it is often easier to provide them as a `blocks_table` (which could also come from a spreadsheet) with one row per block. An `in_filename` of `NA` adds that block to all files.
+
+```{r}
+blocks_table <- tibble(
+  start_scan.no = c(1, 2, 6),
+  end_scan.no = c(1, 4, 9),
+  block_name = c("all", "first", "second"),
+  in_filename = c(NA, "nitrate_test_10scans", "nitrate_test_10scans")
+)
+blocks_table
+
+data |>
+  orbi_define_blocks(blocks_table = blocks_table) |>
+  orbi_get_blocks_info()
+```
+
 # Ratio calculations
 
 ## `orbi_define_basepeak()` *

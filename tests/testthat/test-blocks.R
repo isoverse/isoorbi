@@ -185,6 +185,151 @@ test_that("orbi_define_blocks()", {
     end_time.min = c(0.4, 0.5)
   ) |>
     expect_error("cannot be recycled")
+
+  # in_filename checks
+  orbi_define_blocks(
+    multi_data,
+    start_scan.no = 1L,
+    end_scan.no = 2L,
+    in_filename = 1
+  ) |>
+    expect_error("in_filename.*must be text")
+  orbi_define_blocks(
+    multi_data,
+    start_scan.no = 1L,
+    end_scan.no = 2L,
+    in_filename = c("test1", "nope")
+  ) |>
+    expect_error("in_filename.*nope.*is not in this.*dataset")
+
+  # a block for a single file is only added there (and the others are not
+  # reported as outside the data)
+  expect_no_warning(
+    only_test2 <- orbi_define_blocks(
+      multi_data,
+      start_scan.no = 1L,
+      end_scan.no = 2L,
+      in_filename = "test2"
+    ) |>
+      suppressMessages()
+  )
+  expect_equal(
+    only_test2 |>
+      dplyr::filter(block == 1L) |>
+      dplyr::select(filename, scan.no),
+    tibble(filename = "test2", scan.no = 1:2)
+  )
+  expect_true(all(only_test2$block[only_test2$filename == "test1"] == 0L))
+  expect_message(
+    orbi_define_blocks(
+      multi_data,
+      start_scan.no = 1L,
+      end_scan.no = 2L,
+      in_filename = "test2"
+    ) |>
+      expect_message("added 1 block to 1 file"),
+    "block in test2: covers scans 1 to 2 \\(0.1 to 0.2 min\\)\\s*$"
+  )
+
+  # in_filename is recycled like the other parameters, so the same block for
+  # every file is the same as a block without in_filename
+  expect_equal(
+    orbi_define_blocks(
+      multi_data,
+      start_scan.no = 1L,
+      end_scan.no = 2L,
+      in_filename = c("test1", "test2")
+    ) |>
+      suppressMessages(),
+    orbi_define_blocks(multi_data, start_scan.no = 1L, end_scan.no = 2L) |>
+      suppressMessages()
+  )
+  # and different blocks for different files are each numbered per file
+  per_file <- orbi_define_blocks(
+    multi_data,
+    start_scan.no = c(1L, 5L),
+    end_scan.no = c(2L, 6L),
+    in_filename = c("test1", "test2")
+  ) |>
+    suppressMessages()
+  expect_equal(
+    per_file |> dplyr::filter(block == 1L) |> dplyr::select(filename, scan.no),
+    tibble(filename = rep(c("test1", "test2"), each = 2), scan.no = c(1:2, 5:6))
+  )
+  expect_equal(sort(unique(per_file$block)), c(0L, 1L))
+
+  # via a blocks table, where NA means all files
+  from_table <- orbi_define_blocks(
+    multi_data,
+    blocks_table = tibble(
+      start_scan.no = c(1L, 4L),
+      end_scan.no = c(2L, 5L),
+      in_filename = c(NA, "test1")
+    )
+  ) |>
+    suppressMessages()
+  expect_equal(
+    from_table |>
+      dplyr::filter(block > 0L) |>
+      dplyr::count(filename, block),
+    tibble(
+      filename = c("test1", "test1", "test2"),
+      block = c(1L, 2L, 1L),
+      n = 2L
+    )
+  )
+
+  # a block outside the data of its file only warns about that file
+  orbi_define_blocks(
+    test_data,
+    start_scan.no = 7L,
+    end_scan.no = 8L,
+    in_filename = "test1"
+  ) |>
+    suppressMessages() |>
+    expect_warning("in test1.*outside the data in 1 file.*covers scans 1 to 6")
+
+  # overlapping blocks are only a problem within the same file
+  expect_no_error(
+    orbi_define_blocks(
+      multi_data,
+      start_scan.no = 1L,
+      end_scan.no = 5L,
+      in_filename = c("test1", "test2")
+    ) |>
+      suppressMessages()
+  )
+  orbi_define_blocks(
+    multi_data,
+    start_scan.no = c(1L, 4L),
+    end_scan.no = c(5L, 6L),
+    in_filename = "test1"
+  ) |>
+    suppressMessages() |>
+    expect_error("block in test1: scan 4 to 6.*overlaps")
+
+  # works the same with aggregated data (using the filename from the file info)
+  agg <- system.file("extdata", package = "isoorbi") |>
+    orbi_find_raw(include_cache = TRUE) |>
+    orbi_read_raw(show_progress = FALSE) |>
+    orbi_aggregate_raw(show_progress = FALSE) |>
+    suppressMessages()
+  agg_block <- agg |>
+    orbi_define_blocks(
+      start_scan.no = 1L,
+      end_scan.no = 5L,
+      in_filename = "nitrate_test_10scans"
+    ) |>
+    suppressMessages()
+  expect_equal(
+    agg_block |>
+      orbi_get_data(file_info = "filename", scans = c("scan.no", "block")) |>
+      suppressMessages() |>
+      dplyr::filter(block == 1L) |>
+      dplyr::select(-"uidx"),
+    tibble(filename = "nitrate_test_10scans", scan.no = 1:5, block = 1L),
+    ignore_attr = "unused_columns"
+  )
 })
 
 test_that("internal find_intervals()", {
