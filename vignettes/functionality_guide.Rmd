@@ -126,7 +126,41 @@ my_agg
 raw_files |> orbi_aggregate_raw(aggregator = "test")
 ```
 
-### bonus instrument status log
+## bonus `orbi_get_problems()`
+
+There were no problems reading and/or aggregating the raw data so these are empty but this can be very helpful to see what went wrong during reading or aggregation.
+
+```{r}
+raw_files |> orbi_get_problems()
+agg_data |> orbi_get_problems()
+```
+
+## `orbi_get_data()`
+
+At this point (and any later point), you can always extract the data of interest from the aggregated data set using `orbi_get_data()`. If you prefer working with a data frame tibble from `orbi_get_data()` instead of the aggregated data structure, you can switch to that at any point and use the resulting data frame tibble in subsequent functions.
+
+```{r}
+# direct access to the data stored in the aggregated dataset
+agg_data$file_info
+agg_data$scans
+agg_data$peaks
+agg_data$spectra
+agg_data$status_log
+
+# better way to retrieve+combine the data with dplyr select syntax:
+agg_data |>
+  orbi_get_data(
+    file_info = c(
+      "filename",
+      "creation_date",
+      "instrument" = "InstrumentModel"
+    ),
+    scans = c("time.min", "tic", "resolution"),
+    peaks = c("mz" = "mzMeasured", starts_with("peak"))
+  )
+```
+
+# Bonus: working with the `status_log`
 
 Besides the scans, raw files hold the instrument's **status log**: readbacks that the instrument records independently of the scans (typically every few seconds) such as temperatures, vacuum pressures, voltages, and ion source settings. `orbi_read_raw()` returns it as the `status_log` dataset. Which channels a status log contains depends entirely on the instrument, so none of the included aggregators take anything from it. Instead, `orbi_aggregate_raw()` reports the available status log channels as *not aggregated* so you can pick the ones you are interested in. Printing the aggregated data only says how many there are, use `print(agg_data, show_all = TRUE)` to list all of them.
 
@@ -210,39 +244,6 @@ status_log |>
   theme_bw()
 ```
 
-### bonus `orbi_get_problems()`
-
-There were no problems reading and/or aggregating the raw data so these are empty but this can be very helpful to see what went wrong during reading or aggregation.
-
-```{r}
-raw_files |> orbi_get_problems()
-agg_data |> orbi_get_problems()
-```
-
-## `orbi_get_data()`
-
-At this point (and any later point), you can always extract the data of interest from the aggregated data set using `orbi_get_data()`. If you prefer working with a data frame tibble from `orbi_get_data()` instead of the aggregated data structure, you can switch to that at any point and use the resulting data frame tibble in subsequent functions.
-
-```{r}
-# direct access to the data stored in the aggregated dataset
-agg_data$file_info
-agg_data$scans
-agg_data$peaks
-agg_data$spectra
-
-# better way to retrieve+combine the data with dplyr select syntax:
-agg_data |>
-  orbi_get_data(
-    file_info = c(
-      "filename",
-      "creation_date",
-      "instrument" = "InstrumentModel"
-    ),
-    scans = c("time.min", "tic", "resolution"),
-    peaks = c("mz" = "mzMeasured", starts_with("peak"))
-  )
-```
-
 # Identifying isotopocules
 
 The next step is identifying isotpocules.
@@ -308,6 +309,15 @@ Data blocks mark which scans belong together (e.g. one sample in a flow injectio
 # one block for all files (by time)
 data |>
   orbi_define_blocks(start_time.min = 0, end_time.min = 0.015) |>
+  orbi_get_blocks_info()
+```
+
+Files often differ in length. To let a block last until the end of each file, use `Inf` for `end_time.min` or `end_scan.no`.
+
+```{r}
+# one block from the first until the last scan of each file
+data |>
+  orbi_define_blocks(start_scan.no = 1, end_scan.no = Inf) |>
   orbi_get_blocks_info()
 ```
 
