@@ -16,6 +16,69 @@ test_that("factor_in_order()", {
   expect_equal(factor_in_order(factor(y)), factor_in_order(y))
 })
 
+# find_variable_name() ================
+
+test_that("find_variable_name()", {
+  env <- new_environment()
+  obj <- list(a = 1:3)
+  env$my_obj <- obj
+  # an identical copy that is a different object in memory
+  env$other <- unserialize(serialize(obj, NULL))
+  # neither of these may ever be evaluated
+  delayedAssign("lazy", stop("lazy binding was evaluated"), assign.env = env)
+  makeActiveBinding(
+    "active",
+    function() stop("active binding was evaluated"),
+    env
+  )
+
+  # found by memory address
+  expect_equal(
+    find_variable_name(obj, env = env),
+    list(name = "my_obj", found = TRUE)
+  )
+  expect_equal(
+    find_variable_name(env$other, env = env),
+    list(name = "other", found = TRUE)
+  )
+
+  # the name it was passed as is preferred if it points to the object
+  env$alias <- obj
+  expect_equal(
+    find_variable_name(obj, expr = quote(alias), env = env),
+    list(name = "alias", found = TRUE)
+  )
+  # but not if it points to something else
+  expect_equal(
+    find_variable_name(env$other, expr = quote(alias), env = env),
+    list(name = "other", found = TRUE)
+  )
+
+  # non-syntactic names are never returned as found
+  env$alias <- NULL
+  env$my_obj <- NULL
+  env[["my obj"]] <- obj
+  expect_false(find_variable_name(obj, env = env)$found)
+
+  # not found: fall back to the (deparsed) expression if it is a symbol
+  expect_equal(
+    find_variable_name(list(), expr = quote(x), env = env),
+    list(name = "x", found = FALSE)
+  )
+  expect_equal(
+    find_variable_name(list(), expr = quote(`my obj`), env = env),
+    list(name = "`my obj`", found = FALSE)
+  )
+  expect_equal(
+    find_variable_name(list(), expr = quote(f(x)), env = env),
+    list(name = NA_character_, found = FALSE)
+  )
+  expect_equal(
+    find_variable_name(list(), env = new_environment()),
+    list(name = NA_character_, found = FALSE)
+  )
+})
+
 # check_arg() ================
 
 test_that("check_arg()", {

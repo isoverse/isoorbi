@@ -14,6 +14,53 @@ factor_in_order <- function(x) {
   return(factor(x, levels = levels(x)[idx]))
 }
 
+# Find the variable name of an object
+#
+# Finds which variable in `env` holds `x` (the very same object in memory, not
+# just an identical copy) so messages can refer to it by name, e.g. inside a
+# print method where `substitute(x)` is just `x` whenever R auto-prints.
+# Lazy (promise) and active bindings are skipped so nothing gets evaluated.
+# @param x the object to look for
+# @param expr the expression `x` was passed as (i.e. `substitute(x)` in the caller),
+#   if it is a symbol bound to `x` in `env`, that name is preferred
+# @param env the environment to look in (typically the global environment where
+#   the user can refer to the variable)
+# @return a list with the `name` and whether the variable was `found` in `env`,
+#   if found, `name` is always a syntactic variable name, if not found, `name` is
+#   the deparsed `expr` if it is a symbol (still the best guess) or `NA` otherwise
+find_variable_name <- function(x, expr = NULL, env = globalenv()) {
+  # names in env that are safe to look up and valid to write as code
+  var_names <- env_names(env)
+  var_names <- var_names[
+    var_names == make.names(var_names) &
+      !env_binding_are_lazy(env, var_names) &
+      !env_binding_are_active(env, var_names)
+  ]
+
+  # prefer the name it was passed as (if it points to x)
+  if (is.symbol(expr)) {
+    var_names <- unique(c(intersect(as.character(expr), var_names), var_names))
+  }
+
+  # compare memory addresses (fast and never copies anything)
+  x_address <- obj_address(x)
+  for (var_name in var_names) {
+    if (obj_address(env_get(env, var_name)) == x_address) {
+      return(list(name = var_name, found = TRUE))
+    }
+  }
+
+  # not found
+  list(
+    name = if (is.symbol(expr)) {
+      deparse1(expr, backtick = TRUE)
+    } else {
+      NA_character_
+    },
+    found = FALSE
+  )
+}
+
 # check function argument for condition (instead of stopifnot) for more informative error messages
 # note: throws error if `condition` evaluates to FALSE
 check_arg <- function(

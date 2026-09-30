@@ -9,6 +9,7 @@ orbi_get_data(
   file_info = c("filename"),
   scans = NULL,
   peaks = NULL,
+  status_log = NULL,
   spectra = NULL,
   problems = NULL,
   summary = NULL,
@@ -23,6 +24,8 @@ orbi_get_data(
 \item{scans}{columns to get from the aggregated \code{scans}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
 \item{peaks}{columns to get from the aggregated \code{peaks}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
+
+\item{status_log}{columns to get from the aggregated \code{status_log}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported. Note that none of the included aggregators aggregate anything from the status log, see \code{\link[=orbi_add_to_aggregator]{orbi_add_to_aggregator()}} to include the channels of interest.}
 
 \item{spectra}{columns to get from the aggregated \code{spectra}, all \code{\link[dplyr:select]{dplyr::select()}} syntax is supported}
 
