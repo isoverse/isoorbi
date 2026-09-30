@@ -8,7 +8,8 @@
       "filename",
       source = "FileName",
       func = "sub",
-      args = list(pattern = ".raw", replacement = "", fixed = TRUE)
+      # remove the file extension (in any capitalization, e.g. .raw or .RAW)
+      args = list(pattern = "\\.raw$", replacement = "", ignore.case = TRUE)
     ) |>
     orbi_add_to_aggregator(
       "file_info",
