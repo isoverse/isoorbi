@@ -238,7 +238,7 @@ finish_info <- function(
     paste(
       if (time && !is.null(start$start_time)) {
         format_inline(
-          "{.timestamp {prettyunits::pretty_sec(as.numeric(Sys.time() - start$start_time, 'secs'))}}"
+          "{.timestamp {secs_to_text(as.numeric(Sys.time() - start$start_time, 'secs'))}}"
         )
       },
       if (func) format_inline("{.strong {call}()}"),

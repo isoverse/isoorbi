@@ -58,6 +58,7 @@ Register it with `my_aggregator |> orbi_register_aggregator("my_aggregator")` to
 
 ## Bug fixes & improvements
 
+ * removed the dependency on the `prettyunits` package. Large numbers in info messages are now consistently abbreviated (e.g. `12.3k scans with 185k peaks`) and pluralized correctly (e.g. `1 scan` instead of `1 scans`, `4.32k peaks` instead of `4.32k peak`).
  * fixed the included aggregators only removing a lower case `.raw` extension from the `filename` (e.g. `s3744.RAW` stayed `s3744.RAW` while `dual_inlet.raw` became `dual_inlet`). The extension is now removed in any capitalization and only from the end of the file name.
  * fixed the order of the legends in `orbi_add_blocks_to_plot()` and `orbi_plot_shot_noise()`. Without an explicit order ggplot2 does not guarantee a stable sequence, so the same plot could come out with its legends swapped on different operating systems or ggplot2 versions.
  * fixed `orbi_plot_spectra()` including lock mass peaks with a missing intensity when `show_ref_and_lock_peaks = TRUE` (an operator precedence issue in the peak selection).

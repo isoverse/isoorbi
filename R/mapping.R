@@ -275,7 +275,7 @@ orbi_identify_isotopocules <- function(
     if (n_multimatched > 0) {
       # do it this way for proper alignment
       format_inline(
-        "{qty(multimatched_isos)} isotopocule{?s} {.field {multimatched_isos}} match{?es/} multiple peaks in some same scans ({format_number(n_multimatched)}{qty(n_multimatched)} multi-matched peak{?s} in total) - make sure to run {.strong orbi_flag_satellite_peaks()} and {.strong orbi_plot_satellite_peak()}"
+        "{qty(multimatched_isos)} isotopocule{?s} {.field {multimatched_isos}} match{?es/} multiple peaks in some same scans ({numbers_to_text(n_multimatched)}{qty(n_multimatched)} multi-matched peak{?s} in total) - make sure to run {.strong orbi_flag_satellite_peaks()} and {.strong orbi_plot_satellite_peak()}"
       ) |>
         warn()
     }
@@ -284,7 +284,7 @@ orbi_identify_isotopocules <- function(
     if (n_missing > 0) {
       # do it this way for proper alignment
       format_inline(
-        "{qty(missing_isos)}isotopocule{?s} {.field {missing_isos}} {?is/are} missing from some scans ({format_number(n_missing)}{qty(n_missing)} missing peak{?s} in total) - make sure to evaluate coverage with e.g. {.strong orbi_plot_isotopocule_coverage()}"
+        "{qty(missing_isos)}isotopocule{?s} {.field {missing_isos}} {?is/are} missing from some scans ({numbers_to_text(n_missing)}{qty(n_missing)} missing peak{?s} in total) - make sure to evaluate coverage with e.g. {.strong orbi_plot_isotopocule_coverage()}"
       ) |>
         warn()
     }
@@ -294,7 +294,7 @@ orbi_identify_isotopocules <- function(
   tic_identified <- sum(found_peaks$intensity, na.rm = TRUE)
   tic_all <- sum(all_peaks$intensity, na.rm = TRUE)
   finish_info(
-    "identified {format_number(n_identified)}/{format_number(n_peaks)} peaks ({signif(100 * n_identified/n_peaks, 2)}%) ",
+    "identified {numbers_to_text(n_identified)}/{numbers_to_text(n_peaks)} peaks ({signif(100 * n_identified/n_peaks, 2)}%) ",
     "representing {signif(100*tic_identified/tic_all, 2)}% of the total ion current (TIC) ",
     "as isotopocules {.field {unique(found_peaks$isotopocule)}}",
     if (use_default_tolerance) {
@@ -433,25 +433,25 @@ orbi_filter_isotopocules <- function(
   # info
   info <- c()
   if (n_missing > 0) {
-    info <- "{cli::col_yellow('missing')} isotopocules ({format_number(n_missing)})"
+    info <- "{cli::col_yellow('missing')} isotopocules ({numbers_to_text(n_missing)})"
   }
   if (n_unidentified > 0) {
     info <- c(
       info,
-      "{cli::col_yellow('unidentified')} peaks ({format_number(n_unidentified)})"
+      "{cli::col_yellow('unidentified')} peaks ({numbers_to_text(n_unidentified)})"
     )
   }
   if (n_nonspecific > 0) {
     info <- c(
       info,
-      "{qty(isotopocules)}{cli::col_yellow('not')} {?the/one of the} {cli::col_yellow('selected')} isotopocule{?s} {.field {isotopocules}} ({format_number(n_nonspecific)})"
+      "{qty(isotopocules)}{cli::col_yellow('not')} {?the/one of the} {cli::col_yellow('selected')} isotopocule{?s} {.field {isotopocules}} ({numbers_to_text(n_nonspecific)})"
     )
   }
   finish_info(
     if (n_peaks == nrow(peaks)) {
       "kept all peaks because none fit the criteria for removal"
     } else {
-      "removed {format_number(n_peaks - nrow(peaks))} / {format_number(n_peaks)} peaks ({signif(100 * (n_peaks - nrow(peaks))/n_peaks, 2)}%) because they were "
+      "removed {numbers_to_text(n_peaks - nrow(peaks))} / {numbers_to_text(n_peaks)} peaks ({signif(100 * (n_peaks - nrow(peaks))/n_peaks, 2)}%) because they were "
     },
     glue::glue_collapse(info, sep = ", ", last = ", or "),
     ". ",

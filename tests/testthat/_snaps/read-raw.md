@@ -16,7 +16,7 @@
       ---------------- 2 raw files - combine with orbi_aggregate_raw() ---------------
       1. nitrate_test_10scans.raw has 10 scans with 307 peaks and 1 status log entry;
       no spectra were loaded
-      2. nitrate_test_1scan.raw   has  1 scans with  30 peaks and 1 status log entry;
+      2. nitrate_test_1scan.raw   has  1 scan with  30 peaks and 1 status log entry;
       no spectra were loaded
 
 ---
@@ -83,7 +83,7 @@
       ---------------- 2 raw files - combine with orbi_aggregate_raw() ---------------
       1. nitrate_test_10scans.raw has 10 scans with 307 peaks and 1 status log entry;
       + loaded 1 spectrum (350 points)
-      2. nitrate_test_1scan.raw   has  1 scans with  30 peaks and 1 status log entry;
+      2. nitrate_test_1scan.raw   has  1 scan with  30 peaks and 1 status log entry;
       + loaded 1 spectrum (325 points)
 
 ---
@@ -198,7 +198,7 @@
       ──────────────── [1m2 raw files - combine with orbi_aggregate_raw()[22m ───────────────
       1. [34mnitrate_test_10scans.raw[39m has 10 [32mscans[39m with 307 [32mpeaks[39m and 1 [32mstatus log[39m entry;
       no [32mspectra[39m were loaded
-      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscans[39m with  30 [32mpeaks[39m and 1 [32mstatus log[39m entry;
+      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscan[39m with  30 [32mpeaks[39m and 1 [32mstatus log[39m entry;
       no [32mspectra[39m were loaded
 
 ---
@@ -265,7 +265,7 @@
       ──────────────── [1m2 raw files - combine with orbi_aggregate_raw()[22m ───────────────
       1. [34mnitrate_test_10scans.raw[39m has 10 [32mscans[39m with 307 [32mpeaks[39m and 1 [32mstatus log[39m entry;
       + loaded 1 [32mspectrum[39m (350 points)
-      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscans[39m with  30 [32mpeaks[39m and 1 [32mstatus log[39m entry;
+      2. [34mnitrate_test_1scan.raw[39m   has  1 [32mscan[39m with  30 [32mpeaks[39m and 1 [32mstatus log[39m entry;
       + loaded 1 [32mspectrum[39m (325 points)
 
 ---
@@ -368,8 +368,8 @@
       print(x)
     Message
       ---------------- 1 raw file - process with orbi_aggregate_raw() ----------------
-      1. nitrate_test_1scan.raw has 1 scans with 30 peaks and 3 status log entries;
-      no spectra were loaded
+      1. nitrate_test_1scan.raw has 1 scan with 30 peaks and 3 status log entries; no
+      spectra were loaded
 
 ---
 
@@ -522,8 +522,8 @@
       print(x)
     Message
       ──────────────── [1m1 raw file - process with orbi_aggregate_raw()[22m ────────────────
-      1. [34mnitrate_test_1scan.raw[39m has 1 [32mscans[39m with 30 [32mpeaks[39m and 3 [32mstatus log[39m entries;
-      no [32mspectra[39m were loaded
+      1. [34mnitrate_test_1scan.raw[39m has 1 [32mscan[39m with 30 [32mpeaks[39m and 3 [32mstatus log[39m entries; no
+      [32mspectra[39m were loaded
 
 ---
 

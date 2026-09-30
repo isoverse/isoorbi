@@ -90,13 +90,13 @@ print.orbi_aggregated_data <- function(x, ..., show_all = FALSE) {
         }
 
         # all other fields
-        n_rows <- nrow(dataset) |> format_number()
+        n_rows <- nrow(dataset) |> numbers_to_text()
         n_na <- purrr::map_int(dataset, ~ sum(is.na(.x)))
         cols <- names(dataset) |>
           sprintf(fmt = "{.field %s}") |>
           paste0(if_else(
             n_na > 0,
-            sprintf(" ({col_yellow('%s NA')})", n_na |> format_number()),
+            sprintf(" ({col_yellow('%s NA')})", n_na |> numbers_to_text()),
             ""
           ))
         unused_cols <- sprintf(
@@ -655,7 +655,7 @@ aggregate_files <- function(
     )
 
   # info
-  n_rows <- map_int(results, nrow) |> format_number()
+  n_rows <- map_int(results, nrow) |> numbers_to_text()
   details <- sprintf("{cli::col_blue('%s')} (%s)", names(results), n_rows) |>
     purrr::map_chr(format_inline)
   new_problems <- results$problems |>
@@ -1065,7 +1065,7 @@ get_data <- function(
   }
 
   # info
-  n_rows <- purrr::map_int(.ds[names(selectors)], nrow) |> format_number()
+  n_rows <- purrr::map_int(.ds[names(selectors)], nrow) |> numbers_to_text()
 
   details <-
     if (length(selectors) == 1) {
@@ -1077,7 +1077,7 @@ get_data <- function(
 
   # info
   finish_info(
-    "retrieved {format_number(nrow(out))} records from ",
+    "retrieved {numbers_to_text(nrow(out))} records from ",
     if (length(selectors) > 1) "the combination of ",
     "{details}",
     if (length(selectors) > 1) " via {.field {unique(unlist(join_bys))}}",

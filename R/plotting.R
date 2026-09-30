@@ -215,7 +215,7 @@ orbi_plot_spectra <- function(
   scans <- unique(aggregated_data$spectra$scan.no)
   if (length(scans) > max_scans) {
     cli_bullets(c(
-      "i" = "{cli::col_blue('Info')}: there are {length(scans)} {.field scan{?s}} in this dataset, only the first {if (max_scans > 1) max_scans} will be visualized. To change this, set the {.field max_scans} argument."
+      "i" = "{cli::col_blue('Info')}: there are {numbers_to_text(length(scans))}{qty(length(scans))} {.field scan{?s}} in this dataset, only the first {if (max_scans > 1) max_scans} will be visualized. To change this, set the {.field max_scans} argument."
     ))
     scans <- scans[1:max_scans]
   }
@@ -1184,7 +1184,7 @@ orbi_plot_isotopocule_coverage <- function(
     ggplot2::scale_x_continuous(
       breaks = x_breaks,
       expand = c(0, 0),
-      labels = format_number
+      labels = numbers_to_text
     ) +
     ggplot2::scale_y_reverse(
       breaks = seq_along(levels(isotopocule_coverage$isotopocule)),

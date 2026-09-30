@@ -690,9 +690,9 @@ orbi_summarize_results <- function(
   info_flagged <- if (include_flagged_data) "including" else "excluding"
   info_unused <- if (include_unused_data) "including" else "excluding"
   finish_info(
-    "summarized ratios from {format_number(n_peaks)} peak{?s} ",
+    "summarized ratios from {numbers_to_text(n_peaks)}{qty(n_peaks)} peak{?s} ",
     if (n_flagged > 0 || n_unused > 0) {
-      "({.emph {info_flagged}} {format_number(n_flagged)} flagged peaks; {.emph {info_unused}} {format_number(n_unused)} unused peaks) "
+      "({.emph {info_flagged}} {numbers_to_text(n_flagged)} flagged peaks; {.emph {info_unused}} {numbers_to_text(n_unused)} unused peaks) "
     },
     "using the {.emph {.strong {ratio_method}}} method ",
     "and grouping the data by {.field {dplyr::group_vars(df.group)}}",
