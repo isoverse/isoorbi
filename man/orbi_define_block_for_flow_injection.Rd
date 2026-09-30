@@ -19,11 +19,11 @@ orbi_define_block_for_flow_injection(
 
 \item{start_time.min}{start time of the block(s), a single value or a vector for multiple blocks}
 
-\item{end_time.min}{end time of the block(s), a single value or a vector for multiple blocks}
+\item{end_time.min}{end time of the block(s), a single value or a vector for multiple blocks. Use \code{Inf} for a block that lasts until the end of each file.}
 
 \item{start_scan.no}{start scan of the block(s), a single value or a vector for multiple blocks}
 
-\item{end_scan.no}{end scan of the block(s), a single value or a vector for multiple blocks}
+\item{end_scan.no}{end scan of the block(s), a single value or a vector for multiple blocks. Use \code{Inf} for a block that lasts until the last scan of each file.}
 
 \item{block_name}{name(s) for the block(s), a single value or a vector for multiple blocks, \code{NA} by default (i.e. unnamed)}
 

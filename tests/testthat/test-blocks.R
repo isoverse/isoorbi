@@ -186,6 +186,55 @@ test_that("orbi_define_blocks()", {
   ) |>
     expect_error("cannot be recycled")
 
+  # an infinite end means until the end of each file
+  uneven_data <- tibble(
+    filename = rep(c("test1", "test2"), c(10, 6)),
+    scan.no = c(1:10, 1:6),
+    time.min = scan.no / 10
+  )
+  to_end_by_scan <- orbi_define_blocks(
+    uneven_data,
+    start_scan.no = 3L,
+    end_scan.no = Inf
+  ) |>
+    suppressMessages()
+  expect_equal(
+    to_end_by_scan |> dplyr::filter(block == 1L) |> dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  to_end_by_time <- orbi_define_blocks(
+    uneven_data,
+    start_time.min = 0.25,
+    end_time.min = Inf
+  ) |>
+    suppressMessages()
+  expect_equal(
+    to_end_by_time |> dplyr::filter(block == 1L) |> dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  # also in a blocks table (mixed with finite ends)
+  expect_equal(
+    orbi_define_blocks(
+      uneven_data,
+      blocks_table = tibble(start_scan.no = c(1L, 3L), end_scan.no = c(2, Inf))
+    ) |>
+      suppressMessages() |>
+      dplyr::filter(block == 2L) |>
+      dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  # the summary reports the actual end
+  orbi_define_blocks(uneven_data, start_scan.no = 3L, end_scan.no = Inf) |>
+    expect_message("added 1 block") |>
+    expect_message("covers scans 3 to 10")
+  # but only the end can be infinite
+  orbi_define_blocks(uneven_data, start_scan.no = Inf, end_scan.no = Inf) |>
+    expect_error("start_scan.no.*must be finite")
+  orbi_define_blocks(uneven_data, start_time.min = -Inf, end_time.min = 1) |>
+    expect_error("start_time.min.*must be finite")
+  orbi_define_blocks(uneven_data, start_scan.no = 1L, end_scan.no = -Inf) |>
+    expect_error("end_scan.no.*cannot be.*-Inf")
+
   # in_filename checks
   orbi_define_blocks(
     multi_data,

@@ -50,7 +50,7 @@ numbers_to_text <- function(
     sprintf(fmt = format, names(.metric_prefixes)[prefix])
 
   # special cases?
-  is_special = is.na(x) | is.infinite(x) | is.nan(x)
+  is_special <- is.na(x) | is.infinite(x) | is.nan(x)
   out[is_special] <- as.character(x[is_special])
 
   # trim whitespaces?
@@ -96,4 +96,9 @@ secs_to_text <- function(secs) {
       )
     ) |>
     dplyr::pull("out")
+}
+
+# convert minutes to pretty time
+mins_to_text <- function(mins) {
+  secs_to_text(mins * 60)
 }

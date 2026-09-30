@@ -7,9 +7,9 @@
 #'
 #' @inheritParams orbi_flag_satellite_peaks
 #' @param start_time.min start time of the block(s), a single value or a vector for multiple blocks
-#' @param end_time.min end time of the block(s), a single value or a vector for multiple blocks
+#' @param end_time.min end time of the block(s), a single value or a vector for multiple blocks. Use `Inf` for a block that lasts until the end of each file.
 #' @param start_scan.no start scan of the block(s), a single value or a vector for multiple blocks
-#' @param end_scan.no end scan of the block(s), a single value or a vector for multiple blocks
+#' @param end_scan.no end scan of the block(s), a single value or a vector for multiple blocks. Use `Inf` for a block that lasts until the last scan of each file.
 #' @param block_name name(s) for the block(s), a single value or a vector for multiple blocks, `NA` by default (i.e. unnamed)
 #' @param in_filename the file(s) to add the block(s) to, a single value or a vector for multiple blocks, `NA` (the default if not provided) adds a block to all files. This must be the `filename` of the file(s) as it appears in the `dataset`.
 #' @param blocks_table alternative to the individual parameters: a data frame with any of the columns `start_time.min`, `end_time.min`, `start_scan.no`, `end_scan.no`, `block_name` and `in_filename`, one row per block. Any other columns are ignored. If provided, the individual parameters are not used.
@@ -1314,13 +1314,32 @@ get_blocks_table <- function(
       )
     }
   }
+
+  # only the end of a block can be infinite (i.e. until the end of the file)
+  for (col in c("start_time.min", "start_scan.no")) {
+    if (any(is.infinite(blocks_table[[col]]))) {
+      cli_abort(
+        "{.field {col}} must be finite (only the end of a block can be {.val {Inf}})",
+        call = .env
+      )
+    }
+  }
+  for (col in c("end_time.min", "end_scan.no")) {
+    if (any(blocks_table[[col]] == -Inf, na.rm = TRUE)) {
+      cli_abort(
+        "{.field {col}} cannot be {.val {-Inf}}, use {.val {Inf}} for the end of the file",
+        call = .env
+      )
+    }
+  }
   blocks_table <- blocks_table |>
     dplyr::select(dplyr::all_of(block_def_cols)) |>
     dplyr::mutate(
       start_time.min = as.numeric(.data$start_time.min),
       end_time.min = as.numeric(.data$end_time.min),
       start_scan.no = as.integer(.data$start_scan.no),
-      end_scan.no = as.integer(.data$end_scan.no),
+      # note: stays numeric so it can be Inf (i.e. until the last scan)
+      end_scan.no = as.numeric(.data$end_scan.no),
       block_name = as.character(.data$block_name),
       in_filename = as.character(.data$in_filename)
     )
@@ -1440,7 +1459,12 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
     single_scans <- single_scans |>
       dplyr::mutate(
         start_scan.no = !!block_def$start_scan.no,
-        end_scan.no = !!block_def$end_scan.no
+        # an infinite end means until the last scan of each file
+        end_scan.no = if (is.infinite(block_def$end_scan.no)) {
+          purrr::map_int(data, ~ max(.x$scan.no))
+        } else {
+          as.integer(block_def$end_scan.no)
+        }
       )
   }
 
