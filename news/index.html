@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,9 +36,71 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/isoverse/isoorbi/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.6.0" id="isoorbi-160">isoorbi 1.6.0<a class="anchor" aria-label="anchor" href="#isoorbi-160"></a></h2>
+<p>This release switches to version 0.3 of the <code>isoraw</code> raw file reader, which changes how peak flags are reported and which peaks are read by default.</p>
+<div class="section level3">
+<h3 id="breaking-changes-1-6-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-6-0"></a></h3>
+<ul><li>the <code>isoraw</code> raw file reader now requires version 0.3.0 or later (<code><a href="../reference/orbi_check_isoraw.html">orbi_check_isoraw()</a></code> upgrades automatically). Version 0.3 no longer reports the <code>is_ref</code> and <code>is_lock_peak</code> columns and instead reports the raw Thermo <code>PeakOptions</code> bitmask in a <code>flags</code> column, from which these and every other flag can be derived.</li>
+<li>version 0.3 of the reader also reads <strong>all</strong> peaks by default, including the ones the centroider flagged as problematic (saturated, fragmented, merged, exception, modified). Previously these were silently discarded during the read, so expect noticeably more peaks than before - for the example file bundled with the package the peak count goes from 126 to 307. Filter them out after aggregation (see below) if you do not want them.</li>
+<li>as a result of the above, the <code>peaks</code> dataset of the aggregators now provides a readable <code>centroiderFlags</code> column (a factor with values such as <code>"none"</code>, <code>"reference"</code> or <code>"exception + fragmented"</code>) instead of the previous <code>isRefPeak</code> and <code>isLockPeak</code> columns. The name makes clear that these flags come from the instrument’s centroider, as opposed to the peaks <code>isoorbi</code> itself flags later on (satellite peaks, weak isotopocules and outliers).</li>
+<li>
+<code><a href="../reference/orbi_define_block_for_flow_injection.html">orbi_define_block_for_flow_injection()</a></code> is deprecated in favor of the new <code><a href="../reference/orbi_define_blocks.html">orbi_define_blocks()</a></code>, which is not specific to flow injection and can define several blocks at once. The old function still works, warns, and forwards to the new one.</li>
+<li>the <code>sample_name</code> column created by the block definition functions (<code><a href="../reference/orbi_define_blocks_for_dual_inlet.html">orbi_define_blocks_for_dual_inlet()</a></code>, <code><a href="../reference/orbi_define_block_for_flow_injection.html">orbi_define_block_for_flow_injection()</a></code> and <code><a href="../reference/orbi_adjust_block.html">orbi_adjust_block()</a></code>) is now called <code>block_name</code> to reflect that it names the block rather than necessarily a sample. The <code>sample_name</code> argument of <code><a href="../reference/orbi_define_block_for_flow_injection.html">orbi_define_block_for_flow_injection()</a></code> is renamed to <code>block_name</code> accordingly - the old argument still works but is deprecated and warns - and <code><a href="../reference/orbi_summarize_results.html">orbi_summarize_results()</a></code> groups by <code>block_name</code> instead of <code>sample_name</code> by default.</li>
+<li>raw file caches (<code>.raw.cache.zip</code>) created with an earlier version of the reader are detected and the corresponding raw file is read anew (with a warning). If the original <code>.raw</code> file is no longer available next to such a cache, the read reports a <code>cannot find this .raw file</code> problem (see <code><a href="../reference/problems.html">orbi_get_problems()</a></code>) - copy the <code>.raw</code> file back in or obtain an up to date cache.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-1-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-6-0"></a></h3>
+<ul><li>
+<p>new <code>status_log</code> dataset with the instrument status log, i.e. the instrument readbacks that are recorded independently of the scans (typically every couple of seconds): ion source and ion optics settings, temperatures (ambient, Orbitrap block, detector, …) and diagnostic data (vacuum pressures, supply voltages, fan and turbopump status, …). It is read by <code><a href="../reference/orbi_read_raw.html">orbi_read_raw()</a></code> whenever the raw file reader stored one (isoraw 0.3.1+) and is simply empty for files and caches that don’t have one.</p>
+<p>Which channels a status log holds depends entirely on the instrument, so none of the included aggregators take anything from it. The status log is still reported by <code><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code> like every other dataset, with all of its information listed as not aggregated. Aggregate the channels of interest with a custom aggregator, e.g.:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_aggregator</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_get_aggregator</a></span><span class="op">(</span><span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span><span class="st">"status_log"</span>, <span class="st">"time.min"</span>, source <span class="op">=</span> <span class="st">"StartTime"</span>, cast <span class="op">=</span> <span class="st">"as.numeric"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"status_log"</span>, <span class="st">"ambientTemperature"</span>,</span>
+<span>    source <span class="op">=</span> <span class="st">"Ambient temp. (°C)"</span>, cast <span class="op">=</span> <span class="st">"as.numeric"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="va">my_aggregator</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>status_log <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time.min"</span>, <span class="st">"ambientTemperature"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li><p>printing aggregated data variables now only says how many columns of each dataset were not aggregated (instead of listing them) since the status log alone can easily have 200 channels. Use <code>print(agg_data, show_all = TRUE)</code> to list all of them - the printout suggests this code with the name of your variable.</p></li>
+<li><p>new <code><a href="../reference/orbi_peak_flags.html">orbi_peak_flags_include()</a></code> function works with the peak flags. To filter for an exact set of flags, compare the <code>centroiderFlags</code> column directly (it is a factor, so this is fast), e.g. <code>dplyr::filter(peaks, centroiderFlags == "none")</code> keeps only the peaks without any flags and <code>centroiderFlags %in% c("lock peak", "reference")</code> only those that are exclusively either a lock mass or a reference peak. Use <code>orbi_peak_flags_include(centroiderFlags, "reference")</code> on that column to find every peak carrying the reference flag whether or not it carries others.</p></li>
+<li><p>new <code><a href="../reference/orbi_define_blocks.html">orbi_define_blocks()</a></code> that replaces <code><a href="../reference/orbi_define_block_for_flow_injection.html">orbi_define_block_for_flow_injection()</a></code> and can define multiple blocks in one call. The block boundaries can be given as vectors (<code>orbi_define_blocks(start_time.min = c(0.1, 0.5), end_time.min = c(0.4, 0.8), block_name = c("first", "second"))</code>) or as a <code>blocks_table</code> data frame with any of the <code>start_time.min</code>, <code>end_time.min</code>, <code>start_scan.no</code>, <code>end_scan.no</code> and <code>block_name</code> columns. Each block is defined either by time or by scan number (they can be mixed between blocks) and the resulting blocks are listed in a summary message. Blocks are added to all files by default, use <code>in_filename</code> (also as a <code>blocks_table</code> column) to add a block only to specific file(s), e.g. <code>orbi_define_blocks(start_time.min = 0.1, end_time.min = 0.4, in_filename = c("file1", "file2"))</code>.</p></li>
+<li><p><code><a href="../reference/orbi_check_isoraw.html">orbi_check_isoraw()</a></code> now confirms which reader version is ready for use instead of staying silent when nothing needs to be installed. Set <code>show_version = FALSE</code> to suppress that message (the automatic checks during a raw file read already do).</p></li>
+</ul><div class="section level4">
+<h4 id="restoring-the-isrefpeak--islockpeak-columns-1-6-0">Restoring the <code>isRefPeak</code> / <code>isLockPeak</code> columns<a class="anchor" aria-label="anchor" href="#restoring-the-isrefpeak--islockpeak-columns-1-6-0"></a></h4>
+<p>If you rely on the previous boolean columns, add them back with a custom aggregator:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_aggregator</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_get_aggregator</a></span><span class="op">(</span><span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"peaks"</span>, <span class="st">"isRefPeak"</span>, source <span class="op">=</span> <span class="st">"flags"</span>,</span>
+<span>    func <span class="op">=</span> <span class="st">"orbi_peak_flags_include"</span>, args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>flag <span class="op">=</span> <span class="st">"reference"</span><span class="op">)</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.logical"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"peaks"</span>, <span class="st">"isLockPeak"</span>, source <span class="op">=</span> <span class="st">"flags"</span>,</span>
+<span>    func <span class="op">=</span> <span class="st">"orbi_peak_flags_include"</span>, args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>flag <span class="op">=</span> <span class="st">"lock peak"</span><span class="op">)</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.logical"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="va">my_aggregator</span><span class="op">)</span></span></code></pre></div>
+<p>Register it with <code>my_aggregator |&gt; orbi_register_aggregator("my_aggregator")</code> to be able to refer to it by name in <code><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code>.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="bug-fixes--improvements-1-6-0">Bug fixes &amp; improvements<a class="anchor" aria-label="anchor" href="#bug-fixes--improvements-1-6-0"></a></h3>
+<ul><li>fixed the included aggregators only removing a lower case <code>.raw</code> extension from the <code>filename</code> (e.g. <code>s3744.RAW</code> stayed <code>s3744.RAW</code> while <code>dual_inlet.raw</code> became <code>dual_inlet</code>). The extension is now removed in any capitalization and only from the end of the file name.</li>
+<li>fixed the order of the legends in <code><a href="../reference/orbi_add_blocks_to_plot.html">orbi_add_blocks_to_plot()</a></code> and <code><a href="../reference/orbi_plot_shot_noise.html">orbi_plot_shot_noise()</a></code>. Without an explicit order ggplot2 does not guarantee a stable sequence, so the same plot could come out with its legends swapped on different operating systems or ggplot2 versions.</li>
+<li>fixed <code><a href="../reference/orbi_plot_spectra.html">orbi_plot_spectra()</a></code> including lock mass peaks with a missing intensity when <code>show_ref_and_lock_peaks = TRUE</code> (an operator precedence issue in the peak selection).</li>
+<li>documentation is now generated with roxygen2 8.0.0.</li>
+<li>deprecation warnings now show on every call to a deprecated function or argument instead of only once every 8 hours (this requires <code>lifecycle</code> 1.0.2 or later).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.5.3" id="isoorbi-153">isoorbi 1.5.3<a class="anchor" aria-label="anchor" href="#isoorbi-153"></a></h2>
 <p>This is a minor update to support the latest version of testthat and address a few small bugs.</p>

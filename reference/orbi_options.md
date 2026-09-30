@@ -104,8 +104,8 @@ orbi_get_options()
 #> $aggregators$minimal
 #> ────────────────────────────── Aggregator minimal ──────────────────────────────
 #> Dataset file_info:
-#>  → filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
-#> fixed = TRUE))
+#>  → filename = as.character(sub(FileName, pattern = "\\.raw$", replacement = "",
+#> ignore.case = TRUE))
 #>  → creation_date = as.POSIXct(CreationDate)
 #>  → in_aquisition = as.logical(InAquisition)
 #> Dataset scans:
@@ -122,8 +122,7 @@ orbi_get_options()
 #>  → baseline = as.numeric(baseline)
 #>  → peakNoise = as.numeric(noise)
 #>  → peakResolution = as.numeric(resolution)
-#>  → isRefPeak = as.logical(is_ref)
-#>  → isLockPeak = as.logical(is_lock_peak)
+#>  → centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
 #> Dataset spectra:
 #>  → scan.no = as.integer(scan.no)
 #>  → mz = as.numeric(mass)
@@ -132,8 +131,8 @@ orbi_get_options()
 #> $aggregators$standard
 #> ────────────────────────────── Aggregator standard ─────────────────────────────
 #> Dataset file_info:
-#>  → filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
-#> fixed = TRUE))
+#>  → filename = as.character(sub(FileName, pattern = "\\.raw$", replacement = "",
+#> ignore.case = TRUE))
 #>  → creation_date = as.POSIXct(CreationDate)
 #>  → in_aquisition = as.logical(InAquisition)
 #>  → (.*) = as.character(all_matches("(.*)"))
@@ -161,8 +160,7 @@ orbi_get_options()
 #>  → baseline = as.numeric(baseline)
 #>  → peakNoise = as.numeric(noise)
 #>  → peakResolution = as.numeric(resolution)
-#>  → isRefPeak = as.logical(is_ref)
-#>  → isLockPeak = as.logical(is_lock_peak)
+#>  → centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
 #> Dataset spectra:
 #>  → scan.no = as.integer(scan.no)
 #>  → mz = as.numeric(mass)
@@ -171,8 +169,8 @@ orbi_get_options()
 #> $aggregators$extended
 #> ────────────────────────────── Aggregator extended ─────────────────────────────
 #> Dataset file_info:
-#>  → filename = as.character(sub(FileName, pattern = ".raw", replacement = "",
-#> fixed = TRUE))
+#>  → filename = as.character(sub(FileName, pattern = "\\.raw$", replacement = "",
+#> ignore.case = TRUE))
 #>  → creation_date = as.POSIXct(CreationDate)
 #>  → in_aquisition = as.logical(InAquisition)
 #>  → (.*) = as.character(all_matches("(.*)"))
@@ -201,8 +199,7 @@ orbi_get_options()
 #>  → baseline = as.numeric(baseline)
 #>  → peakNoise = as.numeric(noise)
 #>  → peakResolution = as.numeric(resolution)
-#>  → isRefPeak = as.logical(is_ref)
-#>  → isLockPeak = as.logical(is_lock_peak)
+#>  → centroiderFlags = as.factor(orbi_peak_flags_to_text(flags))
 #> Dataset spectra:
 #>  → scan.no = as.integer(scan.no)
 #>  → mz = as.numeric(mass)

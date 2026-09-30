@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Package options</h1>
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/R/options-package.R" class="external-link"><code>R/options-package.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/R/options-package.R" class="external-link"><code>R/options-package.R</code></a></small>
       <div class="d-none name"><code>orbi_options.Rd</code></div>
     </div>
 
@@ -117,8 +117,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators$minimal</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">minimal</span> ──────────────────────────────</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">fixed = TRUE))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">ignore.case = TRUE))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:</span>
@@ -135,8 +135,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
@@ -145,8 +144,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators$standard</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">standard</span> ─────────────────────────────</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">fixed = TRUE))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">ignore.case = TRUE))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span></span>
@@ -174,8 +173,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>
@@ -184,8 +182,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $aggregators$extended</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">extended</span> ─────────────────────────────</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">fixed = TRUE))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-style: italic;">ignore.case = TRUE))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span></span>
@@ -214,8 +212,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span></span>

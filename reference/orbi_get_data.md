@@ -22,6 +22,7 @@ orbi_get_data(
   file_info = c("filename"),
   scans = NULL,
   peaks = NULL,
+  status_log = NULL,
   spectra = NULL,
   problems = NULL,
   summary = NULL,
@@ -53,6 +54,15 @@ orbi_get_data(
   columns to get from the aggregated `peaks`, all
   [`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html)
   syntax is supported
+
+- status_log:
+
+  columns to get from the aggregated `status_log`, all
+  [`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html)
+  syntax is supported. Note that none of the included aggregators
+  aggregate anything from the status log, see
+  [`orbi_add_to_aggregator()`](https://isoorbi.isoverse.org/reference/orbi_aggregator.md)
+  to include the channels of interest.
 
 - spectra:
 

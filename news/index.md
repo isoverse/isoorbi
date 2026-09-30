@@ -1,5 +1,183 @@
 # Changelog
 
+## isoorbi 1.6.0
+
+This release switches to version 0.3 of the `isoraw` raw file reader,
+which changes how peak flags are reported and which peaks are read by
+default.
+
+### Breaking changes
+
+- the `isoraw` raw file reader now requires version 0.3.0 or later
+  ([`orbi_check_isoraw()`](https://isoorbi.isoverse.org/reference/orbi_check_isoraw.md)
+  upgrades automatically). Version 0.3 no longer reports the `is_ref`
+  and `is_lock_peak` columns and instead reports the raw Thermo
+  `PeakOptions` bitmask in a `flags` column, from which these and every
+  other flag can be derived.
+- version 0.3 of the reader also reads **all** peaks by default,
+  including the ones the centroider flagged as problematic (saturated,
+  fragmented, merged, exception, modified). Previously these were
+  silently discarded during the read, so expect noticeably more peaks
+  than before - for the example file bundled with the package the peak
+  count goes from 126 to 307. Filter them out after aggregation (see
+  below) if you do not want them.
+- as a result of the above, the `peaks` dataset of the aggregators now
+  provides a readable `centroiderFlags` column (a factor with values
+  such as `"none"`, `"reference"` or `"exception + fragmented"`) instead
+  of the previous `isRefPeak` and `isLockPeak` columns. The name makes
+  clear that these flags come from the instrument’s centroider, as
+  opposed to the peaks `isoorbi` itself flags later on (satellite peaks,
+  weak isotopocules and outliers).
+- [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
+  is deprecated in favor of the new
+  [`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md),
+  which is not specific to flow injection and can define several blocks
+  at once. The old function still works, warns, and forwards to the new
+  one.
+- the `sample_name` column created by the block definition functions
+  ([`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md),
+  [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
+  and
+  [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md))
+  is now called `block_name` to reflect that it names the block rather
+  than necessarily a sample. The `sample_name` argument of
+  [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
+  is renamed to `block_name` accordingly - the old argument still works
+  but is deprecated and warns - and
+  [`orbi_summarize_results()`](https://isoorbi.isoverse.org/reference/orbi_summarize_results.md)
+  groups by `block_name` instead of `sample_name` by default.
+- raw file caches (`.raw.cache.zip`) created with an earlier version of
+  the reader are detected and the corresponding raw file is read anew
+  (with a warning). If the original `.raw` file is no longer available
+  next to such a cache, the read reports a `cannot find this .raw file`
+  problem (see
+  [`orbi_get_problems()`](https://isoorbi.isoverse.org/reference/problems.md)) -
+  copy the `.raw` file back in or obtain an up to date cache.
+
+### New features
+
+- new `status_log` dataset with the instrument status log, i.e. the
+  instrument readbacks that are recorded independently of the scans
+  (typically every couple of seconds): ion source and ion optics
+  settings, temperatures (ambient, Orbitrap block, detector, …) and
+  diagnostic data (vacuum pressures, supply voltages, fan and turbopump
+  status, …). It is read by
+  [`orbi_read_raw()`](https://isoorbi.isoverse.org/reference/orbi_read_raw.md)
+  whenever the raw file reader stored one (isoraw 0.3.1+) and is simply
+  empty for files and caches that don’t have one.
+
+  Which channels a status log holds depends entirely on the instrument,
+  so none of the included aggregators take anything from it. The status
+  log is still reported by
+  [`orbi_aggregate_raw()`](https://isoorbi.isoverse.org/reference/orbi_aggregate_raw.md)
+  like every other dataset, with all of its information listed as not
+  aggregated. Aggregate the channels of interest with a custom
+  aggregator, e.g.:
+
+  ``` r
+
+  my_aggregator <- orbi_get_aggregator("standard") |>
+    orbi_add_to_aggregator("status_log", "time.min", source = "StartTime", cast = "as.numeric") |>
+    orbi_add_to_aggregator(
+      "status_log", "ambientTemperature",
+      source = "Ambient temp. (°C)", cast = "as.numeric"
+    )
+
+  raw_files |> orbi_aggregate_raw(aggregator = my_aggregator) |>
+    orbi_get_data(status_log = c("time.min", "ambientTemperature"))
+  ```
+
+- printing aggregated data variables now only says how many columns of
+  each dataset were not aggregated (instead of listing them) since the
+  status log alone can easily have 200 channels. Use
+  `print(agg_data, show_all = TRUE)` to list all of them - the printout
+  suggests this code with the name of your variable.
+
+- new
+  [`orbi_peak_flags_include()`](https://isoorbi.isoverse.org/reference/orbi_peak_flags.md)
+  function works with the peak flags. To filter for an exact set of
+  flags, compare the `centroiderFlags` column directly (it is a factor,
+  so this is fast),
+  e.g. `dplyr::filter(peaks, centroiderFlags == "none")` keeps only the
+  peaks without any flags and
+  `centroiderFlags %in% c("lock peak", "reference")` only those that are
+  exclusively either a lock mass or a reference peak. Use
+  `orbi_peak_flags_include(centroiderFlags, "reference")` on that column
+  to find every peak carrying the reference flag whether or not it
+  carries others.
+
+- new
+  [`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
+  that replaces
+  [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
+  and can define multiple blocks in one call. The block boundaries can
+  be given as vectors
+  (`orbi_define_blocks(start_time.min = c(0.1, 0.5), end_time.min = c(0.4, 0.8), block_name = c("first", "second"))`)
+  or as a `blocks_table` data frame with any of the `start_time.min`,
+  `end_time.min`, `start_scan.no`, `end_scan.no` and `block_name`
+  columns. Each block is defined either by time or by scan number (they
+  can be mixed between blocks) and the resulting blocks are listed in a
+  summary message. Blocks are added to all files by default, use
+  `in_filename` (also as a `blocks_table` column) to add a block only to
+  specific file(s),
+  e.g. `orbi_define_blocks(start_time.min = 0.1, end_time.min = 0.4, in_filename = c("file1", "file2"))`.
+
+- [`orbi_check_isoraw()`](https://isoorbi.isoverse.org/reference/orbi_check_isoraw.md)
+  now confirms which reader version is ready for use instead of staying
+  silent when nothing needs to be installed. Set `show_version = FALSE`
+  to suppress that message (the automatic checks during a raw file read
+  already do).
+
+#### Restoring the `isRefPeak` / `isLockPeak` columns
+
+If you rely on the previous boolean columns, add them back with a custom
+aggregator:
+
+``` r
+
+my_aggregator <- orbi_get_aggregator("standard") |>
+  orbi_add_to_aggregator(
+    "peaks", "isRefPeak", source = "flags",
+    func = "orbi_peak_flags_include", args = list(flag = "reference"),
+    cast = "as.logical"
+  ) |>
+  orbi_add_to_aggregator(
+    "peaks", "isLockPeak", source = "flags",
+    func = "orbi_peak_flags_include", args = list(flag = "lock peak"),
+    cast = "as.logical"
+  )
+
+raw_files |> orbi_aggregate_raw(aggregator = my_aggregator)
+```
+
+Register it with
+`my_aggregator |> orbi_register_aggregator("my_aggregator")` to be able
+to refer to it by name in
+[`orbi_aggregate_raw()`](https://isoorbi.isoverse.org/reference/orbi_aggregate_raw.md).
+
+### Bug fixes & improvements
+
+- fixed the included aggregators only removing a lower case `.raw`
+  extension from the `filename` (e.g. `s3744.RAW` stayed `s3744.RAW`
+  while `dual_inlet.raw` became `dual_inlet`). The extension is now
+  removed in any capitalization and only from the end of the file name.
+- fixed the order of the legends in
+  [`orbi_add_blocks_to_plot()`](https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.md)
+  and
+  [`orbi_plot_shot_noise()`](https://isoorbi.isoverse.org/reference/orbi_plot_shot_noise.md).
+  Without an explicit order ggplot2 does not guarantee a stable
+  sequence, so the same plot could come out with its legends swapped on
+  different operating systems or ggplot2 versions.
+- fixed
+  [`orbi_plot_spectra()`](https://isoorbi.isoverse.org/reference/orbi_plot_spectra.md)
+  including lock mass peaks with a missing intensity when
+  `show_ref_and_lock_peaks = TRUE` (an operator precedence issue in the
+  peak selection).
+- documentation is now generated with roxygen2 8.0.0.
+- deprecation warnings now show on every call to a deprecated function
+  or argument instead of only once every 8 hours (this requires
+  `lifecycle` 1.0.2 or later).
+
 ## isoorbi 1.5.3
 
 This is a minor update to support the latest version of testthat and

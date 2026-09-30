@@ -88,8 +88,12 @@ orbi_read_raw(
 
 a tibble data frame where each row holds the file path and nested
 tibbles of datasets extracted from the raw file (typically `file_info`,
-`scans`, `peaks`, and `spectra`). This is the safest way to extract the
-data without needing to make assumptions about compatibility across
-files. Extract your data of interest from the tibble columns or use
+`scans`, `peaks`, `status_log`, and `spectra`). The `status_log` holds
+the instrument readbacks (temperatures, pressures, voltages, etc.) that
+the instrument records independently of the scans - it is only available
+if the raw file reader stored one (isoraw 0.3.1+), otherwise it comes
+back empty. This is the safest way to extract the data without needing
+to make assumptions about compatibility across files. Extract your data
+of interest from the tibble columns or use
 [`orbi_aggregate_raw()`](https://isoorbi.isoverse.org/reference/orbi_aggregate_raw.md)
 to extract safely across files.

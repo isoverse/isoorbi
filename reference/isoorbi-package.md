@@ -25,9 +25,12 @@ Useful links:
 ## Author
 
 **Maintainer**: Caj Neubauer <caj.neubauer@colorado.edu>
-([ORCID](https://orcid.org/0000-0002-5348-5609)) \[copyright holder\]
+([ORCID](https://orcid.org/0000-0002-5348-5609))
 
 Authors:
+
+- Caj Neubauer <caj.neubauer@colorado.edu>
+  ([ORCID](https://orcid.org/0000-0002-5348-5609))
 
 - Sebastian Kopf <sebastian.kopf@colorado.edu>
   ([ORCID](https://orcid.org/0000-0002-2044-0201))

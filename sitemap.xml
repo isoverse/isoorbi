@@ -23,6 +23,7 @@
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_default_theme.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_define_basepeak.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_export_data_to_excel.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_filter_files.html</loc></url>
@@ -44,6 +45,7 @@
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_identify_isotopocules.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_isotopocule_coverage.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_options.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_peak_flags.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_satellite_peaks.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_plot_shot_noise.html</loc></url>

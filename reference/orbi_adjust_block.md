@@ -2,7 +2,7 @@
 
 This function can be used to manually adjust where certain `block`
 starts or ends after it's been defined with
-[`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
+[`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
 or
 [`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md)
 using either time or scan number. Note that adjusting blocks removes all

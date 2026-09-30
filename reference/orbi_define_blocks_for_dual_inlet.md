@@ -71,7 +71,7 @@ additional columns described below:
 - `block` is an integer counting the data blocks in each file (0 is the
   startup block)
 
-- `sample_name` is the name of the material being measured as defined by
+- `block_name` is the name of the material being measured as defined by
   the `ref_block_name` and `sample_block_name` parameters
 
 - `segment` is an integer defines segments within individual blocks -

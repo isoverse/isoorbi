@@ -26,13 +26,14 @@ data_all <-
 ```
 
 ``` fansi
-✔ [265ms] orbi_read_raw() read dual_inlet.raw from cache, included the spectra
+✔ [244ms] orbi_read_raw() read dual_inlet.raw from cache, included the spectra
 from 2 scans
 ```
 
 ``` fansi
-✔ [295ms] orbi_aggregate_raw() aggregated file_info (1), scans (12.34k), peaks
-(51.77k), and spectra (277) from 1 file using the standard aggregator
+✔ [235ms] orbi_aggregate_raw() aggregated file_info (1), scans (12.34k), peaks
+(184.77k), spectra (277), and status_log (0) from 1 file using the standard
+aggregator
 ```
 
 ``` r
@@ -51,15 +52,15 @@ data_all <- data_all |>
 ```
 
 ``` fansi
-✔ [1.6s] orbi_identify_isotopocules() identified 49.35k/51.77k peaks (95%)
-representing 100% of the total ion current (TIC) as isotopocules M0, 15N, 17O,
+✔ [1.8s] orbi_identify_isotopocules() identified 49.35k/184.77k peaks (27%)
+representing 97% of the total ion current (TIC) as isotopocules M0, 15N, 17O,
 and 18O using the default_tolerance of 1 mmu
 ```
 
 ``` fansi
-✔ [17ms] orbi_filter_isotopocules() removed 2.42k / 51.77k peaks (4.7%) because
-they were unidentified peaks (2.42k). Remaining isotopocules: M0, 15N, 17O, and
-18O.
+✔ [11ms] orbi_filter_isotopocules() removed 135.42k / 184.77k peaks (73%)
+because they were unidentified peaks (135.42k). Remaining isotopocules: M0,
+15N, 17O, and 18O.
 ```
 
 ## Show spectrum
@@ -76,43 +77,43 @@ data_all |> orbi_plot_spectra()
 ``` r
 
 # Preprocess data (this is exactly the same as with an isox file)
-df <- 
+df <-
   data_all |>
   # check for issues
   # removes minor peaks that are in the same mass tolerance window
-  # of an isotopocule 
-  orbi_flag_satellite_peaks() |> 
+  # of an isotopocule
+  orbi_flag_satellite_peaks() |>
   # flag signals of isotopocules that were not detected
   # in all scans
-  orbi_flag_weak_isotopocules(min_percent = 100) |> 
+  orbi_flag_weak_isotopocules(min_percent = 100) |>
   # flags outlying scans that have more than 2 times or less than
-  # 1/2 times the average number of ions in the Orbitrap analyzer; 
+  # 1/2 times the average number of ions in the Orbitrap analyzer;
   # another method: agc_window (see function documentation for more details)
   orbi_flag_outliers(agc_fold_cutoff = 2) |>
   # sets one isotopocule in the dataset as the base peak
   # (denominator) for ratio calculation
-  orbi_define_basepeak(basepeak_def = "M0") 
+  orbi_define_basepeak(basepeak_def = "M0")
 ```
 
 ``` fansi
-✔ [953ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [900ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` fansi
-✔ [43ms] orbi_flag_weak_isotopocules() confirmed there are no weak
+✔ [30ms] orbi_flag_weak_isotopocules() confirmed there are no weak
 isotopocules: all are detected in at least 100% of scans in each of the 4 data
 groups (based on uidx, compound, and isotopocule)
 ```
 
 ``` fansi
-✔ [23ms] orbi_flag_outliers() flagged 14/12338 scans (0.11%) as outliers based
+✔ [17ms] orbi_flag_outliers() flagged 14/12338 scans (0.11%) as outliers based
 on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
 average number of ions tic * it.ms in the Orbitrap analyzer → use
 orbi_plot_raw_data(y = tic * it.ms) to visualize them
 ```
 
 ``` fansi
-✔ [1.5s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
+✔ [1.1s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
 37.01k ratio values for 3 isotopocules (15N, 17O, and 18O)
 ```
 
@@ -135,33 +136,33 @@ df_w_blocks <-
   # general definition
   orbi_define_blocks_for_dual_inlet(
     # the reference block is 10 min long
-    ref_block_time.min = 10, 
+    ref_block_time.min = 10,
     # the sample block is 10 min long
-    sample_block_time.min = 10, 
-    # there is 5 min of data before the reference block starts, 
+    sample_block_time.min = 10,
+    # there is 5 min of data before the reference block starts,
     # to stabilize spray conditions
-    startup_time.min = 5, 
+    startup_time.min = 5,
     # it takes 2 min to make sure the right solution is measured
     # after switching the valve
-    change_over_time.min = 2, 
+    change_over_time.min = 2,
     sample_block_name = "sample",
     ref_block_name = "reference"
-  ) |> 
+  ) |>
   # fine adjustments
   # the 1st reference block is shorter by 2 min, cut from the start
-  orbi_adjust_block(block = 1, shift_start_time.min = 2) |> 
+  orbi_adjust_block(block = 1, shift_start_time.min = 2) |>
   # the start and end of the 2nd reference block are manually set
-  orbi_adjust_block(block = 4, set_start_time.min = 38, set_end_time.min = 44) 
+  orbi_adjust_block(block = 4, set_start_time.min = 38, set_end_time.min = 44)
 ```
 
 ``` fansi
 Adding missing grouping variables: `uidx`
-✔ [52ms] orbi_define_blocks_for_dual_inlet() identified 8 blocks (4 reference,
+✔ [38ms] orbi_define_blocks_for_dual_inlet() identified 8 blocks (4 reference,
 4 sample) in data from 1 file
-✔ [7ms] orbi_adjust_block() made the following block adjustments in file
+✔ [6ms] orbi_adjust_block() made the following block adjustments in file
 dual_inlet:
 → moved block 1 start from scan.no 823 (5.00 min) to 1153 (7.01 min)
-✔ [12ms] orbi_adjust_block() made the following block adjustments in file
+✔ [7ms] orbi_adjust_block() made the following block adjustments in file
 dual_inlet:
 → moved block 4 start from scan.no 6087 (37.00 min) to 6251 (38.00 min)
 → moved block 4 end from scan 7402 (45.00 min) to 7238 (44.00 min)
@@ -174,7 +175,7 @@ blocks_info <- df_w_blocks |> orbi_get_blocks_info()
 blocks_info |> knitr::kable()
 ```
 
-| uidx | filename | data_group | block | sample_name | data_type | segment | start_scan.no | end_scan.no | start_time.min | end_time.min |
+| uidx | filename | data_group | block | block_name | data_type | segment | start_scan.no | end_scan.no | start_time.min | end_time.min |
 |---:|:---|---:|---:|:---|:---|---:|---:|---:|---:|---:|
 | 1 | dual_inlet | 1 | 0 | reference | startup | NA | 1 | 822 | 0.0069267 | 4.996783 |
 | 1 | dual_inlet | 2 | 1 | reference | unused | NA | 823 | 1152 | 5.0028499 | 7.002534 |
@@ -211,7 +212,7 @@ df_w_blocks |> orbi_plot_raw_data(y = intensity, y_scale = "linear")
 
 # isotopocule ratios - you can see that even the AGC outliers
 # still create decent ratios
-df_w_blocks |>  orbi_plot_raw_data(y = ratio)
+df_w_blocks |> orbi_plot_raw_data(y = ratio)
 ```
 
 ![](dual_inlet_files/figure-html/unnamed-chunk-8-2.png)
@@ -220,7 +221,7 @@ df_w_blocks |>  orbi_plot_raw_data(y = ratio)
 
 ``` r
 
-df_w_blocks |> 
+df_w_blocks |>
   orbi_plot_raw_data(
     isotopocules = "15N",
     y = ratio,
@@ -238,7 +239,7 @@ df_w_blocks |>
 
 ``` r
 
-df_w_blocks |> 
+df_w_blocks |>
   orbi_plot_raw_data(
     isotopocules = "15N",
     y = ratio,
@@ -256,7 +257,7 @@ df_w_blocks |>
 ``` r
 
 # calculate summary
-df_w_summary <- 
+df_w_summary <-
   df_w_blocks |>
   # segment (optional)
   orbi_segment_blocks(into_segments = 3) |>
@@ -268,28 +269,29 @@ df_w_summary <-
 ```
 
 ``` fansi
-✔ [41ms] orbi_segment_blocks() segmented 8 data blocks in 1 file creating 3
+✔ [28ms] orbi_segment_blocks() segmented 8 data blocks in 1 file creating 3
 segments per block (on average) with 420 scans per segment (on average)
 ```
 
 ``` fansi
-✔ [601ms] orbi_summarize_results() summarized ratios from 36.97k peak
+✔ [441ms] orbi_summarize_results() summarized ratios from 36.97k peak
 (excluding 42 flagged peaks; including 10.35k unused peaks) using the sum
 method and grouping the data by uidx, filename, compound, basepeak,
-isotopocule, block, sample_name, segment, data_group, and data_type
+isotopocule, block, block_name, segment, data_group, and data_type
 ```
 
 ``` r
 
 # export file info and summary to excel
-df_w_summary |> orbi_export_data_to_excel(
-  file = "output.xlsx",
-  include = c("file_info", "summary")
-)
+df_w_summary |>
+  orbi_export_data_to_excel(
+    file = "output.xlsx",
+    include = c("file_info", "summary")
+  )
 ```
 
 ``` fansi
-✔ [429ms] orbi_export_data_to_excel() exported the dataset (1 row of file_info
+✔ [312ms] orbi_export_data_to_excel() exported the dataset (1 row of file_info
 and 96 rows of summary) to output.xlsx
 ```
 
@@ -306,8 +308,10 @@ df_w_summary |>
   ggplot() +
   aes(
     x = block_seg,
-    y = ratio, ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
-    color = sample_name
+    y = ratio,
+    ymin = ratio - ratio_sem,
+    ymax = ratio + ratio_sem,
+    color = block_name
   ) +
   geom_pointrange() +
   facet_grid(isotopocule ~ ., scales = "free_y") +
@@ -318,7 +322,7 @@ df_w_summary |>
 ```
 
 ``` fansi
-✔ [10ms] orbi_get_data() retrieved 96 records from the combination of file_info
+✔ [9ms] orbi_get_data() retrieved 96 records from the combination of file_info
 (1) and summary (96) via uidx
 ```
 
@@ -340,19 +344,21 @@ plot2 <- df_w_blocks |>
     add_all_blocks = TRUE,
     show_outliers = FALSE
   ) +
-   # ratio summary data
+  # ratio summary data
   geom_pointrange(
     data = function(df) {
-      df_w_summary |> 
+      df_w_summary |>
         orbi_get_data(summary = everything()) |>
-        filter(as.character(isotopocule) == df$isotopocule[1]) |> 
+        filter(as.character(isotopocule) == df$isotopocule[1]) |>
         mutate(panel = "summary")
     },
     map = aes(
-      x = mean_time.min, y = ratio, 
-      ymin = ratio - ratio_sem, ymax = ratio + ratio_sem,
-      shape = sample_name
-    ), 
+      x = mean_time.min,
+      y = ratio,
+      ymin = ratio - ratio_sem,
+      ymax = ratio + ratio_sem,
+      shape = block_name
+    ),
     size = 0.5
   ) +
   facet_grid(panel ~ ., switch = "y") +
@@ -361,7 +367,7 @@ plot2 <- df_w_blocks |>
 ```
 
 ``` fansi
-✔ [18ms] orbi_get_data() retrieved 37.01k records from the combination of
+✔ [14ms] orbi_get_data() retrieved 37.01k records from the combination of
 file_info (1), scans (12.34k), and peaks (37.01k) via uidx and scan.no
 ```
 
@@ -371,7 +377,7 @@ plot2
 ```
 
 ``` fansi
-✔ [14ms] orbi_get_data() retrieved 96 records from the combination of file_info
+✔ [7ms] orbi_get_data() retrieved 96 records from the combination of file_info
 (1) and summary (96) via uidx
 ```
 
@@ -380,19 +386,21 @@ plot2
 ``` r
 
 # same but with 18O
-plot2 %+% 
-  (df_w_blocks |> orbi_get_data(scans = everything(), peaks = everything()) |>
-   filter(isotopocule == "18O") |> mutate(panel = "raw ratios")) +
+plot2 +
+  (df_w_blocks |>
+    orbi_get_data(scans = everything(), peaks = everything()) |>
+    filter(isotopocule == "18O") |>
+    mutate(panel = "raw ratios")) +
   labs(title = "18O/M0")
 ```
 
 ``` fansi
-✔ [17ms] orbi_get_data() retrieved 37.01k records from the combination of
+✔ [14ms] orbi_get_data() retrieved 37.01k records from the combination of
 file_info (1), scans (12.34k), and peaks (37.01k) via uidx and scan.no
 ```
 
 ``` fansi
-✔ [10ms] orbi_get_data() retrieved 96 records from the combination of file_info
+✔ [8ms] orbi_get_data() retrieved 96 records from the combination of file_info
 (1) and summary (96) via uidx
 ```
 

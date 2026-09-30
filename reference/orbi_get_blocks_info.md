@@ -10,7 +10,7 @@ and end time where a block ends).
 ``` r
 orbi_get_blocks_info(
   dataset,
-  .by = c("uidx", "filename", "injection", "data_group", "block", "sample_name",
+  .by = c("uidx", "filename", "injection", "data_group", "block", "block_name",
     "data_type", "segment")
 )
 ```

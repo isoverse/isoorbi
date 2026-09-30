@@ -12,7 +12,9 @@ orbi_plot_isotopocule_coverage(
   isotopocules = c(),
   x = c("scan.no", "time.min"),
   x_breaks = scales::breaks_pretty(5),
-  add_data_blocks = TRUE
+  add_data_blocks = TRUE,
+  colors = c("#7570B3", "#E6AB02", "#66A61E", "#A6761D", "#D95F02", "#1B9E77", "#E7298A",
+    "#666666", "#BBBBBB")
 )
 
 orbi_get_isotopocule_coverage(dataset)
@@ -52,6 +54,13 @@ orbi_get_isotopocule_coverage(dataset)
   [`orbi_add_blocks_to_plot()`](https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.md)
   function afterwards.
 
+- colors:
+
+  the fill colors for the isotopocules that carry peak flags, one per
+  flag combination encountered in the data (recycled if there are more
+  combinations than colors). Isotopocules without any flags are always
+  shown in black.
+
 ## Value
 
 a ggplot object
@@ -60,8 +69,10 @@ summary data frame
 
 ## Functions
 
-- `orbi_plot_isotopocule_coverage()`: visualizes isotope coverage. Weak
-  isotopocules (if previously defined by
+- `orbi_plot_isotopocule_coverage()`: visualizes isotope coverage.
+  Detected isotopocules are shown by their peak flags - those without
+  any flags in black, those carrying flags in the `colors` provided.
+  Weak isotopocules (if previously defined by
   [`orbi_flag_weak_isotopocules()`](https://isoorbi.isoverse.org/reference/orbi_flag_weak_isotopocules.md))
   are highlighted in red.
 

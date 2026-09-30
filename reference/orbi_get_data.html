@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Get data frame from aggregated data</h1>
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/R/aggregation.R" class="external-link"><code>R/aggregation.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/R/aggregation.R" class="external-link"><code>R/aggregation.R</code></a></small>
       <div class="d-none name"><code>orbi_get_data.Rd</code></div>
     </div>
 
@@ -51,6 +51,7 @@
 <span>  file_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"filename"</span><span class="op">)</span>,</span>
 <span>  scans <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  peaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  status_log <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  spectra <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  problems <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  summary <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -76,6 +77,10 @@
 
 <dt id="arg-peaks">peaks<a class="anchor" aria-label="anchor" href="#arg-peaks"></a></dt>
 <dd><p>columns to get from the aggregated <code>peaks</code>, all <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> syntax is supported</p></dd>
+
+
+<dt id="arg-status-log">status_log<a class="anchor" aria-label="anchor" href="#arg-status-log"></a></dt>
+<dd><p>columns to get from the aggregated <code>status_log</code>, all <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> syntax is supported. Note that none of the included aggregators aggregate anything from the status log, see <code><a href="orbi_aggregator.html">orbi_add_to_aggregator()</a></code> to include the channels of interest.</p></dd>
 
 
 <dt id="arg-spectra">spectra<a class="anchor" aria-label="anchor" href="#arg-spectra"></a></dt>

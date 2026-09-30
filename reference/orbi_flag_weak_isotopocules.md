@@ -32,7 +32,7 @@ orbi_flag_weak_isotopocules(dataset, min_percent = 100)
   misinterprations from using isotopotcules that are very close to their
   detection limit within a datablock. For continuous flow operations it
   may be necessary to make data blocks smaller using
-  [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
+  [`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
   and
   [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md).
 
@@ -48,11 +48,11 @@ fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(file = fpath) |>
       orbi_simplify_isox() |>
       orbi_flag_weak_isotopocules(min_percent = 100)
-#> ✔ [19ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [14ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
-#> ✔ [5ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
+#> ✔ [4ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
-#> ✔ [34ms] orbi_flag_weak_isotopocules() flagged 1 of 15 isotopocules as weak
+#> ✔ [31ms] orbi_flag_weak_isotopocules() flagged 1 of 15 isotopocules as weak
 #> because they were NOT present in at least 100% of scans in each of the 15 data
 #> groups (based on filename, compound, and isotopocule) → use
 #> orbi_plot_isotopocule_coverage() to visualize them

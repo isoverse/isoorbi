@@ -1,11 +1,11 @@
 # Define data block for flow injection
 
-Define a data block by either start and end time or start and end scan
-number. If you want to make segments in the blocks (optional), note that
-this function - manually defining blocks - removes all block
-segmentation. Make sure to call
-[`orbi_segment_blocks()`](https://isoorbi.isoverse.org/reference/orbi_segment_blocks.md)
-**only after** finishing block definitions.
+**\[deprecated\]**
+
+`orbi_define_block_for_flow_injection()` was renamed
+[`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
+since it is not specific to flow injection and can now define several
+blocks at once.
 
 ## Usage
 
@@ -16,7 +16,8 @@ orbi_define_block_for_flow_injection(
   end_time.min = NULL,
   start_scan.no = NULL,
   end_scan.no = NULL,
-  sample_name = NULL
+  block_name = NA_character_,
+  sample_name = lifecycle::deprecated()
 )
 ```
 
@@ -33,28 +34,35 @@ orbi_define_block_for_flow_injection(
 
 - start_time.min:
 
-  set the start time of the block
+  start time of the block(s), a single value or a vector for multiple
+  blocks
 
 - end_time.min:
 
-  set the end time of the block
+  end time of the block(s), a single value or a vector for multiple
+  blocks
 
 - start_scan.no:
 
-  set the start scan of the block
+  start scan of the block(s), a single value or a vector for multiple
+  blocks
 
 - end_scan.no:
 
-  set the end scan of the block
+  end scan of the block(s), a single value or a vector for multiple
+  blocks
+
+- block_name:
+
+  name(s) for the block(s), a single value or a vector for multiple
+  blocks, `NA` by default (i.e. unnamed)
 
 - sample_name:
 
-  if provided, will be used as the `sample_name` for the block
+  **\[deprecated\]** renamed to `block_name` since the column it sets
+  names the block rather than necessarily a sample
 
 ## Value
 
-A data frame (tibble) with block definition added. Any data that is not
-part of a block will be marked with the value of
-`orbi_get_option("data_type_unused")`. Any previously applied
-segmentation will be discarded (`segment` column set to `NA`) to avoid
-unintended side effects.
+see
+[`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)

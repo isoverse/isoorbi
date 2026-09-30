@@ -46,7 +46,7 @@ orbi_get_aggregator(name)
 - dataset:
 
   the name of the dataset to aggregate from (`file_info`, `scans`,
-  `peaks`, `spectra`)
+  `peaks`, `status_log`, `spectra`)
 
 - column:
 

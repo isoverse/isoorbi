@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Aggregate data from raw files</h1>
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/R/aggregation.R" class="external-link"><code>R/aggregation.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/R/aggregation.R" class="external-link"><code>R/aggregation.R</code></a></small>
       <div class="d-none name"><code>orbi_aggregate_raw.Rd</code></div>
     </div>
 
@@ -80,7 +80,7 @@ and/or <code><a href="orbi_aggregator.html">orbi_add_to_aggregator()</a></code>)
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a list of merged dataframes collected from the <code>files_data</code> based on the <code>aggregator</code> definitions</p>
+    <p>a list of merged dataframes collected from the <code>files_data</code> based on the <code>aggregator</code> definitions. Printing it summarizes the aggregated columns of each dataset along with how many columns were not aggregated, use <code>print(x, show_all = TRUE)</code> to list all of the not aggregated columns.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -11,7 +11,7 @@ This function runs automatically during a raw file read and does not usually nee
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,7 @@ This function runs automatically during a raw file read and does not usually nee
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Check for the isoorbi raw file reader</h1>
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/R/read_raw.R" class="external-link"><code>R/read_raw.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/R/read_raw.R" class="external-link"><code>R/read_raw.R</code></a></small>
       <div class="d-none name"><code>orbi_check_isoraw.Rd</code></div>
     </div>
 
@@ -56,10 +56,11 @@ This function runs automatically during a raw file read and does not usually nee
 <span>  install_if_missing <span class="op">=</span> <span class="op">!</span><span class="fu">on_cran</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  reinstall_if_outdated <span class="op">=</span> <span class="op">!</span><span class="fu">on_cran</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  reinstall_always <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  min_version <span class="op">=</span> <span class="st">"0.2.2"</span>,</span>
+<span>  min_version <span class="op">=</span> <span class="st">"0.3.1"</span>,</span>
 <span>  source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"https://github.com/isoverse/isoorbi/releases/download/isoraw-v"</span>,</span>
 <span>    <span class="va">min_version</span><span class="op">)</span>,</span>
 <span>  accept_license <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_version <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,10 +93,20 @@ This function runs automatically during a raw file read and does not usually nee
 <dd><p>explicitly accept Thermo's license agreement (if this is FALSE and the license has not previously been accepted, you will be asked about it)</p></dd>
 
 
+<dt id="arg-show-version">show_version<a class="anchor" aria-label="anchor" href="#arg-show-version"></a></dt>
+<dd><p>whether to print a confirmation message with the version number if the reader is already installed and ready to use (default: <code>TRUE</code>).
+Set to <code>FALSE</code> to keep the check silent, which is what the automatic calls during a raw file read do. Note that the message about a (re-)installation is always shown.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>passed on to <code>download.file</code> if (re-) installing the reader</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>called for its side effect of ensuring a working isoraw reader (at least <code>min_version</code>) is installed and that Thermo's license agreement has been
+accepted; returns <code>TRUE</code> invisibly and aborts if either of those cannot be achieved</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

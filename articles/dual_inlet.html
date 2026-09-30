@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Dual Inlet</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/vignettes/dual_inlet.Rmd" class="external-link"><code>vignettes/dual_inlet.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/vignettes/dual_inlet.Rmd" class="external-link"><code>vignettes/dual_inlet.Rmd</code></a></small>
       <div class="d-none name"><code>dual_inlet.Rmd</code></div>
     </div>
 
@@ -94,11 +94,12 @@ inlet experiment</p>
 <span>  <span class="va">raw_file</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span>include_spectra <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[265ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">dual_inlet.raw</span> from cache, included the <span style="color: #00BB00;">spectra</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[244ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">dual_inlet.raw</span> from cache, included the <span style="color: #00BB00;">spectra</span>
 from 2 <span style="color: #00BB00;">scans</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[295ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (1), <span style="color: #0000BB;">scans</span> (12.34k), <span style="color: #0000BB;">peaks</span>
-(51.77k), and <span style="color: #0000BB;">spectra</span> (277) from 1 file using the <span style="font-weight: bold; font-style: italic;">standard</span> aggregator
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[235ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (1), <span style="color: #0000BB;">scans</span> (12.34k), <span style="color: #0000BB;">peaks</span>
+(184.77k), <span style="color: #0000BB;">spectra</span> (277), and <span style="color: #0000BB;">status_log</span> (0) from 1 file using the <span style="font-weight: bold; font-style: italic;">standard</span>
+aggregator
 </code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># identify nitrate isotopocules</span></span>
@@ -112,13 +113,13 @@ from 2 <span style="color: #00BB00;">scans</span>
 <span>  <span class="fu"><a href="../reference/orbi_identify_isotopocules.html">orbi_identify_isotopocules</a></span><span class="op">(</span><span class="va">isotopocules</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># disregard unidentified and missing isotopocules</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_filter_isotopocules.html">orbi_filter_isotopocules</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[1.6s]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 49.35k/51.77k peaks (95%)
-representing 100% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[1.8s]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 49.35k/184.77k peaks (27%)
+representing 97% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
 and <span style="color: #00BB00;">18O</span> using the <span style="color: #00BB00;">default_tolerance</span> of 1 mmu
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[17ms]</span> <span style="font-weight: bold;">orbi_filter_isotopocules()</span> removed 2.42k / 51.77k peaks (4.7%) because
-they were <span style="color: #BBBB00;">unidentified</span> peaks (2.42k). Remaining isotopocules: <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>, and
-<span style="color: #00BB00;">18O</span>.
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[11ms]</span> <span style="font-weight: bold;">orbi_filter_isotopocules()</span> removed 135.42k / 184.77k peaks (73%)
+because they were <span style="color: #BBBB00;">unidentified</span> peaks (135.42k). Remaining isotopocules: <span style="color: #00BB00;">M0</span>,
+<span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>, and <span style="color: #00BB00;">18O</span>.
 </code></pre>
 </div>
 <div class="section level2">
@@ -133,34 +134,34 @@ they were <span style="color: #BBBB00;">unidentified</span> peaks (2.42k). Remai
 </h2>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Preprocess data (this is exactly the same as with an isox file)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> </span>
+<span><span class="va">df</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">data_all</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># check for issues</span></span>
 <span>  <span class="co"># removes minor peaks that are in the same mass tolerance window</span></span>
-<span>  <span class="co"># of an isotopocule </span></span>
-<span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># of an isotopocule</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># flag signals of isotopocules that were not detected</span></span>
 <span>  <span class="co"># in all scans</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_weak_isotopocules.html">orbi_flag_weak_isotopocules</a></span><span class="op">(</span>min_percent <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># flags outlying scans that have more than 2 times or less than</span></span>
-<span>  <span class="co"># 1/2 times the average number of ions in the Orbitrap analyzer; </span></span>
+<span>  <span class="co"># 1/2 times the average number of ions in the Orbitrap analyzer;</span></span>
 <span>  <span class="co"># another method: agc_window (see function documentation for more details)</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_flag_outliers.html">orbi_flag_outliers</a></span><span class="op">(</span>agc_fold_cutoff <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># sets one isotopocule in the dataset as the base peak</span></span>
 <span>  <span class="co"># (denominator) for ratio calculation</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span> </span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[953ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
+<span>  <span class="fu"><a href="../reference/orbi_define_basepeak.html">orbi_define_basepeak</a></span><span class="op">(</span>basepeak_def <span class="op">=</span> <span class="st">"M0"</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[900ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[43ms]</span> <span style="font-weight: bold;">orbi_flag_weak_isotopocules()</span> confirmed there are no <span style="color: #BBBB00;">weak</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[30ms]</span> <span style="font-weight: bold;">orbi_flag_weak_isotopocules()</span> confirmed there are no <span style="color: #BBBB00;">weak</span>
 isotopocules: all are detected in at least 100% of scans in each of the 4 data
 groups (based on <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">compound</span>, and <span style="color: #00BB00;">isotopocule</span>)
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[23ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> flagged 14/12338 scans (0.11%) as <span style="color: #BBBB00;">outliers</span> based
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[17ms]</span> <span style="font-weight: bold;">orbi_flag_outliers()</span> flagged 14/12338 scans (0.11%) as <span style="color: #BBBB00;">outliers</span> based
 on <span style="color: #00BB00;">2 fold AGC cutoff</span>, i.e. based on <span style="font-style: italic;">scans below 1/2 and above 2 times the</span>
 <span style="font-style: italic;">average number of ions </span><span style="color: #00BB00; font-style: italic;">tic</span><span style="font-style: italic;"> * </span><span style="color: #00BB00; font-style: italic;">it.ms</span><span style="font-style: italic;"> in the Orbitrap analyzer</span> → use
 <span style="font-weight: bold;">orbi_plot_raw_data(y = tic * it.ms)</span> to visualize them
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[1.5s]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[1.1s]</span> <span style="font-weight: bold;">orbi_define_basepeak()</span> set <span style="color: #00BB00;">M0</span> as the ratio denominator and calculated
 37.01k <span style="color: #00BB00;">ratio</span> values for 3 isotopocules (<span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>, and <span style="color: #00BB00;">18O</span>)
 </code></pre>
 <p>No satellite peaks, no weak isotopocules, a few AGC fold
@@ -179,30 +180,30 @@ outliers:</p>
 <span>  <span class="co"># general definition</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_define_blocks_for_dual_inlet.html">orbi_define_blocks_for_dual_inlet</a></span><span class="op">(</span></span>
 <span>    <span class="co"># the reference block is 10 min long</span></span>
-<span>    ref_block_time.min <span class="op">=</span> <span class="fl">10</span>, </span>
+<span>    ref_block_time.min <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>    <span class="co"># the sample block is 10 min long</span></span>
-<span>    sample_block_time.min <span class="op">=</span> <span class="fl">10</span>, </span>
-<span>    <span class="co"># there is 5 min of data before the reference block starts, </span></span>
+<span>    sample_block_time.min <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>    <span class="co"># there is 5 min of data before the reference block starts,</span></span>
 <span>    <span class="co"># to stabilize spray conditions</span></span>
-<span>    startup_time.min <span class="op">=</span> <span class="fl">5</span>, </span>
+<span>    startup_time.min <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    <span class="co"># it takes 2 min to make sure the right solution is measured</span></span>
 <span>    <span class="co"># after switching the valve</span></span>
-<span>    change_over_time.min <span class="op">=</span> <span class="fl">2</span>, </span>
+<span>    change_over_time.min <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    sample_block_name <span class="op">=</span> <span class="st">"sample"</span>,</span>
 <span>    ref_block_name <span class="op">=</span> <span class="st">"reference"</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># fine adjustments</span></span>
 <span>  <span class="co"># the 1st reference block is shorter by 2 min, cut from the start</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">1</span>, shift_start_time.min <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">1</span>, shift_start_time.min <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># the start and end of the 2nd reference block are manually set</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">4</span>, set_start_time.min <span class="op">=</span> <span class="fl">38</span>, set_end_time.min <span class="op">=</span> <span class="fl">44</span><span class="op">)</span> </span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/orbi_adjust_block.html">orbi_adjust_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fl">4</span>, set_start_time.min <span class="op">=</span> <span class="fl">38</span>, set_end_time.min <span class="op">=</span> <span class="fl">44</span><span class="op">)</span></span></code></pre></div>
 <pre class="fansi fansi-message"><code>Adding missing grouping variables: `uidx`
-<span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[52ms]</span> <span style="font-weight: bold;">orbi_define_blocks_for_dual_inlet()</span> identified 8 blocks (4 <span style="color: #00BB00;">reference</span>,
+<span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[38ms]</span> <span style="font-weight: bold;">orbi_define_blocks_for_dual_inlet()</span> identified 8 blocks (4 <span style="color: #00BB00;">reference</span>,
 4 <span style="color: #00BB00;">sample</span>) in data from 1 file
-<span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[7ms]</span> <span style="font-weight: bold;">orbi_adjust_block()</span> made the following <span style="color: #00BB00;">block</span> adjustments in file
+<span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[6ms]</span> <span style="font-weight: bold;">orbi_adjust_block()</span> made the following <span style="color: #00BB00;">block</span> adjustments in file
 <span style="color: #0000BB;">dual_inlet</span>:
 → moved <span style="color: #00BB00;">block 1</span> start from <span style="color: #00BB00;">scan.no</span> 823 (5.00 min) to 1153 (7.01 min)
-<span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[12ms]</span> <span style="font-weight: bold;">orbi_adjust_block()</span> made the following <span style="color: #00BB00;">block</span> adjustments in file
+<span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[7ms]</span> <span style="font-weight: bold;">orbi_adjust_block()</span> made the following <span style="color: #00BB00;">block</span> adjustments in file
 <span style="color: #0000BB;">dual_inlet</span>:
 → moved <span style="color: #00BB00;">block 4</span> start from <span style="color: #00BB00;">scan.no</span> 6087 (37.00 min) to 6251 (38.00 min)
 → moved <span style="color: #00BB00;">block 4</span> end from scan 7402 (45.00 min) to 7238 (44.00 min)
@@ -211,13 +212,13 @@ outliers:</p>
 <code class="sourceCode R"><span><span class="co"># get blocks info</span></span>
 <span><span class="va">blocks_info</span> <span class="op">&lt;-</span> <span class="va">df_w_blocks</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_get_blocks_info.html">orbi_get_blocks_info</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">blocks_info</span> <span class="op">|&gt;</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
 <col width="4%">
 <col width="9%">
 <col width="9%">
 <col width="5%">
-<col width="10%">
+<col width="9%">
 <col width="9%">
 <col width="6%">
 <col width="11%">
@@ -230,7 +231,7 @@ outliers:</p>
 <th align="left">filename</th>
 <th align="right">data_group</th>
 <th align="right">block</th>
-<th align="left">sample_name</th>
+<th align="left">block_name</th>
 <th align="left">data_type</th>
 <th align="right">segment</th>
 <th align="right">start_scan.no</th>
@@ -489,14 +490,14 @@ outliers:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># isotopocule ratios - you can see that even the AGC outliers</span></span>
 <span><span class="co"># still create decent ratios</span></span>
-<span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span>  <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span></span></code></pre></div>
 <p><img src="dual_inlet_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="plot-2-highlight-blocks-in-data-no-outliers">Plot 2: highlight blocks in data + no outliers<a class="anchor" aria-label="anchor" href="#plot-2-highlight-blocks-in-data-no-outliers"></a>
 </h3>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span></span>
 <span>    isotopocules <span class="op">=</span> <span class="st">"15N"</span>,</span>
 <span>    y <span class="op">=</span> <span class="va">ratio</span>,</span>
@@ -512,7 +513,7 @@ outliers:</p>
 <h3 id="plot-3-highlight-sample-blocks-on-top">Plot 3: highlight sample blocks on top<a class="anchor" aria-label="anchor" href="#plot-3-highlight-sample-blocks-on-top"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span></span>
 <span>    isotopocules <span class="op">=</span> <span class="st">"15N"</span>,</span>
 <span>    y <span class="op">=</span> <span class="va">ratio</span>,</span>
@@ -529,7 +530,7 @@ outliers:</p>
 </h2>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate summary</span></span>
-<span><span class="va">df_w_summary</span> <span class="op">&lt;-</span> </span>
+<span><span class="va">df_w_summary</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">df_w_blocks</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># segment (optional)</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_segment_blocks.html">orbi_segment_blocks</a></span><span class="op">(</span>into_segments <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -538,21 +539,22 @@ outliers:</p>
 <span>    ratio_method <span class="op">=</span> <span class="st">"sum"</span>,</span>
 <span>    include_unused_data <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[41ms]</span> <span style="font-weight: bold;">orbi_segment_blocks()</span> segmented <span style="color: #00BB00;">8 data blocks</span> in <span style="color: #0000BB;">1 file</span> creating 3
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[28ms]</span> <span style="font-weight: bold;">orbi_segment_blocks()</span> segmented <span style="color: #00BB00;">8 data blocks</span> in <span style="color: #0000BB;">1 file</span> creating 3
 segments per block (on average) with 420 scans per segment (on average)
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[601ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 36.97k peak
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[441ms]</span> <span style="font-weight: bold;">orbi_summarize_results()</span> summarized ratios from 36.97k peak
 (<span style="font-style: italic;">excluding</span> 42 flagged peaks; <span style="font-style: italic;">including</span> 10.35k unused peaks) using the <span style="font-weight: bold; font-style: italic;">sum</span>
 method and grouping the data by <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">basepeak</span>,
-<span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">block</span>, <span style="color: #00BB00;">sample_name</span>, <span style="color: #00BB00;">segment</span>, <span style="color: #00BB00;">data_group</span>, and <span style="color: #00BB00;">data_type</span>
+<span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">block</span>, <span style="color: #00BB00;">block_name</span>, <span style="color: #00BB00;">segment</span>, <span style="color: #00BB00;">data_group</span>, and <span style="color: #00BB00;">data_type</span>
 </code></pre>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># export file info and summary to excel</span></span>
-<span><span class="va">df_w_summary</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel</a></span><span class="op">(</span></span>
-<span>  file <span class="op">=</span> <span class="st">"output.xlsx"</span>,</span>
-<span>  include <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file_info"</span>, <span class="st">"summary"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[429ms]</span> <span style="font-weight: bold;">orbi_export_data_to_excel()</span> exported the <span style="color: #00BB00;">dataset</span> (1 row of <span style="color: #00BB00;">file_info</span>
+<span><span class="va">df_w_summary</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_export_data_to_excel.html">orbi_export_data_to_excel</a></span><span class="op">(</span></span>
+<span>    file <span class="op">=</span> <span class="st">"output.xlsx"</span>,</span>
+<span>    include <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file_info"</span>, <span class="st">"summary"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[312ms]</span> <span style="font-weight: bold;">orbi_export_data_to_excel()</span> exported the <span style="color: #00BB00;">dataset</span> (1 row of <span style="color: #00BB00;">file_info</span>
 and 96 rows of <span style="color: #00BB00;">summary</span>) to <span style="color: #0000BB;">output.xlsx</span>
 </code></pre>
 <div class="section level3">
@@ -568,8 +570,10 @@ and 96 rows of <span style="color: #00BB00;">summary</span>) to <span style="col
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">block_seg</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">ratio</span>, ymin <span class="op">=</span> <span class="va">ratio</span> <span class="op">-</span> <span class="va">ratio_sem</span>, ymax <span class="op">=</span> <span class="va">ratio</span> <span class="op">+</span> <span class="va">ratio_sem</span>,</span>
-<span>    color <span class="op">=</span> <span class="va">sample_name</span></span>
+<span>    y <span class="op">=</span> <span class="va">ratio</span>,</span>
+<span>    ymin <span class="op">=</span> <span class="va">ratio</span> <span class="op">-</span> <span class="va">ratio_sem</span>,</span>
+<span>    ymax <span class="op">=</span> <span class="va">ratio</span> <span class="op">+</span> <span class="va">ratio_sem</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">block_name</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">isotopocule</span> <span class="op">~</span> <span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -577,7 +581,7 @@ and 96 rows of <span style="color: #00BB00;">summary</span>) to <span style="col
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"block.segment"</span>, y <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[10ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 96 records from the combination of <span style="color: #0000BB;">file_info</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[9ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 96 records from the combination of <span style="color: #0000BB;">file_info</span>
 (1) and <span style="color: #0000BB;">summary</span> (96) via <span style="color: #00BB00;">uidx</span>
 </code></pre>
 <p><img src="dual_inlet_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="768"></p>
@@ -598,43 +602,47 @@ and 96 rows of <span style="color: #00BB00;">summary</span>) to <span style="col
 <span>    add_all_blocks <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    show_outliers <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>   <span class="co"># ratio summary data</span></span>
+<span>  <span class="co"># ratio summary data</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html" class="external-link">geom_pointrange</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="va">df_w_summary</span> <span class="op">|&gt;</span> </span>
+<span>      <span class="va">df_w_summary</span> <span class="op">|&gt;</span></span>
 <span>        <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>summary <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">isotopocule</span><span class="op">)</span> <span class="op">==</span> <span class="va">df</span><span class="op">$</span><span class="va">isotopocule</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">isotopocule</span><span class="op">)</span> <span class="op">==</span> <span class="va">df</span><span class="op">$</span><span class="va">isotopocule</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>panel <span class="op">=</span> <span class="st">"summary"</span><span class="op">)</span></span>
 <span>    <span class="op">}</span>,</span>
 <span>    map <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="va">mean_time.min</span>, y <span class="op">=</span> <span class="va">ratio</span>, </span>
-<span>      ymin <span class="op">=</span> <span class="va">ratio</span> <span class="op">-</span> <span class="va">ratio_sem</span>, ymax <span class="op">=</span> <span class="va">ratio</span> <span class="op">+</span> <span class="va">ratio_sem</span>,</span>
-<span>      shape <span class="op">=</span> <span class="va">sample_name</span></span>
-<span>    <span class="op">)</span>, </span>
+<span>      x <span class="op">=</span> <span class="va">mean_time.min</span>,</span>
+<span>      y <span class="op">=</span> <span class="va">ratio</span>,</span>
+<span>      ymin <span class="op">=</span> <span class="va">ratio</span> <span class="op">-</span> <span class="va">ratio_sem</span>,</span>
+<span>      ymax <span class="op">=</span> <span class="va">ratio</span> <span class="op">+</span> <span class="va">ratio_sem</span>,</span>
+<span>      shape <span class="op">=</span> <span class="va">block_name</span></span>
+<span>    <span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">0.5</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">panel</span> <span class="op">~</span> <span class="va">.</span>, switch <span class="op">=</span> <span class="st">"y"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.placement <span class="op">=</span> <span class="st">"outside"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="cn">NULL</span>, title <span class="op">=</span> <span class="st">"15N/M0"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[18ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 37.01k records from the combination of
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[14ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 37.01k records from the combination of
 <span style="color: #0000BB;">file_info</span> (1), <span style="color: #0000BB;">scans</span> (12.34k), and <span style="color: #0000BB;">peaks</span> (37.01k) via <span style="color: #00BB00;">uidx</span> and <span style="color: #00BB00;">scan.no</span>
 </code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot2</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[14ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 96 records from the combination of <span style="color: #0000BB;">file_info</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[7ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 96 records from the combination of <span style="color: #0000BB;">file_info</span>
 (1) and <span style="color: #0000BB;">summary</span> (96) via <span style="color: #00BB00;">uidx</span>
 </code></pre>
 <p><img src="dual_inlet_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="768"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># same but with 18O</span></span>
-<span><span class="va">plot2</span> <span class="op"><a href="https://ggplot2.tidyverse.org/reference/gg-add.html" class="external-link">%+%</a></span> </span>
-<span>  <span class="op">(</span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>scans <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, peaks <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">isotopocule</span> <span class="op">==</span> <span class="st">"18O"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>panel <span class="op">=</span> <span class="st">"raw ratios"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">plot2</span> <span class="op">+</span></span>
+<span>  <span class="op">(</span><span class="va">df_w_blocks</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>scans <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, peaks <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">isotopocule</span> <span class="op">==</span> <span class="st">"18O"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>panel <span class="op">=</span> <span class="st">"raw ratios"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"18O/M0"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[17ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 37.01k records from the combination of
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[14ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 37.01k records from the combination of
 <span style="color: #0000BB;">file_info</span> (1), <span style="color: #0000BB;">scans</span> (12.34k), and <span style="color: #0000BB;">peaks</span> (37.01k) via <span style="color: #00BB00;">uidx</span> and <span style="color: #00BB00;">scan.no</span>
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[10ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 96 records from the combination of <span style="color: #0000BB;">file_info</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[8ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 96 records from the combination of <span style="color: #0000BB;">file_info</span>
 (1) and <span style="color: #0000BB;">summary</span> (96) via <span style="color: #00BB00;">uidx</span>
 </code></pre>
 <p><img src="dual_inlet_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="768"></p>

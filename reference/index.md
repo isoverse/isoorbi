@@ -29,6 +29,9 @@ These functions extract data from raw files
   : Dynamic data agreggator
 - [`orbi_get_data()`](https://isoorbi.isoverse.org/reference/orbi_get_data.md)
   : Get data frame from aggregated data
+- [`orbi_peak_flags_include()`](https://isoorbi.isoverse.org/reference/orbi_peak_flags.md)
+  [`orbi_peak_flags_to_text()`](https://isoorbi.isoverse.org/reference/orbi_peak_flags.md)
+  : Peak flags
 
 ## Read ISOX files
 
@@ -62,8 +65,10 @@ ISOX files
 These functions are useful for annotating and processing `dual inlet`
 and `flow injection` data.
 
+- [`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
+  : Define data blocks
 - [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
-  : Define data block for flow injection
+  **\[deprecated\]** : Define data block for flow injection
 - [`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md)
   : Binning raw data into blocks for dual inlet analyses
 - [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md)

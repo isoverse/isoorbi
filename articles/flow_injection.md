@@ -23,27 +23,28 @@ raw_files <-
 ```
 
 ``` fansi
-✔ [274ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
+✔ [242ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [107ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
+✔ [97ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [72ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
+✔ [75ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
 1 scan
 ```
 
 ``` fansi
-✔ [579ms] orbi_read_raw() finished reading 3 files
+✔ [516ms] orbi_read_raw() finished reading 3 files
 ```
 
 ``` fansi
-✔ [854ms] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
-(514.98k), and spectra (1.98k) from 3 files using the standard aggregator
+✔ [803ms] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
+(694.07k), spectra (1.98k), and status_log (0) from 3 files using the standard
+aggregator
 ```
 
 ``` r
@@ -85,8 +86,8 @@ raw_files_w_isotopocules <- raw_files |>
 ```
 
 ``` fansi
-! [4s] orbi_identify_isotopocules() identified 84.85k/514.98k peaks (16%)
-representing 94% of the total ion current (TIC) as isotopocules M0, 33S, 17O,
+! [3.8s] orbi_identify_isotopocules() identified 84.85k/694.07k peaks (12%)
+representing 91% of the total ion current (TIC) as isotopocules M0, 33S, 17O,
 34S, 18O, 36S, 33S18O, 34S17O, and 18O18O using the default_tolerance of 1
 mmu but encountered 1 warning
   → ! isotopocules M0, 33S, 17O, 34S, 18O, 33S18O, 34S17O, 36S, and 18O18O are
@@ -95,13 +96,13 @@ mmu but encountered 1 warning
 ```
 
 ``` fansi
-✔ [15ms] orbi_filter_isotopocules() removed 430.13k / 579.82k peaks (74%)
-because they were unidentified peaks (430.13k). Remaining isotopocules: M0,
+✔ [17ms] orbi_filter_isotopocules() removed 609.22k / 758.91k peaks (80%)
+because they were unidentified peaks (609.22k). Remaining isotopocules: M0,
 33S, 17O, 34S, 18O, 34S17O, 33S18O, 36S, and 18O18O.
 ```
 
 ``` fansi
-✔ [2.8s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [2.3s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` r
@@ -151,26 +152,26 @@ data <-
 ```
 
 ``` fansi
-✔ [27ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
+✔ [28ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
 because they were missing isotopocules (64.84k), or not the selected
 isotopocule M0, 33S, 17O, 34S, and 18O (1.82k).
 ```
 
 ``` fansi
-✔ [43ms] orbi_flag_weak_isotopocules() confirmed there are no weak
+✔ [33ms] orbi_flag_weak_isotopocules() confirmed there are no weak
 isotopocules: all are detected in at least 99% of scans in each of the 15 data
 groups (based on uidx, compound, and isotopocule)
 ```
 
 ``` fansi
-✔ [25ms] orbi_flag_outliers() flagged 44/16632 scans (0.26%) as outliers based
+✔ [19ms] orbi_flag_outliers() flagged 44/16632 scans (0.26%) as outliers based
 on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
 average number of ions tic * it.ms in the Orbitrap analyzer, in 3 data groups
 (based on uidx) → use orbi_plot_raw_data(y = tic * it.ms) to visualize them
 ```
 
 ``` fansi
-✔ [1.9s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
+✔ [1.4s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
 66.40k ratio values for 4 isotopocules (33S, 17O, 34S, and 18O)
 ```
 
@@ -226,7 +227,7 @@ data_summary <-
 ```
 
 ``` fansi
-✔ [92ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
+✔ [77ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
 68 flagged peaks; excluding 0 unused peaks) using the sum method and grouping
 the data by uidx, filename, compound, basepeak, and isotopocule
 ```
@@ -239,26 +240,26 @@ data_summary |>
 ```
 
 ``` fansi
-✔ [9ms] orbi_get_data() retrieved 12 records from the combination of file_info
+✔ [7ms] orbi_get_data() retrieved 12 records from the combination of file_info
 (3) and summary (12) via uidx
 ```
 
 ``` fansi
 # A tibble: 12 × 7
-    uidx filename  compound isotopocule   ratio ratio_relative_sem_p…¹ ratio_sem
-   <int> <chr>     <fct>    <fct>         <dbl>                  <dbl>     <dbl>
- 1     1 ac5.RAW   HSO4-    33S         0.00903                  1.18    1.06e-5
- 2     1 ac5.RAW   HSO4-    17O         0.00165                  2.92    4.81e-6
- 3     1 ac5.RAW   HSO4-    34S         0.0599                   0.459   2.75e-5
- 4     1 ac5.RAW   HSO4-    18O         0.0107                   1.06    1.13e-5
- 5     2 ac6.RAW   HSO4-    33S         0.00902                  0.99    8.92e-6
- 6     2 ac6.RAW   HSO4-    17O         0.00164                  2.47    4.05e-6
- 7     2 ac6.RAW   HSO4-    34S         0.0595                   0.4     2.38e-5
- 8     2 ac6.RAW   HSO4-    18O         0.0106                   0.911   9.67e-6
- 9     3 s3744.RAW HSO4-    33S         0.00894                  1.01    9.07e-6
-10     3 s3744.RAW HSO4-    17O         0.00164                  2.58    4.23e-6
-11     3 s3744.RAW HSO4-    34S         0.0584                   0.414   2.42e-5
-12     3 s3744.RAW HSO4-    18O         0.0106                   0.944   1.00e-5
+    uidx filename compound isotopocule   ratio ratio_relative_sem_pe…¹ ratio_sem
+   <int> <chr>    <fct>    <fct>         <dbl>                   <dbl>     <dbl>
+ 1     1 ac5      HSO4-    33S         0.00903                   1.18    1.06e-5
+ 2     1 ac5      HSO4-    17O         0.00165                   2.92    4.81e-6
+ 3     1 ac5      HSO4-    34S         0.0599                    0.459   2.75e-5
+ 4     1 ac5      HSO4-    18O         0.0107                    1.06    1.13e-5
+ 5     2 ac6      HSO4-    33S         0.00902                   0.99    8.92e-6
+ 6     2 ac6      HSO4-    17O         0.00164                   2.47    4.05e-6
+ 7     2 ac6      HSO4-    34S         0.0595                    0.4     2.38e-5
+ 8     2 ac6      HSO4-    18O         0.0106                    0.911   9.67e-6
+ 9     3 s3744    HSO4-    33S         0.00894                   1.01    9.07e-6
+10     3 s3744    HSO4-    17O         0.00164                   2.58    4.23e-6
+11     3 s3744    HSO4-    34S         0.0584                    0.414   2.42e-5
+12     3 s3744    HSO4-    18O         0.0106                    0.944   1.00e-5
 # ℹ abbreviated name: ¹​ratio_relative_sem_permil
 ```
 
@@ -272,7 +273,7 @@ data_summary |> orbi_export_data_to_excel(
 ```
 
 ``` fansi
-✔ [422ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
+✔ [323ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
 and 12 rows of summary) to output.xlsx
 ```
 
@@ -308,7 +309,7 @@ fig <-
 ```
 
 ``` fansi
-✔ [10ms] orbi_get_data() retrieved 12 records from the combination of file_info
+✔ [8ms] orbi_get_data() retrieved 12 records from the combination of file_info
 (3) and summary (12) via uidx
 ```
 

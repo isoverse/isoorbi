@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Functionality Guide</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/vignettes/functionality_guide.Rmd" class="external-link"><code>vignettes/functionality_guide.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/isoverse/isoorbi/blob/main/vignettes/functionality_guide.Rmd" class="external-link"><code>vignettes/functionality_guide.Rmd</code></a></small>
       <div class="d-none name"><code>functionality_guide.Rmd</code></div>
     </div>
 
@@ -85,7 +85,8 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://isoorbi.isoverse.org/">isoorbi</a></span><span class="op">)</span> <span class="co">#load isoorbi R package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span> <span class="co"># for mutating data frames</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span> <span class="co"># for mutating data frames</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span> <span class="co"># for data visualization</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="reading-raw-files">Reading raw files<a class="anchor" aria-label="anchor" href="#reading-raw-files"></a>
 </h2>
@@ -113,11 +114,11 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read files (simplest)</span></span>
 <span><span class="va">raw_files</span> <span class="op">&lt;-</span> <span class="va">file_paths</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[238ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_10scans.raw</span> from cache
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[204ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_10scans.raw</span> from cache
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[40ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_1scan.raw</span> from cache
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[52ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">nitrate_test_1scan.raw</span> from cache
 </code></pre>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[391ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 2 files
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[336ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 2 files
 </code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read files including some raw spectra</span></span>
@@ -133,10 +134,10 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <span><span class="va">raw_files</span></span></code></pre></div>
 <pre class="fansi fansi-message"><code>──────────────── <span style="font-weight: bold;">2 raw files - combine with orbi_aggregate_raw()</span> ───────────────
 </code></pre>
-<pre class="fansi fansi-message"><code>1. <span style="color: #0000BB;">nitrate_test_10scans.raw</span> has 10 <span style="color: #00BB00;">scans</span> with 126 <span style="color: #00BB00;">peaks</span>; + loaded 2 <span style="color: #00BB00;">spectra</span>
-(618 points)
-2. <span style="color: #0000BB;">nitrate_test_1scan.raw</span>   has  1 <span style="color: #00BB00;">scans</span> with  12 <span style="color: #00BB00;">peaks</span>; + loaded 1 <span style="color: #00BB00;">spectrum</span>
-(325 points)
+<pre class="fansi fansi-message"><code>1. <span style="color: #0000BB;">nitrate_test_10scans.raw</span> has 10 <span style="color: #00BB00;">scans</span> with 307 <span style="color: #00BB00;">peaks</span> and 1 <span style="color: #00BB00;">status log</span> entry;
++ loaded 2 <span style="color: #00BB00;">spectra</span> (618 points)
+2. <span style="color: #0000BB;">nitrate_test_1scan.raw</span>   has  1 <span style="color: #00BB00;">scans</span> with  30 <span style="color: #00BB00;">peaks</span> and 1 <span style="color: #00BB00;">status log</span> entry;
++ loaded 1 <span style="color: #00BB00;">spectrum</span> (325 points)
 </code></pre>
 </div>
 <div class="section level3">
@@ -147,12 +148,12 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># aggregate raw data</span></span>
 <span><span class="va">agg_data</span> <span class="op">&lt;-</span> <span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[552ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
-(138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">standard</span> aggregator
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[422ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+(337), <span style="color: #0000BB;">spectra</span> (943), and <span style="color: #0000BB;">status_log</span> (0) from 2 files using the <span style="font-weight: bold; font-style: italic;">standard</span>
+aggregator
 </code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># shaw all that was recovered</span></span>
-<span><span class="co"># (as well as what was ignored/not aggregated)</span></span>
+<code class="sourceCode R"><span><span class="co"># show all that was recovered</span></span>
 <span><span class="va">agg_data</span></span></code></pre></div>
 <pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
 </code></pre>
@@ -168,7 +169,37 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">scans</span> (11): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">time.min</span>, <span style="color: #00BB00;">tic</span>, <span style="color: #00BB00;">it.ms</span>, <span style="color: #00BB00;">resolution</span>, <span style="color: #00BB00;">microscans</span>,
 <span style="color: #00BB00;">basePeakMz</span>, <span style="color: #00BB00;">basePeakIntensity</span>, <span style="color: #00BB00;">lowMass</span>, <span style="color: #00BB00;">highMass</span>, <span style="color: #00BB00;">rawOvFtT</span>, <span style="color: #00BB00;">intensCompFactor</span>,
-<span style="color: #00BB00;">agc</span>, <span style="color: #00BB00;">agcTarget</span>, <span style="color: #00BB00;">numberLockmassesFound</span>, <span style="color: #00BB00;">analyzerTemperature</span>; (<span style="font-style: italic;">not aggregated</span>:
+<span style="color: #00BB00;">agc</span>, <span style="color: #00BB00;">agcTarget</span>, <span style="color: #00BB00;">numberLockmassesFound</span>, <span style="color: #00BB00;">analyzerTemperature</span>; <span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00;">65</span>
+<span style="color: #BBBB00;">columns</span> → to show all use: <span style="font-style: italic;">print(agg_data, show_all = TRUE)</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (337): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
+<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">centroiderFlags</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">spectra</span> (943): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mz</span>, <span style="color: #00BB00;">intensity</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">status_log</span> (0): <span style="font-style: italic;">nothing aggregated</span>; <span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00;">198 columns</span> → to show all
+use: <span style="font-style: italic;">print(agg_data, show_all = TRUE)</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">problems</span>: has <span style="color: #00BB00;">no issues</span>
+</code></pre>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># also show all that was ignored/not aggregated</span></span>
+<span><span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>show_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">file_info</span> (2): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">creation_date</span>, <span style="color: #00BB00;">in_aquisition</span>,
+<span style="color: #00BB00;">Operator</span>, <span style="color: #00BB00;">FileDescription</span>, <span style="color: #00BB00;">MassResolution</span>, <span style="color: #00BB00;">SpectraCount</span>, <span style="color: #00BB00;">FirstSpectrum</span>,
+<span style="color: #00BB00;">LastSpectrum</span>, <span style="color: #00BB00;">StartTime</span>, <span style="color: #00BB00;">EndTime</span>, <span style="color: #00BB00;">LowMass</span>, <span style="color: #00BB00;">HighMass</span>, <span style="color: #00BB00;">InstrumentCount</span>,
+<span style="color: #00BB00;">InstrumentModel</span>, <span style="color: #00BB00;">InstrumentName</span>, <span style="color: #00BB00;">SerialNumber</span>, <span style="color: #00BB00;">SoftwareVersion</span>,
+<span style="color: #00BB00;">HardwareVersion</span>, <span style="color: #00BB00;">RawFileVersion</span>, <span style="color: #00BB00;">InstrumentUnits</span>, <span style="color: #00BB00;">Comment</span>, <span style="color: #00BB00;">SampleId</span>,
+<span style="color: #00BB00;">SampleName</span>, <span style="color: #00BB00;">SampleType</span>, <span style="color: #00BB00;">SampleWeight</span>, <span style="color: #00BB00;">SampleVolume</span>, <span style="color: #00BB00;">Barcode</span>, <span style="color: #00BB00;">RowNumber</span>, <span style="color: #00BB00;">Vial</span>,
+<span style="color: #00BB00;">InjectionVolume</span>, <span style="color: #00BB00;">DilutionFactor</span>, <span style="color: #00BB00;">IstdAmount</span>, <span style="color: #00BB00;">CalibrationLevel</span>,
+<span style="color: #00BB00;">InstrumentMethodFile</span>, <span style="color: #00BB00;">CalibrationFile</span>, <span style="color: #00BB00;">ProcessingMethodFile</span>, <span style="color: #00BB00;">UserText0</span>,
+<span style="color: #00BB00;">UserText1</span>, <span style="color: #00BB00;">UserText2</span>, <span style="color: #00BB00;">UserText3</span>, <span style="color: #00BB00;">UserText4</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">scans</span> (11): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">time.min</span>, <span style="color: #00BB00;">tic</span>, <span style="color: #00BB00;">it.ms</span>, <span style="color: #00BB00;">resolution</span>, <span style="color: #00BB00;">microscans</span>,
+<span style="color: #00BB00;">basePeakMz</span>, <span style="color: #00BB00;">basePeakIntensity</span>, <span style="color: #00BB00;">lowMass</span>, <span style="color: #00BB00;">highMass</span>, <span style="color: #00BB00;">rawOvFtT</span>, <span style="color: #00BB00;">intensCompFactor</span>,
+<span style="color: #00BB00;">agc</span>, <span style="color: #00BB00;">agcTarget</span>, <span style="color: #00BB00;">numberLockmassesFound</span>, <span style="color: #00BB00;">analyzerTemperature</span>; <span style="font-style: italic;">not aggregated</span>:
 <span style="color: #BBBB00; font-style: italic;">IsCentroidScan</span>, <span style="color: #BBBB00; font-style: italic;">ScanType</span>, <span style="color: #BBBB00; font-style: italic;">Scan Description</span>, <span style="color: #BBBB00; font-style: italic;">Multiple Injection</span>, <span style="color: #BBBB00; font-style: italic;">Multi Inject</span>
 <span style="color: #BBBB00; font-style: italic;">Info</span>, <span style="color: #BBBB00; font-style: italic;">Scan Segment</span>, <span style="color: #BBBB00; font-style: italic;">Scan Event</span>, <span style="color: #BBBB00; font-style: italic;">Master Index</span>, <span style="color: #BBBB00; font-style: italic;">Master Scan Number</span>, <span style="color: #BBBB00; font-style: italic;">Charge State</span>,
 <span style="color: #BBBB00; font-style: italic;">Monoisotopic M/Z</span>, <span style="color: #BBBB00; font-style: italic;">Error in isotopic envelope fit</span>, <span style="color: #BBBB00; font-style: italic;">Max. Ion Time (ms)</span>, <span style="color: #BBBB00; font-style: italic;">MS2</span>
@@ -184,12 +215,74 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <span style="color: #BBBB00; font-style: italic;">Mode</span>, <span style="color: #BBBB00; font-style: italic;">AGC PS Diag</span>, <span style="color: #BBBB00; font-style: italic;">AGC Target Adjust</span>, <span style="color: #BBBB00; font-style: italic;">AGC Diag 1</span>, <span style="color: #BBBB00; font-style: italic;">AGC Diag 2</span>, <span style="color: #BBBB00; font-style: italic;">HCD abs. Offset</span>,
 <span style="color: #BBBB00; font-style: italic;">Source CID eV</span>, <span style="color: #BBBB00; font-style: italic;">AGC Fill</span>, <span style="color: #BBBB00; font-style: italic;">Injection t0</span>, <span style="color: #BBBB00; font-style: italic;">t0 FLP</span>, <span style="color: #BBBB00; font-style: italic;">Iso Para R</span>, <span style="color: #BBBB00; font-style: italic;">Inj Para R</span>, <span style="color: #BBBB00; font-style: italic;">Access</span>
 <span style="color: #BBBB00; font-style: italic;">Id</span>, <span style="color: #BBBB00; font-style: italic;">Analog In A (V)</span>, <span style="color: #BBBB00; font-style: italic;">Analog In B (V)</span>, <span style="color: #BBBB00; font-style: italic;">FAIMS Attached</span>, <span style="color: #BBBB00; font-style: italic;">FAIMS Voltage On</span>, <span style="color: #BBBB00; font-style: italic;">FAIMS</span>
-<span style="color: #BBBB00; font-style: italic;">CV</span>)
+<span style="color: #BBBB00; font-style: italic;">CV</span>
 </code></pre>
-<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (138): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
-<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">isRefPeak</span>, <span style="color: #00BB00;">isLockPeak</span>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (337): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
+<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">centroiderFlags</span>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">spectra</span> (943): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mz</span>, <span style="color: #00BB00;">intensity</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">status_log</span> (0): <span style="font-style: italic;">nothing aggregated</span>; <span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00; font-style: italic;">log.no</span>, <span style="color: #BBBB00; font-style: italic;">StartTime</span>, <span style="color: #BBBB00; font-style: italic;">====</span>
+<span style="color: #BBBB00; font-style: italic;">FAIMS Device: ====</span>, <span style="color: #BBBB00; font-style: italic;">==== Overall Status: ====</span>, <span style="color: #BBBB00; font-style: italic;">Status</span>, <span style="color: #BBBB00; font-style: italic;">Performance</span>, <span style="color: #BBBB00; font-style: italic;">====== Ion</span>
+<span style="color: #BBBB00; font-style: italic;">Source: ======</span>, <span style="color: #BBBB00; font-style: italic;">Spray Voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">Spray Current (µA)</span>, <span style="color: #BBBB00; font-style: italic;">Spray Current std. dev.</span>
+<span style="color: #BBBB00; font-style: italic;">(µA)</span>, <span style="color: #BBBB00; font-style: italic;">Ion Transfer Tube Temperature (°C)</span>, <span style="color: #BBBB00; font-style: italic;">Sheath gas pressure (psi)</span>, <span style="color: #BBBB00; font-style: italic;">Aux gas</span>
+<span style="color: #BBBB00; font-style: italic;">pressure (psi)</span>, <span style="color: #BBBB00; font-style: italic;">Sweep gas pressure (psi)</span>, <span style="color: #BBBB00; font-style: italic;">Vaporizer Temperature (°C)</span>, <span style="color: #BBBB00; font-style: italic;">======</span>
+<span style="color: #BBBB00; font-style: italic;">Ion Optics: ======</span>, <span style="color: #BBBB00; font-style: italic;">CTB: C-trap RF freq. (MHz)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: C-trap RF amp. (MHz)</span>, <span style="color: #BBBB00; font-style: italic;">CTB:</span>
+<span style="color: #BBBB00; font-style: italic;">Quad. exit lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: Beam split lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: Tr. multipole DC (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB:</span>
+<span style="color: #BBBB00; font-style: italic;">C-trap entr. lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: C-trap exit lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: Z lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: HCD ax.</span>
+<span style="color: #BBBB00; font-style: italic;">field entr. (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: HCD ax. field exit (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: HCD exit lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">QS: Quad.</span>
+<span style="color: #BBBB00; font-style: italic;">RF amp. (Vpp)</span>, <span style="color: #BBBB00; font-style: italic;">QS: Quad. MSeg rod A DC (V)</span>, <span style="color: #BBBB00; font-style: italic;">QS: Quad. MSeg rod B DC (V)</span>, <span style="color: #BBBB00; font-style: italic;">SB:</span>
+<span style="color: #BBBB00; font-style: italic;">Spray HV voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">SB: Spray HV current (uA)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Source DC (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB:</span>
+<span style="color: #BBBB00; font-style: italic;">S-Lens RF amp. (Vpp)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: S-Lens RF freq. (kHz)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Inj. fl. phase A DC (V)</span>,
+<span style="color: #BBBB00; font-style: italic;">IOB: Inj. fl. phase B DC (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Inj. fl. RF amp. (Vpp)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Inj. fl. RF</span>
+<span style="color: #BBBB00; font-style: italic;">freq. (kHz)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Inj. fl. RF curr. (A)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Fl. focus lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Bent fl.</span>
+<span style="color: #BBBB00; font-style: italic;">DC (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Bent fl. ax. f. e. (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Bent fl. exit lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Bent fl.</span>
+<span style="color: #BBBB00; font-style: italic;">RF amp. (Vpp)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: Bent fl. RF freq. (kHz)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: C-trap inj. o. + (V)</span>,
+<span style="color: #BBBB00; font-style: italic;">PCBAOS: C-trap inj. o. - (V)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: HV focus lens (V)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: V lens (V)</span>,
+<span style="color: #BBBB00; font-style: italic;">PCBAOS: Defl. measure + (V)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: Defl. measure - (V)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: CE inject +</span>
+<span style="color: #BBBB00; font-style: italic;">(V)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: CE inject - (V)</span>, <span style="color: #BBBB00; font-style: italic;">===== Temperatures: =====</span>, <span style="color: #BBBB00; font-style: italic;">Ambient temp. (°C)</span>,
+<span style="color: #BBBB00; font-style: italic;">Orbitrap block temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">Detector temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">Ion tr. tube temp. (°C)</span>,
+<span style="color: #BBBB00; font-style: italic;">Vaporizer temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">CPU core temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">PCB temp. top (°C)</span>, <span style="color: #BBBB00; font-style: italic;">PCB temp. center</span>
+<span style="color: #BBBB00; font-style: italic;">(°C)</span>, <span style="color: #BBBB00; font-style: italic;">PCB temp. bottom (°C)</span>, <span style="color: #BBBB00; font-style: italic;">==== Diagnostic Data: ====</span>, <span style="color: #BBBB00; font-style: italic;">Performance ld</span>,
+<span style="color: #BBBB00; font-style: italic;">Performance me</span>, <span style="color: #BBBB00; font-style: italic;">Performance cy</span>, <span style="color: #BBBB00; font-style: italic;">PrOSA counts</span>, <span style="color: #BBBB00; font-style: italic;">PrOSA blank</span>, <span style="color: #BBBB00; font-style: italic;">PrOSA time (us)</span>,
+<span style="color: #BBBB00; font-style: italic;">PrOSA curr (pA)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Up-time (sec)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: +24 V</span>, <span style="color: #BBBB00; font-style: italic;">ICB: +5 V</span>, <span style="color: #BBBB00; font-style: italic;">ICB: +3.3 V</span>, <span style="color: #BBBB00; font-style: italic;">ICB:</span>
+<span style="color: #BBBB00; font-style: italic;">+2.5 V</span>, <span style="color: #BBBB00; font-style: italic;">ICB: +1.2 V</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Power-on time (h)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Acc. bakeout time (h)</span>, <span style="color: #BBBB00; font-style: italic;">ICB:</span>
+<span style="color: #BBBB00; font-style: italic;">Turbopump speed (Hz)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Turbopump power (W)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Turbopump error state</span>,
+<span style="color: #BBBB00; font-style: italic;">ICB: Turbopump last error</span>, <span style="color: #BBBB00; font-style: italic;">ICB: UHV pres. (mbar)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: HCD cell pres. (mbar)</span>,
+<span style="color: #BBBB00; font-style: italic;">ICB: Fore-vac. pres. (mbar)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: IF region pres. (mbar)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: R-f fan speed</span>
+<span style="color: #BBBB00; font-style: italic;">(rpm)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: L-b fan speed (rpm)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: L-f fan speed (rpm)</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Dig. I/O start</span>
+<span style="color: #BBBB00; font-style: italic;">0</span>, <span style="color: #BBBB00; font-style: italic;">ICB: Dig. I/O start 1</span>, <span style="color: #BBBB00; font-style: italic;">ICB: OSPI ERR queue usage</span>, <span style="color: #BBBB00; font-style: italic;">DAQ: Voltage monitor</span>, <span style="color: #BBBB00; font-style: italic;">DAQ:</span>
+<span style="color: #BBBB00; font-style: italic;">Status register</span>, <span style="color: #BBBB00; font-style: italic;">CTB: FAN1 speed (rpm)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: FAN2 speed (rpm)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: ICD integr.</span>
+<span style="color: #BBBB00; font-style: italic;">active</span>, <span style="color: #BBBB00; font-style: italic;">CTB: ICD signal count (ct)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: ICD blank count (ct)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: ICD ion</span>
+<span style="color: #BBBB00; font-style: italic;">inj. time (us)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: C-trap RF curr. (mA)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: C-trap RF s. volt. (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: HV</span>
+<span style="color: #BBBB00; font-style: italic;">positive (V)</span>, <span style="color: #BBBB00; font-style: italic;">CTB: HV negative (V)</span>, <span style="color: #BBBB00; font-style: italic;">QS: HV negative (V)</span>, <span style="color: #BBBB00; font-style: italic;">QS: HV positive (V)</span>,
+<span style="color: #BBBB00; font-style: italic;">SB: +24 V supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: +15 V analog supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: -8 V supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: +5 V analog</span>
+<span style="color: #BBBB00; font-style: italic;">supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: +5 V digital supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: -5 V analog supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: +3.3 V digital</span>
+<span style="color: #BBBB00; font-style: italic;">supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: +2.5 V digital supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: +1.2 V digital supply</span>, <span style="color: #BBBB00; font-style: italic;">SB: Ion tr. tube</span>
+<span style="color: #BBBB00; font-style: italic;">fuse</span>, <span style="color: #BBBB00; font-style: italic;">SB: Ion tr. tube temp. OOR</span>, <span style="color: #BBBB00; font-style: italic;">SB: Ion tr. tube voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">SB: Vaporizer</span>
+<span style="color: #BBBB00; font-style: italic;">fuse</span>, <span style="color: #BBBB00; font-style: italic;">SB: Vaporizer temp. OOR</span>, <span style="color: #BBBB00; font-style: italic;">SB: 8 kV const. volt./c.m.</span>, <span style="color: #BBBB00; font-style: italic;">SB: Valve fuse</span>, <span style="color: #BBBB00; font-style: italic;">SB:</span>
+<span style="color: #BBBB00; font-style: italic;">Aux. gas pres. (psi)</span>, <span style="color: #BBBB00; font-style: italic;">SB: Sheath gas pres. (psi)</span>, <span style="color: #BBBB00; font-style: italic;">SB: Sweep gas pres. (psi)</span>,
+<span style="color: #BBBB00; font-style: italic;">SB: Interlock fuse</span>, <span style="color: #BBBB00; font-style: italic;">SB: Switch 1 closed</span>, <span style="color: #BBBB00; font-style: italic;">SB: Relay 1 closed</span>, <span style="color: #BBBB00; font-style: italic;">SB: Switch 2</span>
+<span style="color: #BBBB00; font-style: italic;">closed</span>, <span style="color: #BBBB00; font-style: italic;">SB: Relay 2 closed</span>, <span style="color: #BBBB00; font-style: italic;">SB: Interlock switch</span>, <span style="color: #BBBB00; font-style: italic;">SB: Cover is taken off</span>, <span style="color: #BBBB00; font-style: italic;">SB:</span>
+<span style="color: #BBBB00; font-style: italic;">ICS/ETD available</span>, <span style="color: #BBBB00; font-style: italic;">IOB: HV fuse</span>, <span style="color: #BBBB00; font-style: italic;">IOB: RF fuse</span>, <span style="color: #BBBB00; font-style: italic;">IOB: HVV positive (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: HVV</span>
+<span style="color: #BBBB00; font-style: italic;">negative (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: HV positive (V)</span>, <span style="color: #BBBB00; font-style: italic;">IOB: HV negative (V)</span>, <span style="color: #BBBB00; font-style: italic;">FTPCU: CPU load</span>
+<span style="color: #BBBB00; font-style: italic;">average</span>, <span style="color: #BBBB00; font-style: italic;">FTPCU: Board free RAM</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: HV monitor (kV)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: R_Pulser_CE</span>
+<span style="color: #BBBB00; font-style: italic;">(V)</span>, <span style="color: #BBBB00; font-style: italic;">PCBAOS: R_Pulser_DE (V)</span>, <span style="color: #BBBB00; font-style: italic;">==== FAIMS Device: ==== (2)</span>, <span style="color: #BBBB00; font-style: italic;">Attached</span>, <span style="color: #BBBB00; font-style: italic;">Dispersion</span>
+<span style="color: #BBBB00; font-style: italic;">Voltage (DV)</span>, <span style="color: #BBBB00; font-style: italic;">Compensation Voltage (CV)</span>, <span style="color: #BBBB00; font-style: italic;">Entrance Plate Voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">Total</span>
+<span style="color: #BBBB00; font-style: italic;">Carrier Gas Flow (lpm)</span>, <span style="color: #BBBB00; font-style: italic;">Cooling Gas Flow (lpm)</span>, <span style="color: #BBBB00; font-style: italic;">Gas Pressure (psi)</span>, <span style="color: #BBBB00; font-style: italic;">Cooling Gas</span>
+<span style="color: #BBBB00; font-style: italic;">Pressure (psi)</span>, <span style="color: #BBBB00; font-style: italic;">Input Gas Pressure (psi)</span>, <span style="color: #BBBB00; font-style: italic;">Inner Electrode Temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">Outer</span>
+<span style="color: #BBBB00; font-style: italic;">Electrode 1 Temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">Outer Electrode 2 Temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">MCB Ambient Temp. (°C)</span>,
+<span style="color: #BBBB00; font-style: italic;">MCB Atmosph. Pressure (kPa)</span>, <span style="color: #BBBB00; font-style: italic;">DV High Frequency Amp. (V)</span>, <span style="color: #BBBB00; font-style: italic;">DV Low Frequency Amp.</span>
+<span style="color: #BBBB00; font-style: italic;">(V)</span>, <span style="color: #BBBB00; font-style: italic;">DV Phase (°)</span>, <span style="color: #BBBB00; font-style: italic;">DV Frequency (Hz)</span>, <span style="color: #BBBB00; font-style: italic;">System Voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">System Current (A)</span>,
+<span style="color: #BBBB00; font-style: italic;">Relays (+24V)</span>, <span style="color: #BBBB00; font-style: italic;">+6.25D (V)</span>, <span style="color: #BBBB00; font-style: italic;">-6.25D (V)</span>, <span style="color: #BBBB00; font-style: italic;">+5A (V)</span>, <span style="color: #BBBB00; font-style: italic;">-5A (V)</span>, <span style="color: #BBBB00; font-style: italic;">+3.0D (V)</span>, <span style="color: #BBBB00; font-style: italic;">+1.8A (V)</span>,
+<span style="color: #BBBB00; font-style: italic;">+3.3D (V)</span>, <span style="color: #BBBB00; font-style: italic;">MCB PCB Temp. (°C)</span>, <span style="color: #BBBB00; font-style: italic;">RTD Reference (+3V)</span>, <span style="color: #BBBB00; font-style: italic;">System Relay Voltage (V)</span>,
+<span style="color: #BBBB00; font-style: italic;">MCB Fan 1 Speed (Hz)</span>, <span style="color: #BBBB00; font-style: italic;">MCB Fan 2 Speed (Hz)</span>, <span style="color: #BBBB00; font-style: italic;">TXB Fan Speed (Hz)</span>, <span style="color: #BBBB00; font-style: italic;">Outer Elec.</span>
+<span style="color: #BBBB00; font-style: italic;">Bias Volt. (V)</span>, <span style="color: #BBBB00; font-style: italic;">HF RF Amp Output Current (A)</span>, <span style="color: #BBBB00; font-style: italic;">HF RF Supply Voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">HF RF</span>
+<span style="color: #BBBB00; font-style: italic;">Supply Current (A)</span>, <span style="color: #BBBB00; font-style: italic;">LF RF Amp Output Current (A)</span>, <span style="color: #BBBB00; font-style: italic;">LF RF Supply Voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">LF</span>
+<span style="color: #BBBB00; font-style: italic;">RF Supply Current (A)</span>, <span style="color: #BBBB00; font-style: italic;">HF RF Amp Output Voltage (V)</span>, <span style="color: #BBBB00; font-style: italic;">LF RF Amp Output Voltage</span>
+<span style="color: #BBBB00; font-style: italic;">(V)</span>, <span style="color: #BBBB00; font-style: italic;">TX PCB temperature (°C)</span>, <span style="color: #BBBB00; font-style: italic;">DV High Frequency RF DAC (V)</span>, <span style="color: #BBBB00; font-style: italic;">DV Low Frequency RF</span>
+<span style="color: #BBBB00; font-style: italic;">DAC (V)</span>, <span style="color: #BBBB00; font-style: italic;">MS Interlock 1 (V)</span>, <span style="color: #BBBB00; font-style: italic;">MS Interlock 2 (V)</span>, <span style="color: #BBBB00; font-style: italic;">Gate Drive Supply (V)</span>, <span style="color: #BBBB00; font-style: italic;">==</span>
+<span style="color: #BBBB00; font-style: italic;">Collaborator Interface =</span>, <span style="color: #BBBB00; font-style: italic;">Custom Interface</span>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">problems</span>: has <span style="color: #00BB00;">no issues</span>
 </code></pre>
@@ -200,14 +293,14 @@ standard flowchart are labeled as <code>bonus</code>.</p>
 <code>minimal</code> aggregator contains a smaller set of columns to
 aggregate. The <code>extended</code> aggregator is more elaborate,
 providing access to additional columns from the raw data files.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example: minimal vs. extended aggregator</span></span>
 <span><span class="fu"><a href="../reference/orbi_aggregator.html">orbi_get_aggregator</a></span><span class="op">(</span><span class="st">"minimal"</span><span class="op">)</span></span></code></pre></div>
 <pre class="fansi fansi-message"><code>────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">minimal</span> ──────────────────────────────
 </code></pre>
 <pre class="fansi fansi-message"><code><span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:
- → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span>
-<span style="font-style: italic;">fixed = TRUE))</span>
+ → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span>
+<span style="font-style: italic;">ignore.case = TRUE))</span>
  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span>
  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span>
 <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:
@@ -224,20 +317,19 @@ providing access to additional columns from the raw data files.</p>
  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span>
  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span>
  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span>
- → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span>
- → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span>
+ → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span>
 <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:
  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span>
  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span>
  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span>
 </code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/orbi_aggregator.html">orbi_get_aggregator</a></span><span class="op">(</span><span class="st">"extended"</span><span class="op">)</span></span></code></pre></div>
 <pre class="fansi fansi-message"><code>────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">extended</span> ─────────────────────────────
 </code></pre>
 <pre class="fansi fansi-message"><code><span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:
- → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span>
-<span style="font-style: italic;">fixed = TRUE))</span>
+ → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span>
+<span style="font-style: italic;">ignore.case = TRUE))</span>
  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span>
  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span>
  → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span>
@@ -266,18 +358,18 @@ providing access to additional columns from the raw data files.</p>
  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span>
  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span>
  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span>
- → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span>
- → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span>
+ → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span>
 <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:
  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span>
  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span>
  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span>
 </code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using the extended aggregator instead of the default (standard)</span></span>
 <span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="st">"extended"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[969ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
-(138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">extended</span> aggregator
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[745ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+(337), <span style="color: #0000BB;">spectra</span> (943), and <span style="color: #0000BB;">status_log</span> (0) from 2 files using the <span style="font-weight: bold; font-style: italic;">extended</span>
+aggregator
 </code></pre>
 <pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
 </code></pre>
@@ -311,10 +403,13 @@ providing access to additional columns from the raw data files.</p>
 <span style="color: #00BB00;">Id</span>, <span style="color: #00BB00;">Analog In A (V)</span>, <span style="color: #00BB00;">Analog In B (V)</span>, <span style="color: #00BB00;">FAIMS Attached</span>, <span style="color: #00BB00;">FAIMS Voltage On</span>, <span style="color: #00BB00;">FAIMS</span>
 <span style="color: #00BB00;">CV</span>
 </code></pre>
-<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (138): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
-<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">isRefPeak</span>, <span style="color: #00BB00;">isLockPeak</span>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (337): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
+<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">centroiderFlags</span>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">spectra</span> (943): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mz</span>, <span style="color: #00BB00;">intensity</span>
+</code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">status_log</span> (0): <span style="font-style: italic;">nothing aggregated</span>; <span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00;">198 columns</span> → to show all
+use: <span style="font-style: italic;">print(x, show_all = TRUE)</span>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">problems</span>: has <span style="color: #00BB00;">no issues</span>
 </code></pre>
@@ -327,11 +422,16 @@ providing access to additional columns from the raw data files.</p>
 <code>orgi_add_to_aggregator()</code> and then register it via
 <code><a href="../reference/orbi_aggregator.html">orbi_register_aggregator()</a></code>. This funnctionality is rarely
 needed and thus not part of the package structure flowchart.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_agg</span> <span class="op">&lt;-</span> </span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_agg</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_get_aggregator</a></span><span class="op">(</span><span class="st">"minimal"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># pull out the S-Lens RF Level information from the scans and store it as a number</span></span>
-<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span><span class="st">"scans"</span>, <span class="st">"slens_rf"</span>, source <span class="op">=</span> <span class="st">"S-Lens RF Level"</span>, cast <span class="op">=</span> <span class="st">"as.numeric"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"scans"</span>,</span>
+<span>    <span class="st">"slens_rf"</span>,</span>
+<span>    source <span class="op">=</span> <span class="st">"S-Lens RF Level"</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.numeric"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_register_aggregator</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># show my agg summary</span></span>
@@ -339,8 +439,8 @@ needed and thus not part of the package structure flowchart.</p>
 <pre class="fansi fansi-message"><code>────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">minimal</span> ──────────────────────────────
 </code></pre>
 <pre class="fansi fansi-message"><code><span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:
- → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = ".raw", replacement = "",</span>
-<span style="font-style: italic;">fixed = TRUE))</span>
+ → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span>
+<span style="font-style: italic;">ignore.case = TRUE))</span>
  → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span>
  → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span>
 <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:
@@ -358,57 +458,214 @@ needed and thus not part of the package structure flowchart.</p>
  → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span>
  → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span>
  → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span>
- → <span style="color: #00BB00;">isRefPeak</span> = <span style="font-style: italic;">as.logical(is_ref)</span>
- → <span style="color: #00BB00;">isLockPeak</span> = <span style="font-style: italic;">as.logical(is_lock_peak)</span>
+ → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span>
 <span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:
  → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span>
  → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span>
  → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span>
 </code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># use it</span></span>
 <span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[244ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
-(138), and <span style="color: #0000BB;">spectra</span> (943) from 2 files using the <span style="font-weight: bold; font-style: italic;">test</span> aggregator
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[182ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), <span style="color: #0000BB;">peaks</span>
+(337), <span style="color: #0000BB;">spectra</span> (943), and <span style="color: #0000BB;">status_log</span> (0) from 2 files using the <span style="font-weight: bold; font-style: italic;">test</span> aggregator
 </code></pre>
 <pre class="fansi fansi-message"><code>─────── <span style="font-weight: bold;">aggregated data from 2 raw files - retrieve with orbi_get_data()</span> ───────
 </code></pre>
-<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">file_info</span> (2): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">creation_date</span>, <span style="color: #00BB00;">in_aquisition</span>; (<span style="font-style: italic;">not</span>
-<span style="font-style: italic;">aggregated</span>: <span style="color: #BBBB00; font-style: italic;">Operator</span>, <span style="color: #BBBB00; font-style: italic;">FileDescription</span>, <span style="color: #BBBB00; font-style: italic;">MassResolution</span>, <span style="color: #BBBB00; font-style: italic;">SpectraCount</span>,
-<span style="color: #BBBB00; font-style: italic;">FirstSpectrum</span>, <span style="color: #BBBB00; font-style: italic;">LastSpectrum</span>, <span style="color: #BBBB00; font-style: italic;">StartTime</span>, <span style="color: #BBBB00; font-style: italic;">EndTime</span>, <span style="color: #BBBB00; font-style: italic;">LowMass</span>, <span style="color: #BBBB00; font-style: italic;">HighMass</span>,
-<span style="color: #BBBB00; font-style: italic;">InstrumentCount</span>, <span style="color: #BBBB00; font-style: italic;">InstrumentModel</span>, <span style="color: #BBBB00; font-style: italic;">InstrumentName</span>, <span style="color: #BBBB00; font-style: italic;">SerialNumber</span>,
-<span style="color: #BBBB00; font-style: italic;">SoftwareVersion</span>, <span style="color: #BBBB00; font-style: italic;">HardwareVersion</span>, <span style="color: #BBBB00; font-style: italic;">RawFileVersion</span>, <span style="color: #BBBB00; font-style: italic;">InstrumentUnits</span>, <span style="color: #BBBB00; font-style: italic;">Comment</span>,
-<span style="color: #BBBB00; font-style: italic;">SampleId</span>, <span style="color: #BBBB00; font-style: italic;">SampleName</span>, <span style="color: #BBBB00; font-style: italic;">SampleType</span>, <span style="color: #BBBB00; font-style: italic;">SampleWeight</span>, <span style="color: #BBBB00; font-style: italic;">SampleVolume</span>, <span style="color: #BBBB00; font-style: italic;">Barcode</span>,
-<span style="color: #BBBB00; font-style: italic;">RowNumber</span>, <span style="color: #BBBB00; font-style: italic;">Vial</span>, <span style="color: #BBBB00; font-style: italic;">InjectionVolume</span>, <span style="color: #BBBB00; font-style: italic;">DilutionFactor</span>, <span style="color: #BBBB00; font-style: italic;">IstdAmount</span>, <span style="color: #BBBB00; font-style: italic;">CalibrationLevel</span>,
-<span style="color: #BBBB00; font-style: italic;">InstrumentMethodFile</span>, <span style="color: #BBBB00; font-style: italic;">CalibrationFile</span>, <span style="color: #BBBB00; font-style: italic;">ProcessingMethodFile</span>, <span style="color: #BBBB00; font-style: italic;">UserText0</span>,
-<span style="color: #BBBB00; font-style: italic;">UserText1</span>, <span style="color: #BBBB00; font-style: italic;">UserText2</span>, <span style="color: #BBBB00; font-style: italic;">UserText3</span>, <span style="color: #BBBB00; font-style: italic;">UserText4</span>)
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">file_info</span> (2): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">creation_date</span>, <span style="color: #00BB00;">in_aquisition</span>; <span style="font-style: italic;">not</span>
+<span style="font-style: italic;">aggregated</span>: <span style="color: #BBBB00;">39 columns</span> → to show all use: <span style="font-style: italic;">print(x, show_all = TRUE)</span>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">scans</span> (11): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">time.min</span>, <span style="color: #00BB00;">tic</span>, <span style="color: #00BB00;">it.ms</span>, <span style="color: #00BB00;">resolution</span>, <span style="color: #00BB00;">microscans</span>,
-<span style="color: #00BB00;">slens_rf</span>; (<span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00; font-style: italic;">BasePeakIntensity</span>, <span style="color: #BBBB00; font-style: italic;">BasePeakMass</span>, <span style="color: #BBBB00; font-style: italic;">HighMass</span>,
-<span style="color: #BBBB00; font-style: italic;">IsCentroidScan</span>, <span style="color: #BBBB00; font-style: italic;">LowMass</span>, <span style="color: #BBBB00; font-style: italic;">ScanType</span>, <span style="color: #BBBB00; font-style: italic;">Scan Description</span>, <span style="color: #BBBB00; font-style: italic;">Multiple Injection</span>, <span style="color: #BBBB00; font-style: italic;">Multi</span>
-<span style="color: #BBBB00; font-style: italic;">Inject Info</span>, <span style="color: #BBBB00; font-style: italic;">AGC</span>, <span style="color: #BBBB00; font-style: italic;">Scan Segment</span>, <span style="color: #BBBB00; font-style: italic;">Scan Event</span>, <span style="color: #BBBB00; font-style: italic;">Master Index</span>, <span style="color: #BBBB00; font-style: italic;">Master Scan Number</span>,
-<span style="color: #BBBB00; font-style: italic;">Charge State</span>, <span style="color: #BBBB00; font-style: italic;">Monoisotopic M/Z</span>, <span style="color: #BBBB00; font-style: italic;">Error in isotopic envelope fit</span>, <span style="color: #BBBB00; font-style: italic;">Max. Ion Time</span>
-<span style="color: #BBBB00; font-style: italic;">(ms)</span>, <span style="color: #BBBB00; font-style: italic;">MS2 Isolation Width</span>, <span style="color: #BBBB00; font-style: italic;">MS2 Isolation Offset</span>, <span style="color: #BBBB00; font-style: italic;">AGC Target</span>, <span style="color: #BBBB00; font-style: italic;">HCD Energy</span>, <span style="color: #BBBB00; font-style: italic;">HCD</span>
-<span style="color: #BBBB00; font-style: italic;">Energy V</span>, <span style="color: #BBBB00; font-style: italic;">Analyzer Temperature</span>, <span style="color: #BBBB00; font-style: italic;">=== Mass Calibration: ===</span>, <span style="color: #BBBB00; font-style: italic;">Conversion Parameter</span>
-<span style="color: #BBBB00; font-style: italic;">B</span>, <span style="color: #BBBB00; font-style: italic;">Conversion Parameter C</span>, <span style="color: #BBBB00; font-style: italic;">Temperature Comp. (ppm)</span>, <span style="color: #BBBB00; font-style: italic;">RF Comp. (ppm)</span>, <span style="color: #BBBB00; font-style: italic;">Space</span>
-<span style="color: #BBBB00; font-style: italic;">Charge Comp. (ppm)</span>, <span style="color: #BBBB00; font-style: italic;">Resolution Comp. (ppm)</span>, <span style="color: #BBBB00; font-style: italic;">Number of Lock Masses</span>, <span style="color: #BBBB00; font-style: italic;">Lock Mass #1</span>
-<span style="color: #BBBB00; font-style: italic;">(m/z)</span>, <span style="color: #BBBB00; font-style: italic;">Lock Mass #2 (m/z)</span>, <span style="color: #BBBB00; font-style: italic;">Lock Mass #3 (m/z)</span>, <span style="color: #BBBB00; font-style: italic;">LM Search Window (ppm)</span>, <span style="color: #BBBB00; font-style: italic;">LM</span>
-<span style="color: #BBBB00; font-style: italic;">Search Window (mmu)</span>, <span style="color: #BBBB00; font-style: italic;">Number of LM Found</span>, <span style="color: #BBBB00; font-style: italic;">Last Locking (sec)</span>, <span style="color: #BBBB00; font-style: italic;">LM m/z-Correction</span>
-<span style="color: #BBBB00; font-style: italic;">(ppm)</span>, <span style="color: #BBBB00; font-style: italic;">=== Ion Optics Settings: ===</span>, <span style="color: #BBBB00; font-style: italic;">==== Diagnostic Data: ====</span>, <span style="color: #BBBB00; font-style: italic;">Application</span>
-<span style="color: #BBBB00; font-style: italic;">Mode</span>, <span style="color: #BBBB00; font-style: italic;">Mild Trapping Mode</span>, <span style="color: #BBBB00; font-style: italic;">APD</span>, <span style="color: #BBBB00; font-style: italic;">OT Intens Comp Factor</span>, <span style="color: #BBBB00; font-style: italic;">Res. Dep. Intens</span>, <span style="color: #BBBB00; font-style: italic;">Q Trans</span>
-<span style="color: #BBBB00; font-style: italic;">Comp</span>, <span style="color: #BBBB00; font-style: italic;">PrOSA NumF</span>, <span style="color: #BBBB00; font-style: italic;">PrOSA Comp</span>, <span style="color: #BBBB00; font-style: italic;">PrOSA ScScr</span>, <span style="color: #BBBB00; font-style: italic;">RawOvFtT</span>, <span style="color: #BBBB00; font-style: italic;">Dynamic RT Shift (min)</span>,
-<span style="color: #BBBB00; font-style: italic;">Analytical OT usage (%)</span>, <span style="color: #BBBB00; font-style: italic;">LC FWHM parameter</span>, <span style="color: #BBBB00; font-style: italic;">PS Inj. Time (ms)</span>, <span style="color: #BBBB00; font-style: italic;">AGC PS Mode</span>, <span style="color: #BBBB00; font-style: italic;">AGC</span>
-<span style="color: #BBBB00; font-style: italic;">PS Diag</span>, <span style="color: #BBBB00; font-style: italic;">AGC Target Adjust</span>, <span style="color: #BBBB00; font-style: italic;">AGC Diag 1</span>, <span style="color: #BBBB00; font-style: italic;">AGC Diag 2</span>, <span style="color: #BBBB00; font-style: italic;">HCD abs. Offset</span>, <span style="color: #BBBB00; font-style: italic;">Source CID</span>
-<span style="color: #BBBB00; font-style: italic;">eV</span>, <span style="color: #BBBB00; font-style: italic;">AGC Fill</span>, <span style="color: #BBBB00; font-style: italic;">Injection t0</span>, <span style="color: #BBBB00; font-style: italic;">t0 FLP</span>, <span style="color: #BBBB00; font-style: italic;">Iso Para R</span>, <span style="color: #BBBB00; font-style: italic;">Inj Para R</span>, <span style="color: #BBBB00; font-style: italic;">Access Id</span>, <span style="color: #BBBB00; font-style: italic;">Analog</span>
-<span style="color: #BBBB00; font-style: italic;">In A (V)</span>, <span style="color: #BBBB00; font-style: italic;">Analog In B (V)</span>, <span style="color: #BBBB00; font-style: italic;">FAIMS Attached</span>, <span style="color: #BBBB00; font-style: italic;">FAIMS Voltage On</span>, <span style="color: #BBBB00; font-style: italic;">FAIMS CV</span>)
+<span style="color: #00BB00;">slens_rf</span>; <span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00;">74 columns</span> → to show all use: <span style="font-style: italic;">print(x, show_all =</span>
+<span style="font-style: italic;">TRUE)</span>
 </code></pre>
-<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (138): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
-<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">isRefPeak</span>, <span style="color: #00BB00;">isLockPeak</span>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">peaks</span> (337): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mzMeasured</span>, <span style="color: #00BB00;">intensity</span>, <span style="color: #00BB00;">baseline</span>, <span style="color: #00BB00;">peakNoise</span>,
+<span style="color: #00BB00;">peakResolution</span>, <span style="color: #00BB00;">centroiderFlags</span>
 </code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">spectra</span> (943): <span style="color: #00BB00;">uidx</span>, <span style="color: #00BB00;">scan.no</span>, <span style="color: #00BB00;">mz</span>, <span style="color: #00BB00;">intensity</span>
 </code></pre>
+<pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">status_log</span> (0): <span style="font-style: italic;">nothing aggregated</span>; <span style="font-style: italic;">not aggregated</span>: <span style="color: #BBBB00;">198 columns</span> → to show all
+use: <span style="font-style: italic;">print(x, show_all = TRUE)</span>
+</code></pre>
 <pre class="fansi fansi-message"><code>→ <span style="color: #0000BB;">problems</span>: has <span style="color: #00BB00;">no issues</span>
 </code></pre>
+</div>
+<div class="section level4">
+<h4 id="bonus-instrument-status-log">bonus instrument status log<a class="anchor" aria-label="anchor" href="#bonus-instrument-status-log"></a>
+</h4>
+<p>Besides the scans, raw files hold the instrument’s <strong>status
+log</strong>: readbacks that the instrument records independently of the
+scans (typically every few seconds) such as temperatures, vacuum
+pressures, voltages, and ion source settings.
+<code><a href="../reference/orbi_read_raw.html">orbi_read_raw()</a></code> returns it as the <code>status_log</code>
+dataset. Which channels a status log contains depends entirely on the
+instrument, so none of the included aggregators take anything from it.
+Instead, <code><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw()</a></code> reports the available status
+log channels as <em>not aggregated</em> so you can pick the ones you are
+interested in. Printing the aggregated data only says how many there
+are, use <code>print(agg_data, show_all = TRUE)</code> to list all of
+them.</p>
+<p>Here we use two example files from two different instruments (an
+Orbitrap Exploris 240 and a Q Exactive Focus) to show how to aggregate a
+few channels of interest.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># two example files from different instruments</span></span>
+<span><span class="va">status_files</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_get_example_files.html">orbi_get_example_files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dual_inlet.raw"</span>, <span class="st">"s3744.RAW"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_read_raw.html">orbi_read_raw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[92ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">dual_inlet.raw</span> from cache
+</code></pre>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[75ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> read <span style="color: #0000BB;">s3744.RAW</span> from cache
+</code></pre>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[216ms]</span> <span style="font-weight: bold;">orbi_read_raw()</span> finished reading 2 files
+</code></pre>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># the raw status log of the first file (one row per log entry, one column per channel)</span></span>
+<span><span class="va">status_files</span><span class="op">$</span><span class="va">status_log</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 441 × 198</span>
+   log.no StartTime `====  FAIMS Device:  ====` ====  Overall Status:  …¹ Status
+    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> 
+<span style="color: #BCBCBC;"> 1</span>      1   0.006<span style="text-decoration: underline;">93</span> <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 2</span>      2   0.177   <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 3</span>      3   0.347   <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 4</span>      4   0.517   <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 5</span>      5   0.687   <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 6</span>      6   0.858   <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 7</span>      7   1.03    <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 8</span>      8   1.20    <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;"> 9</span>      9   1.37    <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #BCBCBC;">10</span>     10   1.54    <span style="color: #949494;">""</span>                          <span style="color: #949494;">""</span>                        Instr…
+<span style="color: #949494;"># ℹ 431 more rows</span>
+<span style="color: #949494;"># ℹ abbreviated name: ¹​`====  Overall Status:  ====`</span>
+<span style="color: #949494;"># ℹ 193 more variables: Performance &lt;chr&gt;, `======  Ion Source:  ======` &lt;chr&gt;,</span>
+<span style="color: #949494;">#   `Spray Voltage (V)` &lt;chr&gt;, `Spray Current (µA)` &lt;chr&gt;,</span>
+<span style="color: #949494;">#   `Spray Current std. dev. (µA)` &lt;chr&gt;,</span>
+<span style="color: #949494;">#   `Ion Transfer Tube Temperature (°C)` &lt;chr&gt;,</span>
+<span style="color: #949494;">#   `Sheath gas pressure (psi)` &lt;chr&gt;, `Aux gas pressure (psi)` &lt;chr&gt;, …</span>
+</code></pre>
+<p>The status log stores all channel values as text (exactly as the
+instrument reports them), so the aggregator needs to <code>cast</code>
+the channels you want to use to numbers. Because the two instruments
+call the same channels by different names, you can provide the
+alternative names as the <code>source</code> and the aggregator uses
+whichever one exists in each file.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">status_agg</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_get_aggregator</a></span><span class="op">(</span><span class="st">"standard"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># when each status log entry was recorded</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"status_log"</span>,</span>
+<span>    <span class="st">"time.min"</span>,</span>
+<span>    source <span class="op">=</span> <span class="st">"StartTime"</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.numeric"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># temperatures (the channel names differ between the instruments)</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"status_log"</span>,</span>
+<span>    <span class="st">"ambient_temp.C"</span>,</span>
+<span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ambient temp. (°C)"</span>, <span class="st">"Ambient Temperature (°C)"</span><span class="op">)</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.numeric"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"status_log"</span>,</span>
+<span>    <span class="st">"analyzer_temp.C"</span>,</span>
+<span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Orbitrap block temp. (°C)"</span>, <span class="st">"Analyzer Temperature (°C)"</span><span class="op">)</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.numeric"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># ultra high vacuum pressure</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_add_to_aggregator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"status_log"</span>,</span>
+<span>    <span class="st">"uhv_pressure.mbar"</span>,</span>
+<span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ICB: UHV pres. (mbar)"</span>, <span class="st">"UHV Sensor (mbar)"</span><span class="op">)</span>,</span>
+<span>    cast <span class="op">=</span> <span class="st">"as.numeric"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregator.html">orbi_register_aggregator</a></span><span class="op">(</span><span class="st">"standard with status logs"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># show summary</span></span>
+<span><span class="va">status_agg</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code>────────────────────────────── <span style="font-weight: bold;">Aggregator </span><span style="font-weight: bold; font-style: italic;">standard</span> ─────────────────────────────
+</code></pre>
+<pre class="fansi fansi-message"><code><span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">file_info</span>:
+ → <span style="color: #00BB00;">filename</span> = <span style="font-style: italic;">as.character(sub(FileName, pattern = "\\.raw$", replacement = "",</span>
+<span style="font-style: italic;">ignore.case = TRUE))</span>
+ → <span style="color: #00BB00;">creation_date</span> = <span style="font-style: italic;">as.POSIXct(CreationDate)</span>
+ → <span style="color: #00BB00;">in_aquisition</span> = <span style="font-style: italic;">as.logical(InAquisition)</span>
+ → <span style="color: #BB00BB;">(.*)</span> = <span style="font-style: italic;">as.character(all_matches("(.*)"))</span>
+<span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">scans</span>:
+ → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span>
+ → <span style="color: #00BB00;">time.min</span> = <span style="font-style: italic;">as.numeric(StartTime)</span>
+ → <span style="color: #00BB00;">tic</span> = <span style="font-style: italic;">as.numeric(TIC)</span>
+ → <span style="color: #00BB00;">it.ms</span> = <span style="font-style: italic;">as.numeric(`Ion Injection Time (ms)`)</span>
+ → <span style="color: #00BB00;">resolution</span> = <span style="font-style: italic;">as.numeric(one_of(`FT Resolution`, `Orbitrap Resolution`))</span>
+ → <span style="color: #00BB00;">microscans</span> = <span style="font-style: italic;">as.integer(`Micro Scan Count`)</span>
+ → <span style="color: #00BB00;">basePeakMz</span> = <span style="font-style: italic;">as.numeric(BasePeakMass)</span>
+ → <span style="color: #00BB00;">basePeakIntensity</span> = <span style="font-style: italic;">as.numeric(BasePeakIntensity)</span>
+ → <span style="color: #00BB00;">lowMass</span> = <span style="font-style: italic;">as.numeric(LowMass)</span>
+ → <span style="color: #00BB00;">highMass</span> = <span style="font-style: italic;">as.numeric(HighMass)</span>
+ → <span style="color: #00BB00;">rawOvFtT</span> = <span style="font-style: italic;">as.numeric(RawOvFtT)</span>
+ → <span style="color: #00BB00;">intensCompFactor</span> = <span style="font-style: italic;">as.numeric(`OT Intens Comp Factor`)</span>
+ → <span style="color: #00BB00;">agc</span> = <span style="font-style: italic;">as.character(AGC)</span>
+ → <span style="color: #00BB00;">agcTarget</span> = <span style="font-style: italic;">as.integer(`AGC Target`)</span>
+ → <span style="color: #00BB00;">numberLockmassesFound</span> = <span style="font-style: italic;">as.integer(`Number of LM Found`)</span>
+ → <span style="color: #00BB00;">analyzerTemperature</span> = <span style="font-style: italic;">as.numeric(`Analyzer Temperature`)</span>
+<span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">peaks</span>:
+ → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span>
+ → <span style="color: #00BB00;">mzMeasured</span> = <span style="font-style: italic;">as.numeric(mass)</span>
+ → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span>
+ → <span style="color: #00BB00;">baseline</span> = <span style="font-style: italic;">as.numeric(baseline)</span>
+ → <span style="color: #00BB00;">peakNoise</span> = <span style="font-style: italic;">as.numeric(noise)</span>
+ → <span style="color: #00BB00;">peakResolution</span> = <span style="font-style: italic;">as.numeric(resolution)</span>
+ → <span style="color: #00BB00;">centroiderFlags</span> = <span style="font-style: italic;">as.factor(orbi_peak_flags_to_text(flags))</span>
+<span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">spectra</span>:
+ → <span style="color: #00BB00;">scan.no</span> = <span style="font-style: italic;">as.integer(scan.no)</span>
+ → <span style="color: #00BB00;">mz</span> = <span style="font-style: italic;">as.numeric(mass)</span>
+ → <span style="color: #00BB00;">intensity</span> = <span style="font-style: italic;">as.numeric(intensity)</span>
+<span style="font-weight: bold;">Dataset</span> <span style="color: #0000BB;">status_log</span>:
+ → <span style="color: #00BB00;">time.min</span> = <span style="font-style: italic;">as.numeric(StartTime)</span>
+ → <span style="color: #00BB00;">ambient_temp.C</span> = <span style="font-style: italic;">as.numeric(one_of(`Ambient temp. (°C)`, `Ambient</span>
+<span style="font-style: italic;">Temperature (°C)`))</span>
+ → <span style="color: #00BB00;">analyzer_temp.C</span> = <span style="font-style: italic;">as.numeric(one_of(`Orbitrap block temp. (°C)`, `Analyzer</span>
+<span style="font-style: italic;">Temperature (°C)`))</span>
+ → <span style="color: #00BB00;">uhv_pressure.mbar</span> = <span style="font-style: italic;">as.numeric(one_of(`ICB: UHV pres. (mbar)`, `UHV Sensor</span>
+<span style="font-style: italic;">(mbar)`))</span>
+</code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># aggregate with the status log aggregator</span></span>
+<span><span class="va">status_agg_data</span> <span class="op">&lt;-</span> <span class="va">status_files</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_aggregate_raw.html">orbi_aggregate_raw</a></span><span class="op">(</span>aggregator <span class="op">=</span> <span class="st">"standard with status logs"</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[482ms]</span> <span style="font-weight: bold;">orbi_aggregate_raw()</span> aggregated <span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (17.83k), <span style="color: #0000BB;">peaks</span>
+(340.17k), <span style="color: #0000BB;">spectra</span> (0), and <span style="color: #0000BB;">status_log</span> (520) from 2 files using the <span style="font-weight: bold; font-style: italic;">standard</span>
+<span style="font-weight: bold; font-style: italic;">with status logs</span> aggregator
+</code></pre>
+<p>Status log data is a great way to check on the instrument conditions
+during an analysis, for example to see whether the temperatures were
+stable or whether there were any vacuum issues.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># retrieve the status log channels</span></span>
+<span><span class="va">status_log</span> <span class="op">&lt;-</span> <span class="va">status_agg_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span>file_info <span class="op">=</span> <span class="st">"filename"</span>, status_log <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[8ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 520 records from the combination of <span style="color: #0000BB;">file_info</span>
+(2) and <span style="color: #0000BB;">status_log</span> (520) via <span style="color: #00BB00;">uidx</span>
+</code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># bring the channels into long format for plotting them in panels</span></span>
+<span><span class="va">status_log</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span></span>
+<span>    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ambient_temp.C"</span>, <span class="st">"analyzer_temp.C"</span>, <span class="st">"uhv_pressure.mbar"</span><span class="op">)</span>,</span>
+<span>    names_to <span class="op">=</span> <span class="st">"channel"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time.min</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">channel</span> <span class="op">~</span> <span class="va">filename</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"time [min]"</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="functionality_guide_files/figure-html/fig-status-log-1.png" class="r-plt" alt="Instrument temperatures and vacuum pressure recorded in the status logs of the two files." width="768"><p class="caption">
+Instrument temperatures and vacuum pressure recorded in the status logs
+of the two files.
+</p>
+</div>
 </div>
 <div class="section level4">
 <h4 id="bonus-orbi_get_problems">bonus <code>orbi_get_problems()</code><a class="anchor" aria-label="anchor" href="#bonus-orbi_get_problems"></a>
@@ -416,12 +673,12 @@ needed and thus not part of the package structure flowchart.</p>
 <p>There were no problems reading and/or aggregating the raw data so
 these are empty but this can be very helpful to see what went wrong
 during reading or aggregation.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_files</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/problems.html">orbi_get_problems</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre class="fansi fansi-output"><code><span><span class="co"># A tibble: 0 × 6</span></span>
 <span><span class="co"># ℹ 6 variables: uidx &lt;int&gt;, file &lt;chr&gt;, type &lt;chr&gt;, call &lt;chr&gt;, message &lt;chr&gt;,</span></span>
 <span><span class="co">#   condition &lt;list&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/problems.html">orbi_get_problems</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre class="fansi fansi-output"><code><span><span class="co"># A tibble: 0 × 6</span></span>
 <span><span class="co"># ℹ 6 variables: uidx &lt;int&gt;, file &lt;chr&gt;, type &lt;chr&gt;, call &lt;chr&gt;, message &lt;chr&gt;,</span></span>
@@ -438,7 +695,7 @@ of interest from the aggregated data set using
 tibble from <code><a href="../reference/orbi_get_data.html">orbi_get_data()</a></code> instead of the aggregated data
 structure, you can switch to that at any point and use the resulting
 data frame tibble in subsequent functions.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># direct access to the data stored in the aggregated dataset</span></span>
 <span><span class="va">agg_data</span><span class="op">$</span><span class="va">file_info</span></span></code></pre></div>
 <pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 2 × 44</span>
@@ -454,7 +711,7 @@ data frame tibble in subsequent functions.</p>
 <span style="color: #949494;">#   RawFileVersion &lt;chr&gt;, InstrumentUnits &lt;chr&gt;, Comment &lt;chr&gt;, SampleId &lt;chr&gt;,</span>
 <span style="color: #949494;">#   SampleName &lt;chr&gt;, SampleType &lt;chr&gt;, SampleWeight &lt;chr&gt;, …</span>
 </code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">agg_data</span><span class="op">$</span><span class="va">scans</span></span></code></pre></div>
 <pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 11 × 17</span>
     uidx scan.no time.min      tic it.ms resolution microscans basePeakMz
@@ -474,25 +731,25 @@ data frame tibble in subsequent functions.</p>
 <span style="color: #949494;">#   rawOvFtT &lt;dbl&gt;, intensCompFactor &lt;dbl&gt;, agc &lt;chr&gt;, agcTarget &lt;int&gt;,</span>
 <span style="color: #949494;">#   numberLockmassesFound &lt;int&gt;, analyzerTemperature &lt;dbl&gt;</span>
 </code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">agg_data</span><span class="op">$</span><span class="va">peaks</span></span></code></pre></div>
-<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 138 × 9</span>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 337 × 8</span>
     uidx scan.no mzMeasured intensity baseline peakNoise peakResolution
    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>
 <span style="color: #BCBCBC;"> 1</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>211.     8.32      513.          <span style="text-decoration: underline;">70</span>900
 <span style="color: #BCBCBC;"> 2</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>463.     8.32      513.          <span style="text-decoration: underline;">94</span>100
 <span style="color: #BCBCBC;"> 3</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>172.     8.31      513.          <span style="text-decoration: underline;">80</span>300
 <span style="color: #BCBCBC;"> 4</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>116.     8.30      513.          <span style="text-decoration: underline;">87</span>900
-<span style="color: #BCBCBC;"> 5</span>     1       1       62.0  4<span style="text-decoration: underline;">046</span>979      8.28      513.         <span style="text-decoration: underline;">114</span>902
-<span style="color: #BCBCBC;"> 6</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>798.     8.26      513.          <span style="text-decoration: underline;">86</span>300
-<span style="color: #BCBCBC;"> 7</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>444.     8.26      513.          <span style="text-decoration: underline;">93</span>200
-<span style="color: #BCBCBC;"> 8</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>346.     8.25      513.          <span style="text-decoration: underline;">84</span>700
-<span style="color: #BCBCBC;"> 9</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>469.     8.25      513.          <span style="text-decoration: underline;">92</span>400
-<span style="color: #BCBCBC;">10</span>     1       1       62.1     <span style="text-decoration: underline;">1</span>043.     8.16      513.          <span style="text-decoration: underline;">89</span>900
-<span style="color: #949494;"># ℹ 128 more rows</span>
-<span style="color: #949494;"># ℹ 2 more variables: isRefPeak &lt;lgl&gt;, isLockPeak &lt;lgl&gt;</span>
+<span style="color: #BCBCBC;"> 5</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>264.     8.30      513.          <span style="text-decoration: underline;">71</span>108
+<span style="color: #BCBCBC;"> 6</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>265.     8.30      513.          <span style="text-decoration: underline;">70</span>208
+<span style="color: #BCBCBC;"> 7</span>     1       1       62.0     <span style="text-decoration: underline;">2</span>320.     8.30      513.         <span style="text-decoration: underline;">102</span>308
+<span style="color: #BCBCBC;"> 8</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>931.     8.29      513.          <span style="text-decoration: underline;">91</span>808
+<span style="color: #BCBCBC;"> 9</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>731.     8.29      513.         <span style="text-decoration: underline;">106</span>708
+<span style="color: #BCBCBC;">10</span>     1       1       62.0     <span style="text-decoration: underline;">1</span>683.     8.29      513.         <span style="text-decoration: underline;">123</span>008
+<span style="color: #949494;"># ℹ 327 more rows</span>
+<span style="color: #949494;"># ℹ 1 more variable: centroiderFlags &lt;fct&gt;</span>
 </code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">agg_data</span><span class="op">$</span><span class="va">spectra</span></span></code></pre></div>
 <pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 943 × 4</span>
     uidx scan.no    mz intensity
@@ -509,18 +766,22 @@ data frame tibble in subsequent functions.</p>
 <span style="color: #BCBCBC;">10</span>     1       1  62.0      935.
 <span style="color: #949494;"># ℹ 933 more rows</span>
 </code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># better way to retrieve+combine the data with dplyr select syntax:</span></span>
 <span><span class="va">agg_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/orbi_get_data.html">orbi_get_data</a></span><span class="op">(</span></span>
-<span>    file_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"filename"</span>, <span class="st">"creation_date"</span>, <span class="st">"instrument"</span> <span class="op">=</span> <span class="st">"InstrumentModel"</span><span class="op">)</span>,</span>
+<span>    file_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"filename"</span>,</span>
+<span>      <span class="st">"creation_date"</span>,</span>
+<span>      <span class="st">"instrument"</span> <span class="op">=</span> <span class="st">"InstrumentModel"</span></span>
+<span>    <span class="op">)</span>,</span>
 <span>    scans <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time.min"</span>, <span class="st">"tic"</span>, <span class="st">"resolution"</span><span class="op">)</span>,</span>
 <span>    peaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mz"</span> <span class="op">=</span> <span class="st">"mzMeasured"</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"peak"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[15ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 138 records from the combination of
-<span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), and <span style="color: #0000BB;">peaks</span> (138) via <span style="color: #00BB00;">uidx</span> and <span style="color: #00BB00;">scan.no</span>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[12ms]</span> <span style="font-weight: bold;">orbi_get_data()</span> retrieved 337 records from the combination of
+<span style="color: #0000BB;">file_info</span> (2), <span style="color: #0000BB;">scans</span> (11), and <span style="color: #0000BB;">peaks</span> (337) via <span style="color: #00BB00;">uidx</span> and <span style="color: #00BB00;">scan.no</span>
 </code></pre>
-<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 138 × 11</span>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 337 × 11</span>
     uidx filename         creation_date       instrument scan.no time.min    tic
    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>
 <span style="color: #BCBCBC;"> 1</span>     1 nitrate_test_10… 2025-01-30 <span style="color: #949494;">13:57:12</span> Orbitrap …       1  0.004<span style="text-decoration: underline;">54</span> 4.34<span style="color: #949494;">e</span>6
@@ -533,7 +794,7 @@ data frame tibble in subsequent functions.</p>
 <span style="color: #BCBCBC;"> 8</span>     1 nitrate_test_10… 2025-01-30 <span style="color: #949494;">13:57:12</span> Orbitrap …       1  0.004<span style="text-decoration: underline;">54</span> 4.34<span style="color: #949494;">e</span>6
 <span style="color: #BCBCBC;"> 9</span>     1 nitrate_test_10… 2025-01-30 <span style="color: #949494;">13:57:12</span> Orbitrap …       1  0.004<span style="text-decoration: underline;">54</span> 4.34<span style="color: #949494;">e</span>6
 <span style="color: #BCBCBC;">10</span>     1 nitrate_test_10… 2025-01-30 <span style="color: #949494;">13:57:12</span> Orbitrap …       1  0.004<span style="text-decoration: underline;">54</span> 4.34<span style="color: #949494;">e</span>6
-<span style="color: #949494;"># ℹ 128 more rows</span>
+<span style="color: #949494;"># ℹ 327 more rows</span>
 <span style="color: #949494;"># ℹ 4 more variables: resolution &lt;dbl&gt;, mz &lt;dbl&gt;, peakNoise &lt;dbl&gt;,</span>
 <span style="color: #949494;">#   peakResolution &lt;dbl&gt;</span>
 </code></pre>
@@ -547,21 +808,24 @@ data frame tibble in subsequent functions.</p>
 <h3 id="orbi_identify_isotopocules">
 <code>orbi_identify_isotopocules()</code> *<a class="anchor" aria-label="anchor" href="#orbi_identify_isotopocules"></a>
 </h3>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># list of isotopocules (can alternatively be in a tsv/csv/xlsx file)</span></span>
 <span><span class="va">isotopocules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    compound <span class="op">=</span> <span class="st">"nitrate"</span>,</span>
-<span>    isotopolog <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M0"</span>, <span class="st">"15N"</span>, <span class="st">"17O"</span>, <span class="st">"18O"</span><span class="op">)</span>,</span>
-<span>    mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">61.9878</span>, <span class="fl">62.9850</span>, <span class="fl">62.9922</span>, <span class="fl">63.9922</span><span class="op">)</span>,</span>
-<span>    tolerance <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>    charge <span class="op">=</span> <span class="fl">1</span></span>
-<span>  <span class="op">)</span></span>
+<span>  compound <span class="op">=</span> <span class="st">"nitrate"</span>,</span>
+<span>  isotopolog <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M0"</span>, <span class="st">"15N"</span>, <span class="st">"17O"</span>, <span class="st">"18O"</span><span class="op">)</span>,</span>
+<span>  mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">61.9878</span>, <span class="fl">62.9850</span>, <span class="fl">62.9922</span>, <span class="fl">63.9922</span><span class="op">)</span>,</span>
+<span>  tolerance <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  charge <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># identify</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">agg_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_identify_isotopocules.html">orbi_identify_isotopocules</a></span><span class="op">(</span><span class="va">isotopocules</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[38ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 44/138 peaks (32%)
-representing 100% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
-and <span style="color: #00BB00;">18O</span>
+<pre class="fansi fansi-message"><code><span style="color: #BBBB00;">!</span> <span style="color: #B2B2B2;">[39ms]</span> <span style="font-weight: bold;">orbi_identify_isotopocules()</span> identified 50/337 peaks (15%)
+representing 96% of the total ion current (TIC) as isotopocules <span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">15N</span>, <span style="color: #00BB00;">17O</span>,
+and <span style="color: #00BB00;">18O</span> but encountered <span style="color: #BBBB00;">1 warning</span>
+  → <span style="color: #BBBB00;">!</span> isotopocule <span style="color: #00BB00;">M0</span> matches multiple peaks in some same scans (4 multi-matched
+  peaks in total) - make sure to run <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> and
+  <span style="font-weight: bold;">orbi_plot_satellite_peak()</span>
 </code></pre>
 </div>
 <div class="section level3">
@@ -574,44 +838,188 @@ and <span style="color: #00BB00;">18O</span>
 <h2 id="data-checks">Data checks<a class="anchor" aria-label="anchor" href="#data-checks"></a>
 </h2>
 <div class="section level3">
-<h3 id="orbi_flag_satellite_peas">
-<code>orbi_flag_satellite_peas()</code> *<a class="anchor" aria-label="anchor" href="#orbi_flag_satellite_peas"></a>
+<h3 id="orbi_flag_satellite_peaks">
+<code>orbi_flag_satellite_peaks()</code> *<a class="anchor" aria-label="anchor" href="#orbi_flag_satellite_peaks"></a>
 </h3>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># this can happen here or later on in the workflow</span></span>
 <span><span class="co"># in the case of these files there are no satellite peaks</span></span>
-<span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_plot_satellite_peaks.html">orbi_plot_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[10ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> confirmed there are no <span style="color: #BBBB00;">satellite</span> peaks
+<span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_filter_files.html">orbi_filter_files</a></span><span class="op">(</span><span class="st">"nitrate_test_10scans"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_flag_satellite_peaks.html">orbi_flag_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_plot_satellite_peaks.html">orbi_plot_satellite_peaks</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[9ms]</span> <span style="font-weight: bold;">orbi_filter_files()</span> filtered the dataset by <span style="color: #00BB00;">filenames</span>
+<span style="color: #00BB00;">(nitrate_test_10scans)</span> and removed a total of 30/337 peaks (8.9%)
 </code></pre>
-<pre class="fansi fansi-message"><code>`geom_line()`: Each group consists of only one observation.
-<span style="color: #00BBBB;">ℹ</span> Do you need to adjust the <span style="color: #00BB00;">group</span> aesthetic?
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[7ms]</span> <span style="font-weight: bold;">orbi_flag_satellite_peaks()</span> flagged 6/307 peaks in 1 isotopocule (<span style="color: #00BB00;">M0</span>)
+as <span style="color: #BBBB00;">satellite</span> peaks (2%)
 </code></pre>
-<p><img src="functionality_guide_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
+<div class="figure">
+<img src="functionality_guide_files/figure-html/fig-satellite-peaks-1.png" class="r-plt" alt="Satellite peaks in the 10 scan test file." width="576"><p class="caption">
+Satellite peaks in the 10 scan test file.
+</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="orbi_plot_isotopocule_coverage">
 <code>orbi_plot_isotopocule_coverage()</code><a class="anchor" aria-label="anchor" href="#orbi_plot_isotopocule_coverage"></a>
 </h3>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># this can happen here or later on in the workflow</span></span>
 <span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_isotopocule_coverage.html">orbi_get_isotopocule_coverage</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 8 × 10</span>
-   uidx filename        compound isotopocule data_stretch n_points start_scan.no
-  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>
-<span style="color: #BCBCBC;">1</span>     1 nitrate_test_1… nitrate  M0                     0       10             1
-<span style="color: #BCBCBC;">2</span>     1 nitrate_test_1… nitrate  15N                    0       10             1
-<span style="color: #BCBCBC;">3</span>     1 nitrate_test_1… nitrate  17O                    0       10             1
-<span style="color: #BCBCBC;">4</span>     1 nitrate_test_1… nitrate  18O                    0       10             1
-<span style="color: #BCBCBC;">5</span>     2 nitrate_test_1… nitrate  M0                     0        1             1
-<span style="color: #BCBCBC;">6</span>     2 nitrate_test_1… nitrate  15N                    0        1             1
-<span style="color: #BCBCBC;">7</span>     2 nitrate_test_1… nitrate  17O                    0        1             1
-<span style="color: #BCBCBC;">8</span>     2 nitrate_test_1… nitrate  18O                    0        1             1
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 12 × 11</span>
+    uidx filename     compound isotopocule centroiderFlags data_stretch n_points
+   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>
+<span style="color: #BCBCBC;"> 1</span>     1 nitrate_tes… nitrate  M0          exception                  0        1
+<span style="color: #BCBCBC;"> 2</span>     1 nitrate_tes… nitrate  M0          none                       0       10
+<span style="color: #BCBCBC;"> 3</span>     1 nitrate_tes… nitrate  M0          exception                  1        2
+<span style="color: #BCBCBC;"> 4</span>     1 nitrate_tes… nitrate  M0          exception                  2        2
+<span style="color: #BCBCBC;"> 5</span>     1 nitrate_tes… nitrate  M0          exception                  3        1
+<span style="color: #BCBCBC;"> 6</span>     1 nitrate_tes… nitrate  15N         none                       0       10
+<span style="color: #BCBCBC;"> 7</span>     1 nitrate_tes… nitrate  17O         none                       0       10
+<span style="color: #BCBCBC;"> 8</span>     1 nitrate_tes… nitrate  18O         none                       0       10
+<span style="color: #BCBCBC;"> 9</span>     2 nitrate_tes… nitrate  M0          none                       0        1
+<span style="color: #BCBCBC;">10</span>     2 nitrate_tes… nitrate  15N         none                       0        1
+<span style="color: #BCBCBC;">11</span>     2 nitrate_tes… nitrate  17O         none                       0        1
+<span style="color: #BCBCBC;">12</span>     2 nitrate_tes… nitrate  18O         none                       0        1
+<span style="color: #949494;"># ℹ 4 more variables: start_scan.no &lt;int&gt;, end_scan.no &lt;int&gt;,</span>
+<span style="color: #949494;">#   start_time.min &lt;dbl&gt;, end_time.min &lt;dbl&gt;</span>
+</code></pre>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_filter_files.html">orbi_filter_files</a></span><span class="op">(</span><span class="st">"nitrate_test_10scans"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_isotopocule_coverage.html">orbi_plot_isotopocule_coverage</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[8ms]</span> <span style="font-weight: bold;">orbi_filter_files()</span> filtered the dataset by <span style="color: #00BB00;">filenames</span>
+<span style="color: #00BB00;">(nitrate_test_10scans)</span> and removed a total of 30/337 peaks (8.9%)
+</code></pre>
+<div class="figure">
+<img src="functionality_guide_files/figure-html/fig-coverage-1.png" class="r-plt" alt="Isotopocule coverage of the 10 scan test file." width="768"><p class="caption">
+Isotopocule coverage of the 10 scan test file.
+</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="data-blocks">Data blocks<a class="anchor" aria-label="anchor" href="#data-blocks"></a>
+</h2>
+<div class="section level3">
+<h3 id="orbi_define_blocks">
+<code>orbi_define_blocks()</code><a class="anchor" aria-label="anchor" href="#orbi_define_blocks"></a>
+</h3>
+<p>Data blocks mark which scans belong together (e.g. one sample in a
+flow injection) and which scans are not used for the ratio calculations.
+Each block is defined either by time (<code>start_time.min</code> and
+<code>end_time.min</code>) or by scan number (<code>start_scan.no</code>
+and <code>end_scan.no</code>). By default, a block is added to every
+file.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># one block for all files (by time)</span></span>
+<span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_define_blocks.html">orbi_define_blocks</a></span><span class="op">(</span>start_time.min <span class="op">=</span> <span class="fl">0</span>, end_time.min <span class="op">=</span> <span class="fl">0.015</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_get_blocks_info.html">orbi_get_blocks_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[38ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 2 files
+</code></pre>
+<pre><code> → block: covers scans 1 to 5 (0.00399154 to 0.0133997 min) in 2 files</code></pre>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 3 × 11</span>
+   uidx filename     data_group block block_name data_type segment start_scan.no
+  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>
+<span style="color: #BCBCBC;">1</span>     1 nitrate_tes…          1     1 <span style="color: #BB0000;">NA</span>         data           <span style="color: #BB0000;">NA</span>             1
+<span style="color: #BCBCBC;">2</span>     1 nitrate_tes…          2     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>             6
+<span style="color: #BCBCBC;">3</span>     2 nitrate_tes…          1     1 <span style="color: #BB0000;">NA</span>         data           <span style="color: #BB0000;">NA</span>             1
 <span style="color: #949494;"># ℹ 3 more variables: end_scan.no &lt;int&gt;, start_time.min &lt;dbl&gt;,</span>
 <span style="color: #949494;">#   end_time.min &lt;dbl&gt;</span>
 </code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_isotopocule_coverage.html">orbi_plot_isotopocule_coverage</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="functionality_guide_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
+<p>To add a block only to specific file(s), use
+<code>in_filename</code>. Like all the other parameters, it can be a
+single value or a vector with one value per block.</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># two blocks (by scan number) only in the 10 scan file</span></span>
+<span><span class="va">blocks_data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_define_blocks.html">orbi_define_blocks</a></span><span class="op">(</span></span>
+<span>    start_scan.no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>    end_scan.no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span>,</span>
+<span>    block_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first"</span>, <span class="st">"second"</span><span class="op">)</span>,</span>
+<span>    in_filename <span class="op">=</span> <span class="st">"nitrate_test_10scans"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[58ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 1 file
+</code></pre>
+<pre class="fansi fansi-message"><code> → block <span style="color: #00BB00;">first</span> in <span style="color: #0000BB;">nitrate_test_10scans</span>: covers scans 2 to 4 (0.00675358 to
+0.0111844 min)
+ → block <span style="color: #00BB00;">second</span> in <span style="color: #0000BB;">nitrate_test_10scans</span>: covers scans 6 to 9 (0.0156155 to
+0.0224996 min)
+</code></pre>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># overview of the blocks in each file</span></span>
+<span><span class="va">blocks_data</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/orbi_get_blocks_info.html">orbi_get_blocks_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 6 × 11</span>
+   uidx filename     data_group block block_name data_type segment start_scan.no
+  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>
+<span style="color: #BCBCBC;">1</span>     1 nitrate_tes…          1     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>             1
+<span style="color: #BCBCBC;">2</span>     1 nitrate_tes…          2     1 first      data           <span style="color: #BB0000;">NA</span>             2
+<span style="color: #BCBCBC;">3</span>     1 nitrate_tes…          3     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>             5
+<span style="color: #BCBCBC;">4</span>     1 nitrate_tes…          4     2 second     data           <span style="color: #BB0000;">NA</span>             6
+<span style="color: #BCBCBC;">5</span>     1 nitrate_tes…          5     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>            10
+<span style="color: #BCBCBC;">6</span>     2 nitrate_tes…          1     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>             1
+<span style="color: #949494;"># ℹ 3 more variables: end_scan.no &lt;int&gt;, start_time.min &lt;dbl&gt;,</span>
+<span style="color: #949494;">#   end_time.min &lt;dbl&gt;</span>
+</code></pre>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">blocks_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_filter_files.html">orbi_filter_files</a></span><span class="op">(</span><span class="st">"nitrate_test_10scans"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_plot_raw_data.html">orbi_plot_raw_data</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">tic</span> <span class="op">*</span> <span class="va">it.ms</span>, x <span class="op">=</span> <span class="st">"scan.no"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="co"># add the data points for clarity</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[8ms]</span> <span style="font-weight: bold;">orbi_filter_files()</span> filtered the dataset by <span style="color: #00BB00;">filenames</span>
+<span style="color: #00BB00;">(nitrate_test_10scans)</span> and removed a total of 30/337 peaks (8.9%)
+</code></pre>
+<div class="figure">
+<img src="functionality_guide_files/figure-html/fig-blocks-1.png" class="r-plt" alt="The two blocks defined in the 10 scan test file (scans outside the blocks are unused)." width="768"><p class="caption">
+The two blocks defined in the 10 scan test file (scans outside the
+blocks are unused).
+</p>
+</div>
+<p>For many blocks, it is often easier to provide them as a
+<code>blocks_table</code> (which could also come from a spreadsheet)
+with one row per block. An <code>in_filename</code> of <code>NA</code>
+adds that block to all files.</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">blocks_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  start_scan.no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>  end_scan.no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span>,</span>
+<span>  block_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"all"</span>, <span class="st">"first"</span>, <span class="st">"second"</span><span class="op">)</span>,</span>
+<span>  in_filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">"nitrate_test_10scans"</span>, <span class="st">"nitrate_test_10scans"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">blocks_table</span></span></code></pre></div>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 3 × 4</span>
+  start_scan.no end_scan.no block_name in_filename         
+          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               
+<span style="color: #BCBCBC;">1</span>             1           1 all        <span style="color: #BB0000;">NA</span>                  
+<span style="color: #BCBCBC;">2</span>             2           4 first      nitrate_test_10scans
+<span style="color: #BCBCBC;">3</span>             6           9 second     nitrate_test_10scans
+</code></pre>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_define_blocks.html">orbi_define_blocks</a></span><span class="op">(</span>blocks_table <span class="op">=</span> <span class="va">blocks_table</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/orbi_get_blocks_info.html">orbi_get_blocks_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre class="fansi fansi-message"><code><span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[90ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 3 blocks to 2 files
+</code></pre>
+<pre class="fansi fansi-message"><code> → block <span style="color: #00BB00;">all</span>: covers scans 1 to 1 (0.00399154 to 0.00453811 min) in 2 files
+ → block <span style="color: #00BB00;">first</span> in <span style="color: #0000BB;">nitrate_test_10scans</span>: covers scans 2 to 4 (0.00675358 to
+0.0111844 min)
+ → block <span style="color: #00BB00;">second</span> in <span style="color: #0000BB;">nitrate_test_10scans</span>: covers scans 6 to 9 (0.0156155 to
+0.0224996 min)
+</code></pre>
+<pre class="fansi fansi-output"><code><span style="color: #949494;"># A tibble: 6 × 11</span>
+   uidx filename     data_group block block_name data_type segment start_scan.no
+  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>
+<span style="color: #BCBCBC;">1</span>     1 nitrate_tes…          1     1 all        data           <span style="color: #BB0000;">NA</span>             1
+<span style="color: #BCBCBC;">2</span>     1 nitrate_tes…          2     2 first      data           <span style="color: #BB0000;">NA</span>             2
+<span style="color: #BCBCBC;">3</span>     1 nitrate_tes…          3     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>             5
+<span style="color: #BCBCBC;">4</span>     1 nitrate_tes…          4     3 second     data           <span style="color: #BB0000;">NA</span>             6
+<span style="color: #BCBCBC;">5</span>     1 nitrate_tes…          5     0 <span style="color: #BB0000;">NA</span>         unused         <span style="color: #BB0000;">NA</span>            10
+<span style="color: #BCBCBC;">6</span>     2 nitrate_tes…          1     1 all        data           <span style="color: #BB0000;">NA</span>             1
+<span style="color: #949494;"># ℹ 3 more variables: end_scan.no &lt;int&gt;, start_time.min &lt;dbl&gt;,</span>
+<span style="color: #949494;">#   end_time.min &lt;dbl&gt;</span>
+</code></pre>
 </div>
 </div>
 <div class="section level2">

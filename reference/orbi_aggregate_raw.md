@@ -61,4 +61,6 @@ orbi_aggregate_raw(
 ## Value
 
 a list of merged dataframes collected from the `files_data` based on the
-`aggregator` definitions
+`aggregator` definitions. Printing it summarizes the aggregated columns
+of each dataset along with how many columns were not aggregated, use
+`print(x, show_all = TRUE)` to list all of the not aggregated columns.

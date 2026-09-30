@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **Caj Neubauer**. Author, maintainer, copyright holder.
+- **Caj Neubauer**. Author, maintainer.
   [](https://orcid.org/0000-0002-5348-5609)
 
 - **Sebastian Kopf**. Author. [](https://orcid.org/0000-0002-2044-0201)
@@ -13,7 +13,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/isoverse/isoorbi/blob/isoraw-v0.3.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/isoverse/isoorbi/blob/main/inst/CITATION)
 
 Kantnerova et al.
 
