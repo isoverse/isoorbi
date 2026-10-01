@@ -20,6 +20,7 @@ orbi_plot_raw_data(
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
+  use_data_block_names = FALSE,
   show_outliers = TRUE
 )
 }
@@ -28,7 +29,7 @@ orbi_plot_raw_data(
 
 \item{isotopocules}{which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)}
 
-\item{x}{x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"}
+\item{x}{which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.}
 
 \item{x_breaks}{what breaks to use for the x axis. By default (\code{NULL}) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. \verb{1:30 min}), provide breaks to make more specific tickmarks. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
 
@@ -51,6 +52,8 @@ orbi_plot_raw_data(
 \item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 
 \item{add_all_blocks}{add highlight for all blocks, not just data blocks (equivalent to the \code{data_only = FALSE} argument in \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}})}
+
+\item{use_data_block_names}{whether to label the data blocks by their individual \code{block_name} (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.}
 
 \item{show_outliers}{whether to highlight data previously flagged as outliers by \code{\link[=orbi_flag_outliers]{orbi_flag_outliers()}}}
 }

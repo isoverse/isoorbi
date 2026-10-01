@@ -1119,6 +1119,52 @@ test_that("orbi_add_blocks_to_plot()", {
     "intensity plot with blocks",
     orbi_plot_raw_data(df, y = ions.incremental)
   )
+
+  # block labels in the legend: data blocks as "data" (default) or by name
+  fill_labels <- function(plot) {
+    ggplot2::ggplot_build(plot)$plot$scales$get_scales("fill")$get_limits()
+  }
+  expect_equal(
+    fill_labels(orbi_plot_raw_data(df, y = ions.incremental)),
+    "data"
+  )
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, use_data_block_names = TRUE)
+    ),
+    c("ref", "sam")
+  )
+  # other blocks keep their data type
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, add_all_blocks = TRUE)
+    ),
+    c("changeover", "data")
+  )
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        add_all_blocks = TRUE,
+        use_data_block_names = TRUE
+      )
+    ),
+    c("ref", "sam", "changeover")
+  )
+  # unnamed data blocks are still labeled as "data"
+  expect_equal(
+    df |>
+      dplyr::mutate(block_name = NA_character_) |>
+      orbi_plot_raw_data(y = ions.incremental, use_data_block_names = TRUE) |>
+      fill_labels(),
+    "data"
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental) |>
+      orbi_add_blocks_to_plot(use_data_block_names = "yes"),
+    "use_data_block_names.*must be TRUE or FALSE"
+  )
 })
 
 test_that("find_scan_from_time()", {

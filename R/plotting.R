@@ -776,6 +776,7 @@ orbi_plot_satellite_peaks <- function(
 #' @param color expression for what to use for the color aesthetic, default is isotopocule
 #' @param add_data_blocks add highlight for data blocks if there are any block definitions in the dataset (uses [orbi_add_blocks_to_plot()]). To add blocks manually, set `add_data_blocks = FALSE` and manually call the `orbi_add_blocks_to_plot()` function afterwards.
 #' @param add_all_blocks add highlight for all blocks, not just data blocks (equivalent to the `data_only = FALSE` argument in [orbi_add_blocks_to_plot()])
+#' @inheritParams orbi_add_blocks_to_plot
 #' @param show_outliers whether to highlight data previously flagged as outliers by [orbi_flag_outliers()]
 #' @inheritParams orbi_plot_satellite_peaks
 #' @return a ggplot object
@@ -805,6 +806,7 @@ orbi_plot_raw_data <- function(
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
+  use_data_block_names = FALSE,
   show_outliers = TRUE
 ) {
   # safety checks
@@ -991,15 +993,36 @@ orbi_plot_raw_data <- function(
 
   # blocks
   if (add_all_blocks && has_blocks(plot_df)) {
-    plot <- plot |> orbi_add_blocks_to_plot(x = x_column)
-  } else if (add_data_blocks && has_blocks(plot_df)) {
     plot <- plot |>
       orbi_add_blocks_to_plot(
         x = x_column,
-        data_only = TRUE,
-        fill_colors = "gray80",
-        show.legend = TRUE
+        use_data_block_names = use_data_block_names
       )
+  } else if (add_data_blocks && has_blocks(plot_df)) {
+    # data blocks are all gray unless they are color coded by their names
+    has_data_block_names <- use_data_block_names &&
+      any(
+        !is.na(plot_df$block_name) &
+          plot_df$data_type == orbi_get_option("data_type_data")
+      )
+    plot <- if (has_data_block_names) {
+      plot |>
+        orbi_add_blocks_to_plot(
+          x = x_column,
+          data_only = TRUE,
+          use_data_block_names = TRUE,
+          show.legend = TRUE
+        )
+    } else {
+      plot |>
+        orbi_add_blocks_to_plot(
+          x = x_column,
+          data_only = TRUE,
+          use_data_block_names = FALSE,
+          fill_colors = "gray80",
+          show.legend = TRUE
+        )
+    }
   }
 
   # outliers

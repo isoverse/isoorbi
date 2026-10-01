@@ -1068,7 +1068,8 @@ orbi_get_blocks_info <- function(
 #' @param plot object with a dataset that has defined blocks
 #' @param x which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.
 #' @param data_only if set to TRUE, only the blocks flagged as "data" (`orbi_get_option("data_type_data")`) are highlighted
-#' @param fill what to use for the fill aesthetic, default is the block `data_type`
+#' @param use_data_block_names whether to label the data blocks by their individual `block_name` (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.
+#' @param fill what to use for the fill aesthetic, default is the `block_label`, i.e. the block's `data_type` or, for data blocks with `use_data_block_names = TRUE`, the `block_name`
 #' @param fill_colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
 #' @param fill_scale use this parameter to replace the entire fill scale rather than just the `fill_colors`
 #' @param alpha opacity settings for the background
@@ -1079,7 +1080,8 @@ orbi_add_blocks_to_plot <- function(
   plot,
   x = c("guess", "scan.no", "time.min"),
   data_only = FALSE,
-  fill = .data$data_type,
+  use_data_block_names = FALSE,
+  fill = .data$block_label,
   fill_colors = c(
     "#1B9E77",
     "#D95F02",
@@ -1101,6 +1103,11 @@ orbi_add_blocks_to_plot <- function(
     "has to be a ggplot"
   )
   x_column <- arg_match(x)
+  check_arg(
+    use_data_block_names,
+    is_bool(use_data_block_names),
+    "must be TRUE or FALSE"
+  )
 
   # check if it's a log y axis
   y_axis <- plot$scales$scales[[which(plot$scales$find("y"))[1]]]
@@ -1135,9 +1142,27 @@ orbi_add_blocks_to_plot <- function(
       df <- df |>
         dplyr::filter(.data$data_type == orbi_get_option("data_type_data"))
     }
-    blocks <- df |> orbi_get_blocks_info()
+    blocks <- df |>
+      orbi_get_blocks_info() |>
+      dplyr::filter(!is.na(.data$block))
+
+    # block labels: the data type or (if requested) the name of data blocks
+    data_type <- as.character(blocks$data_type)
+    is_named_data <- use_data_block_names &
+      data_type == orbi_get_option("data_type_data") &
+      !is.na(blocks$block_name)
+    block_label <- ifelse(is_named_data, blocks$block_name, data_type)
+    # named data blocks first (in the order they occur), then the data types
+    blocks$block_label <- factor(
+      block_label,
+      levels = unique(c(
+        block_label[is_named_data],
+        levels(factor(blocks$data_type))
+      ))
+    ) |>
+      droplevels()
+
     blocks |>
-      dplyr::filter(!is.na(.data$block)) |>
       dplyr::mutate(
         .by = dplyr::any_of(c("uidx", "filename")),
         xmin = if (!!x_column == "time.min") {
