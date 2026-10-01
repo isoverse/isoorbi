@@ -65,7 +65,7 @@ numbers_to_text <- function(
 # convert seconds to pretty time
 secs_to_text <- function(secs) {
   stopifnot(is.numeric(secs))
-  tibble(
+  out <- tibble(
     idx = seq_along(secs),
     d = floor(secs / 86400),
     h = floor((secs / 3600) %% 24),
@@ -96,6 +96,11 @@ secs_to_text <- function(secs) {
       )
     ) |>
     dplyr::pull("out")
+
+  # special cases (Inf, -Inf) pass through as-is
+  is_inf <- is.infinite(secs)
+  out[is_inf] <- as.character(secs[is_inf])
+  return(out)
 }
 
 # convert minutes to pretty time

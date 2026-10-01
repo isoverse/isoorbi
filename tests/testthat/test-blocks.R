@@ -127,7 +127,7 @@ test_that("orbi_define_blocks()", {
   # ... and by time, which is treated the same way (the file's time range is named)
   orbi_define_blocks(test_data, start_time.min = 5, end_time.min = 6) |>
     suppressMessages() |>
-    expect_warning("outside the data in 2 files.*covers 0.1 to 0.6 min")
+    expect_warning("outside the data in 2 files.*covers 6s to 36s")
   orbi_define_blocks(test_data, start_time.min = 0.001, end_time.min = 0.01) |>
     suppressMessages() |>
     expect_warning("outside the data in 2 files")
@@ -153,7 +153,7 @@ test_that("orbi_define_blocks()", {
   expect_message(
     orbi_define_blocks(multi_data, start_time.min = 0, end_time.min = 99) |>
       expect_message("added 1 block"),
-    "covers scans 1 to 10 \\(0.1 to 1 min\\) in 2 files"
+    "covers scans 1 to 10 \\(6s to 1m\\) in 2 files"
   )
   # and says so when a block could not be added anywhere
   suppressWarnings(
@@ -277,7 +277,7 @@ test_that("orbi_define_blocks()", {
       in_filename = "test2"
     ) |>
       expect_message("added 1 block to 1 file"),
-    "block in test2: covers scans 1 to 2 \\(0.1 to 0.2 min\\)\\s*$"
+    "block in test2: covers scans 1 to 2 \\(6s to 12s\\)\\s*$"
   )
 
   # in_filename is recycled like the other parameters, so the same block for

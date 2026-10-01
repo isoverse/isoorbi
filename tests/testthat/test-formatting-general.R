@@ -27,5 +27,10 @@ test_that("secs_to_text()", {
   expect_equal(secs_to_text(65), "1m 5s")
   expect_equal(secs_to_text(3661), "1h 1m 1s")
   expect_equal(secs_to_text(c(0.5, 65)), c("500ms", "1m 5s"))
+  # special values pass through
+  expect_equal(
+    secs_to_text(c(65, Inf, -Inf, NA)),
+    c("1m 5s", "Inf", "-Inf", NA)
+  )
   expect_error(secs_to_text("x"))
 })

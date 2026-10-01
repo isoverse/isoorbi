@@ -650,24 +650,24 @@ orbi_adjust_block <- function(
 
   if (change_start) {
     sprintf(
-      "{cli::symbol$arrow_right} moved {.field block %d} start from {.field scan.no} %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} start from {.field scan.no} %d (%s) to %d (%s)",
       block,
       old_start_scan,
-      old_start_time,
+      mins_to_text(old_start_time),
       new_start_scan,
-      new_start_time
+      mins_to_text(new_start_time)
     ) |>
       setNames(" ") |>
       cli_bullets()
   }
   if (change_end) {
     sprintf(
-      "{cli::symbol$arrow_right} moved {.field block %d} end from scan %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} end from scan %d (%s) to %d (%s)",
       block,
       old_end_scan,
-      old_end_time,
+      mins_to_text(old_end_time),
       new_end_scan,
-      new_end_time
+      mins_to_text(new_end_time)
     ) |>
       setNames(" ") |>
       cli_bullets()
@@ -1543,7 +1543,7 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
       \(i) {
         file_range <- if (set_by_time) {
           format_inline(
-            "covers {signif(unmatched$file_start_time[i])} to {signif(unmatched$file_end_time[i])} min"
+            "covers {mins_to_text(unmatched$file_start_time[i])} to {mins_to_text(unmatched$file_end_time[i])}"
           )
         } else {
           format_inline(
@@ -1690,9 +1690,9 @@ describe_blocks <- function(blocks_table) {
   where <- ifelse(
     !is.na(blocks_table$start_time.min),
     sprintf(
-      "%s to %s min",
-      blocks_table$start_time.min,
-      blocks_table$end_time.min
+      "%s to %s",
+      mins_to_text(blocks_table$start_time.min),
+      mins_to_text(blocks_table$end_time.min)
     ),
     sprintf(
       "scan %s to %s",
@@ -1723,7 +1723,7 @@ describe_block_coverage <- function(block_def, coverage) {
   )
   if (!all(is.na(added$start_time))) {
     covers <- format_inline(
-      "{covers} ({signif(min(added$start_time))} to {signif(max(added$end_time))} min)"
+      "{covers} ({mins_to_text(min(added$start_time))} to {mins_to_text(max(added$end_time))})"
     )
   }
   if (for_one_file) {
@@ -1916,8 +1916,8 @@ find_scan_from_time <- function(
     }
     cli_abort(
       c(
-        "invalid {which} time ({signif(time)} minutes){file_info}",
-        "i" = "the time ranges from {signif(min(scans$time.min))} to {signif(max(scans$time.min))} minutes"
+        "invalid {which} time ({mins_to_text(time)}){file_info}",
+        "i" = "the time ranges from {mins_to_text(min(scans$time.min))} to {mins_to_text(max(scans$time.min))}"
       ),
       call = .env
     )

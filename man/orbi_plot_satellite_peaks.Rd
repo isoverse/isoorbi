@@ -9,7 +9,9 @@ orbi_plot_satellite_peaks(
   isotopocules = c(),
   x = c("scan.no", "time.min"),
   y = c("ions.incremental", "intensity"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   y_scale = c("log", "pseudo-log", "linear", "raw"),
   y_scale_sci_labels = TRUE,
   colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D",
@@ -26,7 +28,11 @@ orbi_plot_satellite_peaks(
 
 \item{y}{y-axis column for the plot, typially either "ions.incremental" or "intensity", default is "ions.incremental" (falls back to "intensity" if "ions.incremental" has not been calculated yet for the provided dataset)}
 
-\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
+\item{x_breaks}{what breaks to use for the x axis. By default (\code{NULL}) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. \verb{1:30 min}), provide breaks to make more specific tickmarks. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{n_x_breaks}{the desired number of x axis breaks when using the default pretty breaks (\code{x_breaks = NULL}), default: \code{5}. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{short_time_labels}{whether to use compact time axis labels with no space between value and unit and abbreviated units (\code{hr}, \code{m}, \code{s}), e.g. \verb{1:30m} instead of \verb{1:30 min}. Only relevant for a time based x axis (\code{x = "time.min"}).}
 
 \item{y_scale}{what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "linear" scale, or "raw" (if you want to add a y scale to the plot manually instead)}
 

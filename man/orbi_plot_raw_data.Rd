@@ -8,7 +8,9 @@ orbi_plot_raw_data(
   dataset,
   isotopocules = c(),
   x = c("time.min", "scan.no"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   y,
   y_scale = c("raw", "linear", "pseudo-log", "log"),
   y_scale_sci_labels = TRUE,
@@ -28,7 +30,11 @@ orbi_plot_raw_data(
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"}
 
-\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
+\item{x_breaks}{what breaks to use for the x axis. By default (\code{NULL}) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. \verb{1:30 min}), provide breaks to make more specific tickmarks. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{n_x_breaks}{the desired number of x axis breaks when using the default pretty breaks (\code{x_breaks = NULL}), default: \code{5}. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{short_time_labels}{whether to use compact time axis labels with no space between value and unit and abbreviated units (\code{hr}, \code{m}, \code{s}), e.g. \verb{1:30m} instead of \verb{1:30 min}. Only relevant for a time based x axis (\code{x = "time.min"}).}
 
 \item{y}{expression for what to plot on the y-axis, e.g. \code{intensity}, \code{tic * it.ms} (pick one \code{isotopocules} as this is identical for different istopocules), \code{ratio}. Depending on the variable, you may want to adjust the \code{y_scale} and potentially \code{y_scale_sci_labels} argument.}
 

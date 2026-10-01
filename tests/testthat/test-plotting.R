@@ -154,6 +154,87 @@ test_that("orbi_plot_raw_data() tests", {
     orbi_plot_raw_data(df, y = ions.incremental, y_scale = "log")
   )
 
+  # time axis labels (durations, optionally short) vs. scan axis labels
+  # note: breaks outside the plotted range have NA labels
+  x_labels <- function(plot) {
+    labels <- ggplot2::ggplot_build(plot)$layout$panel_params[[
+      1
+    ]]$x$get_labels()
+    labels[!is.na(labels)]
+  }
+  expect_equal(
+    x_labels(orbi_plot_raw_data(df, y = ions.incremental)),
+    c("0:30 min", "1:00 min", "1:30 min", "2:00 min", "2:30 min", "3:00 min")
+  )
+  expect_equal(
+    x_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, short_time_labels = TRUE)
+    ),
+    c("0:30m", "1:00m", "1:30m", "2:00m", "2:30m", "3:00m")
+  )
+  # no effect on scan based axes
+  expect_equal(
+    x_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        x = "scan.no",
+        short_time_labels = TRUE
+      )
+    ),
+    x_labels(orbi_plot_raw_data(df, y = ions.incremental, x = "scan.no"))
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, short_time_labels = "yes"),
+    "short_time_labels.*must be TRUE or FALSE"
+  )
+
+  # number of pretty breaks, on both time and scan axes
+  expect_gt(
+    length(x_labels(orbi_plot_raw_data(
+      df,
+      y = ions.incremental,
+      n_x_breaks = 10
+    ))),
+    length(x_labels(orbi_plot_raw_data(df, y = ions.incremental)))
+  )
+  expect_lt(
+    length(x_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        x = "scan.no",
+        n_x_breaks = 2
+      )
+    )),
+    length(x_labels(orbi_plot_raw_data(
+      df,
+      y = ions.incremental,
+      x = "scan.no"
+    )))
+  )
+  # but not together with specific breaks
+  expect_error(
+    orbi_plot_raw_data(
+      df,
+      y = ions.incremental,
+      x_breaks = 1:2,
+      n_x_breaks = 3
+    ),
+    "either.*x_breaks.*or.*n_x_breaks.*not both"
+  )
+  expect_no_error(
+    orbi_plot_raw_data(df, y = ions.incremental, x_breaks = c(1, 2))
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, n_x_breaks = 0),
+    "n_x_breaks.*must be a single whole number"
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, n_x_breaks = 2.5),
+    "n_x_breaks.*must be a single whole number"
+  )
+
   df2 <- orbi_read_isox(system.file(
     "extdata",
     "testfile_flow.isox",

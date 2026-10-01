@@ -58,6 +58,7 @@ Register it with `my_aggregator |> orbi_register_aggregator("my_aggregator")` to
 
 ## Bug fixes & improvements
 
+ * time based x-axes in `orbi_plot_raw_data()`, `orbi_plot_satellite_peaks()` and `orbi_plot_isotopocule_coverage()` (`x = "time.min"`) are now labeled as durations with pretty time intervals (e.g. `0:30 min`, `1:00 min` or `0:20 hours`) instead of decimal minutes. The default `x_breaks = NULL` picks the breaks automatically (use `n_x_breaks` to change how many) and `short_time_labels = TRUE` switches to compact labels (e.g. `1:30m`), scan number based x-axes are unchanged. The time ranges in the block messages are likewise shown as durations (e.g. `3m to 4m 30s`).
  * removed the dependency on the `prettyunits` package. Large numbers in info messages are now consistently abbreviated (e.g. `12.3k scans with 185k peaks`) and pluralized correctly (e.g. `1 scan` instead of `1 scans`, `4.32k peaks` instead of `4.32k peak`).
  * fixed the included aggregators only removing a lower case `.raw` extension from the `filename` (e.g. `s3744.RAW` stayed `s3744.RAW` while `dual_inlet.raw` became `dual_inlet`). The extension is now removed in any capitalization and only from the end of the file name.
  * fixed the order of the legends in `orbi_add_blocks_to_plot()` and `orbi_plot_shot_noise()`. Without an explicit order ggplot2 does not guarantee a stable sequence, so the same plot could come out with its legends swapped on different operating systems or ggplot2 versions.
