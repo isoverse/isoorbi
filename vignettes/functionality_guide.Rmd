@@ -303,7 +303,8 @@ data |>
 
 ## `orbi_define_blocks()`
 
-Data blocks mark which scans belong together (e.g. one sample in a flow injection) and which scans are not used for the ratio calculations. Each block is defined either by time (`start_time.min` and `end_time.min`) or by scan number (`start_scan.no` and `end_scan.no`). By default, a block is added to every file.
+Data blocks mark which scans belong together (e.g. one sample in a flow injection) and which scans are not used for the ratio calculations. Each block is defined either by time (`start_time.min` and `end_time.min`) or by scan number (`start_scan.no` and `end_scan.no`). By default, a block is added to every file. Note that to let a block stretch until the last data point, use `Inf` for `end_time.min` or `end_scan.no`. Use `orbi_get_blocks_info()` to get a table of the defined blocks.
+
 
 ```{r}
 # one block for all files (by time)
@@ -312,56 +313,50 @@ data |>
   orbi_get_blocks_info()
 ```
 
-Files often differ in length. To let a block last until the end of each file, use `Inf` for `end_time.min` or `end_scan.no`.
-
-```{r}
-# one block from the first until the last scan of each file
-data |>
-  orbi_define_blocks(start_scan.no = 1, end_scan.no = Inf) |>
-  orbi_get_blocks_info()
-```
-
-To add a block only to specific file(s), use `in_filename`. Like all the other parameters, it can be a single value or a vector with one value per block.
-
-```{r}
-# two blocks (by scan number) only in the 10 scan file
-blocks_data <- data |>
-  orbi_define_blocks(
-    start_scan.no = c(2, 6),
-    end_scan.no = c(4, 9),
-    block_name = c("first", "second"),
-    in_filename = "nitrate_test_10scans"
-  )
-
-# overview of the blocks in each file
-blocks_data |> orbi_get_blocks_info()
-```
+To add a block only to specific file(s), use `in_filename`. Like all the other parameters, it can be a single value or a vector with one value per block. Use `orbi_plot_raw_data()` to visualize where blocks have been defined.
 
 ```{r}
 #| label: fig-blocks
-#| fig-cap: The two blocks defined in the 10 scan test file (scans outside the blocks are unused).
+#| fig-cap: The two data blocks defined in the 10 scan test file only.
 #| fig-width: 8
 #| fig-height: 4
-blocks_data |>
-  orbi_filter_files("nitrate_test_10scans") |>
-  orbi_plot_raw_data(y = tic * it.ms, x = "scan.no") +
-  geom_point(size = 4) # add the data points for clarity
+#| message: false
+data |>
+  orbi_define_blocks(
+    start_scan.no = c(1, 6),
+    end_scan.no = c(4, Inf),
+    block_name = c("start", "finish"),
+    in_filename = "nitrate_test_10scans"
+  ) |>
+  # plot with scans instead of time as x axis and show all data points for clarity
+  orbi_plot_raw_data(y = tic, x = "scan.no", show_points = TRUE)
 ```
 
-For many blocks, it is often easier to provide them as a `blocks_table` (which could also come from a spreadsheet) with one row per block. An `in_filename` of `NA` adds that block to all files.
+For defining many blocks in a file, it is often easier to provide them as a `blocks_table` (which could also come from a spreadsheet) with one row per block. An `in_filename` of `NA` adds that block to all files.
 
 ```{r}
+#| label: fig-blocks2
+#| fig-cap: Data blocks defined from a blocks table and shown with the block names.
+#| fig-width: 8
+#| fig-height: 4
+#| message: false
 blocks_table <- tibble(
-  start_scan.no = c(1, 2, 6),
-  end_scan.no = c(1, 4, 9),
-  block_name = c("all", "first", "second"),
+  start_scan.no = c(1, 3, 6),
+  end_scan.no = c(1, 4, Inf),
+  block_name = c("first", "second", "end"),
   in_filename = c(NA, "nitrate_test_10scans", "nitrate_test_10scans")
 )
 blocks_table
 
 data |>
   orbi_define_blocks(blocks_table = blocks_table) |>
-  orbi_get_blocks_info()
+  orbi_plot_raw_data(
+    y = tic * it.ms,
+    x = "scan.no",
+    show_points = TRUE,
+    # to show the names of the data blocks, turn this setting on
+    use_data_block_names = TRUE
+  )
 ```
 
 # Ratio calculations
