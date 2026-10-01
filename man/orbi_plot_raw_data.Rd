@@ -21,7 +21,9 @@ orbi_plot_raw_data(
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
   use_data_block_names = FALSE,
-  show_outliers = TRUE
+  show_outliers = TRUE,
+  show_points = FALSE,
+  point_size = NULL
 )
 }
 \arguments{
@@ -56,6 +58,10 @@ orbi_plot_raw_data(
 \item{use_data_block_names}{whether to label the data blocks by their individual \code{block_name} (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.}
 
 \item{show_outliers}{whether to highlight data previously flagged as outliers by \code{\link[=orbi_flag_outliers]{orbi_flag_outliers()}}}
+
+\item{show_points}{whether to show the individual data points in addition to the lines connecting them}
+
+\item{point_size}{the size of the data points (if \code{show_points = TRUE}) and of the outlier points (if \code{show_outliers = TRUE}). By default (\code{NULL}) the ggplot2 default point size is used.}
 }
 \value{
 a ggplot object

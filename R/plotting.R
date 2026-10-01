@@ -778,6 +778,8 @@ orbi_plot_satellite_peaks <- function(
 #' @param add_all_blocks add highlight for all blocks, not just data blocks (equivalent to the `data_only = FALSE` argument in [orbi_add_blocks_to_plot()])
 #' @inheritParams orbi_add_blocks_to_plot
 #' @param show_outliers whether to highlight data previously flagged as outliers by [orbi_flag_outliers()]
+#' @param show_points whether to show the individual data points in addition to the lines connecting them
+#' @param point_size the size of the data points (if `show_points = TRUE`) and of the outlier points (if `show_outliers = TRUE`). By default (`NULL`) the ggplot2 default point size is used.
 #' @inheritParams orbi_plot_satellite_peaks
 #' @return a ggplot object
 #' @export
@@ -807,11 +809,23 @@ orbi_plot_raw_data <- function(
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
   use_data_block_names = FALSE,
-  show_outliers = TRUE
+  show_outliers = TRUE,
+  show_points = FALSE,
+  point_size = NULL
 ) {
   # safety checks
   ## dataset
   check_dataset_arg(dataset)
+  check_arg(show_points, is_bool(show_points), "must be TRUE or FALSE")
+  check_arg(
+    point_size,
+    is.null(point_size) ||
+      is.numeric(point_size) &&
+        length(point_size) == 1L &&
+        !is.na(point_size) &&
+        point_size > 0,
+    "must be a single number larger than 0"
+  )
   check_x_axis_args(
     x_breaks,
     n_x_breaks,
@@ -958,20 +972,41 @@ orbi_plot_raw_data <- function(
     plot <- plot + ggplot2::aes(color = {{ color }})
   }
 
+  # point size (if any, otherwise the ggplot default)
+  point_size_param <- if (!is.null(point_size)) list(size = point_size)
+
   # data
+  # note: lines are drawn within each of these groups, groups with a single
+  # data point are left out of the lines (ggplot would warn about them)
+  line_group_cols <- intersect(
+    c("filename", "data_group", "compound", "isotopocule"),
+    names(plot_df)
+  )
   plot <- plot +
     ggplot2::geom_line(
-      data = function(df) dplyr::filter(df, !.data$is_outlier),
+      data = function(df) {
+        df |>
+          dplyr::filter(!.data$is_outlier) |>
+          dplyr::filter(
+            .by = dplyr::all_of(line_group_cols),
+            dplyr::n() > 1L
+          )
+      },
       alpha = if (show_outliers) 0.5 else 1.0,
       map = ggplot2::aes(
-        group = paste(
-          .data$filename,
-          .data$data_group,
-          if ("compound" %in% names(plot_df)) .data$compound,
-          if ("isotopocule" %in% names(plot_df)) .data$isotopocule
-        )
+        group = paste(!!!rlang::data_syms(line_group_cols))
       )
-    ) +
+    )
+  if (show_points) {
+    plot <- plot +
+      exec(
+        ggplot2::geom_point,
+        data = function(df) dplyr::filter(df, !.data$is_outlier),
+        alpha = if (show_outliers) 0.5 else 1.0,
+        !!!point_size_param
+      )
+  }
+  plot <- plot +
     {
       {
         color_scale
@@ -1028,11 +1063,13 @@ orbi_plot_raw_data <- function(
   # outliers
   if (show_outliers) {
     plot <- plot +
-      ggplot2::geom_point(
+      exec(
+        ggplot2::geom_point,
         data = function(df) {
           dplyr::filter(df, !!show_outliers & .data$is_outlier)
         },
-        map = ggplot2::aes(shape = .data$outlier_type)
+        map = ggplot2::aes(shape = .data$outlier_type),
+        !!!point_size_param
       ) +
       # typicall only the first or sometimes first two will be used
       ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +
