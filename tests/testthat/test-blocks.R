@@ -127,7 +127,7 @@ test_that("orbi_define_blocks()", {
   # ... and by time, which is treated the same way (the file's time range is named)
   orbi_define_blocks(test_data, start_time.min = 5, end_time.min = 6) |>
     suppressMessages() |>
-    expect_warning("outside the data in 2 files.*covers 0.1 to 0.6 min")
+    expect_warning("outside the data in 2 files.*covers 6s to 36s")
   orbi_define_blocks(test_data, start_time.min = 0.001, end_time.min = 0.01) |>
     suppressMessages() |>
     expect_warning("outside the data in 2 files")
@@ -153,7 +153,7 @@ test_that("orbi_define_blocks()", {
   expect_message(
     orbi_define_blocks(multi_data, start_time.min = 0, end_time.min = 99) |>
       expect_message("added 1 block"),
-    "covers scans 1 to 10 \\(0.1 to 1 min\\) in 2 files"
+    "covers scans 1 to 10 \\(6s to 1m\\) in 2 files"
   )
   # and says so when a block could not be added anywhere
   suppressWarnings(
@@ -185,6 +185,55 @@ test_that("orbi_define_blocks()", {
     end_time.min = c(0.4, 0.5)
   ) |>
     expect_error("cannot be recycled")
+
+  # an infinite end means until the end of each file
+  uneven_data <- tibble(
+    filename = rep(c("test1", "test2"), c(10, 6)),
+    scan.no = c(1:10, 1:6),
+    time.min = scan.no / 10
+  )
+  to_end_by_scan <- orbi_define_blocks(
+    uneven_data,
+    start_scan.no = 3L,
+    end_scan.no = Inf
+  ) |>
+    suppressMessages()
+  expect_equal(
+    to_end_by_scan |> dplyr::filter(block == 1L) |> dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  to_end_by_time <- orbi_define_blocks(
+    uneven_data,
+    start_time.min = 0.25,
+    end_time.min = Inf
+  ) |>
+    suppressMessages()
+  expect_equal(
+    to_end_by_time |> dplyr::filter(block == 1L) |> dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  # also in a blocks table (mixed with finite ends)
+  expect_equal(
+    orbi_define_blocks(
+      uneven_data,
+      blocks_table = tibble(start_scan.no = c(1L, 3L), end_scan.no = c(2, Inf))
+    ) |>
+      suppressMessages() |>
+      dplyr::filter(block == 2L) |>
+      dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  # the summary reports the actual end
+  orbi_define_blocks(uneven_data, start_scan.no = 3L, end_scan.no = Inf) |>
+    expect_message("added 1 block") |>
+    expect_message("covers scans 3 to 10")
+  # but only the end can be infinite
+  orbi_define_blocks(uneven_data, start_scan.no = Inf, end_scan.no = Inf) |>
+    expect_error("start_scan.no.*must be finite")
+  orbi_define_blocks(uneven_data, start_time.min = -Inf, end_time.min = 1) |>
+    expect_error("start_time.min.*must be finite")
+  orbi_define_blocks(uneven_data, start_scan.no = 1L, end_scan.no = -Inf) |>
+    expect_error("end_scan.no.*cannot be.*-Inf")
 
   # in_filename checks
   orbi_define_blocks(
@@ -228,7 +277,7 @@ test_that("orbi_define_blocks()", {
       in_filename = "test2"
     ) |>
       expect_message("added 1 block to 1 file"),
-    "block in test2: covers scans 1 to 2 \\(0.1 to 0.2 min\\)\\s*$"
+    "block in test2: covers scans 1 to 2 \\(6s to 12s\\)\\s*$"
   )
 
   # in_filename is recycled like the other parameters, so the same block for
@@ -1069,6 +1118,52 @@ test_that("orbi_add_blocks_to_plot()", {
   vdiffr::expect_doppelganger(
     "intensity plot with blocks",
     orbi_plot_raw_data(df, y = ions.incremental)
+  )
+
+  # block labels in the legend: data blocks as "data" (default) or by name
+  fill_labels <- function(plot) {
+    ggplot2::ggplot_build(plot)$plot$scales$get_scales("fill")$get_limits()
+  }
+  expect_equal(
+    fill_labels(orbi_plot_raw_data(df, y = ions.incremental)),
+    "data"
+  )
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, use_data_block_names = TRUE)
+    ),
+    c("ref", "sam")
+  )
+  # other blocks keep their data type
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, add_all_blocks = TRUE)
+    ),
+    c("changeover", "data")
+  )
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        add_all_blocks = TRUE,
+        use_data_block_names = TRUE
+      )
+    ),
+    c("ref", "sam", "changeover")
+  )
+  # unnamed data blocks are still labeled as "data"
+  expect_equal(
+    df |>
+      dplyr::mutate(block_name = NA_character_) |>
+      orbi_plot_raw_data(y = ions.incremental, use_data_block_names = TRUE) |>
+      fill_labels(),
+    "data"
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental) |>
+      orbi_add_blocks_to_plot(use_data_block_names = "yes"),
+    "use_data_block_names.*must be TRUE or FALSE"
   )
 })
 

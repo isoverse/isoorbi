@@ -73,7 +73,7 @@ orbi_export_data_to_excel <- function(
       info <- c(
         info,
         format_inline(
-          "{format_number(nrow(dataset[[sheet]]))}{qty(nrow(dataset[[sheet]]))} row{?s} of {.field {sheet}}"
+          "{numbers_to_text(nrow(dataset[[sheet]]))}{qty(nrow(dataset[[sheet]]))} row{?s} of {.field {sheet}}"
         )
       )
       # export
@@ -99,7 +99,7 @@ orbi_export_data_to_excel <- function(
   } else {
     # single data
     info <- format_inline(
-      "{format_number(nrow(dataset))}{qty(nrow(dataset))} row{?s}, {ncol(dataset)} column{?s}"
+      "{numbers_to_text(nrow(dataset))}{qty(nrow(dataset))} row{?s}, {ncol(dataset)} column{?s}"
     )
     add_excel_sheet(
       wb,

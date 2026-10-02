@@ -7,9 +7,9 @@
 #'
 #' @inheritParams orbi_flag_satellite_peaks
 #' @param start_time.min start time of the block(s), a single value or a vector for multiple blocks
-#' @param end_time.min end time of the block(s), a single value or a vector for multiple blocks
+#' @param end_time.min end time of the block(s), a single value or a vector for multiple blocks. Use `Inf` for a block that lasts until the end of each file.
 #' @param start_scan.no start scan of the block(s), a single value or a vector for multiple blocks
-#' @param end_scan.no end scan of the block(s), a single value or a vector for multiple blocks
+#' @param end_scan.no end scan of the block(s), a single value or a vector for multiple blocks. Use `Inf` for a block that lasts until the last scan of each file.
 #' @param block_name name(s) for the block(s), a single value or a vector for multiple blocks, `NA` by default (i.e. unnamed)
 #' @param in_filename the file(s) to add the block(s) to, a single value or a vector for multiple blocks, `NA` (the default if not provided) adds a block to all files. This must be the `filename` of the file(s) as it appears in the `dataset`.
 #' @param blocks_table alternative to the individual parameters: a data frame with any of the columns `start_time.min`, `end_time.min`, `start_scan.no`, `end_scan.no`, `block_name` and `in_filename`, one row per block. Any other columns are ignored. If provided, the individual parameters are not used.
@@ -650,24 +650,24 @@ orbi_adjust_block <- function(
 
   if (change_start) {
     sprintf(
-      "{cli::symbol$arrow_right} moved {.field block %d} start from {.field scan.no} %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} start from {.field scan.no} %d (%s) to %d (%s)",
       block,
       old_start_scan,
-      old_start_time,
+      mins_to_text(old_start_time),
       new_start_scan,
-      new_start_time
+      mins_to_text(new_start_time)
     ) |>
       setNames(" ") |>
       cli_bullets()
   }
   if (change_end) {
     sprintf(
-      "{cli::symbol$arrow_right} moved {.field block %d} end from scan %d (%.2f min) to %d (%.2f min)",
+      "{cli::symbol$arrow_right} moved {.field block %d} end from scan %d (%s) to %d (%s)",
       block,
       old_end_scan,
-      old_end_time,
+      mins_to_text(old_end_time),
       new_end_scan,
-      new_end_time
+      mins_to_text(new_end_time)
     ) |>
       setNames(" ") |>
       cli_bullets()
@@ -1068,7 +1068,8 @@ orbi_get_blocks_info <- function(
 #' @param plot object with a dataset that has defined blocks
 #' @param x which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.
 #' @param data_only if set to TRUE, only the blocks flagged as "data" (`orbi_get_option("data_type_data")`) are highlighted
-#' @param fill what to use for the fill aesthetic, default is the block `data_type`
+#' @param use_data_block_names whether to label the data blocks by their individual `block_name` (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.
+#' @param fill what to use for the fill aesthetic, default is the `block_label`, i.e. the block's `data_type` or, for data blocks with `use_data_block_names = TRUE`, the `block_name`
 #' @param fill_colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
 #' @param fill_scale use this parameter to replace the entire fill scale rather than just the `fill_colors`
 #' @param alpha opacity settings for the background
@@ -1079,7 +1080,8 @@ orbi_add_blocks_to_plot <- function(
   plot,
   x = c("guess", "scan.no", "time.min"),
   data_only = FALSE,
-  fill = .data$data_type,
+  use_data_block_names = FALSE,
+  fill = .data$block_label,
   fill_colors = c(
     "#1B9E77",
     "#D95F02",
@@ -1101,6 +1103,11 @@ orbi_add_blocks_to_plot <- function(
     "has to be a ggplot"
   )
   x_column <- arg_match(x)
+  check_arg(
+    use_data_block_names,
+    is_bool(use_data_block_names),
+    "must be TRUE or FALSE"
+  )
 
   # check if it's a log y axis
   y_axis <- plot$scales$scales[[which(plot$scales$find("y"))[1]]]
@@ -1135,9 +1142,27 @@ orbi_add_blocks_to_plot <- function(
       df <- df |>
         dplyr::filter(.data$data_type == orbi_get_option("data_type_data"))
     }
-    blocks <- df |> orbi_get_blocks_info()
+    blocks <- df |>
+      orbi_get_blocks_info() |>
+      dplyr::filter(!is.na(.data$block))
+
+    # block labels: the data type or (if requested) the name of data blocks
+    data_type <- as.character(blocks$data_type)
+    is_named_data <- use_data_block_names &
+      data_type == orbi_get_option("data_type_data") &
+      !is.na(blocks$block_name)
+    block_label <- ifelse(is_named_data, blocks$block_name, data_type)
+    # named data blocks first (in the order they occur), then the data types
+    blocks$block_label <- factor(
+      block_label,
+      levels = unique(c(
+        block_label[is_named_data],
+        levels(factor(blocks$data_type))
+      ))
+    ) |>
+      droplevels()
+
     blocks |>
-      dplyr::filter(!is.na(.data$block)) |>
       dplyr::mutate(
         .by = dplyr::any_of(c("uidx", "filename")),
         xmin = if (!!x_column == "time.min") {
@@ -1314,13 +1339,32 @@ get_blocks_table <- function(
       )
     }
   }
+
+  # only the end of a block can be infinite (i.e. until the end of the file)
+  for (col in c("start_time.min", "start_scan.no")) {
+    if (any(is.infinite(blocks_table[[col]]))) {
+      cli_abort(
+        "{.field {col}} must be finite (only the end of a block can be {.val {Inf}})",
+        call = .env
+      )
+    }
+  }
+  for (col in c("end_time.min", "end_scan.no")) {
+    if (any(blocks_table[[col]] == -Inf, na.rm = TRUE)) {
+      cli_abort(
+        "{.field {col}} cannot be {.val {-Inf}}, use {.val {Inf}} for the end of the file",
+        call = .env
+      )
+    }
+  }
   blocks_table <- blocks_table |>
     dplyr::select(dplyr::all_of(block_def_cols)) |>
     dplyr::mutate(
       start_time.min = as.numeric(.data$start_time.min),
       end_time.min = as.numeric(.data$end_time.min),
       start_scan.no = as.integer(.data$start_scan.no),
-      end_scan.no = as.integer(.data$end_scan.no),
+      # note: stays numeric so it can be Inf (i.e. until the last scan)
+      end_scan.no = as.numeric(.data$end_scan.no),
       block_name = as.character(.data$block_name),
       in_filename = as.character(.data$in_filename)
     )
@@ -1440,7 +1484,12 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
     single_scans <- single_scans |>
       dplyr::mutate(
         start_scan.no = !!block_def$start_scan.no,
-        end_scan.no = !!block_def$end_scan.no
+        # an infinite end means until the last scan of each file
+        end_scan.no = if (is.infinite(block_def$end_scan.no)) {
+          purrr::map_int(data, ~ max(.x$scan.no))
+        } else {
+          as.integer(block_def$end_scan.no)
+        }
       )
   }
 
@@ -1519,7 +1568,7 @@ add_single_block <- function(dataset, block_def, .env = caller_env()) {
       \(i) {
         file_range <- if (set_by_time) {
           format_inline(
-            "covers {signif(unmatched$file_start_time[i])} to {signif(unmatched$file_end_time[i])} min"
+            "covers {mins_to_text(unmatched$file_start_time[i])} to {mins_to_text(unmatched$file_end_time[i])}"
           )
         } else {
           format_inline(
@@ -1666,9 +1715,9 @@ describe_blocks <- function(blocks_table) {
   where <- ifelse(
     !is.na(blocks_table$start_time.min),
     sprintf(
-      "%s to %s min",
-      blocks_table$start_time.min,
-      blocks_table$end_time.min
+      "%s to %s",
+      mins_to_text(blocks_table$start_time.min),
+      mins_to_text(blocks_table$end_time.min)
     ),
     sprintf(
       "scan %s to %s",
@@ -1699,7 +1748,7 @@ describe_block_coverage <- function(block_def, coverage) {
   )
   if (!all(is.na(added$start_time))) {
     covers <- format_inline(
-      "{covers} ({signif(min(added$start_time))} to {signif(max(added$end_time))} min)"
+      "{covers} ({mins_to_text(min(added$start_time))} to {mins_to_text(max(added$end_time))})"
     )
   }
   if (for_one_file) {
@@ -1892,8 +1941,8 @@ find_scan_from_time <- function(
     }
     cli_abort(
       c(
-        "invalid {which} time ({signif(time)} minutes){file_info}",
-        "i" = "the time ranges from {signif(min(scans$time.min))} to {signif(max(scans$time.min))} minutes"
+        "invalid {which} time ({mins_to_text(time)}){file_info}",
+        "i" = "the time ranges from {mins_to_text(min(scans$time.min))} to {mins_to_text(max(scans$time.min))}"
       ),
       call = .env
     )

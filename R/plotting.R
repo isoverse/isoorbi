@@ -49,6 +49,83 @@ dynamic_y_scale <- function(
   return(plot)
 }
 
+# time axis breaks for time in minutes
+# note: the duration axis functions (time_axis-general.R) work in seconds
+breaks_pretty_minutes <- function(n = 5) {
+  breaks <- breaks_pretty_duration(n = n)
+  function(mins) breaks(mins * 60) / 60
+}
+
+# time axis labels for time in minutes
+labels_minutes <- function(...) {
+  labels <- labels_duration(...)
+  # note: round to avoid floating point artifacts from the unit conversion
+  # (e.g. 179.9999999 s instead of 180 s)
+  function(mins) labels(round(mins * 60, 9))
+}
+
+# x axis by scan number or by time in minutes
+# time axes show durations (e.g. 1:30 min) and need no axis title as the
+# labels include the units, scan axes are unchanged
+# @param x_breaks NULL for pretty breaks (scans) or pretty durations (time)
+# @param n_x_breaks the desired number of pretty breaks (if x_breaks is NULL)
+# @param short_time_labels whether to use compact time labels (e.g. 1:30m)
+# @param scan_labels labels for the scan axis
+scale_x_scan_or_time <- function(
+  x_column,
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
+  scan_labels = ggplot2::waiver(),
+  ...
+) {
+  if (x_column == "time.min") {
+    ggplot2::scale_x_continuous(
+      name = NULL,
+      breaks = x_breaks %||% breaks_pretty_minutes(n = n_x_breaks),
+      labels = labels_minutes(short_format = short_time_labels),
+      ...
+    )
+  } else {
+    ggplot2::scale_x_continuous(
+      breaks = x_breaks %||% scales::breaks_pretty(n_x_breaks),
+      labels = scan_labels,
+      ...
+    )
+  }
+}
+
+# check the x axis arguments of the plotting functions
+# @param n_x_breaks_set whether n_x_breaks was provided (i.e. not missing)
+check_x_axis_args <- function(
+  x_breaks,
+  n_x_breaks,
+  n_x_breaks_set,
+  short_time_labels,
+  .env = caller_env()
+) {
+  check_arg(
+    n_x_breaks,
+    is_scalar_integerish(n_x_breaks) && !is.na(n_x_breaks) && n_x_breaks > 0,
+    "must be a single whole number larger than 0",
+    .arg = "n_x_breaks",
+    .env = .env
+  )
+  if (!is.null(x_breaks) && n_x_breaks_set) {
+    cli_abort(
+      "provide either {.field x_breaks} or {.field n_x_breaks}, not both",
+      call = .env
+    )
+  }
+  check_arg(
+    short_time_labels,
+    is_bool(short_time_labels),
+    "must be TRUE or FALSE",
+    .arg = "short_time_labels",
+    .env = .env
+  )
+}
+
 # internal function for the facet_wrap
 # decides whether to wrap by filename, compound or both filename and compound
 # depending on if either has more than 1 value
@@ -215,7 +292,7 @@ orbi_plot_spectra <- function(
   scans <- unique(aggregated_data$spectra$scan.no)
   if (length(scans) > max_scans) {
     cli_bullets(c(
-      "i" = "{cli::col_blue('Info')}: there are {length(scans)} {.field scan{?s}} in this dataset, only the first {if (max_scans > 1) max_scans} will be visualized. To change this, set the {.field max_scans} argument."
+      "i" = "{cli::col_blue('Info')}: there are {numbers_to_text(length(scans))}{qty(length(scans))} {.field scan{?s}} in this dataset, only the first {if (max_scans > 1) max_scans} will be visualized. To change this, set the {.field max_scans} argument."
     ))
     scans <- scans[1:max_scans]
   }
@@ -570,7 +647,9 @@ orbi_plot_spectra <- function(
 #' @param isotopocules which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)
 #' @param x x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"
 #' @param y y-axis column for the plot, typially either "ions.incremental" or "intensity", default is "ions.incremental" (falls back to "intensity" if "ions.incremental" has not been calculated yet for the provided dataset)
-#' @param x_breaks what breaks to use for the x axis, change to make more specifid tickmarks
+#' @param x_breaks what breaks to use for the x axis. By default (`NULL`) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. `1:30 min`), provide breaks to make more specific tickmarks. Use either `x_breaks` or `n_x_breaks`, not both.
+#' @param n_x_breaks the desired number of x axis breaks when using the default pretty breaks (`x_breaks = NULL`), default: `5`. Use either `x_breaks` or `n_x_breaks`, not both.
+#' @param short_time_labels whether to use compact time axis labels with no space between value and unit and abbreviated units (`hr`, `m`, `s`), e.g. `1:30m` instead of `1:30 min`. Only relevant for a time based x axis (`x = "time.min"`).
 #' @param y_scale what type of y scale to use: "log" scale, "pseudo-log" scale (smoothly transitions to linear scale around 0), "linear" scale, or "raw" (if you want to add a y scale to the plot manually instead)
 #' @param y_scale_sci_labels whether to render numbers with scientific exponential notation
 #' @param colors which colors to use, by default a color-blind friendly color palettes (RColorBrewer, dark2)
@@ -582,7 +661,9 @@ orbi_plot_satellite_peaks <- function(
   isotopocules = c(),
   x = c("scan.no", "time.min"),
   y = c("ions.incremental", "intensity"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   y_scale = c("log", "pseudo-log", "linear", "raw"),
   y_scale_sci_labels = TRUE,
   colors = c(
@@ -600,6 +681,12 @@ orbi_plot_satellite_peaks <- function(
 ) {
   # safety checks
   check_dataset_arg(dataset)
+  check_x_axis_args(
+    x_breaks,
+    n_x_breaks,
+    n_x_breaks_set = !missing(n_x_breaks),
+    short_time_labels
+  )
 
   # keep track for later
   peaks <- if (is(dataset, "orbi_aggregated_data")) {
@@ -654,7 +741,13 @@ orbi_plot_satellite_peaks <- function(
       },
       map = ggplot2::aes(shape = .data$flagged)
     ) +
-    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
+    scale_x_scan_or_time(
+      x_column,
+      x_breaks,
+      n_x_breaks,
+      short_time_labels,
+      expand = c(0, 0)
+    ) +
     ggplot2::scale_shape_manual(values = 17) +
     {
       {
@@ -683,7 +776,10 @@ orbi_plot_satellite_peaks <- function(
 #' @param color expression for what to use for the color aesthetic, default is isotopocule
 #' @param add_data_blocks add highlight for data blocks if there are any block definitions in the dataset (uses [orbi_add_blocks_to_plot()]). To add blocks manually, set `add_data_blocks = FALSE` and manually call the `orbi_add_blocks_to_plot()` function afterwards.
 #' @param add_all_blocks add highlight for all blocks, not just data blocks (equivalent to the `data_only = FALSE` argument in [orbi_add_blocks_to_plot()])
+#' @inheritParams orbi_add_blocks_to_plot
 #' @param show_outliers whether to highlight data previously flagged as outliers by [orbi_flag_outliers()]
+#' @param show_points whether to show the individual data points in addition to the lines connecting them
+#' @param point_size the size of the data points (if `show_points = TRUE`) and of the outlier points (if `show_outliers = TRUE`). By default (`NULL`) the ggplot2 default point size is used.
 #' @inheritParams orbi_plot_satellite_peaks
 #' @return a ggplot object
 #' @export
@@ -691,7 +787,9 @@ orbi_plot_raw_data <- function(
   dataset,
   isotopocules = c(),
   x = c("time.min", "scan.no"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   y,
   y_scale = c("raw", "linear", "pseudo-log", "log"),
   y_scale_sci_labels = TRUE,
@@ -710,11 +808,30 @@ orbi_plot_raw_data <- function(
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
-  show_outliers = TRUE
+  use_data_block_names = FALSE,
+  show_outliers = TRUE,
+  show_points = FALSE,
+  point_size = NULL
 ) {
   # safety checks
   ## dataset
   check_dataset_arg(dataset)
+  check_arg(show_points, is_bool(show_points), "must be TRUE or FALSE")
+  check_arg(
+    point_size,
+    is.null(point_size) ||
+      is.numeric(point_size) &&
+        length(point_size) == 1L &&
+        !is.na(point_size) &&
+        point_size > 0,
+    "must be a single number larger than 0"
+  )
+  check_x_axis_args(
+    x_breaks,
+    n_x_breaks,
+    n_x_breaks_set = !missing(n_x_breaks),
+    short_time_labels
+  )
 
   ## y
   check_arg(
@@ -855,26 +972,53 @@ orbi_plot_raw_data <- function(
     plot <- plot + ggplot2::aes(color = {{ color }})
   }
 
+  # point size (if any, otherwise the ggplot default)
+  point_size_param <- if (!is.null(point_size)) list(size = point_size)
+
   # data
+  # note: lines are drawn within each of these groups, groups with a single
+  # data point are left out of the lines (ggplot would warn about them)
+  line_group_cols <- intersect(
+    c("filename", "data_group", "compound", "isotopocule"),
+    names(plot_df)
+  )
   plot <- plot +
     ggplot2::geom_line(
-      data = function(df) dplyr::filter(df, !.data$is_outlier),
+      data = function(df) {
+        df |>
+          dplyr::filter(!.data$is_outlier) |>
+          dplyr::filter(
+            .by = dplyr::all_of(line_group_cols),
+            dplyr::n() > 1L
+          )
+      },
       alpha = if (show_outliers) 0.5 else 1.0,
       map = ggplot2::aes(
-        group = paste(
-          .data$filename,
-          .data$data_group,
-          if ("compound" %in% names(plot_df)) .data$compound,
-          if ("isotopocule" %in% names(plot_df)) .data$isotopocule
-        )
+        group = paste(!!!rlang::data_syms(line_group_cols))
       )
-    ) +
+    )
+  if (show_points) {
+    plot <- plot +
+      exec(
+        ggplot2::geom_point,
+        data = function(df) dplyr::filter(df, !.data$is_outlier),
+        alpha = if (show_outliers) 0.5 else 1.0,
+        !!!point_size_param
+      )
+  }
+  plot <- plot +
     {
       {
         color_scale
       }
     } +
-    ggplot2::scale_x_continuous(breaks = x_breaks, expand = c(0, 0)) +
+    scale_x_scan_or_time(
+      x_column,
+      x_breaks,
+      n_x_breaks,
+      short_time_labels,
+      expand = c(0, 0)
+    ) +
     orbi_default_theme()
 
   # scale and dynamic wrap
@@ -884,25 +1028,48 @@ orbi_plot_raw_data <- function(
 
   # blocks
   if (add_all_blocks && has_blocks(plot_df)) {
-    plot <- plot |> orbi_add_blocks_to_plot(x = x_column)
-  } else if (add_data_blocks && has_blocks(plot_df)) {
     plot <- plot |>
       orbi_add_blocks_to_plot(
         x = x_column,
-        data_only = TRUE,
-        fill_colors = "gray80",
-        show.legend = TRUE
+        use_data_block_names = use_data_block_names
       )
+  } else if (add_data_blocks && has_blocks(plot_df)) {
+    # data blocks are all gray unless they are color coded by their names
+    has_data_block_names <- use_data_block_names &&
+      any(
+        !is.na(plot_df$block_name) &
+          plot_df$data_type == orbi_get_option("data_type_data")
+      )
+    plot <- if (has_data_block_names) {
+      plot |>
+        orbi_add_blocks_to_plot(
+          x = x_column,
+          data_only = TRUE,
+          use_data_block_names = TRUE,
+          show.legend = TRUE
+        )
+    } else {
+      plot |>
+        orbi_add_blocks_to_plot(
+          x = x_column,
+          data_only = TRUE,
+          use_data_block_names = FALSE,
+          fill_colors = "gray80",
+          show.legend = TRUE
+        )
+    }
   }
 
   # outliers
   if (show_outliers) {
     plot <- plot +
-      ggplot2::geom_point(
+      exec(
+        ggplot2::geom_point,
         data = function(df) {
           dplyr::filter(df, !!show_outliers & .data$is_outlier)
         },
-        map = ggplot2::aes(shape = .data$outlier_type)
+        map = ggplot2::aes(shape = .data$outlier_type),
+        !!!point_size_param
       ) +
       # typicall only the first or sometimes first two will be used
       ggplot2::scale_shape_manual(values = c(17, 15, 16, 18)) +
@@ -928,7 +1095,9 @@ orbi_plot_isotopocule_coverage <- function(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   add_data_blocks = TRUE,
   colors = c(
     "#7570B3",
@@ -944,6 +1113,12 @@ orbi_plot_isotopocule_coverage <- function(
 ) {
   # safety checks
   check_dataset_arg(dataset)
+  check_x_axis_args(
+    x_breaks,
+    n_x_breaks,
+    n_x_breaks_set = !missing(n_x_breaks),
+    short_time_labels
+  )
   x_column <- arg_match(x)
 
   # filter for isotopocules
@@ -1181,10 +1356,13 @@ orbi_plot_isotopocule_coverage <- function(
       data = isotopocule_coverage,
       map = ggplot2::aes(fill = .data$fill_label)
     ) +
-    ggplot2::scale_x_continuous(
-      breaks = x_breaks,
-      expand = c(0, 0),
-      labels = format_number
+    scale_x_scan_or_time(
+      x_column,
+      x_breaks,
+      n_x_breaks,
+      short_time_labels,
+      scan_labels = numbers_to_text,
+      expand = c(0, 0)
     ) +
     ggplot2::scale_y_reverse(
       breaks = seq_along(levels(isotopocule_coverage$isotopocule)),

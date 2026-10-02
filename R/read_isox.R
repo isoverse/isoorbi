@@ -123,7 +123,7 @@ orbi_read_isox <- function(file) {
             try_catch_cnds()
           # individual file info
           finish_info(
-            "loaded {nrow(out$result)} peak{?s}",
+            "loaded {numbers_to_text(nrow(out$result))}{qty(nrow(out$result))} peak{?s}",
             if ("compound" %in% names(out$result)) {
               " for {length(levels(out$result$compound))} compound{?s} ({.field {levels(out$result$compound)}})"
             },
@@ -470,7 +470,7 @@ orbi_filter_files <-
     n_row_end <- if (is_agg) nrow(dataset$peaks) else nrow(dataset)
     finish_info(
       "filtered the dataset by {.field {filters}} and removed ",
-      "a total of {format_number(n_row_start - n_row_end)}/{format_number(n_row_start)} ",
+      "a total of {numbers_to_text(n_row_start - n_row_end)}/{numbers_to_text(n_row_start)} ",
       "peaks ({signif(100 * (n_row_start - n_row_end)/n_row_start, 2)}%)",
       start = start
     )

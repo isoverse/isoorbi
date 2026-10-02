@@ -61,16 +61,6 @@ count_grouped_distinct <- function(dataset, column) {
     sum()
 }
 
-# format number pretty number
-format_number <- function(x) {
-  x |>
-    prettyunits::pretty_num() |>
-    # take care of leading/trailing whitespaces (style = "no_pad") doesn't quite do this
-    #gsub(pattern = "(^ +| +$)", replacement = "")
-    # remove all white spacs (also between the units)
-    gsub(pattern = " ", replacement = "", fixed = TRUE)
-}
-
 
 # Data utility functions ======
 

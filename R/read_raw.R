@@ -747,7 +747,7 @@ orbi_read_raw <- function(
         func = "read_cached_raw_file",
         "{if(!has_file_info) 'tried to '}",
         "read {.file {basename(info$file_path)}} from cache",
-        "{if(n_spectra_scans > 0) format_inline(', included the {.field spectr{?um/a}} from {n_spectra_scans} {.field scan{?s}}')}"
+        "{if(n_spectra_scans > 0) format_inline(', included the {qty(n_spectra_scans)}{.field spectr{?um/a}} from {numbers_to_text(n_spectra_scans)}{qty(n_spectra_scans)} {.field scan{?s}}')}"
       ) |>
       dplyr::bind_rows()
     finish_info(start = start)
@@ -782,7 +782,7 @@ orbi_read_raw <- function(
     start <- start_info(
       "is reading {pb_extra$info$idx}/{pb_extra$n_files} raw files {pb_bar} ",
       "| {pb_elapsed} | ETA {pb_eta} | {.file {basename(pb_extra$info$file_path)}} ",
-      "({prettyunits::pretty_bytes(file.size(pb_extra$info$file_path))}) ",
+      "({bytes_to_text(file.size(pb_extra$info$file_path))}) ",
       "| {.field {pb_status}}",
       pb_total = read_files$total[1],
       pb_extra = list(info = read_files[1, ], n_files = nrow(read_files)),
@@ -799,8 +799,8 @@ orbi_read_raw <- function(
         func = "read_raw_file",
         "{if(info$is_cached) 're-read' else 'read'} ",
         "{.file {basename(info$file_path)}} ",
-        "({if (info$file_exists) prettyunits::pretty_bytes(info$file_size) else '? B'})",
-        "{if(n_spectra_scans > 0) format_inline(', included the {.field spectr{?um/a}} from {n_spectra_scans} {.field scan{?s}}')}"
+        "({if (info$file_exists) bytes_to_text(info$file_size) else '? B'})",
+        "{if(n_spectra_scans > 0) format_inline(', included the {qty(n_spectra_scans)}{.field spectr{?um/a}} from {numbers_to_text(n_spectra_scans)}{qty(n_spectra_scans)} {.field scan{?s}}')}"
       ) |>
       dplyr::bind_rows()
     finish_info(start = start)
@@ -853,6 +853,8 @@ print.orbi_raw_files <- function(x, ...) {
   n_digits <- function(x) {
     ifelse(x == 0, 1, floor(log10(abs(x))) + 1)
   }
+  # spacers to right-align text
+  n_spacers <- function(text) max(nchar(text)) - nchar(text)
 
   x |>
     dplyr::mutate(
@@ -865,13 +867,15 @@ print.orbi_raw_files <- function(x, ...) {
       } else {
         0L
       },
-      scans_spacers = max(n_digits(.data$n_scans)) - n_digits(.data$n_scans),
+      scans_text = numbers_to_text(.data$n_scans),
+      scans_spacers = n_spacers(.data$scans_text),
       n_peaks = if ("peaks" %in% names(x)) {
         purrr::map_int(.data$peaks, nrow)
       } else {
         0L
       },
-      peaks_spacers = max(n_digits(.data$n_peaks)) - n_digits(.data$n_peaks),
+      peaks_text = numbers_to_text(.data$n_peaks),
+      peaks_spacers = n_spacers(.data$peaks_text),
       n_status_log = if ("status_log" %in% names(x)) {
         purrr::map_int(.data$status_log, nrow)
       } else {
@@ -909,20 +913,20 @@ print.orbi_raw_files <- function(x, ...) {
         ),
         strrep("\u00a0", .data$scans_spacers),
         format_inline(
-          "{n_scans} {.field scans} with "
+          "{scans_text}{qty(n_scans)} {.field scan{?s}} with "
         ),
         strrep("\u00a0", .data$peaks_spacers),
         format_inline(
-          "{n_peaks} {.field peak{?s}}",
+          "{peaks_text}{qty(n_peaks)} {.field peak{?s}}",
           if_else(
             .data$n_status_log > 0,
-            " and {n_status_log} {.field status log} entr{?y/ies}",
+            " and {numbers_to_text(n_status_log)}{qty(n_status_log)} {.field status log} entr{?y/ies}",
             ""
           ),
           "; ",
           if_else(
             .data$n_spectral_data > 0,
-            "+ loaded {n_spectra} {.field spectr{?um/a}} ({n_spectral_data} points)",
+            "+ loaded {numbers_to_text(n_spectra)}{qty(n_spectra)} {.field spectr{?um/a}} ({numbers_to_text(n_spectral_data)} points)",
             "no {.field spectra} were loaded"
           )
         )
@@ -1044,7 +1048,7 @@ read_cached_raw_file <- function(
       file_path_info$file_size != existing_cache_info$result$file_size
   ) {
     cli_warn(
-      "file size has changed (from {prettyunits::pretty_bytes(existing_cache_info$result$file_size)} to {prettyunits::pretty_bytes(file_path_info$file_size)}), cache is outdated"
+      "file size has changed (from {bytes_to_text(existing_cache_info$result$file_size)} to {bytes_to_text(file_path_info$file_size)}), cache is outdated"
     )
     return(tibble())
   }
@@ -1211,7 +1215,7 @@ read_cached_raw_file <- function(
         if (length(missing_spectra) > 0) {
           # can't get everything
           cli_warn(
-            "missing {length(missing_spectra)} spectr{?um/a} that {?is/are} not cached and could not be read from the .raw file"
+            "missing {numbers_to_text(length(missing_spectra))}{qty(length(missing_spectra))} spectr{?um/a} that {?is/are} not cached and could not be read from the .raw file"
           )
         } else if (cache && cache_spectra) {
           # none missing and we're caching --> zip up the cache files
@@ -1233,7 +1237,7 @@ read_cached_raw_file <- function(
         }
       } else {
         cli_warn(
-          "missing {length(missing_spectra)} spectr{?um/a} that {?is/are} not cached (.raw file is not available)"
+          "missing {numbers_to_text(length(missing_spectra))}{qty(length(missing_spectra))} spectr{?um/a} that {?is/are} not cached (.raw file is not available)"
         )
       }
     }
