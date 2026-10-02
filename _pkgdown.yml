@@ -22,6 +22,8 @@ navbar:
   - text: Examples
     menu:
       - text: "Isoorbi package"
+      - text: "Aggregation"
+        href: articles/aggregation.html
       - text: "Dual inlet analysis"
         href: articles/dual_inlet.html
       - text: "Flow injection analysis"

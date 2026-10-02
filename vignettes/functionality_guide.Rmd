@@ -90,41 +90,7 @@ agg_data
 agg_data |> print(show_all = TRUE)
 ```
 
-### bonus `orbi_get_aggregator()`
-
-You can optionally use a different aggregator. The `minimal` aggregator contains a smaller set of columns to aggregate. The `extended` aggregator is more elaborate, providing access to additional columns from the raw data files.
-
-```{r}
-# example: minimal vs. extended aggregator
-orbi_get_aggregator("minimal")
-orbi_get_aggregator("extended")
-
-# using the extended aggregator instead of the default (standard)
-raw_files |> orbi_aggregate_raw(aggregator = "extended")
-```
-
-### bonus `orbi_register_aggregator()`
-
-Or even build your own aggregator with `orbi_start_aggregator()` and/or expand an existing one with `orgi_add_to_aggregator()` and then register it via `orbi_register_aggregator()`. This funnctionality is rarely needed and thus not part of the package structure flowchart.
-
-```{r}
-my_agg <-
-  orbi_get_aggregator("minimal") |>
-  # pull out the S-Lens RF Level information from the scans and store it as a number
-  orbi_add_to_aggregator(
-    "scans",
-    "slens_rf",
-    source = "S-Lens RF Level",
-    cast = "as.numeric"
-  ) |>
-  orbi_register_aggregator(name = "test")
-
-# show my agg summary
-my_agg
-
-# use it
-raw_files |> orbi_aggregate_raw(aggregator = "test")
-```
+For how to use the other included aggregators, how to build your own, and how to aggregate the instrument status log, see the [aggregation vignette](aggregation.html).
 
 ## bonus `orbi_get_problems()`
 
@@ -158,90 +124,6 @@ agg_data |>
     scans = c("time.min", "tic", "resolution"),
     peaks = c("mz" = "mzMeasured", starts_with("peak"))
   )
-```
-
-# Bonus: working with the `status_log`
-
-Besides the scans, raw files hold the instrument's **status log**: readbacks that the instrument records independently of the scans (typically every few seconds) such as temperatures, vacuum pressures, voltages, and ion source settings. `orbi_read_raw()` returns it as the `status_log` dataset. Which channels a status log contains depends entirely on the instrument, so none of the included aggregators take anything from it. Instead, `orbi_aggregate_raw()` reports the available status log channels as *not aggregated* so you can pick the ones you are interested in. Printing the aggregated data only says how many there are, use `print(agg_data, show_all = TRUE)` to list all of them.
-
-Here we use two example files from two different instruments (an Orbitrap Exploris 240 and a Q Exactive Focus) to show how to aggregate a few channels of interest.
-
-```{r}
-# two example files from different instruments
-status_files <-
-  orbi_get_example_files(c("dual_inlet.raw", "s3744.RAW")) |>
-  orbi_read_raw()
-
-# the raw status log of the first file (one row per log entry, one column per channel)
-status_files$status_log[[1]]
-```
-
-The status log stores all channel values as text (exactly as the instrument reports them), so the aggregator needs to `cast` the channels you want to use to numbers. Because the two instruments call the same channels by different names, you can provide the alternative names as the `source` and the aggregator uses whichever one exists in each file.
-
-```{r}
-status_agg <-
-  orbi_get_aggregator("standard") |>
-  # when each status log entry was recorded
-  orbi_add_to_aggregator(
-    "status_log",
-    "time.min",
-    source = "StartTime",
-    cast = "as.numeric"
-  ) |>
-  # temperatures (the channel names differ between the instruments)
-  orbi_add_to_aggregator(
-    "status_log",
-    "ambient_temp.C",
-    source = c("Ambient temp. (°C)", "Ambient Temperature (°C)"),
-    cast = "as.numeric"
-  ) |>
-  orbi_add_to_aggregator(
-    "status_log",
-    "analyzer_temp.C",
-    source = c("Orbitrap block temp. (°C)", "Analyzer Temperature (°C)"),
-    cast = "as.numeric"
-  ) |>
-  # ultra high vacuum pressure
-  orbi_add_to_aggregator(
-    "status_log",
-    "uhv_pressure.mbar",
-    source = c("ICB: UHV pres. (mbar)", "UHV Sensor (mbar)"),
-    cast = "as.numeric"
-  ) |>
-  orbi_register_aggregator("standard with status logs")
-
-# show summary
-status_agg
-
-# aggregate with the status log aggregator
-status_agg_data <- status_files |>
-  orbi_aggregate_raw(aggregator = "standard with status logs")
-```
-
-Status log data is a great way to check on the instrument conditions during an analysis, for example to see whether the temperatures were stable or whether there were any vacuum issues.
-
-```{r}
-#| label: fig-status-log
-#| fig-cap: Instrument temperatures and vacuum pressure recorded in the status logs of the two files.
-#| fig-width: 8
-#| fig-height: 7
-
-# retrieve the status log channels
-status_log <- status_agg_data |>
-  orbi_get_data(file_info = "filename", status_log = everything())
-
-# bring the channels into long format for plotting them in panels
-status_log |>
-  tidyr::pivot_longer(
-    cols = c("ambient_temp.C", "analyzer_temp.C", "uhv_pressure.mbar"),
-    names_to = "channel"
-  ) |>
-  ggplot() +
-  aes(x = time.min, y = value) +
-  geom_line() +
-  facet_grid(channel ~ filename, scales = "free") +
-  labs(x = "time [min]", y = NULL) +
-  theme_bw()
 ```
 
 # Identifying isotopocules
