@@ -65,12 +65,14 @@ numbers_to_text <- function(
 # convert seconds to pretty time
 secs_to_text <- function(secs) {
   stopifnot(is.numeric(secs))
+  # round to the shown precision first so e.g. 59.96s becomes 1m, not 60s
+  rsecs <- ifelse(!is.na(secs) & secs >= 1, round(secs, 1), secs)
   out <- tibble(
     idx = seq_along(secs),
-    d = floor(secs / 86400),
-    h = floor((secs / 3600) %% 24),
-    m = floor((secs / 60) %% 60),
-    s = round(secs %% 60, 1),
+    d = floor(rsecs / 86400),
+    h = floor((rsecs / 3600) %% 24),
+    m = floor((rsecs / 60) %% 60),
+    s = round(rsecs %% 60, 1),
     ms = round((secs * 1000L) %% 1000),
     small = secs < 1
   ) |>

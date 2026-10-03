@@ -26,6 +26,8 @@ test_that("secs_to_text()", {
   expect_equal(secs_to_text(0.5), "500ms")
   expect_equal(secs_to_text(65), "1m 5s")
   expect_equal(secs_to_text(3661), "1h 1m 1s")
+  # rounding carries over into the minutes / hours
+  expect_equal(secs_to_text(c(59.96, 2639.96, 3599.97)), c("1m", "44m", "1h"))
   expect_equal(secs_to_text(c(0.5, 65)), c("500ms", "1m 5s"))
   # special values pass through
   expect_equal(
