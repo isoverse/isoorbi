@@ -24,6 +24,8 @@ navbar:
       - text: "Isoorbi package"
       - text: "Aggregation"
         href: articles/aggregation.html
+      - text: "Data blocks"
+        href: articles/blocks.html
       - text: "Dual inlet analysis"
         href: articles/dual_inlet.html
       - text: "Flow injection analysis"
@@ -85,6 +87,7 @@ reference:
   - orbi_define_blocks
   - orbi_define_block_for_flow_injection
   - orbi_define_blocks_for_dual_inlet
+  - orbi_adjust_blocks
   - orbi_adjust_block
   - orbi_segment_blocks
   - orbi_get_blocks_info
