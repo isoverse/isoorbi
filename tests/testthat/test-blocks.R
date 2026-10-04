@@ -127,7 +127,7 @@ test_that("orbi_define_blocks()", {
   # ... and by time, which is treated the same way (the file's time range is named)
   orbi_define_blocks(test_data, start_time.min = 5, end_time.min = 6) |>
     suppressMessages() |>
-    expect_warning("outside the data in 2 files.*covers 0.1 to 0.6 min")
+    expect_warning("outside the data in 2 files.*covers 6s to 36s")
   orbi_define_blocks(test_data, start_time.min = 0.001, end_time.min = 0.01) |>
     suppressMessages() |>
     expect_warning("outside the data in 2 files")
@@ -153,7 +153,7 @@ test_that("orbi_define_blocks()", {
   expect_message(
     orbi_define_blocks(multi_data, start_time.min = 0, end_time.min = 99) |>
       expect_message("added 1 block"),
-    "covers scans 1 to 10 \\(0.1 to 1 min\\) in 2 files"
+    "covers scans 1 to 10 \\(6s to 1m\\) in 2 files"
   )
   # and says so when a block could not be added anywhere
   suppressWarnings(
@@ -185,6 +185,55 @@ test_that("orbi_define_blocks()", {
     end_time.min = c(0.4, 0.5)
   ) |>
     expect_error("cannot be recycled")
+
+  # an infinite end means until the end of each file
+  uneven_data <- tibble(
+    filename = rep(c("test1", "test2"), c(10, 6)),
+    scan.no = c(1:10, 1:6),
+    time.min = scan.no / 10
+  )
+  to_end_by_scan <- orbi_define_blocks(
+    uneven_data,
+    start_scan.no = 3L,
+    end_scan.no = Inf
+  ) |>
+    suppressMessages()
+  expect_equal(
+    to_end_by_scan |> dplyr::filter(block == 1L) |> dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  to_end_by_time <- orbi_define_blocks(
+    uneven_data,
+    start_time.min = 0.25,
+    end_time.min = Inf
+  ) |>
+    suppressMessages()
+  expect_equal(
+    to_end_by_time |> dplyr::filter(block == 1L) |> dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  # also in a blocks table (mixed with finite ends)
+  expect_equal(
+    orbi_define_blocks(
+      uneven_data,
+      blocks_table = tibble(start_scan.no = c(1L, 3L), end_scan.no = c(2, Inf))
+    ) |>
+      suppressMessages() |>
+      dplyr::filter(block == 2L) |>
+      dplyr::count(filename),
+    tibble(filename = c("test1", "test2"), n = c(8L, 4L))
+  )
+  # the summary reports the actual end
+  orbi_define_blocks(uneven_data, start_scan.no = 3L, end_scan.no = Inf) |>
+    expect_message("added 1 block") |>
+    expect_message("covers scans 3 to 10")
+  # but only the end can be infinite
+  orbi_define_blocks(uneven_data, start_scan.no = Inf, end_scan.no = Inf) |>
+    expect_error("start_scan.no.*must be finite")
+  orbi_define_blocks(uneven_data, start_time.min = -Inf, end_time.min = 1) |>
+    expect_error("start_time.min.*must be finite")
+  orbi_define_blocks(uneven_data, start_scan.no = 1L, end_scan.no = -Inf) |>
+    expect_error("end_scan.no.*cannot be.*-Inf")
 
   # in_filename checks
   orbi_define_blocks(
@@ -228,7 +277,7 @@ test_that("orbi_define_blocks()", {
       in_filename = "test2"
     ) |>
       expect_message("added 1 block to 1 file"),
-    "block in test2: covers scans 1 to 2 \\(0.1 to 0.2 min\\)\\s*$"
+    "block in test2: covers scans 1 to 2 \\(6s to 12s\\)\\s*$"
   )
 
   # in_filename is recycled like the other parameters, so the same block for
@@ -701,69 +750,95 @@ test_that("orbi_define_blocks_for_dual_inlet()", {
   )
 })
 
-test_that("orbi_adjust_block()", {
+test_that("orbi_adjust_blocks()", {
   # type checks
   expect_error(
-    orbi_adjust_block(),
+    orbi_adjust_blocks(),
     "dataset.*must be.*aggregated.*or.*data frame"
   )
   expect_error(
-    orbi_adjust_block(42),
+    orbi_adjust_blocks(42),
     "dataset.*must be.*aggregated.*or.*data frame"
   )
-  expect_error(orbi_adjust_block(tibble()), "`block` must be a single integer")
+  expect_error(orbi_adjust_blocks(tibble()), "block.*is required")
   expect_error(
-    orbi_adjust_block(tibble(), "42"),
-    "`block` must be a single integer"
+    orbi_adjust_blocks(tibble(), "42"),
+    "block.*must be a whole number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), "4.2"),
-    "`block` must be a single integer"
+    orbi_adjust_blocks(tibble(), 4.2),
+    "block.*must be a whole number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), c(42, 42)),
-    "`block` must be a single integer"
+    orbi_adjust_blocks(tibble(), NA_integer_),
+    "block adjustment 1 is missing the.*block"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, 42),
-    "if set, `filename` must be a single string"
+    orbi_adjust_blocks(tibble(), 42, 42),
+    "in_filename.*must be text"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, c("file", "file")),
-    "if set, `filename` must be a single string"
+    orbi_adjust_blocks(tibble(), 42, "file", shift_start_time.min = "42"),
+    "shift_start_time.min.*must be a number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", shift_start_time.min = "42"),
-    "if set, `shift_start_time.min` must be a single number"
+    orbi_adjust_blocks(tibble(), 42, "file", shift_end_time.min = "42"),
+    "shift_end_time.min.*must be a number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", shift_end_time.min = "42"),
-    "if set, `shift_end_time.min` must be a single number"
+    orbi_adjust_blocks(tibble(), 42, "file", shift_start_scan.no = 4.2),
+    "shift_start_scan.no.*must be a whole number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", shift_start_scan.no = 4.2),
-    "if set, `shift_start_scan.no` must be a single integer"
+    orbi_adjust_blocks(tibble(), 42, "file", shift_end_scan.no = 4.2),
+    "shift_end_scan.no.*must be a whole number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", shift_end_scan.no = 4.2),
-    "if set, `shift_end_scan.no` must be a single integer"
+    orbi_adjust_blocks(tibble(), 42, "file", set_start_time.min = "42"),
+    "set_start_time.min.*must be a number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", set_start_time.min = "42"),
-    "if set, `set_start_time.min` must be a single number"
+    orbi_adjust_blocks(tibble(), 42, "file", set_end_time.min = "42"),
+    "set_end_time.min.*must be a number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", set_end_time.min = "42"),
-    "if set, `set_end_time.min` must be a single number"
+    orbi_adjust_blocks(tibble(), 42, "file", set_start_scan.no = 4.2),
+    "set_start_scan.no.*must be a whole number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", set_start_scan.no = 4.2),
-    "if set, `set_start_scan.no` must be a single integer"
+    orbi_adjust_blocks(tibble(), 42, "file", set_end_scan.no = 4.2),
+    "set_end_scan.no.*must be a whole number"
   )
   expect_error(
-    orbi_adjust_block(tibble(), 42, "file", set_end_scan.no = 4.2),
-    "if set, `set_end_scan.no` must be a single integer"
+    orbi_adjust_blocks(tibble(), 1:3, shift_start_scan.no = 1:2),
+    "cannot be recycled"
   )
+  expect_error(
+    orbi_adjust_blocks(
+      tibble(),
+      1:2,
+      shift_start_time.min = c(42, NA),
+      shift_start_scan.no = c(42, NA)
+    ),
+    "only provide ONE.*to change the block start.*block adjustment 1\\)"
+  )
+  expect_error(
+    orbi_adjust_blocks(
+      tibble(),
+      1,
+      set_end_time.min = 42,
+      set_end_scan.no = 42
+    ),
+    "only provide ONE.*to change the block end"
+  )
+
+  # blocks_table checks
+  orbi_adjust_blocks(tibble(), blocks_table = 42) |>
+    expect_error("must be a data frame")
+  orbi_adjust_blocks(tibble(), blocks_table = tibble()) |>
+    expect_error("at least one row")
+  orbi_adjust_blocks(tibble(), blocks_table = tibble(foo = 1)) |>
+    expect_error("requires a.*block.*column")
 
   # argument value checks
   test_data <- tibble(
@@ -777,68 +852,53 @@ test_that("orbi_adjust_block()", {
     segment = rep(c(NA_integer_, 1L), c(4, 2))
   )
   expect_error(
-    orbi_adjust_block(tibble(), 1),
+    orbi_adjust_blocks(tibble(), 1),
     "does not seem to have any block definitions yet"
   )
   expect_error(
-    orbi_adjust_block(test_data, 1),
-    "has data from more than 1 file"
+    orbi_adjust_blocks(test_data, 1, "dne"),
+    "in_filename.*dne.*is not in this.*dataset"
   )
   expect_error(
-    orbi_adjust_block(test_data, 1, "dne"),
-    "filename.*is not in this.*dataset"
+    orbi_adjust_blocks(test_data, 3, "test1"),
+    "block.*3.*is not in file.*test1"
   )
   expect_error(
-    orbi_adjust_block(test_data, 3, "test1"),
-    "block.*is not in this.*dataset"
+    orbi_adjust_blocks(test_data, 3),
+    "block.*3.*is not in this.*dataset"
   )
   expect_error(
-    orbi_adjust_block(
-      test_data,
-      1,
-      "test1",
-      shift_start_time.min = 42,
-      shift_start_scan.no = 42
-    ),
-    "only provide ONE.*to change the block start"
-  )
-  expect_error(
-    orbi_adjust_block(
-      test_data,
-      1,
-      "test1",
-      set_end_time.min = 42,
-      set_end_scan.no = 42
-    ),
-    "only provide ONE.*to change the block end"
-  )
-  expect_error(
-    orbi_adjust_block(test_data, 1, "test1", set_start_scan.no = 42),
+    orbi_adjust_blocks(test_data, 1, "test1", set_start_scan.no = 42),
     "does not contain scan"
   )
   expect_error(
-    orbi_adjust_block(test_data, 1, "test1", set_start_scan.no = 5),
+    orbi_adjust_blocks(test_data, 1, "test1", set_start_scan.no = 5),
     "invalid scan range.*requested.*block cannot end before it starts"
   )
   expect_error(
-    orbi_adjust_block(test_data, 1, "test1", set_start_time.min = 1),
+    orbi_adjust_blocks(test_data, 1, "test1", set_start_time.min = 1),
     "invalid start time"
   )
   expect_error(
-    orbi_adjust_block(test_data, 1, "test1", set_end_time.min = -1),
+    orbi_adjust_blocks(test_data, 1, "test1", set_end_time.min = -1),
     "invalid end time"
   )
 
   # results check
   expect_message(
-    result0 <- orbi_adjust_block(test_data, 1, "test1"),
+    result0 <- orbi_adjust_blocks(test_data, 1, "test1"),
     "made no changes"
   )
   expect_equal(test_data, result0)
 
   expect_message(
-    result1 <- orbi_adjust_block(test_data, 2, "test1", set_start_time.min = 0),
-    "made the following.*block.*adjustments"
+    result1 <- orbi_adjust_blocks(
+      test_data,
+      2,
+      "test1",
+      set_start_time.min = 0
+    ),
+    "adjusted 1 block in 1 file"
   ) |>
     suppressMessages()
   expect_equal(result1$block, rep(2, 6))
@@ -846,10 +906,100 @@ test_that("orbi_adjust_block()", {
   expect_equal(result1$data_type, test_data$data_type)
   expect_equal(result1$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
+  # without in_filename, the block is adjusted in all files that have it
+  # (and the others are mentioned)
+  multi_file_data <- tibble(
+    filename = rep(c("test1", "test2"), each = 6),
+    scan.no = rep(1:6, 2),
+    time.min = scan.no / 10,
+    block = rep(rep(1:2, each = 3), 2),
+    block_name = "name",
+    data_type = "data"
+  )
+  expect_message(
+    all_files <- orbi_adjust_blocks(
+      multi_file_data,
+      1,
+      shift_start_scan.no = 1
+    ),
+    "adjusted 2 blocks in 2 files"
+  ) |>
+    suppressMessages()
+  expect_equal(
+    all_files$data_type,
+    rep(rep(c("unused", "data"), c(1, 5)), 2)
+  )
+  orbi_adjust_blocks(
+    multi_file_data |> dplyr::filter(!(filename == "test2" & block == 1L)),
+    1,
+    shift_start_scan.no = 1
+  ) |>
+    suppressMessages() |>
+    expect_warning("block.*1.*is not in.*file.*test2.*not adjusted there")
+
+  # several adjustments at once, via vectors and via a blocks table
+  expect_message(
+    several <- orbi_adjust_blocks(
+      multi_file_data,
+      block = c(1, 2),
+      in_filename = "test1",
+      shift_start_scan.no = c(1, NA),
+      shift_end_scan.no = c(NA, -1)
+    ),
+    "adjusted 2 blocks in 1 file"
+  ) |>
+    suppressMessages()
+  expect_equal(
+    several$data_type,
+    c("unused", rep("data", 4), "unused", rep("data", 6))
+  )
+  expect_equal(
+    orbi_adjust_blocks(
+      multi_file_data,
+      blocks_table = tibble(
+        block = c(1, 2),
+        in_filename = "test1",
+        shift_start_scan.no = c(1, NA),
+        shift_end_scan.no = c(NA, -1)
+      )
+    ) |>
+      suppressMessages(),
+    several
+  )
+
+  # which other blocks are affected (block 0 = scans not in any block)
+  gap_data <- tibble(
+    filename = "test1",
+    scan.no = 1:10,
+    time.min = scan.no / 10,
+    block = c(0L, 1L, 1L, 1L, 0L, 2L, 2L, 2L, 2L, 0L),
+    block_name = "name",
+    data_type = rep(
+      c("unused", "data", "unused", "data", "unused"),
+      c(1, 3, 1, 4, 1)
+    )
+  )
+  adjust_messages <- function(...) {
+    testthat::capture_messages(orbi_adjust_blocks(gap_data, ...)) |>
+      paste(collapse = "")
+  }
+  # into the gap: no other block is affected
+  into_gap <- adjust_messages(2, shift_start_scan.no = -1)
+  expect_match(into_gap, "moved start from scan 6")
+  expect_no_match(into_gap, "block 1|block 0|removed")
+  # into part of block 1: block 1 is shortened
+  into_block <- adjust_messages(2, set_start_scan.no = 3)
+  expect_match(into_block, "moved the end of block 1 to the new start")
+  expect_no_match(into_block, "removed")
+  # over all of block 1: block 1 is gone
+  over_block <- adjust_messages(2, set_start_scan.no = 2)
+  expect_match(over_block, "removed block 1 entirely")
+  expect_no_match(over_block, "moved the end of block 1")
+
   # capture success messages and results
   test_that_cli("cli", configs = c("plain", "fancy"), {
     expect_snapshot({
-      result2 <- orbi_adjust_block(
+      result2 <- orbi_adjust_blocks(
         test_data,
         1,
         "test1",
@@ -863,7 +1013,7 @@ test_that("orbi_adjust_block()", {
     expect_equal(result2$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
     expect_snapshot(
-      result3 <- orbi_adjust_block(
+      result3 <- orbi_adjust_blocks(
         test_data,
         2,
         "test1",
@@ -876,7 +1026,7 @@ test_that("orbi_adjust_block()", {
     expect_equal(result3$segment, rep(c(NA_integer_, 1L), c(5, 1)))
 
     expect_snapshot(
-      result4 <- orbi_adjust_block(
+      result4 <- orbi_adjust_blocks(
         test_data,
         1,
         "test1",
@@ -884,15 +1034,55 @@ test_that("orbi_adjust_block()", {
       )
     )
     expect_snapshot(
-      result5 <- orbi_adjust_block(
+      result5 <- orbi_adjust_blocks(
         test_data,
         1,
         "test1",
         shift_end_time.min = 1
       )
     )
+    expect_snapshot(
+      result6 <- orbi_adjust_blocks(
+        multi_file_data,
+        block = c(1, 2),
+        shift_start_scan.no = c(1, NA),
+        shift_end_scan.no = c(NA, -1)
+      )
+    )
   }) |>
     withr::with_options(new = list(show_exec_times = FALSE))
+})
+
+test_that("orbi_adjust_block() is deprecated", {
+  withr::local_options(lifecycle_verbosity = "warning")
+  test_data <- tibble(
+    filename = rep(c("test1", "test2"), c(5, 1)),
+    scan.no = 1:6,
+    time.min = (1:6) / 10,
+    block = rep(1:2, each = 3),
+    block_name = "name",
+    data_type = "data"
+  )
+  expect_warning(
+    deprecated <- orbi_adjust_block(
+      test_data,
+      1,
+      "test1",
+      shift_start_scan.no = 1
+    ) |>
+      suppressMessages(),
+    "orbi_adjust_block.*deprecated.*orbi_adjust_blocks"
+  )
+  expect_equal(
+    deprecated,
+    orbi_adjust_blocks(test_data, 1, "test1", shift_start_scan.no = 1) |>
+      suppressMessages()
+  )
+  # still requires the filename if there is more than one file
+  expect_error(
+    orbi_adjust_block(test_data, 1) |> suppressWarnings(),
+    "has data from more than 1 file"
+  )
 })
 
 test_that("orbi_segment_block()", {
@@ -1069,6 +1259,52 @@ test_that("orbi_add_blocks_to_plot()", {
   vdiffr::expect_doppelganger(
     "intensity plot with blocks",
     orbi_plot_raw_data(df, y = ions.incremental)
+  )
+
+  # block labels in the legend: data blocks as "data" (default) or by name
+  fill_labels <- function(plot) {
+    ggplot2::ggplot_build(plot)$plot$scales$get_scales("fill")$get_limits()
+  }
+  expect_equal(
+    fill_labels(orbi_plot_raw_data(df, y = ions.incremental)),
+    "data"
+  )
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, use_data_block_names = TRUE)
+    ),
+    c("ref", "sam")
+  )
+  # other blocks keep their data type
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, add_all_blocks = TRUE)
+    ),
+    c("changeover", "data")
+  )
+  expect_equal(
+    fill_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        add_all_blocks = TRUE,
+        use_data_block_names = TRUE
+      )
+    ),
+    c("ref", "sam", "changeover")
+  )
+  # unnamed data blocks are still labeled as "data"
+  expect_equal(
+    df |>
+      dplyr::mutate(block_name = NA_character_) |>
+      orbi_plot_raw_data(y = ions.incremental, use_data_block_names = TRUE) |>
+      fill_labels(),
+    "data"
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental) |>
+      orbi_add_blocks_to_plot(use_data_block_names = "yes"),
+    "use_data_block_names.*must be TRUE or FALSE"
   )
 })
 

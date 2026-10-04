@@ -8,7 +8,9 @@ orbi_plot_raw_data(
   dataset,
   isotopocules = c(),
   x = c("time.min", "scan.no"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   y,
   y_scale = c("raw", "linear", "pseudo-log", "log"),
   y_scale_sci_labels = TRUE,
@@ -18,7 +20,10 @@ orbi_plot_raw_data(
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
-  show_outliers = TRUE
+  use_data_block_names = FALSE,
+  show_outliers = TRUE,
+  show_points = FALSE,
+  point_size = NULL
 )
 }
 \arguments{
@@ -26,9 +31,13 @@ orbi_plot_raw_data(
 
 \item{isotopocules}{which isotopocules to visualize, if none provided will visualize all (this may take a long time or even crash your R session if there are too many isotopocules in the data set)}
 
-\item{x}{x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"}
+\item{x}{which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.}
 
-\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
+\item{x_breaks}{what breaks to use for the x axis. By default (\code{NULL}) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. \verb{1:30 min}), provide breaks to make more specific tickmarks. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{n_x_breaks}{the desired number of x axis breaks when using the default pretty breaks (\code{x_breaks = NULL}), default: \code{5}. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{short_time_labels}{whether to use compact time axis labels with no space between value and unit and abbreviated units (\code{hr}, \code{m}, \code{s}), e.g. \verb{1:30m} instead of \verb{1:30 min}. Only relevant for a time based x axis (\code{x = "time.min"}).}
 
 \item{y}{expression for what to plot on the y-axis, e.g. \code{intensity}, \code{tic * it.ms} (pick one \code{isotopocules} as this is identical for different istopocules), \code{ratio}. Depending on the variable, you may want to adjust the \code{y_scale} and potentially \code{y_scale_sci_labels} argument.}
 
@@ -46,7 +55,13 @@ orbi_plot_raw_data(
 
 \item{add_all_blocks}{add highlight for all blocks, not just data blocks (equivalent to the \code{data_only = FALSE} argument in \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}})}
 
+\item{use_data_block_names}{whether to label the data blocks by their individual \code{block_name} (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.}
+
 \item{show_outliers}{whether to highlight data previously flagged as outliers by \code{\link[=orbi_flag_outliers]{orbi_flag_outliers()}}}
+
+\item{show_points}{whether to show the individual data points in addition to the lines connecting them}
+
+\item{point_size}{the size of the data points (if \code{show_points = TRUE}) and of the outlier points (if \code{show_outliers = TRUE}). By default (\code{NULL}) the ggplot2 default point size is used.}
 }
 \value{
 a ggplot object

@@ -99,7 +99,7 @@ orbi_flag_satellite_peaks <- function(dataset) {
 
   if (sat_peaks > 0) {
     finish_info(
-      "flagged {format_number(sat_peaks)}/{format_number(nrow(peaks))} peaks ",
+      "flagged {numbers_to_text(sat_peaks)}/{numbers_to_text(nrow(peaks))} peaks ",
       "in {length(isotopocules)} isotopocule{?s} ({.field {isotopocules}}) ",
       "as {cli::col_yellow('satellite')} peaks ({signif(100 * sat_peaks / nrow(peaks), 2)}%)",
       start = start
@@ -150,7 +150,7 @@ orbi_filter_weak_isotopocules <- function(...) {
 #' is defined relative to the most commonly observed isotopocule of each compound). The default is 100, the most stringent condition to ensure reliable
 #' isotpocule coverage and ratio calculations across data blocks. If you lower the default, be mindful of potential misinterprations from using isotopotcules
 #' that are very close to their detection limit within a datablock. For continuous flow operations it may be necessary to make data blocks smaller using
-#' [orbi_define_blocks()] and [orbi_adjust_block()].
+#' [orbi_define_blocks()] and [orbi_adjust_blocks()].
 #'
 #' @examples
 #' fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
@@ -251,7 +251,7 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent = 100) {
       "flagged {removed_isotopocules} of {starting_isotopocules} isotopocules as {cli::col_yellow('weak')} ",
       "because they were NOT present in at least {min_percent}% of scans ",
       if (n_groups > 0) {
-        "in each of the {n_groups} data groups (based on {.field {dplyr::group_vars(peaks_out)}}) "
+        "in each of the {numbers_to_text(n_groups)} data groups (based on {.field {dplyr::group_vars(peaks_out)}}) "
       },
       "{cli::symbol$arrow_right} use {.strong orbi_plot_isotopocule_coverage()} to visualize them",
       start = start
@@ -261,7 +261,7 @@ orbi_flag_weak_isotopocules <- function(dataset, min_percent = 100) {
       "confirmed there are no {cli::col_yellow('weak')} isotopocules: ",
       "all are detected in at least {min_percent}% of scans ",
       if (n_groups > 0) {
-        "in each of the {n_groups} data groups (based on {.field {dplyr::group_vars(peaks_out)}})"
+        "in each of the {numbers_to_text(n_groups)} data groups (based on {.field {dplyr::group_vars(peaks_out)}})"
       },
       start = start
     )
@@ -666,20 +666,20 @@ orbi_flag_outliers <- function(
   n_groups <- dplyr::n_groups(single_scans)
   if (n_scans_flagged > 0) {
     finish_info(
-      "flagged {n_scans_flagged}/{n_scans} scans ({signif(n_scans_flagged / n_scans * 100, 2)}%) as {cli::col_yellow('outliers')} ",
+      "flagged {numbers_to_text(n_scans_flagged)}/{numbers_to_text(n_scans)} scans ({signif(n_scans_flagged / n_scans * 100, 2)}%) as {cli::col_yellow('outliers')} ",
       "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
       if (n_groups > 1) {
-        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(single_scans)}}) "
+        ", in {numbers_to_text(n_groups)} data groups (based on {.field {dplyr::group_vars(single_scans)}}) "
       },
       " {cli::symbol$arrow_right} use {.strong orbi_plot_raw_data(y = tic * it.ms)} to visualize them",
       start = start
     )
   } else {
     finish_info(
-      "confirmed that none of the {n_scans} scans are {cli::col_yellow('outliers')} ",
+      "confirmed that none of the {numbers_to_text(n_scans)} scans are {cli::col_yellow('outliers')} ",
       "based on {.field {method_type}}, i.e. based on {.emph {method_msg}}",
       if (n_groups > 1) {
-        ", in {n_groups} data groups (based on {.field {dplyr::group_vars(single_scans)}}) "
+        ", in {numbers_to_text(n_groups)} data groups (based on {.field {dplyr::group_vars(single_scans)}}) "
       },
       start = start
     )
@@ -898,7 +898,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
           groupings <- setdiff(names(df.info), c("uidx", "..n_too_few"))
           cli_bullets(
             c(
-              "!" = "{cli::col_yellow('Warning')}: {format_number(sum(df.info$..n_too_few))}/{format_number(nrow(df.info))} data groups ({.field {paste(groupings, collapse = ' + ')}}) cannot be used because the {.field {basepeak_def}} isotopocule is missing",
+              "!" = "{cli::col_yellow('Warning')}: {numbers_to_text(sum(df.info$..n_too_few))}/{numbers_to_text(nrow(df.info))} data groups ({.field {paste(groupings, collapse = ' + ')}}) cannot be used because the {.field {basepeak_def}} isotopocule is missing",
               "i" = "To investigate, use {.strong orbi_flag_weak_isotopocules()} and {.strong orbi_plot_isotopocule_coverage()} or {.strong orbi_get_isotopocule_coverage()} {.emph before} defining the base peak"
             )
           )
@@ -957,7 +957,7 @@ orbi_define_basepeak <- function(dataset, basepeak_def) {
   finish_info(
     "set {.field {basepeak_def}} as the ratio denominator ",
     if (is.data.frame(df.out)) {
-      "and calculated {format_number(nrow(df.out))} {.field ratio} values "
+      "and calculated {numbers_to_text(nrow(df.out))} {.field ratio} values "
     },
     if (is.data.frame(df.out) && "isotopocule" %in% names(df.out)) {
       "for {length(levels(df.out$isotopocule))} isotopocules ({.field {levels(df.out$isotopocule)}})"

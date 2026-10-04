@@ -139,11 +139,11 @@ orbi_analyze_shot_noise <- function(dataset, include_flagged_data = FALSE) {
 
   # info
   finish_info(
-    "analyzed the shot noise for {if (include_flagged_data) format_number(n_all) else format_number(n_after)} {.field ratios} (",
+    "analyzed the shot noise for {if (include_flagged_data) numbers_to_text(n_all) else numbers_to_text(n_after)} {.field ratios} (",
     if (n_all == n_after) {
       "there are no flagged peaks)"
     } else {
-      "{if (include_flagged_data) 'including' else 'excluding'} {format_number(n_all - n_after)} flagged peaks)"
+      "{if (include_flagged_data) 'including' else 'excluding'} {numbers_to_text(n_all - n_after)} flagged peaks)"
     },
     start = start
   )

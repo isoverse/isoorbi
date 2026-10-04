@@ -2,7 +2,7 @@
 % Please edit documentation in R/blocks_functions.R
 \name{orbi_adjust_block}
 \alias{orbi_adjust_block}
-\title{Manually adjust block delimiters}
+\title{Manually adjust a block delimiter}
 \usage{
 orbi_adjust_block(
   dataset,
@@ -42,9 +42,11 @@ orbi_adjust_block(
 \item{set_end_scan.no}{if provided, sets the end of the block to this scan number (scan must exist in the \code{dataset})}
 }
 \value{
-A data frame (tibble) with block limits altered according to the provided start/end change parameters. Any data that is no longer part of the original block will be marked with the value of \code{orbi_get_option("data_type_unused")}. Any previously applied segmentation will be discarded (\code{segment} column set to \code{NA}) to avoid unintended side effects.
+see \code{\link[=orbi_adjust_blocks]{orbi_adjust_blocks()}}
 }
 \description{
-This function can be used to manually adjust where certain \code{block} starts or ends after it's been defined with \code{\link[=orbi_define_blocks]{orbi_define_blocks()}} or \code{\link[=orbi_define_blocks_for_dual_inlet]{orbi_define_blocks_for_dual_inlet()}} using either time or scan number.
-Note that adjusting blocks removes all block segmentation. Make sure to call \code{\link[=orbi_segment_blocks]{orbi_segment_blocks()}} \strong{after} adjusting block delimiters.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+\code{orbi_adjust_block()} was renamed \code{\link[=orbi_adjust_blocks]{orbi_adjust_blocks()}} since it can now adjust several blocks at once
+(and identifies the file with \code{in_filename} instead of \code{filename}).
 }

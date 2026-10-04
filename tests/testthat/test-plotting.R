@@ -154,6 +154,171 @@ test_that("orbi_plot_raw_data() tests", {
     orbi_plot_raw_data(df, y = ions.incremental, y_scale = "log")
   )
 
+  # data points in addition to the lines
+  geoms <- function(plot) {
+    unname(purrr::map_chr(plot$layers, ~ class(.x$geom)[1]))
+  }
+  expect_false(
+    "GeomPoint" %in%
+      geoms(orbi_plot_raw_data(df, y = ions.incremental, show_outliers = FALSE))
+  )
+  expect_equal(
+    geoms(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        show_outliers = FALSE,
+        show_points = TRUE
+      )
+    ),
+    c("GeomLine", "GeomPoint")
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, show_points = "yes"),
+    "show_points.*must be TRUE or FALSE"
+  )
+  # groups with a single data point are not part of the lines but they are
+  # still in the points
+  df_singles <- df |> dplyr::mutate(data_group = scan.no)
+  singles_plot <- orbi_plot_raw_data(
+    df_singles,
+    y = ions.incremental,
+    show_points = TRUE
+  ) |>
+    ggplot2::ggplot_build()
+  expect_equal(nrow(singles_plot$data[[1]]), 0L)
+  expect_equal(nrow(singles_plot$data[[2]]), nrow(df_singles))
+  df_some_singles <- df |>
+    dplyr::mutate(data_group = ifelse(scan.no %% 50 == 0, -scan.no, 1L))
+  expect_equal(
+    orbi_plot_raw_data(df_some_singles, y = ions.incremental) |>
+      ggplot2::layer_data(1) |>
+      nrow(),
+    sum(df_some_singles$scan.no %% 50 != 0)
+  )
+
+  # point size: ggplot default unless set, then for data AND outlier points
+  df_outliers <- df |>
+    dplyr::mutate(
+      is_outlier = scan.no %% 100 == 0,
+      outlier_type = ifelse(is_outlier, "test", NA_character_)
+    )
+  expect_true(any(df_outliers$is_outlier))
+  point_sizes <- function(plot) {
+    plot$layers[geoms(plot) == "GeomPoint"] |>
+      purrr::map(~ .x$aes_params$size) |>
+      unname()
+  }
+  expect_equal(
+    point_sizes(
+      orbi_plot_raw_data(df_outliers, y = ions.incremental, show_points = TRUE)
+    ),
+    list(NULL, NULL)
+  )
+  expect_equal(
+    point_sizes(
+      orbi_plot_raw_data(
+        df_outliers,
+        y = ions.incremental,
+        show_points = TRUE,
+        point_size = 2L
+      )
+    ),
+    list(2L, 2L)
+  )
+  # also for the outliers if the data points are not shown
+  expect_equal(
+    point_sizes(
+      orbi_plot_raw_data(df_outliers, y = ions.incremental, point_size = 2)
+    ),
+    list(2)
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, point_size = 0),
+    "point_size.*must be a single number larger than 0"
+  )
+
+  # time axis labels (durations, optionally short) vs. scan axis labels
+  # note: breaks outside the plotted range have NA labels
+  x_labels <- function(plot) {
+    labels <- ggplot2::ggplot_build(plot)$layout$panel_params[[
+      1
+    ]]$x$get_labels()
+    labels[!is.na(labels)]
+  }
+  expect_equal(
+    x_labels(orbi_plot_raw_data(df, y = ions.incremental)),
+    c("0:30 min", "1:00 min", "1:30 min", "2:00 min", "2:30 min", "3:00 min")
+  )
+  expect_equal(
+    x_labels(
+      orbi_plot_raw_data(df, y = ions.incremental, short_time_labels = TRUE)
+    ),
+    c("0:30m", "1:00m", "1:30m", "2:00m", "2:30m", "3:00m")
+  )
+  # no effect on scan based axes
+  expect_equal(
+    x_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        x = "scan.no",
+        short_time_labels = TRUE
+      )
+    ),
+    x_labels(orbi_plot_raw_data(df, y = ions.incremental, x = "scan.no"))
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, short_time_labels = "yes"),
+    "short_time_labels.*must be TRUE or FALSE"
+  )
+
+  # number of pretty breaks, on both time and scan axes
+  expect_gt(
+    length(x_labels(orbi_plot_raw_data(
+      df,
+      y = ions.incremental,
+      n_x_breaks = 10
+    ))),
+    length(x_labels(orbi_plot_raw_data(df, y = ions.incremental)))
+  )
+  expect_lt(
+    length(x_labels(
+      orbi_plot_raw_data(
+        df,
+        y = ions.incremental,
+        x = "scan.no",
+        n_x_breaks = 2
+      )
+    )),
+    length(x_labels(orbi_plot_raw_data(
+      df,
+      y = ions.incremental,
+      x = "scan.no"
+    )))
+  )
+  # but not together with specific breaks
+  expect_error(
+    orbi_plot_raw_data(
+      df,
+      y = ions.incremental,
+      x_breaks = 1:2,
+      n_x_breaks = 3
+    ),
+    "either.*x_breaks.*or.*n_x_breaks.*not both"
+  )
+  expect_no_error(
+    orbi_plot_raw_data(df, y = ions.incremental, x_breaks = c(1, 2))
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, n_x_breaks = 0),
+    "n_x_breaks.*must be a single whole number"
+  )
+  expect_error(
+    orbi_plot_raw_data(df, y = ions.incremental, n_x_breaks = 2.5),
+    "n_x_breaks.*must be a single whole number"
+  )
+
   df2 <- orbi_read_isox(system.file(
     "extdata",
     "testfile_flow.isox",

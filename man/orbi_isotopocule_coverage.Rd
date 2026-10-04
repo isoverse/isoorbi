@@ -9,7 +9,9 @@ orbi_plot_isotopocule_coverage(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   add_data_blocks = TRUE,
   colors = c("#7570B3", "#E6AB02", "#66A61E", "#A6761D", "#D95F02", "#1B9E77", "#E7298A",
     "#666666", "#BBBBBB")
@@ -24,7 +26,11 @@ orbi_get_isotopocule_coverage(dataset)
 
 \item{x}{x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"}
 
-\item{x_breaks}{what breaks to use for the x axis, change to make more specifid tickmarks}
+\item{x_breaks}{what breaks to use for the x axis. By default (\code{NULL}) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. \verb{1:30 min}), provide breaks to make more specific tickmarks. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{n_x_breaks}{the desired number of x axis breaks when using the default pretty breaks (\code{x_breaks = NULL}), default: \code{5}. Use either \code{x_breaks} or \code{n_x_breaks}, not both.}
+
+\item{short_time_labels}{whether to use compact time axis labels with no space between value and unit and abbreviated units (\code{hr}, \code{m}, \code{s}), e.g. \verb{1:30m} instead of \verb{1:30 min}. Only relevant for a time based x axis (\code{x = "time.min"}).}
 
 \item{add_data_blocks}{add highlight for data blocks if there are any block definitions in the dataset (uses \code{\link[=orbi_add_blocks_to_plot]{orbi_add_blocks_to_plot()}}). To add blocks manually, set \code{add_data_blocks = FALSE} and manually call the \code{orbi_add_blocks_to_plot()} function afterwards.}
 
