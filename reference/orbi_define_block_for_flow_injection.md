@@ -40,7 +40,7 @@ orbi_define_block_for_flow_injection(
 - end_time.min:
 
   end time of the block(s), a single value or a vector for multiple
-  blocks
+  blocks. Use `Inf` for a block that lasts until the end of each file.
 
 - start_scan.no:
 
@@ -50,7 +50,8 @@ orbi_define_block_for_flow_injection(
 - end_scan.no:
 
   end scan of the block(s), a single value or a vector for multiple
-  blocks
+  blocks. Use `Inf` for a block that lasts until the last scan of each
+  file.
 
 - block_name:
 

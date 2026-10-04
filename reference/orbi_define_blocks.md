@@ -43,7 +43,7 @@ orbi_define_blocks(
 - end_time.min:
 
   end time of the block(s), a single value or a vector for multiple
-  blocks
+  blocks. Use `Inf` for a block that lasts until the end of each file.
 
 - start_scan.no:
 
@@ -53,7 +53,8 @@ orbi_define_blocks(
 - end_scan.no:
 
   end scan of the block(s), a single value or a vector for multiple
-  blocks
+  blocks. Use `Inf` for a block that lasts until the last scan of each
+  file.
 
 - block_name:
 
@@ -110,15 +111,15 @@ check if a block was trimmed.
 ``` r
 fpath <- system.file("extdata", "testfile_flow.isox", package = "isoorbi")
 df <- orbi_read_isox(file = fpath) |> orbi_simplify_isox()
-#> ✔ [14ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [15ms] orbi_read_isox() loaded 6.45k peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 #> ✔ [4ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
 
 # a single block
 df |> orbi_define_blocks(start_time.min = 0.2, end_time.min = 0.8)
-#> ✔ [41ms] orbi_define_blocks() added 1 block to 3 files
-#>  → block: covers scans 87 to 344 (0.202 to 0.799 min) in 3 files
+#> ✔ [39ms] orbi_define_blocks() added 1 block to 3 files
+#>  → block: covers scans 87 to 344 (12.1s to 47.9s) in 3 files
 #> # A tibble: 6,449 × 14
 #>    filepath      filename scan.no time.min compound isotopocule ions.incremental
 #>    <chr>         <fct>      <int>    <dbl> <fct>    <fct>                  <dbl>
@@ -142,9 +143,9 @@ df |> orbi_define_blocks(
   end_time.min = c(0.4, 0.8),
   block_name = c("first", "second")
 )
-#> ✔ [67ms] orbi_define_blocks() added 2 blocks to 3 files
-#>  → block first: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files
-#>  → block second: covers scans 216 to 344 (0.502 to 0.799 min) in 3 files
+#> ✔ [77ms] orbi_define_blocks() added 2 blocks to 3 files
+#>  → block first: covers scans 43 to 172 (6s to 23.9s) in 3 files
+#>  → block second: covers scans 216 to 344 (30.1s to 47.9s) in 3 files
 #> # A tibble: 6,449 × 14
 #>    filepath      filename scan.no time.min compound isotopocule ions.incremental
 #>    <chr>         <fct>      <int>    <dbl> <fct>    <fct>                  <dbl>
@@ -172,9 +173,9 @@ df |> orbi_define_blocks(
     block_name = c("first", "second")
   )
 )
-#> ✔ [61ms] orbi_define_blocks() added 2 blocks to 3 files
-#>  → block first: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files
-#>  → block second: covers scans 200 to 350 (0.464 to 0.813 min) in 3 files
+#> ✔ [65ms] orbi_define_blocks() added 2 blocks to 3 files
+#>  → block first: covers scans 43 to 172 (6s to 23.9s) in 3 files
+#>  → block second: covers scans 200 to 350 (27.8s to 48.8s) in 3 files
 #> # A tibble: 6,449 × 14
 #>    filepath      filename scan.no time.min compound isotopocule ions.incremental
 #>    <chr>         <fct>      <int>    <dbl> <fct>    <fct>                  <dbl>
@@ -198,8 +199,8 @@ df |> orbi_define_blocks(
   end_time.min = 0.8,
   in_filename = "ac5"
 )
-#> ✔ [35ms] orbi_define_blocks() added 1 block to 1 file
-#>  → block in ac5: covers scans 87 to 344 (0.202 to 0.799 min)
+#> ✔ [36ms] orbi_define_blocks() added 1 block to 1 file
+#>  → block in ac5: covers scans 87 to 344 (12.1s to 47.9s)
 #> # A tibble: 6,449 × 14
 #>    filepath      filename scan.no time.min compound isotopocule ions.incremental
 #>    <chr>         <fct>      <int>    <dbl> <fct>    <fct>                  <dbl>

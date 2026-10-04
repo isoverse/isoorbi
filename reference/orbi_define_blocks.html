@@ -11,7 +11,7 @@ If you want to make segments in the blocks (optional), note that this function -
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@ If you want to make segments in the blocks (optional), note that this function -
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-examples"><li><h6 class="dropdown-header" data-toc-skip>Isoorbi package</h6></li>
+    <li><a class="dropdown-item" href="../articles/aggregation.html">Aggregation</a></li>
+    <li><a class="dropdown-item" href="../articles/blocks.html">Data blocks</a></li>
     <li><a class="dropdown-item" href="../articles/dual_inlet.html">Dual inlet analysis</a></li>
     <li><a class="dropdown-item" href="../articles/flow_injection.html">Flow injection analysis</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Kantnerová et al. 2024</h6></li>
@@ -77,7 +79,7 @@ If you want to make segments in the blocks (optional), note that this function -
 
 
 <dt id="arg-end-time-min">end_time.min<a class="anchor" aria-label="anchor" href="#arg-end-time-min"></a></dt>
-<dd><p>end time of the block(s), a single value or a vector for multiple blocks</p></dd>
+<dd><p>end time of the block(s), a single value or a vector for multiple blocks. Use <code>Inf</code> for a block that lasts until the end of each file.</p></dd>
 
 
 <dt id="arg-start-scan-no">start_scan.no<a class="anchor" aria-label="anchor" href="#arg-start-scan-no"></a></dt>
@@ -85,7 +87,7 @@ If you want to make segments in the blocks (optional), note that this function -
 
 
 <dt id="arg-end-scan-no">end_scan.no<a class="anchor" aria-label="anchor" href="#arg-end-scan-no"></a></dt>
-<dd><p>end scan of the block(s), a single value or a vector for multiple blocks</p></dd>
+<dd><p>end scan of the block(s), a single value or a vector for multiple blocks. Use <code>Inf</code> for a block that lasts until the last scan of each file.</p></dd>
 
 
 <dt id="arg-block-name">block_name<a class="anchor" aria-label="anchor" href="#arg-block-name"></a></dt>
@@ -115,15 +117,15 @@ If you want to make segments in the blocks (optional), note that this function -
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fpath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"testfile_flow.isox"</span>, package <span class="op">=</span> <span class="st">"isoorbi"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="orbi_read_isox.html">orbi_read_isox</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">fpath</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="orbi_simplify_isox.html">orbi_simplify_isox</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[14ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6449 peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[15ms]</span> <span style="font-weight: bold;">orbi_read_isox()</span> loaded 6.45k peaks for 1 compound (<span style="color: #00BB00;">HSO4-</span>) with 5</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> isotopocules (<span style="color: #00BB00;">M0</span>, <span style="color: #00BB00;">33S</span>, <span style="color: #00BB00;">17O</span>, <span style="color: #00BB00;">34S</span>, and <span style="color: #00BB00;">18O</span>) from <span style="color: #0000BB;">testfile_flow.isox</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[4ms]</span> <span style="font-weight: bold;">orbi_simplify_isox()</span> kept columns <span style="color: #00BB00;">filepath</span>, <span style="color: #00BB00;">filename</span>, <span style="color: #00BB00;">scan.no</span>,</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">time.min</span>, <span style="color: #00BB00;">compound</span>, <span style="color: #00BB00;">isotopocule</span>, <span style="color: #00BB00;">ions.incremental</span>, <span style="color: #00BB00;">tic</span>, and <span style="color: #00BB00;">it.ms</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a single block</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">|&gt;</span> <span class="fu">orbi_define_blocks</span><span class="op">(</span>start_time.min <span class="op">=</span> <span class="fl">0.2</span>, end_time.min <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[41ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 3 files</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block: covers scans 87 to 344 (0.202 to 0.799 min) in 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[39ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block: covers scans 87 to 344 (12.1s to 47.9s) in 3 files</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    filepath      filename scan.no time.min compound isotopocule ions.incremental</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -147,9 +149,9 @@ If you want to make segments in the blocks (optional), note that this function -
 <span class="r-in"><span>  end_time.min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.8</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  block_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first"</span>, <span class="st">"second"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[67ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 3 files</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">first</span>: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">second</span>: covers scans 216 to 344 (0.502 to 0.799 min) in 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[77ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">first</span>: covers scans 43 to 172 (6s to 23.9s) in 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">second</span>: covers scans 216 to 344 (30.1s to 47.9s) in 3 files</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    filepath      filename scan.no time.min compound isotopocule ions.incremental</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -177,9 +179,9 @@ If you want to make segments in the blocks (optional), note that this function -
 <span class="r-in"><span>    block_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first"</span>, <span class="st">"second"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[61ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 3 files</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">first</span>: covers scans 43 to 172 (0.1 to 0.399 min) in 3 files</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">second</span>: covers scans 200 to 350 (0.464 to 0.813 min) in 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[65ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 2 blocks to 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">first</span>: covers scans 43 to 172 (6s to 23.9s) in 3 files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block <span style="color: #00BB00;">second</span>: covers scans 200 to 350 (27.8s to 48.8s) in 3 files</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    filepath      filename scan.no time.min compound isotopocule ions.incremental</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -203,8 +205,8 @@ If you want to make segments in the blocks (optional), note that this function -
 <span class="r-in"><span>  end_time.min <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
 <span class="r-in"><span>  in_filename <span class="op">=</span> <span class="st">"ac5"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[35ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 1 file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block in <span style="color: #0000BB;">ac5</span>: covers scans 87 to 344 (0.202 to 0.799 min)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> <span style="color: #B2B2B2;">[36ms]</span> <span style="font-weight: bold;">orbi_define_blocks()</span> added 1 block to 1 file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  → block in <span style="color: #0000BB;">ac5</span>: covers scans 87 to 344 (12.1s to 47.9s)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6,449 × 14</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    filepath      filename scan.no time.min compound isotopocule ions.incremental</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

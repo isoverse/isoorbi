@@ -11,7 +11,9 @@ orbi_plot_isotopocule_coverage(
   dataset,
   isotopocules = c(),
   x = c("scan.no", "time.min"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   add_data_blocks = TRUE,
   colors = c("#7570B3", "#E6AB02", "#66A61E", "#A6761D", "#D95F02", "#1B9E77", "#E7298A",
     "#666666", "#BBBBBB")
@@ -41,8 +43,24 @@ orbi_get_isotopocule_coverage(dataset)
 
 - x_breaks:
 
-  what breaks to use for the x axis, change to make more specifid
-  tickmarks
+  what breaks to use for the x axis. By default (`NULL`) these are
+  pretty breaks for scan numbers or pretty time intervals for time
+  (which is labeled as a duration, e.g. `1:30 min`), provide breaks to
+  make more specific tickmarks. Use either `x_breaks` or `n_x_breaks`,
+  not both.
+
+- n_x_breaks:
+
+  the desired number of x axis breaks when using the default pretty
+  breaks (`x_breaks = NULL`), default: `5`. Use either `x_breaks` or
+  `n_x_breaks`, not both.
+
+- short_time_labels:
+
+  whether to use compact time axis labels with no space between value
+  and unit and abbreviated units (`hr`, `m`, `s`), e.g. `1:30m` instead
+  of `1:30 min`. Only relevant for a time based x axis
+  (`x = "time.min"`).
 
 - add_data_blocks:
 

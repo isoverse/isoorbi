@@ -273,8 +273,10 @@ and `flow injection` data.
   **\[deprecated\]** : Define data block for flow injection
 - [`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md)
   : Binning raw data into blocks for dual inlet analyses
-- [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md)
+- [`orbi_adjust_blocks()`](https://isoorbi.isoverse.org/reference/orbi_adjust_blocks.md)
   : Manually adjust block delimiters
+- [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md)
+  **\[deprecated\]** : Manually adjust a block delimiter
 - [`orbi_segment_blocks()`](https://isoorbi.isoverse.org/reference/orbi_segment_blocks.md)
   : Segment data blocks
 - [`orbi_get_blocks_info()`](https://isoorbi.isoverse.org/reference/orbi_get_blocks_info.md)
@@ -399,6 +401,15 @@ analysis.
 # Articles
 
 ### All vignettes
+
+- [Aggregation](https://isoorbi.isoverse.org/articles/aggregation.md):
+
+  How to use the included aggregators, build custom ones, and aggregate
+  the instrument status log.
+
+- [Data blocks](https://isoorbi.isoverse.org/articles/blocks.md):
+
+  How to define, inspect, adjust, and segment data blocks.
 
 - [Dual Inlet](https://isoorbi.isoverse.org/articles/dual_inlet.md):
 

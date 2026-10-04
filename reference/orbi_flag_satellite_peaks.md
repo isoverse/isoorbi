@@ -39,9 +39,9 @@ df <-
   orbi_read_isox(file = fpath) |>
   orbi_simplify_isox() |>
   orbi_flag_satellite_peaks()
-#> ✔ [15ms] orbi_read_isox() loaded 6449 peaks for 1 compound (HSO4-) with 5
+#> ✔ [16ms] orbi_read_isox() loaded 6.45k peaks for 1 compound (HSO4-) with 5
 #> isotopocules (M0, 33S, 17O, 34S, and 18O) from testfile_flow.isox
 #> ✔ [4ms] orbi_simplify_isox() kept columns filepath, filename, scan.no,
 #> time.min, compound, isotopocule, ions.incremental, tic, and it.ms
-#> ✔ [103ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+#> ✔ [109ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```

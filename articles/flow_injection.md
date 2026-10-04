@@ -23,27 +23,27 @@ raw_files <-
 ```
 
 ``` fansi
-✔ [242ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
+✔ [270ms] orbi_read_raw() read ac5.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [97ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
+✔ [116ms] orbi_read_raw() read ac6.RAW from cache, included the spectrum from 1
 scan
 ```
 
 ``` fansi
-✔ [75ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
+✔ [92ms] orbi_read_raw() read s3744.RAW from cache, included the spectrum from
 1 scan
 ```
 
 ``` fansi
-✔ [516ms] orbi_read_raw() finished reading 3 files
+✔ [639ms] orbi_read_raw() finished reading 3 files
 ```
 
 ``` fansi
-✔ [803ms] orbi_aggregate_raw() aggregated file_info (3), scans (16.63k), peaks
-(694.07k), spectra (1.98k), and status_log (0) from 3 files using the standard
+✔ [1.1s] orbi_aggregate_raw() aggregated file_info (3), scans (16.6k), peaks
+(694k), spectra (1.98k), and status_log (0) from 3 files using the standard
 aggregator
 ```
 
@@ -86,23 +86,23 @@ raw_files_w_isotopocules <- raw_files |>
 ```
 
 ``` fansi
-! [3.8s] orbi_identify_isotopocules() identified 84.85k/694.07k peaks (12%)
+! [4.2s] orbi_identify_isotopocules() identified 84.8k/694k peaks (12%)
 representing 91% of the total ion current (TIC) as isotopocules M0, 33S, 17O,
 34S, 18O, 36S, 33S18O, 34S17O, and 18O18O using the default_tolerance of 1
 mmu but encountered 1 warning
   → ! isotopocules M0, 33S, 17O, 34S, 18O, 33S18O, 34S17O, 36S, and 18O18O are
-  missing from some scans (64.84k missing peaks in total) - make sure to
+  missing from some scans (64.8k missing peaks in total) - make sure to
   evaluate coverage with e.g. orbi_plot_isotopocule_coverage()
 ```
 
 ``` fansi
-✔ [17ms] orbi_filter_isotopocules() removed 609.22k / 758.91k peaks (80%)
-because they were unidentified peaks (609.22k). Remaining isotopocules: M0,
-33S, 17O, 34S, 18O, 34S17O, 33S18O, 36S, and 18O18O.
+✔ [17ms] orbi_filter_isotopocules() removed 609k / 759k peaks (80%) because
+they were unidentified peaks (609k). Remaining isotopocules: M0, 33S, 17O, 34S,
+18O, 34S17O, 33S18O, 36S, and 18O18O.
 ```
 
 ``` fansi
-✔ [2.3s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [2.5s] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` r
@@ -152,27 +152,27 @@ data <-
 ```
 
 ``` fansi
-✔ [28ms] orbi_filter_isotopocules() removed 66.66k / 149.69k peaks (45%)
-because they were missing isotopocules (64.84k), or not the selected
-isotopocule M0, 33S, 17O, 34S, and 18O (1.82k).
+✔ [29ms] orbi_filter_isotopocules() removed 66.7k / 150k peaks (45%) because
+they were missing isotopocules (64.8k), or not the selected isotopocule M0,
+33S, 17O, 34S, and 18O (1.82k).
 ```
 
 ``` fansi
-✔ [33ms] orbi_flag_weak_isotopocules() confirmed there are no weak
+✔ [38ms] orbi_flag_weak_isotopocules() confirmed there are no weak
 isotopocules: all are detected in at least 99% of scans in each of the 15 data
 groups (based on uidx, compound, and isotopocule)
 ```
 
 ``` fansi
-✔ [19ms] orbi_flag_outliers() flagged 44/16632 scans (0.26%) as outliers based
+✔ [23ms] orbi_flag_outliers() flagged 44/16.6k scans (0.26%) as outliers based
 on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
 average number of ions tic * it.ms in the Orbitrap analyzer, in 3 data groups
 (based on uidx) → use orbi_plot_raw_data(y = tic * it.ms) to visualize them
 ```
 
 ``` fansi
-✔ [1.4s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
-66.40k ratio values for 4 isotopocules (33S, 17O, 34S, and 18O)
+✔ [1.5s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
+66.4k ratio values for 4 isotopocules (33S, 17O, 34S, and 18O)
 ```
 
 Let’s take a look at the AGC cutoff flagged samples
@@ -227,7 +227,7 @@ data_summary <-
 ```
 
 ``` fansi
-✔ [77ms] orbi_summarize_results() summarized ratios from 66.33k peak (excluding
+✔ [83ms] orbi_summarize_results() summarized ratios from 66.3k peaks (excluding
 68 flagged peaks; excluding 0 unused peaks) using the sum method and grouping
 the data by uidx, filename, compound, basepeak, and isotopocule
 ```
@@ -240,7 +240,7 @@ data_summary |>
 ```
 
 ``` fansi
-✔ [7ms] orbi_get_data() retrieved 12 records from the combination of file_info
+✔ [8ms] orbi_get_data() retrieved 12 records from the combination of file_info
 (3) and summary (12) via uidx
 ```
 
@@ -273,7 +273,7 @@ data_summary |> orbi_export_data_to_excel(
 ```
 
 ``` fansi
-✔ [323ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
+✔ [381ms] orbi_export_data_to_excel() exported the dataset (3 rows of file_info
 and 12 rows of summary) to output.xlsx
 ```
 

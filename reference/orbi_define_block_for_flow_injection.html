@@ -11,7 +11,7 @@ and can now define several blocks at once."><meta property="og:image" content="h
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@ and can now define several blocks at once."><meta property="og:image" content="h
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-examples"><li><h6 class="dropdown-header" data-toc-skip>Isoorbi package</h6></li>
+    <li><a class="dropdown-item" href="../articles/aggregation.html">Aggregation</a></li>
+    <li><a class="dropdown-item" href="../articles/blocks.html">Data blocks</a></li>
     <li><a class="dropdown-item" href="../articles/dual_inlet.html">Dual inlet analysis</a></li>
     <li><a class="dropdown-item" href="../articles/flow_injection.html">Flow injection analysis</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Kantnerová et al. 2024</h6></li>
@@ -76,7 +78,7 @@ and can now define several blocks at once.</p>
 
 
 <dt id="arg-end-time-min">end_time.min<a class="anchor" aria-label="anchor" href="#arg-end-time-min"></a></dt>
-<dd><p>end time of the block(s), a single value or a vector for multiple blocks</p></dd>
+<dd><p>end time of the block(s), a single value or a vector for multiple blocks. Use <code>Inf</code> for a block that lasts until the end of each file.</p></dd>
 
 
 <dt id="arg-start-scan-no">start_scan.no<a class="anchor" aria-label="anchor" href="#arg-start-scan-no"></a></dt>
@@ -84,7 +86,7 @@ and can now define several blocks at once.</p>
 
 
 <dt id="arg-end-scan-no">end_scan.no<a class="anchor" aria-label="anchor" href="#arg-end-scan-no"></a></dt>
-<dd><p>end scan of the block(s), a single value or a vector for multiple blocks</p></dd>
+<dd><p>end scan of the block(s), a single value or a vector for multiple blocks. Use <code>Inf</code> for a block that lasts until the last scan of each file.</p></dd>
 
 
 <dt id="arg-block-name">block_name<a class="anchor" aria-label="anchor" href="#arg-block-name"></a></dt>

@@ -12,7 +12,8 @@ orbi_add_blocks_to_plot(
   plot,
   x = c("guess", "scan.no", "time.min"),
   data_only = FALSE,
-  fill = .data$data_type,
+  use_data_block_names = FALSE,
+  fill = .data$block_label,
   fill_colors = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02",
     "#A6761D", "#666666"),
   fill_scale = scale_fill_manual("blocks", values = fill_colors),
@@ -37,9 +38,19 @@ orbi_add_blocks_to_plot(
   if set to TRUE, only the blocks flagged as "data"
   (`orbi_get_option("data_type_data")`) are highlighted
 
+- use_data_block_names:
+
+  whether to label the data blocks by their individual `block_name` (if
+  they have one) instead of just as "data" (the default). This allows
+  color coding the background of the different data blocks (e.g.
+  reference vs. sample). All other blocks (e.g. "unused") are always
+  labeled by their data type.
+
 - fill:
 
-  what to use for the fill aesthetic, default is the block `data_type`
+  what to use for the fill aesthetic, default is the `block_label`, i.e.
+  the block's `data_type` or, for data blocks with
+  `use_data_block_names = TRUE`, the `block_name`
 
 - fill_colors:
 

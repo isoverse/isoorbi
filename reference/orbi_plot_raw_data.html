@@ -11,7 +11,7 @@ By default includes all isotopcules that have not been previously identified by 
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@ By default includes all isotopcules that have not been previously identified by 
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-examples"><li><h6 class="dropdown-header" data-toc-skip>Isoorbi package</h6></li>
+    <li><a class="dropdown-item" href="../articles/aggregation.html">Aggregation</a></li>
+    <li><a class="dropdown-item" href="../articles/blocks.html">Data blocks</a></li>
     <li><a class="dropdown-item" href="../articles/dual_inlet.html">Dual inlet analysis</a></li>
     <li><a class="dropdown-item" href="../articles/flow_injection.html">Flow injection analysis</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Kantnerová et al. 2024</h6></li>
@@ -56,7 +58,9 @@ By default includes all isotopcules that have not been previously identified by 
 <span>  <span class="va">dataset</span>,</span>
 <span>  isotopocules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time.min"</span>, <span class="st">"scan.no"</span><span class="op">)</span>,</span>
-<span>  x_breaks <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/breaks_pretty.html" class="external-link">breaks_pretty</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>,</span>
+<span>  x_breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_x_breaks <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  short_time_labels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  y_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw"</span>, <span class="st">"linear"</span>, <span class="st">"pseudo-log"</span>, <span class="st">"log"</span><span class="op">)</span>,</span>
 <span>  y_scale_sci_labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -66,7 +70,10 @@ By default includes all isotopcules that have not been previously identified by 
 <span>  color_scale <span class="op">=</span> <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="va">colors</span><span class="op">)</span>,</span>
 <span>  add_data_blocks <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  add_all_blocks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  show_outliers <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  use_data_block_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_outliers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,11 +90,19 @@ By default includes all isotopcules that have not been previously identified by 
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>x-axis column for the plot, either "time.min" or "scan.no", default is "scan.no"</p></dd>
+<dd><p>which x-axis to use (time vs. scan number). If set to "guess" (the default), the function will try to figure it out from the plot.</p></dd>
 
 
 <dt id="arg-x-breaks">x_breaks<a class="anchor" aria-label="anchor" href="#arg-x-breaks"></a></dt>
-<dd><p>what breaks to use for the x axis, change to make more specifid tickmarks</p></dd>
+<dd><p>what breaks to use for the x axis. By default (<code>NULL</code>) these are pretty breaks for scan numbers or pretty time intervals for time (which is labeled as a duration, e.g. <code>1:30 min</code>), provide breaks to make more specific tickmarks. Use either <code>x_breaks</code> or <code>n_x_breaks</code>, not both.</p></dd>
+
+
+<dt id="arg-n-x-breaks">n_x_breaks<a class="anchor" aria-label="anchor" href="#arg-n-x-breaks"></a></dt>
+<dd><p>the desired number of x axis breaks when using the default pretty breaks (<code>x_breaks = NULL</code>), default: <code>5</code>. Use either <code>x_breaks</code> or <code>n_x_breaks</code>, not both.</p></dd>
+
+
+<dt id="arg-short-time-labels">short_time_labels<a class="anchor" aria-label="anchor" href="#arg-short-time-labels"></a></dt>
+<dd><p>whether to use compact time axis labels with no space between value and unit and abbreviated units (<code>hr</code>, <code>m</code>, <code>s</code>), e.g. <code>1:30m</code> instead of <code>1:30 min</code>. Only relevant for a time based x axis (<code>x = "time.min"</code>).</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
@@ -122,8 +137,20 @@ By default includes all isotopcules that have not been previously identified by 
 <dd><p>add highlight for all blocks, not just data blocks (equivalent to the <code>data_only = FALSE</code> argument in <code><a href="orbi_add_blocks_to_plot.html">orbi_add_blocks_to_plot()</a></code>)</p></dd>
 
 
+<dt id="arg-use-data-block-names">use_data_block_names<a class="anchor" aria-label="anchor" href="#arg-use-data-block-names"></a></dt>
+<dd><p>whether to label the data blocks by their individual <code>block_name</code> (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.</p></dd>
+
+
 <dt id="arg-show-outliers">show_outliers<a class="anchor" aria-label="anchor" href="#arg-show-outliers"></a></dt>
 <dd><p>whether to highlight data previously flagged as outliers by <code><a href="orbi_flag_outliers.html">orbi_flag_outliers()</a></code></p></dd>
+
+
+<dt id="arg-show-points">show_points<a class="anchor" aria-label="anchor" href="#arg-show-points"></a></dt>
+<dd><p>whether to show the individual data points in addition to the lines connecting them</p></dd>
+
+
+<dt id="arg-point-size">point_size<a class="anchor" aria-label="anchor" href="#arg-point-size"></a></dt>
+<dd><p>the size of the data points (if <code>show_points = TRUE</code>) and of the outlier points (if <code>show_outliers = TRUE</code>). By default (<code>NULL</code>) the ggplot2 default point size is used.</p></dd>
 
 </dl></div>
     <div class="section level2">

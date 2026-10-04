@@ -17,7 +17,9 @@ orbi_plot_raw_data(
   dataset,
   isotopocules = c(),
   x = c("time.min", "scan.no"),
-  x_breaks = scales::breaks_pretty(5),
+  x_breaks = NULL,
+  n_x_breaks = 5,
+  short_time_labels = FALSE,
   y,
   y_scale = c("raw", "linear", "pseudo-log", "log"),
   y_scale_sci_labels = TRUE,
@@ -27,7 +29,10 @@ orbi_plot_raw_data(
   color_scale = scale_color_manual(values = colors),
   add_data_blocks = TRUE,
   add_all_blocks = FALSE,
-  show_outliers = TRUE
+  use_data_block_names = FALSE,
+  show_outliers = TRUE,
+  show_points = FALSE,
+  point_size = NULL
 )
 ```
 
@@ -50,13 +55,29 @@ orbi_plot_raw_data(
 
 - x:
 
-  x-axis column for the plot, either "time.min" or "scan.no", default is
-  "scan.no"
+  which x-axis to use (time vs. scan number). If set to "guess" (the
+  default), the function will try to figure it out from the plot.
 
 - x_breaks:
 
-  what breaks to use for the x axis, change to make more specifid
-  tickmarks
+  what breaks to use for the x axis. By default (`NULL`) these are
+  pretty breaks for scan numbers or pretty time intervals for time
+  (which is labeled as a duration, e.g. `1:30 min`), provide breaks to
+  make more specific tickmarks. Use either `x_breaks` or `n_x_breaks`,
+  not both.
+
+- n_x_breaks:
+
+  the desired number of x axis breaks when using the default pretty
+  breaks (`x_breaks = NULL`), default: `5`. Use either `x_breaks` or
+  `n_x_breaks`, not both.
+
+- short_time_labels:
+
+  whether to use compact time axis labels with no space between value
+  and unit and abbreviated units (`hr`, `m`, `s`), e.g. `1:30m` instead
+  of `1:30 min`. Only relevant for a time based x axis
+  (`x = "time.min"`).
 
 - y:
 
@@ -107,10 +128,29 @@ orbi_plot_raw_data(
   `data_only = FALSE` argument in
   [`orbi_add_blocks_to_plot()`](https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.md))
 
+- use_data_block_names:
+
+  whether to label the data blocks by their individual `block_name` (if
+  they have one) instead of just as "data" (the default). This allows
+  color coding the background of the different data blocks (e.g.
+  reference vs. sample). All other blocks (e.g. "unused") are always
+  labeled by their data type.
+
 - show_outliers:
 
   whether to highlight data previously flagged as outliers by
   [`orbi_flag_outliers()`](https://isoorbi.isoverse.org/reference/orbi_flag_outliers.md)
+
+- show_points:
+
+  whether to show the individual data points in addition to the lines
+  connecting them
+
+- point_size:
+
+  the size of the data points (if `show_points = TRUE`) and of the
+  outlier points (if `show_outliers = TRUE`). By default (`NULL`) the
+  ggplot2 default point size is used.
 
 ## Value
 

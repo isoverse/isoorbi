@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">isoorbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-examples"><li><h6 class="dropdown-header" data-toc-skip>Isoorbi package</h6></li>
+    <li><a class="dropdown-item" href="../articles/aggregation.html">Aggregation</a></li>
+    <li><a class="dropdown-item" href="../articles/blocks.html">Data blocks</a></li>
     <li><a class="dropdown-item" href="../articles/dual_inlet.html">Dual inlet analysis</a></li>
     <li><a class="dropdown-item" href="../articles/flow_injection.html">Flow injection analysis</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Kantnerová et al. 2024</h6></li>
@@ -50,7 +52,8 @@
 <span>  <span class="va">plot</span>,</span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"guess"</span>, <span class="st">"scan.no"</span>, <span class="st">"time.min"</span><span class="op">)</span>,</span>
 <span>  data_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  fill <span class="op">=</span> <span class="va">.data</span><span class="op">$</span><span class="va">data_type</span>,</span>
+<span>  use_data_block_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fill <span class="op">=</span> <span class="va">.data</span><span class="op">$</span><span class="va">block_label</span>,</span>
 <span>  fill_colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#1B9E77"</span>, <span class="st">"#D95F02"</span>, <span class="st">"#7570B3"</span>, <span class="st">"#E7298A"</span>, <span class="st">"#66A61E"</span>, <span class="st">"#E6AB02"</span>,</span>
 <span>    <span class="st">"#A6761D"</span>, <span class="st">"#666666"</span><span class="op">)</span>,</span>
 <span>  fill_scale <span class="op">=</span> <span class="fu">scale_fill_manual</span><span class="op">(</span><span class="st">"blocks"</span>, values <span class="op">=</span> <span class="va">fill_colors</span><span class="op">)</span>,</span>
@@ -75,8 +78,12 @@
 <dd><p>if set to TRUE, only the blocks flagged as "data" (<code>orbi_get_option("data_type_data")</code>) are highlighted</p></dd>
 
 
+<dt id="arg-use-data-block-names">use_data_block_names<a class="anchor" aria-label="anchor" href="#arg-use-data-block-names"></a></dt>
+<dd><p>whether to label the data blocks by their individual <code>block_name</code> (if they have one) instead of just as "data" (the default). This allows color coding the background of the different data blocks (e.g. reference vs. sample). All other blocks (e.g. "unused") are always labeled by their data type.</p></dd>
+
+
 <dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
-<dd><p>what to use for the fill aesthetic, default is the block <code>data_type</code></p></dd>
+<dd><p>what to use for the fill aesthetic, default is the <code>block_label</code>, i.e. the block's <code>data_type</code> or, for data blocks with <code>use_data_block_names = TRUE</code>, the <code>block_name</code></p></dd>
 
 
 <dt id="arg-fill-colors">fill_colors<a class="anchor" aria-label="anchor" href="#arg-fill-colors"></a></dt>

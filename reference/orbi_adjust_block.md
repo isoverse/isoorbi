@@ -1,14 +1,11 @@
-# Manually adjust block delimiters
+# Manually adjust a block delimiter
 
-This function can be used to manually adjust where certain `block`
-starts or ends after it's been defined with
-[`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
-or
-[`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md)
-using either time or scan number. Note that adjusting blocks removes all
-block segmentation. Make sure to call
-[`orbi_segment_blocks()`](https://isoorbi.isoverse.org/reference/orbi_segment_blocks.md)
-**after** adjusting block delimiters.
+**\[deprecated\]**
+
+`orbi_adjust_block()` was renamed
+[`orbi_adjust_blocks()`](https://isoorbi.isoverse.org/reference/orbi_adjust_blocks.md)
+since it can now adjust several blocks at once (and identifies the file
+with `in_filename` instead of `filename`).
 
 ## Usage
 
@@ -90,9 +87,5 @@ orbi_adjust_block(
 
 ## Value
 
-A data frame (tibble) with block limits altered according to the
-provided start/end change parameters. Any data that is no longer part of
-the original block will be marked with the value of
-`orbi_get_option("data_type_unused")`. Any previously applied
-segmentation will be discarded (`segment` column set to `NA`) to avoid
-unintended side effects.
+see
+[`orbi_adjust_blocks()`](https://isoorbi.isoverse.org/reference/orbi_adjust_blocks.md)

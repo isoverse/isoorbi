@@ -26,13 +26,13 @@ data_all <-
 ```
 
 ``` fansi
-✔ [244ms] orbi_read_raw() read dual_inlet.raw from cache, included the spectra
+✔ [259ms] orbi_read_raw() read dual_inlet.raw from cache, included the spectra
 from 2 scans
 ```
 
 ``` fansi
-✔ [235ms] orbi_aggregate_raw() aggregated file_info (1), scans (12.34k), peaks
-(184.77k), spectra (277), and status_log (0) from 1 file using the standard
+✔ [240ms] orbi_aggregate_raw() aggregated file_info (1), scans (12.3k), peaks
+(185k), spectra (277), and status_log (0) from 1 file using the standard
 aggregator
 ```
 
@@ -52,15 +52,15 @@ data_all <- data_all |>
 ```
 
 ``` fansi
-✔ [1.8s] orbi_identify_isotopocules() identified 49.35k/184.77k peaks (27%)
+✔ [1.8s] orbi_identify_isotopocules() identified 49.4k/185k peaks (27%)
 representing 97% of the total ion current (TIC) as isotopocules M0, 15N, 17O,
 and 18O using the default_tolerance of 1 mmu
 ```
 
 ``` fansi
-✔ [11ms] orbi_filter_isotopocules() removed 135.42k / 184.77k peaks (73%)
-because they were unidentified peaks (135.42k). Remaining isotopocules: M0,
-15N, 17O, and 18O.
+✔ [157ms] orbi_filter_isotopocules() removed 135k / 185k peaks (73%) because
+they were unidentified peaks (135k). Remaining isotopocules: M0, 15N, 17O, and
+18O.
 ```
 
 ## Show spectrum
@@ -96,17 +96,17 @@ df <-
 ```
 
 ``` fansi
-✔ [900ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
+✔ [938ms] orbi_flag_satellite_peaks() confirmed there are no satellite peaks
 ```
 
 ``` fansi
-✔ [30ms] orbi_flag_weak_isotopocules() confirmed there are no weak
+✔ [38ms] orbi_flag_weak_isotopocules() confirmed there are no weak
 isotopocules: all are detected in at least 100% of scans in each of the 4 data
 groups (based on uidx, compound, and isotopocule)
 ```
 
 ``` fansi
-✔ [17ms] orbi_flag_outliers() flagged 14/12338 scans (0.11%) as outliers based
+✔ [22ms] orbi_flag_outliers() flagged 14/12.3k scans (0.11%) as outliers based
 on 2 fold AGC cutoff, i.e. based on scans below 1/2 and above 2 times the
 average number of ions tic * it.ms in the Orbitrap analyzer → use
 orbi_plot_raw_data(y = tic * it.ms) to visualize them
@@ -114,7 +114,7 @@ orbi_plot_raw_data(y = tic * it.ms) to visualize them
 
 ``` fansi
 ✔ [1.1s] orbi_define_basepeak() set M0 as the ratio denominator and calculated
-37.01k ratio values for 3 isotopocules (15N, 17O, and 18O)
+37k ratio values for 3 isotopocules (15N, 17O, and 18O)
 ```
 
 No satellite peaks, no weak isotopocules, a few AGC fold outliers:
@@ -156,16 +156,36 @@ df_w_blocks <-
 ```
 
 ``` fansi
-Adding missing grouping variables: `uidx`
-✔ [38ms] orbi_define_blocks_for_dual_inlet() identified 8 blocks (4 reference,
+Warning: `orbi_adjust_block()` was deprecated in isoorbi 1.6.0.
+ℹ Please use `orbi_adjust_blocks()` instead.
+ℹ The new function can adjust several blocks at once and identifies the file
+  with `in_filename` instead of `filename`.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.
+```
+
+``` fansi
+✔ [34ms] orbi_define_blocks_for_dual_inlet() identified 8 blocks (4 reference,
 4 sample) in data from 1 file
-✔ [6ms] orbi_adjust_block() made the following block adjustments in file
-dual_inlet:
-→ moved block 1 start from scan.no 823 (5.00 min) to 1153 (7.01 min)
-✔ [7ms] orbi_adjust_block() made the following block adjustments in file
-dual_inlet:
-→ moved block 4 start from scan.no 6087 (37.00 min) to 6251 (38.00 min)
-→ moved block 4 end from scan 7402 (45.00 min) to 7238 (44.00 min)
+```
+
+``` fansi
+✔ [46ms] orbi_adjust_blocks() adjusted 1 block in 1 file
+```
+
+``` fansi
+ → block 1 in dual_inlet: moved start from scan 823 (5m 0.2s) to 1153 (7m 0.5s)
+```
+
+``` fansi
+✔ [77ms] orbi_adjust_blocks() adjusted 1 block in 1 file
+```
+
+``` fansi
+ → block 4 in dual_inlet: moved start from scan 6087 (37m 0.3s) to 6251 (38m
+0.1s)
+ → block 4 in dual_inlet: moved end from scan 7402 (44m 59.8s) to 7238 (44m)
 ```
 
 ``` r
@@ -269,15 +289,15 @@ df_w_summary <-
 ```
 
 ``` fansi
-✔ [28ms] orbi_segment_blocks() segmented 8 data blocks in 1 file creating 3
+✔ [32ms] orbi_segment_blocks() segmented 8 data blocks in 1 file creating 3
 segments per block (on average) with 420 scans per segment (on average)
 ```
 
 ``` fansi
-✔ [441ms] orbi_summarize_results() summarized ratios from 36.97k peak
-(excluding 42 flagged peaks; including 10.35k unused peaks) using the sum
-method and grouping the data by uidx, filename, compound, basepeak,
-isotopocule, block, block_name, segment, data_group, and data_type
+✔ [479ms] orbi_summarize_results() summarized ratios from 37k peaks (excluding
+42 flagged peaks; including 10.4k unused peaks) using the sum method and
+grouping the data by uidx, filename, compound, basepeak, isotopocule, block,
+block_name, segment, data_group, and data_type
 ```
 
 ``` r
@@ -291,7 +311,7 @@ df_w_summary |>
 ```
 
 ``` fansi
-✔ [312ms] orbi_export_data_to_excel() exported the dataset (1 row of file_info
+✔ [368ms] orbi_export_data_to_excel() exported the dataset (1 row of file_info
 and 96 rows of summary) to output.xlsx
 ```
 
@@ -322,7 +342,7 @@ df_w_summary |>
 ```
 
 ``` fansi
-✔ [9ms] orbi_get_data() retrieved 96 records from the combination of file_info
+✔ [8ms] orbi_get_data() retrieved 96 records from the combination of file_info
 (1) and summary (96) via uidx
 ```
 
@@ -367,8 +387,8 @@ plot2 <- df_w_blocks |>
 ```
 
 ``` fansi
-✔ [14ms] orbi_get_data() retrieved 37.01k records from the combination of
-file_info (1), scans (12.34k), and peaks (37.01k) via uidx and scan.no
+✔ [17ms] orbi_get_data() retrieved 37k records from the combination of
+file_info (1), scans (12.3k), and peaks (37k) via uidx and scan.no
 ```
 
 ``` r
@@ -377,7 +397,7 @@ plot2
 ```
 
 ``` fansi
-✔ [7ms] orbi_get_data() retrieved 96 records from the combination of file_info
+✔ [8ms] orbi_get_data() retrieved 96 records from the combination of file_info
 (1) and summary (96) via uidx
 ```
 
@@ -395,8 +415,8 @@ plot2 +
 ```
 
 ``` fansi
-✔ [14ms] orbi_get_data() retrieved 37.01k records from the combination of
-file_info (1), scans (12.34k), and peaks (37.01k) via uidx and scan.no
+✔ [14ms] orbi_get_data() retrieved 37k records from the combination of
+file_info (1), scans (12.3k), and peaks (37k) via uidx and scan.no
 ```
 
 ``` fansi

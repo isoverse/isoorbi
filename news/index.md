@@ -34,6 +34,14 @@ default.
   which is not specific to flow injection and can define several blocks
   at once. The old function still works, warns, and forwards to the new
   one.
+- [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md)
+  is deprecated in favor of the new
+  [`orbi_adjust_blocks()`](https://isoorbi.isoverse.org/reference/orbi_adjust_blocks.md),
+  which can adjust several blocks at once and identifies the file with
+  `in_filename` instead of `filename` (like
+  [`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)).
+  The old function still works, warns (once every 8 hours), and forwards
+  to the new one.
 - the `sample_name` column created by the block definition functions
   ([`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md),
   [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
@@ -107,6 +115,21 @@ default.
   carries others.
 
 - new
+  [`orbi_adjust_blocks()`](https://isoorbi.isoverse.org/reference/orbi_adjust_blocks.md)
+  that replaces
+  [`orbi_adjust_block()`](https://isoorbi.isoverse.org/reference/orbi_adjust_block.md)
+  and can adjust multiple blocks at once. The adjustments can be given
+  as vectors
+  (`orbi_adjust_blocks(block = c(1, 4), shift_start_time.min = c(2, NA), set_end_time.min = c(NA, 44))`)
+  or as a `blocks_table` data frame with a `block` column and any of the
+  `in_filename`, `shift_*` and `set_*` columns. Without an
+  `in_filename`, a block is adjusted in all files that have it. The
+  summary message now also correctly reports which other blocks were
+  shortened or removed entirely by an adjustment (previously, extending
+  a block into the unused scans before it could report the preceding
+  block as removed).
+
+- new
   [`orbi_define_blocks()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks.md)
   that replaces
   [`orbi_define_block_for_flow_injection()`](https://isoorbi.isoverse.org/reference/orbi_define_block_for_flow_injection.md)
@@ -117,9 +140,10 @@ default.
   `end_time.min`, `start_scan.no`, `end_scan.no` and `block_name`
   columns. Each block is defined either by time or by scan number (they
   can be mixed between blocks) and the resulting blocks are listed in a
-  summary message. Blocks are added to all files by default, use
-  `in_filename` (also as a `blocks_table` column) to add a block only to
-  specific file(s),
+  summary message. Use `Inf` for `end_time.min` or `end_scan.no` to let
+  a block last until the end of each file. Blocks are added to all files
+  by default, use `in_filename` (also as a `blocks_table` column) to add
+  a block only to specific file(s),
   e.g. `orbi_define_blocks(start_time.min = 0.1, end_time.min = 0.4, in_filename = c("file1", "file2"))`.
 
 - [`orbi_check_isoraw()`](https://isoorbi.isoverse.org/reference/orbi_check_isoraw.md)
@@ -157,6 +181,47 @@ to refer to it by name in
 
 ### Bug fixes & improvements
 
+- fixed
+  [`orbi_define_blocks_for_dual_inlet()`](https://isoorbi.isoverse.org/reference/orbi_define_blocks_for_dual_inlet.md)
+  emitting a spurious “Adding missing grouping variables” message from
+  dplyr.
+- fixed time durations in messages rounding up to `60s` instead of the
+  next minute (e.g. `43m 60s` instead of `44m`).
+- [`orbi_plot_raw_data()`](https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.md)
+  no longer tries to draw lines for groups of data (e.g. data groups)
+  that consist of only a single data point, which caused ggplot2’s “Each
+  group consists of only one observation” message. These data points are
+  still shown with `show_points = TRUE`.
+- new `show_points` argument for
+  [`orbi_plot_raw_data()`](https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.md)
+  to show the individual data points in addition to the lines connecting
+  them - the new `point_size` argument sets the size of these points and
+  of the outlier points (by default the ggplot2 default size is used).
+- new `use_data_block_names` argument for
+  [`orbi_add_blocks_to_plot()`](https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.md)
+  and
+  [`orbi_plot_raw_data()`](https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.md):
+  set `use_data_block_names = TRUE` to color code the block backgrounds
+  of the data blocks by their `block_name` (e.g. reference vs. sample in
+  dual inlet data) instead of showing them all as `data`. Other blocks
+  (e.g. `changeover` or `unused`) are always shown by their data type.
+- time based x-axes in
+  [`orbi_plot_raw_data()`](https://isoorbi.isoverse.org/reference/orbi_plot_raw_data.md),
+  [`orbi_plot_satellite_peaks()`](https://isoorbi.isoverse.org/reference/orbi_plot_satellite_peaks.md)
+  and
+  [`orbi_plot_isotopocule_coverage()`](https://isoorbi.isoverse.org/reference/orbi_isotopocule_coverage.md)
+  (`x = "time.min"`) are now labeled as durations with pretty time
+  intervals (e.g. `0:30 min`, `1:00 min` or `0:20 hours`) instead of
+  decimal minutes. The default `x_breaks = NULL` picks the breaks
+  automatically (use `n_x_breaks` to change how many) and
+  `short_time_labels = TRUE` switches to compact labels (e.g. `1:30m`),
+  scan number based x-axes are unchanged. The time ranges in the block
+  messages are likewise shown as durations (e.g. `3m to 4m 30s`).
+- removed the dependency on the `prettyunits` package. Large numbers in
+  info messages are now consistently abbreviated
+  (e.g. `12.3k scans with 185k peaks`) and pluralized correctly
+  (e.g. `1 scan` instead of `1 scans`, `4.32k peaks` instead of
+  `4.32k peak`).
 - fixed the included aggregators only removing a lower case `.raw`
   extension from the `filename` (e.g. `s3744.RAW` stayed `s3744.RAW`
   while `dual_inlet.raw` became `dual_inlet`). The extension is now

@@ -2,6 +2,8 @@
 <url><loc>https://isoorbi.isoverse.org/404.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/LICENSE-text.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/LICENSE.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/aggregation.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/articles/blocks.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/articles/dual_inlet.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/articles/flow_injection.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/articles/functionality_guide.html</loc></url>
@@ -13,6 +15,7 @@
 <url><loc>https://isoorbi.isoverse.org/reference/isoorbi-package.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_add_blocks_to_plot.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_adjust_block.html</loc></url>
+<url><loc>https://isoorbi.isoverse.org/reference/orbi_adjust_blocks.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_aggregate_raw.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_aggregator.html</loc></url>
 <url><loc>https://isoorbi.isoverse.org/reference/orbi_analyze_shot_noise.html</loc></url>
