@@ -201,7 +201,7 @@ status_log |>
 
 ## Comparison with the scans
 
-The scans also record the temperature of the Orbitrap analyzer (`analyzerTemperature`, aggregated by the `standard` aggregator), so we can compare it with the temperatures in the status log: the ambient temperature, the Orbitrap block (analyzer) temperature, and the detector temperature. Note that the analyzer temperature in the scans is not identical to the Orbitrap temperature in the status log: it is not as precise and differs from the status log readback by up to ~0.2 °C in these files. In the longer run below (`dual_inlet`), it behaves like a strongly smoothed version of the status log's Orbitrap block temperature that lags behind its changes. The differences stem likely from temperature data recorded with different sensors/circuit boards.
+The scans also record the temperature of the Orbitrap analyzer (`analyzerTemperature`, aggregated by the `standard` aggregator), so we can compare it with the temperatures in the status log: the ambient temperature, the Orbitrap block (analyzer) temperature, and the detector temperature. Note that the analyzer temperature in the scans is not identical to the Orbitrap temperature in the status log. This is because the Orbitrap block temperature from the status log is the raw readback of the temperature sensor inside of the Orbitrap block. The analyzer temperature recorded in the scans is calculated based on these measurements but it also considers the slower thermal response time of the electrodes and other nearby heat sources to estimate the actual temperature of the electrodes. This derived analyzer temperature recorded in the scans is the value that is used by the Orbitrap to calculate the temperature correction factor.
 
 ```{r}
 #| label: fig-temperatures
